@@ -27,9 +27,13 @@ internal static class ExportFileWriter
         var temporaryPath = path + ".tmp";
         File.WriteAllText(temporaryPath, JsonConvert.SerializeObject(content, SerializerSettings));
         if (File.Exists(path))
+        {
             File.Replace(temporaryPath, path, null);
+        }
         else
+        {
             File.Move(temporaryPath, path);
+        }
 
         return path;
     }
