@@ -64,8 +64,8 @@ Once per repository, before the rest of the workflow applies:
 - **The issue records every decision about it.** Signed-off plans and later decisions go into the
   description while work hasn't started, and into a new comment once it has.
 - **Labels:** apply the repo's existing labels that fit; ask before creating a new one. They
-  follow the commit types: `feat` → `enhancement`, `fix` → `bug`, `refactor` → `refactor`, `docs` →
-  `documentation`, `chore` → `chore`; `research` has no commit type of its own.
+  describe what the issue is, independent of the commit types its work uses: a `bug` issue can
+  still have `refactor` commits that came up in review.
 - **Help manage the GitHub Project** for planned features: break features into issues, add them to
   the project, and keep their status current as work starts and lands.
 
