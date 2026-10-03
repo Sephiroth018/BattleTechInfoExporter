@@ -8,6 +8,5 @@ public static class ModEntryPoint
     public static void Init()
     {
         Harmony.CreateAndPatchAll(typeof(ModEntryPoint).Assembly, ModAssembly.Name);
-        ModLog.Logger.Log($"Loaded version {ModAssembly.Version}");
     }
 }

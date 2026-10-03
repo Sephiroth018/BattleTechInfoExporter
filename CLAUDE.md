@@ -425,8 +425,9 @@ In the game, by the user. Every PR's description lists what to check in the game
 before the go-ahead. Every checklist starts with the standard checks:
 
 1. The game starts and the main menu shows `/W MODTEK`.
-2. ModTek's log (`Mods/.modtek/battletech_log.txt`) shows the mod loaded with the PR's version,
-   without errors or exceptions from it.
+2. ModTek's log (`Mods/.modtek/battletech_log.txt`) shows ModTek loading the mod with the PR's
+   version (`"BattleTechInfoExporter" <version>` and `Loaded assembly BattleTechInfoExporter
+   (v<version>.0)`), without errors or exceptions from it.
 
 followed by the PR's own feature checks.
 
