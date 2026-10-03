@@ -1,4 +1,6 @@
 using System.Reflection;
+using BattleTechInfoExporter.Triggers;
+using HarmonyLib;
 using HBS.Logging;
 
 namespace BattleTechInfoExporter;
@@ -7,10 +9,13 @@ namespace BattleTechInfoExporter;
 public static class ModEntryPoint
 {
     private static readonly AssemblyName ModAssemblyName = typeof(ModEntryPoint).Assembly.GetName();
-    private static readonly ILog Logger = HBS.Logging.Logger.GetLogger(ModAssemblyName.Name);
+
+    internal static ILog Logger { get; } = HBS.Logging.Logger.GetLogger(ModAssemblyName.Name);
 
     public static void Init()
     {
+        Harmony.CreateAndPatchAll(typeof(ModEntryPoint).Assembly, ModAssemblyName.Name);
+        CareerLoadedTrigger.SubscribeToCareerScreensAttached();
         Logger.Log($"Loaded version {ModAssemblyName.Version.ToString(3)}");
     }
 }
