@@ -25,4 +25,4 @@ internal sealed record ShipUpgradeExpense(DefinitionReference Upgrade, int Amoun
 internal sealed record MechExpense(DefinitionReference Mech, int Amount);
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record PilotExpense(DefinitionReference Pilot, int Amount);
+internal sealed record PilotExpense(PilotReference Pilot, int Amount);

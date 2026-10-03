@@ -65,12 +65,12 @@ internal static class GameStateReader
             ReadShipUpgradeExpenses(simGame, costModifier),
             simGame.ActiveMechs.Values
                 .Select(mech => new MechExpense(
-                    new DefinitionReference(mech.Description.Id, mech.Name),
+                    ReferenceTo(mech),
                     Mathf.RoundToInt(costModifier * simGame.Constants.Finances.MechCostPerQuarter)))
                 .ToList(),
             simGame.PilotRoster
                 .Select(pilot => new PilotExpense(
-                    new DefinitionReference(pilot.pilotDef.Description.Id, pilot.pilotDef.Description.DisplayName),
+                    ReferenceTo(pilot.pilotDef.Description),
                     Mathf.CeilToInt(costModifier * simGame.GetMechWarriorValue(pilot.pilotDef))))
                 .ToList());
     }
@@ -130,6 +130,17 @@ internal static class GameStateReader
 
     private static DefinitionReference ReferenceTo(BaseDescriptionDef description) =>
         new(description.Id, description.Name);
+
+    // A mech's name is its nickname (renameable in the mech lab); the variant (e.g. "PXH-1") identifies it,
+    // as in the game's lance and store lists.
+    private static DefinitionReference ReferenceTo(MechDef mech) =>
+        new(mech.Description.Id, $"{mech.Name} ({mech.Chassis.VariantName})");
+
+    private static PilotReference ReferenceTo(HumanDescriptionDef pilot) =>
+        new(
+            pilot.Id,
+            $"{pilot.FirstName} {pilot.LastName}".Trim() is { Length: > 0 } fullName ? fullName : pilot.Name,
+            string.IsNullOrEmpty(pilot.Callsign) ? null : pilot.Callsign);
 
     private static DefinitionReference ReferenceTo(FactionValue faction) =>
         new(faction.FactionDefID, FactionNames.Format(faction));
