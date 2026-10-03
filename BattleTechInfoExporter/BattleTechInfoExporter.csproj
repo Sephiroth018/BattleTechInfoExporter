@@ -31,6 +31,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Assembly-CSharp" />
+    <Reference Include="Newtonsoft.Json" />
   </ItemGroup>
 
   <!-- Everything the mod folder needs; deployed to the game and packaged for releases. -->

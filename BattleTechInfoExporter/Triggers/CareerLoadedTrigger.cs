@@ -1,5 +1,6 @@
-using System;
 using BattleTech;
+using BattleTechInfoExporter.Export;
+using BattleTechInfoExporter.Models;
 using HarmonyLib;
 using JetBrains.Annotations;
 
@@ -16,15 +17,6 @@ internal static class CareerLoadedTrigger
     [HarmonyPostfix]
     private static void OnCareerLoaded([HarmonyArgument("__instance")] SimGameState simGame)
     {
-        // An exception escaping a patch would break the game's career loading; log it instead.
-        try
-        {
-            ModLog.Logger.Log(
-                $"Career loaded: company '{simGame.CompanyName}', system '{simGame.CurSystem.Name}'");
-        }
-        catch (Exception exception)
-        {
-            ModLog.Logger.LogException(exception);
-        }
+        GameStateExporter.Export(simGame, ExportTrigger.CareerLoaded);
     }
 }

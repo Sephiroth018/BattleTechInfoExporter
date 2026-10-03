@@ -4,34 +4,41 @@ A mod for BattleTech (Harebrained Schemes, 2018) that exports the career state a
 moments. The files are meant to be read by tools, for example a Claude session that plans mech and
 pilot upgrades.
 
-**Status:** work in progress, nothing implemented yet.
+Only the story campaign is supported; in career mode the mod exports nothing.
 
-## Planned exports
+**Status:** work in progress; checked items below are implemented.
 
-The **game state**, written to one file:
+## Exports
 
-- Pilots
-- Mechs with all their equipment and stats
-- Storage: equipment, mechs and mech parts
-- The current system's store and hiring hall
-- Available missions
-- The current position and the work queue
+The **game state**, written to `Mods/BattleTechInfoExporter/exports/game-state.json` and
+overwritten on every export:
+
+- [x] The company: dropship, funds, monthly expenses, date, reputation with every faction
+- [x] The current position: system and travel status
+- [ ] Pilots
+- [ ] Mechs with all their equipment and stats
+- [ ] Storage: equipment, mechs and mech parts
+- [ ] The current system's store and hiring hall
+- [ ] Available missions
+- [ ] The work queue
 
 Written to separate files, if the game makes them accessible:
 
-- The **mission outcome**, after a mission is completed
-- The **salvage result**, after priority salvage is chosen
+- [ ] The **mission outcome**, after a mission is completed
+- [ ] The **salvage result**, after priority salvage is chosen
 
 ## Triggers
 
 The game state is exported when:
 
-- The current system changes
-- A mission is completed
-- Salvage is chosen
-- The financial report is triggered
-- A work queue item finishes
-- Possibly a key combination
+- [x] The career is loaded: starting a new career, loading a save, and returning to the career
+      screens after a mission
+- [ ] The current system changes
+- [ ] A mission is completed
+- [ ] Salvage is chosen
+- [ ] The financial report is triggered
+- [ ] A work queue item finishes
+- [ ] Possibly a key combination
 
 ## Installing
 
