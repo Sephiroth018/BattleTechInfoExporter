@@ -1,0 +1,72 @@
+<Project Sdk="Microsoft.NET.Sdk" InitialTargets="ValidateBattleTechGameDir">
+  <PropertyGroup>
+    <!-- The game runs on Mono with the .NET Framework 4.7.2 profile; newer targets don't load. -->
+    <TargetFramework>net472</TargetFramework>
+    <!-- Framework and game assemblies resolve from the game's Managed folder only. -->
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <AssemblySearchPaths>{HintPathFromItem};$(BattleTechGameDir)\BattleTech_Data\Managed</AssemblySearchPaths>
+    <DebugType>embedded</DebugType>
+    <!-- Avoids IgnoresAccessChecksToAttribute warnings from the publicized game assembly. -->
+    <PublicizerRuntimeStrategies>Unsafe</PublicizerRuntimeStrategies>
+    <ModDirectoryInGame>$(BattleTechGameDir)\Mods\$(MSBuildProjectName)\</ModDirectoryInGame>
+    <PackageFile>$(MSBuildThisFileDirectory)..\artifacts\$(MSBuildProjectName)-$(Version).zip</PackageFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HarmonyX" PrivateAssets="all" ExcludeAssets="runtime" />
+    <PackageReference Include="Krafs.Publicizer" PrivateAssets="all" />
+    <Publicize Include="Assembly-CSharp" />
+  </ItemGroup>
+
+  <!-- The game provides these at runtime; they're never copied into the mod. -->
+  <ItemDefinitionGroup>
+    <Reference>
+      <Private>false</Private>
+    </Reference>
+  </ItemDefinitionGroup>
+
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Assembly-CSharp" />
+  </ItemGroup>
+
+  <!-- Everything the mod folder needs; deployed to the game and packaged for releases. -->
+  <ItemGroup>
+    <ModFile Include="$(TargetPath);$(OutDir)mod.json" />
+  </ItemGroup>
+
+  <Target Name="ValidateBattleTechGameDir"
+          Condition="'$(BattleTechGameDir)' == '' Or !Exists('$(BattleTechGameDir)\BattleTech_Data\Managed')">
+    <Error Text="BattleTechGameDir must point to the BattleTech install; see README.md." />
+  </Target>
+
+  <!-- mod.json is generated so the version has a single source: $(Version). -->
+  <Target Name="WriteModJson" AfterTargets="Build">
+    <PropertyGroup>
+      <ModJson>{
+  "Name": "$(MSBuildProjectName)",
+  "Version": "$(Version)",
+  "DLL": "$(TargetFileName)"
+}</ModJson>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(OutDir)mod.json" Lines="$(ModJson)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+  </Target>
+
+  <Target Name="DeployToGame" AfterTargets="WriteModJson">
+    <Copy SourceFiles="@(ModFile)" DestinationFolder="$(ModDirectoryInGame)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <!-- The release zip extracts into the game's Mods folder. -->
+  <Target Name="PackageMod" AfterTargets="WriteModJson" Condition="'$(Configuration)' == 'Release'"
+          Inputs="@(ModFile)" Outputs="$(PackageFile)">
+    <PropertyGroup>
+      <PackageStagingDir>$(IntermediateOutputPath)package\</PackageStagingDir>
+    </PropertyGroup>
+    <RemoveDir Directories="$(PackageStagingDir)" />
+    <Copy SourceFiles="@(ModFile)" DestinationFolder="$(PackageStagingDir)$(MSBuildProjectName)\" />
+    <MakeDir Directories="$([System.IO.Path]::GetDirectoryName($(PackageFile)))" />
+    <ZipDirectory SourceDirectory="$(PackageStagingDir)" DestinationFile="$(PackageFile)" Overwrite="true" />
+    <Message Importance="high" Text="Packaged $(PackageFile)" />
+  </Target>
+</Project>

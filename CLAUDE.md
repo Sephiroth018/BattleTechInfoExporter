@@ -18,6 +18,9 @@ they're stripped before this file is loaded.
 - **Ask before widening scope.** Mention unrelated problems you notice and ask; don't fix them in
   passing.
 - **English everywhere:** code, comments, docs, commits, issues and PRs.
+- **Mark everything you write on GitHub** (issues, comments, PRs, review replies, releases) by
+  ending it with `🤖 Generated with [Claude Code](https://claude.com/claude-code)`. Commits carry a
+  `Co-Authored-By: Claude` trailer.
 - **Keep chat reports short.** A line or two on what was done. Explain at length only what's
   non-standard, what went wrong, or what needs a decision.
 - **Standing authorization** covers the source control steps below, except merging. Other
@@ -35,16 +38,21 @@ Once per repository, before the rest of the workflow applies:
 
 1. **First commit, directly on `main` and without an issue** (`chore: set up repository`): this
    file, the stack's standard `.gitignore`, a `.gitattributes` fixing line endings to LF on every
-   machine (`* text=auto eol=lf`, CRLF only for `.cmd`/`.bat`), a README with the project goal, the LICENSE (MIT unless
+   machine (`* text=auto eol=lf`, CRLF only for `.cmd`/`.bat`), a README with the project goal and
+   the AI disclaimer, the LICENSE (MIT unless
    the project says otherwise) and the initial solution.
 2. **Create the GitHub repository** (name and visibility decided with the user) and push.
 3. **Repository settings:** merge commits only (no squash or rebase merging), default merge message
    from the PR title and description, head branches deleted automatically after merging.
 4. **Ruleset on `main`:** changes only through PRs, signed commits required, no force pushes or
    deletion, and the CI checks required once CI exists.
-5. **CI** is a GitHub Actions workflow, `.github/workflows/ci.yml`, running on PRs and pushes to
+5. **Labels:** delete `good first issue`, `help wanted`, `accessibility` and `invalid`; add `chore`
+   (build, tooling, dependencies), `refactor` (restructuring without behavior change) and
+   `research` (finding out how something works before building on it). Work that is only about
+   tests gets `enhancement` or `chore`.
+6. **CI** is a GitHub Actions workflow, `.github/workflows/ci.yml`, running on PRs and pushes to
    `main`.
-6. **No Dependabot or other scheduled workflows**: they use up Actions minutes even on an abandoned
+7. **No Dependabot or other scheduled workflows**: they use up Actions minutes even on an abandoned
    repository.
 
 ## Source control
@@ -55,7 +63,9 @@ Once per repository, before the rest of the workflow applies:
   before creating it.
 - **The issue records every decision about it.** Signed-off plans and later decisions go into the
   description while work hasn't started, and into a new comment once it has.
-- **Labels:** apply the repo's existing labels that fit; ask before creating a new one.
+- **Labels:** apply the repo's existing labels that fit; ask before creating a new one. They
+  describe what the issue is, independent of the commit types its work uses: a `bug` issue can
+  still have `refactor` commits that came up in review.
 - **Help manage the GitHub Project** for planned features: break features into issues, add them to
   the project, and keep their status current as work starts and lands.
 
@@ -215,7 +225,8 @@ deliberate workaround, or an external fact with its source (e.g. the game method
 
 ### Documentation
 
-- **The README** says what the project is, how to install and use it, and how to build it.
+- **The README** says what the project is, how to install and use it, and how to build it, and
+  carries an AI disclaimer stating how extensively AI is used in the project.
 - **Decisions live in their GitHub issue**, not in separate decision records (see "Issues and
   projects").
 
@@ -268,9 +279,11 @@ this file.
 - **ReSharper Command Line Tools** (`JetBrains.ReSharper.GlobalTools`, a local tool) apply the
   IDE's rules outside it: `jb cleanupcode` formats, `jb inspectcode` reports inspections.
 - **Tests use xUnit v3.**
-- **CI (GitHub Actions) is strict:** the build passes with warnings as errors, all tests pass, `jb cleanupcode`
-  leaves no diff, and `jb inspectcode` reports nothing at warning level or above. Fix the cause;
-  never weaken a check to get green.
+- **ReSharper runs only on shared settings** (`--disable-settings-layers` for the global and
+  personal layers), so its results don't depend on anyone's IDE settings.
+- **CI (GitHub Actions) is strict:** the build passes with warnings as errors, all tests pass,
+  `jb cleanupcode` leaves no diff, and `jb inspectcode` reports nothing at warning level or above.
+  Fix the cause; never weaken a check to get green.
 
 ## C# conventions
 
@@ -280,8 +293,9 @@ This section holds what needs judgment.
 
 - **`internal` by default**; a type is `public` only when another assembly needs it. Internal
   classes are `sealed` unless designed for inheritance (CA1852 enforces it); public ones stay open.
-- **Expression bodies (`=>`) for properties and for value-returning methods that fit on one line.**
-  Constructors, `void` methods and anything that wraps use a block body.
+- **Expression bodies (`=>`) for properties and for value-returning methods that are a single
+  expression**, even when it wraps. Constructors and `void` methods use a block body. ReSharper's
+  cleanup enforces this (`resharper_use_heuristics_for_body_style`).
 - **Immutable by default:** records for data, `init`/`readonly` where possible, and read-only
   collection interfaces (`IReadOnlyList<T>`, `IReadOnlyDictionary<TKey, TValue>`) in signatures.
 - **Classic constructors with explicit fields**, no primary constructors on classes.
@@ -296,8 +310,49 @@ This section holds what needs judgment.
 
 # Project
 
-A BattleTech mod that exports the career state as JSON for tools to read (see README.md). Game and
-runtime constraints, architecture, commands and glossary follow once the project setup is agreed.
+A BattleTech mod that exports the career state as JSON for tools to read (see README.md).
+
+## Game and runtime constraints
+
+- **BattleTech 1.9.1 on Mono with the .NET Framework 4.7.2 profile**, so the project targets
+  `net472`. It is loaded by ModTek v4.5.1 or later, which calls every public static `Init` method.
+- **Game assemblies come from the install** (`BattleTechGameDir` in the git-ignored
+  `Directory.Build.user.props`) and are never copied into the build output or the repository.
+- **Libraries the game ships are used in the game's version**, not the latest one; this overrides
+  "Latest stable version only" for them. Newtonsoft.Json is the game's 10.0.3. HarmonyX is a
+  compile-only package because ModTek provides it at runtime.
+- **Private game members are accessed through Krafs.Publicizer**, never reflection. This is the
+  one allowed escape hatch, and only for game types.
+- **Harmony patches are static by nature**; that is the allowed exception to "No mutable static
+  state", limited to what a patch needs.
+- **Logging** goes through the game's `HBS.Logging.Logger` under the name `BattleTechInfoExporter`
+  and ends up in ModTek's log.
+
+## Structure
+
+One project, `BattleTechInfoExporter/`, in `BattleTechInfoExporter.slnx`. `ModEntryPoint` is the
+only public type. The version lives only in `<Version>` in `Directory.Build.props`; the build stamps
+it into the DLL and generates `mod.json` from it.
+
+## Commands
+
+- **Build and deploy:** `dotnet build` copies the DLL and `mod.json` into
+  `<game>/Mods/BattleTechInfoExporter/`.
+- **Package:** `dotnet build -c Release` also writes `artifacts/BattleTechInfoExporter-<version>.zip`.
+- **Format:** `dotnet jb cleanupcode BattleTechInfoExporter.slnx --profile="Built-in: Full Cleanup"
+  --disable-settings-layers="GlobalAll;GlobalPerProduct;SolutionPersonal;ProjectPersonal"
+  --no-build`, with `--include=<changed files>` for a single change.
+- **Inspect:** `dotnet jb inspectcode BattleTechInfoExporter.slnx
+  --output=artifacts/inspectcode.sarif --severity=WARNING
+  --disable-settings-layers="GlobalAll;GlobalPerProduct;SolutionPersonal;ProjectPersonal"
+  --no-build`; the SARIF report must have no results.
+
+## Releases
+
+From the first PR after the setup on, every merged PR that changes the mod gets a GitHub release,
+after the merge, from the merged
+`main`: a Release build, then `gh release create v<version>` with the zip attached and release
+notes summarizing the PR (marked as generated with Claude Code).
 
 ## Testing and CI
 
@@ -311,17 +366,33 @@ runtime constraints, architecture, commands and glossary follow once the project
 
 ## Knowledge sources
 
-Not researched yet. Find out what's available (the game's assemblies, modding documentation,
-existing mods) and agree with the user on what to rely on before using any of it.
+The game is BattleTech 1.9.1 (Unity 2018.4, Mono, .NET Framework 4.7.2). In order of authority:
+
+1. **The decompiled game code** in the sibling folder `../BattleTechDecompiled` (`Assembly-CSharp`,
+   `BattleTech.Common`) is the source of truth for game behavior. It is never copied into this
+   repository; comments cite the game's class and member names instead. If the folder is missing,
+   ask the user; regenerating it needs a decompiler run on a thread with a large stack, because
+   `ilspycmd -p` overflows its stack on `Assembly-CSharp`.
+2. **The game's data files** (`BattleTech_Data/StreamingAssets/data` in the install) for
+   definitions and ids.
+3. **ModTek's documentation** (github.com/BattletechModders/ModTek, `doc/`) for mod loader
+   behavior: `mod.json`, DLL entry points, HarmonyX, logging.
+4. **Other mods' source and community answers** are hints only, confirmed in the game code before
+   relying on them.
 
 ## Verification
 
 In the game, by the user. Every PR's description lists what to check in the game; the user ticks it
-before the go-ahead. The standard checks every PR includes are defined with the project setup.
+before the go-ahead. Every checklist starts with the standard checks:
+
+1. The game starts and the main menu shows `/W MODTEK`.
+2. ModTek's log (`Mods/.modtek/battletech_log.txt`) shows the mod loaded with the PR's version,
+   without errors or exceptions from it.
+
+followed by the PR's own feature checks.
 
 ## Versioning
 
 Semantic versioning, bumped in every PR as part of its changes: major for breaking changes to the
 exported JSON (its consumers must adapt), minor for new data, files or triggers, patch for fixes.
-The version is defined once and flows into both the compiled DLL and the manifest the game's mod
-loader reads; the exact mechanism is defined with the project setup.
+The version is defined once (see "Structure") and flows into both the DLL and `mod.json`.

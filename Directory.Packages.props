@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="HarmonyX" Version="2.16.1" />
+    <PackageVersion Include="Krafs.Publicizer" Version="2.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Polyfills for newer C# features on old target frameworks, in every project. -->
+    <GlobalPackageReference Include="PolySharp" Version="1.16.0" />
+  </ItemGroup>
+</Project>
