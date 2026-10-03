@@ -327,10 +327,10 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
 - **Private game members are accessed through Krafs.Publicizer**, never reflection. This is the
   one allowed escape hatch, and only for game types.
 - **Hook into the game with Harmony patches**, as ModTek's guide does; the game's `MessageCenter`
-  doesn't exist yet when `Init` runs. A patch class is `internal static`, marked
-  `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` so ReSharper knows Harmony calls it, and
-  takes the patched object as `[HarmonyArgument("__instance")]` with a name that follows our naming
-  rules. Its body catches and logs every exception: one escaping a patch breaks the game's own code.
+  doesn't exist yet when `Init` runs. A patch class is `internal static` and marked
+  `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]`: ReSharper doesn't recognize Harmony's
+  attributes and would otherwise report the patch as unused. It takes the patched object as
+  `[HarmonyArgument("__instance")]` with a name that follows our naming rules. Its body catches and logs every exception: one escaping a patch breaks the game's own code.
   Being static by nature, patches are the allowed exception to "No mutable static state", limited
   to what a patch needs.
 - **Logging** goes through `ModLog.Logger`, the game's `HBS.Logging` logger under the name
