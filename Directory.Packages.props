@@ -4,7 +4,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageVersion Include="HarmonyX" Version="2.16.1" />
+    <!-- The version ModTek ships and loads at runtime. -->
+    <PackageVersion Include="HarmonyX" Version="2.16.0" />
+    <PackageVersion Include="JetBrains.Annotations" Version="2026.2.0" />
     <PackageVersion Include="Krafs.Publicizer" Version="2.3.2" />
   </ItemGroup>
 

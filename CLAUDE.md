@@ -10,7 +10,9 @@ they're stripped before this file is loaded.
 
 - **Plan architecture before building it.** Anything that shapes structure (new projects or layers,
   dependencies, data formats, cross-cutting patterns) gets a written plan first, presented in chat,
-  and waits for the user's sign-off. Work inside an agreed design doesn't need one.
+  and waits for the user's sign-off. Work inside an agreed design doesn't need one. A signed-off
+  parent plan covers what to build, not how; each issue's implementation approach gets its own
+  short plan unless it's trivial.
 - **Stop when the plan breaks.** If a problem mid-task invalidates the agreed approach, stop and ask
   how to proceed, with concrete options and a recommendation. Never switch approach silently.
 - **Say so when there's a better way.** Raise it before implementing, with the trade-off, then do
@@ -318,21 +320,28 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
   `net472`. It is loaded by ModTek v4.5.1 or later, which calls every public static `Init` method.
 - **Game assemblies come from the install** (`BattleTechGameDir` in the git-ignored
   `Directory.Build.user.props`) and are never copied into the build output or the repository.
-- **Libraries the game ships are used in the game's version**, not the latest one; this overrides
-  "Latest stable version only" for them. Newtonsoft.Json is the game's 10.0.3. HarmonyX is a
-  compile-only package because ModTek provides it at runtime.
+- **Libraries the game or ModTek ship are used in their version**, not the latest one; this
+  overrides "Latest stable version only" for them. Newtonsoft.Json is the game's 10.0.3. HarmonyX is
+  a compile-only package in the version ModTek ships (2.16.0 with ModTek 4.5.1, in
+  `Mods/ModTek/lib`).
 - **Private game members are accessed through Krafs.Publicizer**, never reflection. This is the
   one allowed escape hatch, and only for game types.
-- **Harmony patches are static by nature**; that is the allowed exception to "No mutable static
-  state", limited to what a patch needs.
-- **Logging** goes through the game's `HBS.Logging.Logger` under the name `BattleTechInfoExporter`
-  and ends up in ModTek's log.
+- **Hook into the game with Harmony patches**, as ModTek's guide does; the game's `MessageCenter`
+  doesn't exist yet when `Init` runs. A patch class is `internal static` and marked
+  `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]`: ReSharper doesn't recognize Harmony's
+  attributes and would otherwise report the patch as unused. It takes the patched object as
+  `[HarmonyArgument("__instance")]` with a name that follows our naming rules. Its body catches and logs every exception: one escaping a patch breaks the game's own code.
+  Being static by nature, patches are the allowed exception to "No mutable static state", limited
+  to what a patch needs.
+- **Logging** goes through `ModLog.Logger`, the game's `HBS.Logging` logger under the name
+  `BattleTechInfoExporter`, and ends up in ModTek's log.
 
 ## Structure
 
 One project, `BattleTechInfoExporter/`, in `BattleTechInfoExporter.slnx`. `ModEntryPoint` is the
-only public type. The version lives only in `<Version>` in `Directory.Build.props`; the build stamps
-it into the DLL and generates `mod.json` from it.
+only public type; it applies all Harmony patches in the assembly. Folders: `Triggers/` holds the
+patches that decide when to export. The version lives only in `<Version>` in
+`Directory.Build.props`; the build stamps it into the DLL and generates `mod.json` from it.
 
 ## Commands
 
@@ -349,10 +358,10 @@ it into the DLL and generates `mod.json` from it.
 
 ## Releases
 
-From the first PR after the setup on, every merged PR that changes the mod gets a GitHub release,
-after the merge, from the merged
-`main`: a Release build, then `gh release create v<version>` with the zip attached and release
-notes summarizing the PR (marked as generated with Claude Code).
+From the first PR that exports something on, every merged PR that changes the mod gets a GitHub
+release, after the merge, from the merged `main`: a Release build, then
+`gh release create v<version>` with the zip attached and release notes summarizing the PR (marked as
+generated with Claude Code).
 
 ## Testing and CI
 
@@ -395,4 +404,6 @@ followed by the PR's own feature checks.
 
 Semantic versioning, bumped in every PR as part of its changes: major for breaking changes to the
 exported JSON (its consumers must adapt), minor for new data, files or triggers, patch for fixes.
-The version is defined once (see "Structure") and flows into both the DLL and `mod.json`.
+While the export format is still being worked out, versions stay at 0.x and a breaking format change
+bumps only the minor version; 1.0.0 marks the format as settled. The version is defined once (see
+"Structure") and flows into both the DLL and `mod.json`.

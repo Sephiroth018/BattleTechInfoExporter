@@ -1,5 +1,5 @@
 using System.Reflection;
-using HBS.Logging;
+using HarmonyLib;
 
 namespace BattleTechInfoExporter;
 
@@ -7,10 +7,10 @@ namespace BattleTechInfoExporter;
 public static class ModEntryPoint
 {
     private static readonly AssemblyName ModAssemblyName = typeof(ModEntryPoint).Assembly.GetName();
-    private static readonly ILog Logger = HBS.Logging.Logger.GetLogger(ModAssemblyName.Name);
 
     public static void Init()
     {
-        Logger.Log($"Loaded version {ModAssemblyName.Version.ToString(3)}");
+        Harmony.CreateAndPatchAll(typeof(ModEntryPoint).Assembly, ModAssemblyName.Name);
+        ModLog.Logger.Log($"Loaded version {ModAssemblyName.Version.ToString(3)}");
     }
 }
