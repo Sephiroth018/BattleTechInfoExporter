@@ -8,9 +8,11 @@ namespace BattleTechInfoExporter.Models;
 internal sealed record Company(
     string Name,
     DropshipType Dropship,
-    int Funds,
-    int MonthlyExpenses,
     int DaysPassed,
     string CurrentDate,
+    Morale Morale,
+    Finances Finances,
     MercenaryReviewBoard MercenaryReviewBoard,
-    IReadOnlyList<FactionReputation> Reputation);
+    IReadOnlyList<FactionReputation> Reputation,
+    int MechTech,
+    int MedTech);

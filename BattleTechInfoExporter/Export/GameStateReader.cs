@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using BattleTech;
 using BattleTechInfoExporter.Models;
+using Localize;
+using UnityEngine;
 
 namespace BattleTechInfoExporter.Export;
 
@@ -10,16 +13,22 @@ namespace BattleTechInfoExporter.Export;
 internal static class GameStateReader
 {
     internal static GameState Read(SimGameState simGame, ExportTrigger trigger) =>
-        new(ModAssembly.Version, DateTimeOffset.Now, trigger, ReadCompany(simGame), ReadPosition(simGame));
+        new(
+            ModAssembly.Version,
+            DateTimeOffset.Now,
+            trigger,
+            ReadCompany(simGame),
+            ReadPosition(simGame),
+            ReadMoraleLevels(simGame));
 
     private static Company ReadCompany(SimGameState simGame) =>
         new(
             simGame.CompanyName,
             simGame.CurDropship,
-            simGame.Funds,
-            simGame.GetExpenditures(),
             simGame.DaysPassed,
             simGame.CurrentDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+            new Morale(simGame.Morale, simGame.GetCurrentMoraleLevelDescriptor()),
+            ReadFinances(simGame),
             new MercenaryReviewBoard(
                 simGame.GetRawReputation(FactionEnumeration.GetMercenaryReviewBoardFactionValue()),
                 simGame.GetCurrentMRBLevel()),
@@ -27,7 +36,74 @@ internal static class GameStateReader
             FactionEnumeration.FactionList
                 .Where(faction => faction.DoesGainReputation && !faction.IsMercenaryReviewBoard)
                 .Select(faction => ReadReputation(simGame, faction))
+                .ToList(),
+            simGame.MechTechSkill,
+            simGame.MedTechSkill);
+
+    private static Finances ReadFinances(SimGameState simGame) =>
+        new(
+            simGame.Funds,
+            simGame.DayRemainingInQuarter,
+            new Spending(
+                simGame.ExpenditureLevel,
+                simGame.ExpenditureMoraleValue
+                    .Select(option => new SpendingOption(option.Key, simGame.GetExpenditures(option.Key), option.Value))
+                    .ToList()),
+            ReadExpectedExpenses(simGame));
+
+    // Mirrors the line items of SGCaptainsQuartersStatusScreen.RefreshData, including its rounding;
+    // the game has no method that returns them.
+    private static ExpectedExpenses ReadExpectedExpenses(SimGameState simGame)
+    {
+        var costModifier = simGame.GetExpenditureCostModifier(simGame.ExpenditureLevel);
+        var shipName = simGame.CurDropship == DropshipType.Leopard
+            ? Strings.T("Bank Loan Interest Payment")
+            : Strings.T("Argo Operating Costs");
+        return new ExpectedExpenses(
+            simGame.GetExpenditures(),
+            new ShipExpense(shipName, Mathf.RoundToInt(costModifier * simGame.GetShipBaseMaintenanceCost())),
+            ReadShipUpgradeExpenses(simGame, costModifier),
+            simGame.ActiveMechs.Values
+                .Select(mech => new MechExpense(
+                    ReferenceTo(mech),
+                    Mathf.RoundToInt(costModifier * simGame.Constants.Finances.MechCostPerQuarter)))
+                .ToList(),
+            simGame.PilotRoster
+                .Select(pilot => new PilotExpense(
+                    ReferenceTo(pilot.pilotDef.Description),
+                    Mathf.CeilToInt(costModifier * simGame.GetMechWarriorValue(pilot.pilotDef))))
                 .ToList());
+    }
+
+    // Only the Argo charges upkeep for its upgrades.
+    private static List<ShipUpgradeExpense> ReadShipUpgradeExpenses(SimGameState simGame, float costModifier)
+    {
+        if (simGame.CurDropship != DropshipType.Argo)
+        {
+            return [];
+        }
+
+        return simGame.ShipUpgrades
+            .Select(upgrade => (upgrade, upkeep: Mathf.CeilToInt(
+                upgrade.AdditionalCost * simGame.Constants.CareerMode.ArgoMaintenanceMultiplier)))
+            .Where(upgradeUpkeep => upgradeUpkeep.upkeep > 0)
+            .Select(upgradeUpkeep => new ShipUpgradeExpense(
+                ReferenceTo(upgradeUpkeep.upgrade.Description),
+                Mathf.RoundToInt(costModifier * upgradeUpkeep.upkeep)))
+            .ToList();
+    }
+
+    // Names, thresholds and resolve come from two constant files that mods can change separately;
+    // only levels present in all three are complete.
+    private static List<MoraleLevel> ReadMoraleLevels(SimGameState simGame)
+    {
+        var names = simGame.Constants.Story.MoraleLevelNames;
+        var thresholds = simGame.CombatConstants.MoraleConstants.BaselineAddFromSimGameThresholds;
+        var resolvePerTurn = simGame.CombatConstants.MoraleConstants.BaselineAddFromSimGameValues;
+        return Enumerable.Range(0, Math.Min(names.Length, Math.Min(thresholds.Length, resolvePerTurn.Length)))
+            .Select(level => new MoraleLevel(names[level], thresholds[level], resolvePerTurn[level]))
+            .ToList();
+    }
 
     private static FactionReputation ReadReputation(SimGameState simGame, FactionValue faction) =>
         new(
@@ -42,10 +118,36 @@ internal static class GameStateReader
         new(
             ReferenceTo(simGame.CurSystem.Def.Description),
             ReferenceTo(simGame.CurSystem.OwnerValue),
-            simGame.TravelState);
+            simGame.TravelState,
+            ReadTravel(simGame));
+
+    // TravelTime only counts the current leg (e.g. to the jump point). The travel order keeps the legs as
+    // internal sub-entries, so its remaining cost is the whole trip, the single entry the queue shows.
+    private static Travel? ReadTravel(SimGameState simGame)
+    {
+        var destination = simGame.Starmap?.Destination?.System;
+        var travelOrder = simGame.TravelOrder;
+        return simGame.TravelState == SimGameTravelStatus.IN_SYSTEM || destination is null || travelOrder is null
+            ? null
+            : new Travel(
+                ReferenceTo(destination.Def.Description),
+                ReferenceTo(destination.OwnerValue),
+                travelOrder.GetRemainingCost());
+    }
 
     private static DefinitionReference ReferenceTo(BaseDescriptionDef description) =>
         new(description.Id, description.Name);
+
+    // A mech's name is its nickname (renameable in the mech lab); the variant (e.g. "PXH-1") identifies it,
+    // as in the game's lance and store lists.
+    private static DefinitionReference ReferenceTo(MechDef mech) =>
+        new(mech.Description.Id, $"{mech.Name} ({mech.Chassis.VariantName})");
+
+    private static PilotReference ReferenceTo(HumanDescriptionDef pilot) =>
+        new(
+            pilot.Id,
+            $"{pilot.FirstName} {pilot.LastName}".Trim() is { Length: > 0 } fullName ? fullName : pilot.Name,
+            pilot.Callsign);
 
     private static DefinitionReference ReferenceTo(FactionValue faction) =>
         new(faction.FactionDefID, FactionNames.Format(faction));

@@ -14,8 +14,6 @@
 
   <ItemGroup>
     <PackageReference Include="HarmonyX" PrivateAssets="all" ExcludeAssets="runtime" />
-    <!-- Its attributes are compiled out; they tell ReSharper that Harmony uses patches through reflection. -->
-    <PackageReference Include="JetBrains.Annotations" PrivateAssets="all" ExcludeAssets="runtime" />
     <PackageReference Include="Krafs.Publicizer" PrivateAssets="all" />
     <Publicize Include="Assembly-CSharp" />
   </ItemGroup>
@@ -32,6 +30,8 @@
     <Reference Include="System.Core" />
     <Reference Include="Assembly-CSharp" />
     <Reference Include="Newtonsoft.Json" />
+    <!-- Also ships the JetBrains annotations ([UsedImplicitly]) that tell ReSharper what only reflection uses. -->
+    <Reference Include="UnityEngine.CoreModule" />
   </ItemGroup>
 
   <!-- Everything the mod folder needs; deployed to the game and packaged for releases. -->

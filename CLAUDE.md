@@ -327,7 +327,9 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
 - **Libraries the game or ModTek ship are used in their version**, not the latest one; this
   overrides "Latest stable version only" for them. Newtonsoft.Json is the game's 10.0.3. HarmonyX is
   a compile-only package in the version ModTek ships (2.16.0 with ModTek 4.5.1, in
-  `Mods/ModTek/lib`).
+  `Mods/ModTek/lib`). The JetBrains annotations (`[UsedImplicitly]`) come from the game's
+  `UnityEngine.CoreModule`, which embeds them on purpose; a `JetBrains.Annotations` package would
+  clash with them.
 - **Private game members are accessed through Krafs.Publicizer**, never reflection. This is the
   one allowed escape hatch, and only for game types.
 - **Hook into the game with Harmony patches**, as ModTek's guide does; the game's `MessageCenter`
@@ -363,6 +365,8 @@ and generates `mod.json` from it.
   game's enumeration stands in. Faction names get title case with the short name in brackets
   (`FactionNames`), e.g. "The Local Pirate Organization (Pirates)", because the game's are written
   for use mid-sentence.
+- **Static game tables sit at the root** (e.g. `moraleLevels`), and values in the sections refer to
+  them by name, instead of repeating thresholds per entry.
 - **Game enums keep the game's values** (e.g. `IN_SYSTEM`, `LIKED`); the UI shows the same. Our own
   enums are camelCase.
 - **JSON:** camelCase properties, indented, `null` written explicitly, through the game's
