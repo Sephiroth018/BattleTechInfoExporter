@@ -47,8 +47,6 @@ internal static class GameStateReader
     private static DefinitionReference ReferenceTo(BaseDescriptionDef description) =>
         new(description.Id, description.Name);
 
-    // Faction names are written for use mid-sentence ("the Federated Suns"), so the capitalized one.
-    // Some factions (e.g. placeholders) have no FactionDef; the enumeration's name stands in.
     private static DefinitionReference ReferenceTo(FactionValue faction) =>
-        new(faction.FactionDefID, faction.FactionDef?.CapitalizedName ?? faction.FriendlyName);
+        new(faction.FactionDefID, FactionNames.Format(faction));
 }
