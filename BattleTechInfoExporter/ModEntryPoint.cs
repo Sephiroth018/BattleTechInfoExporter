@@ -1,3 +1,4 @@
+using System.Reflection;
 using HBS.Logging;
 
 namespace BattleTechInfoExporter;
@@ -5,11 +6,11 @@ namespace BattleTechInfoExporter;
 /// <summary>ModTek calls every public static <c>Init</c> when it loads the mod.</summary>
 public static class ModEntryPoint
 {
-    private static readonly ILog Logger = HBS.Logging.Logger.GetLogger("BattleTechInfoExporter");
+    private static readonly AssemblyName ModAssemblyName = typeof(ModEntryPoint).Assembly.GetName();
+    private static readonly ILog Logger = HBS.Logging.Logger.GetLogger(ModAssemblyName.Name);
 
     public static void Init()
     {
-        var version = typeof(ModEntryPoint).Assembly.GetName().Version;
-        Logger.Log($"Loaded version {version.ToString(3)}");
+        Logger.Log($"Loaded version {ModAssemblyName.Version.ToString(3)}");
     }
 }

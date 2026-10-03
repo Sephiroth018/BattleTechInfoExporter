@@ -9,19 +9,31 @@
     <!-- Avoids IgnoresAccessChecksToAttribute warnings from the publicized game assembly. -->
     <PublicizerRuntimeStrategies>Unsafe</PublicizerRuntimeStrategies>
     <ModDirectoryInGame>$(BattleTechGameDir)\Mods\$(MSBuildProjectName)\</ModDirectoryInGame>
+    <PackageFile>$(MSBuildThisFileDirectory)..\artifacts\$(MSBuildProjectName)-$(Version).zip</PackageFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="HarmonyX" PrivateAssets="all" ExcludeAssets="runtime" />
     <PackageReference Include="Krafs.Publicizer" PrivateAssets="all" />
-    <PackageReference Include="PolySharp" PrivateAssets="all" />
     <Publicize Include="Assembly-CSharp" />
   </ItemGroup>
 
+  <!-- The game provides these at runtime; they're never copied into the mod. -->
+  <ItemDefinitionGroup>
+    <Reference>
+      <Private>false</Private>
+    </Reference>
+  </ItemDefinitionGroup>
+
   <ItemGroup>
-    <Reference Include="System" Private="false" />
-    <Reference Include="System.Core" Private="false" />
-    <Reference Include="Assembly-CSharp" Private="false" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Assembly-CSharp" />
+  </ItemGroup>
+
+  <!-- Everything the mod folder needs; deployed to the game and packaged for releases. -->
+  <ItemGroup>
+    <ModFile Include="$(TargetPath);$(OutDir)mod.json" />
   </ItemGroup>
 
   <Target Name="ValidateBattleTechGameDir"
@@ -42,19 +54,18 @@
   </Target>
 
   <Target Name="DeployToGame" AfterTargets="WriteModJson">
-    <Copy SourceFiles="$(TargetPath);$(OutDir)mod.json" DestinationFolder="$(ModDirectoryInGame)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(ModFile)" DestinationFolder="$(ModDirectoryInGame)" SkipUnchangedFiles="true" />
   </Target>
 
   <!-- The release zip extracts into the game's Mods folder. -->
-  <Target Name="PackageMod" AfterTargets="WriteModJson" Condition="'$(Configuration)' == 'Release'">
+  <Target Name="PackageMod" AfterTargets="WriteModJson" Condition="'$(Configuration)' == 'Release'"
+          Inputs="@(ModFile)" Outputs="$(PackageFile)">
     <PropertyGroup>
       <PackageStagingDir>$(IntermediateOutputPath)package\</PackageStagingDir>
-      <PackageDir>$(MSBuildThisFileDirectory)..\artifacts\</PackageDir>
-      <PackageFile>$(PackageDir)$(MSBuildProjectName)-$(Version).zip</PackageFile>
     </PropertyGroup>
     <RemoveDir Directories="$(PackageStagingDir)" />
-    <MakeDir Directories="$(PackageDir)" />
-    <Copy SourceFiles="$(TargetPath);$(OutDir)mod.json" DestinationFolder="$(PackageStagingDir)$(MSBuildProjectName)\" />
+    <Copy SourceFiles="@(ModFile)" DestinationFolder="$(PackageStagingDir)$(MSBuildProjectName)\" />
+    <MakeDir Directories="$([System.IO.Path]::GetDirectoryName($(PackageFile)))" />
     <ZipDirectory SourceDirectory="$(PackageStagingDir)" DestinationFile="$(PackageFile)" Overwrite="true" />
     <Message Importance="high" Text="Packaged $(PackageFile)" />
   </Target>
