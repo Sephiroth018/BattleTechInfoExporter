@@ -306,6 +306,8 @@ This section holds what needs judgment.
   its "Project" part says where.
 - **No mutable static state** unless a host framework requires it, documented under "Project".
 - **Persisted enums have explicit values**, so reordering members can't change stored data.
+- **`string.Empty`, not `""`**, except where C# requires a constant (patterns, `const`, attribute
+  arguments). No analyzer enforces it.
 - **Async all the way:** no `.Result` or `.Wait()`, no `async void` outside event handlers.
 - **Extension methods only for types we don't own**, never to avoid putting a method in the right
   class.
