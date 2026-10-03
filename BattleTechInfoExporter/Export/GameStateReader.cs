@@ -15,6 +15,7 @@ internal static class GameStateReader
     private static Company ReadCompany(SimGameState simGame) =>
         new(
             simGame.CompanyName,
+            simGame.CurDropship,
             simGame.Funds,
             simGame.GetExpenditures(),
             simGame.DaysPassed,
@@ -47,7 +48,7 @@ internal static class GameStateReader
         new(description.Id, description.Name);
 
     // Faction names are written for use mid-sentence ("the Federated Suns"), so the capitalized one.
-    // Some factions (e.g. placeholders) have no FactionDef, and with it no display name.
+    // Some factions (e.g. placeholders) have no FactionDef; the enumeration's name stands in.
     private static DefinitionReference ReferenceTo(FactionValue faction) =>
-        new(faction.FactionDefID, faction.FactionDef?.CapitalizedName);
+        new(faction.FactionDefID, faction.FactionDef?.CapitalizedName ?? faction.FriendlyName);
 }

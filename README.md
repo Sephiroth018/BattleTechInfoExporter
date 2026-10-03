@@ -11,7 +11,7 @@ pilot upgrades.
 The **game state**, written to `Mods/BattleTechInfoExporter/exports/game-state.json` and
 overwritten on every export:
 
-- [x] The company: funds, monthly expenses, date, reputation with every faction
+- [x] The company: dropship, funds, monthly expenses, date, reputation with every faction
 - [x] The current position: system and travel status
 - [ ] Pilots
 - [ ] Mechs with all their equipment and stats
@@ -41,7 +41,7 @@ The game state is exported when:
 ## Installing
 
 Requires BattleTech 1.9.1 with [ModTek](https://github.com/BattletechModders/ModTek) v4.5.1 or
-later. Extract a release zip into `BATTLETECH/Mods/`, so the mod ends up in
+later. Only the story campaign is supported; in career mode the mod exports nothing. Extract a release zip into `BATTLETECH/Mods/`, so the mod ends up in
 `BATTLETECH/Mods/BattleTechInfoExporter/`.
 
 ## Building

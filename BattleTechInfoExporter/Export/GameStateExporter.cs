@@ -14,6 +14,13 @@ internal static class GameStateExporter
         // Triggers run inside the game's own code; an exception escaping here would break it.
         try
         {
+            if (!simGame.IsCampaign)
+            {
+                ModLog.Logger.Log(
+                    $"Skipped the export ({trigger}): only the story campaign is supported, not {simGame.SimGameMode}");
+                return;
+            }
+
             var path = ExportFileWriter.Write(FileName, GameStateReader.Read(simGame, trigger));
             ModLog.Logger.Log($"Exported the game state ({trigger}) to {path}");
         }

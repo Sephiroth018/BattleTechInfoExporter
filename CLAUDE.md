@@ -318,6 +318,8 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
 
 - **BattleTech 1.9.1 on Mono with the .NET Framework 4.7.2 profile**, so the project targets
   `net472`. It is loaded by ModTek v4.5.1 or later, which calls every public static `Init` method.
+- **Only the story campaign is supported** (`SimGameState.IsCampaign`); `GameStateExporter` skips
+  career mode with a log line.
 - **Game assemblies come from the install** (`BattleTechGameDir` in the git-ignored
   `Directory.Build.user.props`) and are never copied into the build output or the repository.
 - **Libraries the game or ModTek ship are used in their version**, not the latest one; this
@@ -355,7 +357,8 @@ and generates `mod.json` from it.
 ## Export format
 
 - **References to game definitions are `{ "id", "name" }`:** the id from the game's data files and
-  the name shown in the UI.
+  the name shown in the UI. Both are always set; where a definition is missing, a name from the
+  game's enumeration stands in.
 - **Game enums keep the game's values** (e.g. `IN_SYSTEM`, `LIKED`); the UI shows the same. Our own
   enums are camelCase.
 - **JSON:** camelCase properties, indented, `null` written explicitly, through the game's
