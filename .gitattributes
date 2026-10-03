@@ -1,0 +1,8 @@
+# LF everywhere, independent of each machine's core.autocrlf; .editorconfig matches it.
+* text=auto eol=lf
+
+# Windows batch files only run reliably with CRLF.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+*.cs diff=csharp
