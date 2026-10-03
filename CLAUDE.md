@@ -311,8 +311,19 @@ runtime constraints, architecture, commands and glossary follow once the project
 
 ## Knowledge sources
 
-Not researched yet. Find out what's available (the game's assemblies, modding documentation,
-existing mods) and agree with the user on what to rely on before using any of it.
+The game is BattleTech 1.9.1 (Unity 2018.4, Mono, .NET Framework 4.7.2). In order of authority:
+
+1. **The decompiled game code** in the sibling folder `../BattleTechDecompiled` (`Assembly-CSharp`,
+   `BattleTech.Common`) is the source of truth for game behavior. It is never copied into this
+   repository; comments cite the game's class and member names instead. If the folder is missing,
+   ask the user; regenerating it needs a decompiler run on a thread with a large stack, because
+   `ilspycmd -p` overflows its stack on `Assembly-CSharp`.
+2. **The game's data files** (`BattleTech_Data/StreamingAssets/data` in the install) for
+   definitions and ids.
+3. **ModTek's documentation** (github.com/BattletechModders/ModTek, `doc/`) for mod loader
+   behavior: `mod.json`, DLL entry points, HarmonyX, logging.
+4. **Other mods' source and community answers** are hints only, confirmed in the game code before
+   relying on them.
 
 ## Verification
 
