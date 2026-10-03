@@ -4,6 +4,8 @@ A mod for BattleTech (Harebrained Schemes, 2018) that exports the career state a
 moments. The files are meant to be read by tools, for example a Claude session that plans mech and
 pilot upgrades.
 
+Only the story campaign is supported; in career mode the mod exports nothing.
+
 **Status:** work in progress; checked items below are implemented.
 
 ## Exports
@@ -41,7 +43,7 @@ The game state is exported when:
 ## Installing
 
 Requires BattleTech 1.9.1 with [ModTek](https://github.com/BattletechModders/ModTek) v4.5.1 or
-later. Only the story campaign is supported; in career mode the mod exports nothing. Extract a release zip into `BATTLETECH/Mods/`, so the mod ends up in
+later. Extract a release zip into `BATTLETECH/Mods/`, so the mod ends up in
 `BATTLETECH/Mods/BattleTechInfoExporter/`.
 
 ## Building
