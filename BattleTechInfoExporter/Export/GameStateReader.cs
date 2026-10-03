@@ -93,14 +93,15 @@ internal static class GameStateReader
             .ToList();
     }
 
+    // Names, thresholds and resolve come from two constant files that mods can change separately;
+    // only levels present in all three are complete.
     private static List<MoraleLevel> ReadMoraleLevels(SimGameState simGame)
     {
-        var moraleConstants = simGame.CombatConstants.MoraleConstants;
-        return simGame.Constants.Story.MoraleLevelNames
-            .Select((name, level) => new MoraleLevel(
-                name,
-                moraleConstants.BaselineAddFromSimGameThresholds[level],
-                moraleConstants.BaselineAddFromSimGameValues[level]))
+        var names = simGame.Constants.Story.MoraleLevelNames;
+        var thresholds = simGame.CombatConstants.MoraleConstants.BaselineAddFromSimGameThresholds;
+        var resolvePerTurn = simGame.CombatConstants.MoraleConstants.BaselineAddFromSimGameValues;
+        return Enumerable.Range(0, Math.Min(names.Length, Math.Min(thresholds.Length, resolvePerTurn.Length)))
+            .Select(level => new MoraleLevel(names[level], thresholds[level], resolvePerTurn[level]))
             .ToList();
     }
 
@@ -124,7 +125,7 @@ internal static class GameStateReader
     // internal sub-entries, so its remaining cost is the whole trip, the single entry the queue shows.
     private static Travel? ReadTravel(SimGameState simGame)
     {
-        var destination = simGame.Starmap.Destination?.System;
+        var destination = simGame.Starmap?.Destination?.System;
         var travelOrder = simGame.TravelOrder;
         return simGame.TravelState == SimGameTravelStatus.IN_SYSTEM || destination is null || travelOrder is null
             ? null
