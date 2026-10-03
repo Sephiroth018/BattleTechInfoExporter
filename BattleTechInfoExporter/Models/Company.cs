@@ -10,5 +10,5 @@ internal sealed record Company(
     int MonthlyExpenses,
     int DaysPassed,
     string CurrentDate,
-    int MercenaryReviewBoardLevel,
+    MercenaryReviewBoard MercenaryReviewBoard,
     IReadOnlyList<FactionReputation> Reputation);

@@ -19,9 +19,12 @@ internal static class GameStateReader
             simGame.GetExpenditures(),
             simGame.DaysPassed,
             simGame.CurrentDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
-            simGame.GetCurrentMRBLevel(),
+            new MercenaryReviewBoard(
+                simGame.GetRawReputation(FactionEnumeration.GetMercenaryReviewBoardFactionValue()),
+                simGame.GetCurrentMRBLevel()),
+            // The game models the Mercenary Review Board as a faction, but it isn't one; it has its own object.
             FactionEnumeration.FactionList
-                .Where(faction => faction.DoesGainReputation)
+                .Where(faction => faction.DoesGainReputation && !faction.IsMercenaryReviewBoard)
                 .Select(faction => ReadReputation(simGame, faction))
                 .ToList());
 
@@ -31,7 +34,8 @@ internal static class GameStateReader
             simGame.GetRawReputation(faction),
             simGame.GetReputation(faction),
             simGame.IsFactionAlly(faction),
-            simGame.IsFactionEnemy(faction));
+            simGame.IsFactionEnemy(faction),
+            simGame.displayedFactions.Contains(faction.Name));
 
     private static Position ReadPosition(SimGameState simGame) =>
         new(
