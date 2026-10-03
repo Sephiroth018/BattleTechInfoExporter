@@ -15,7 +15,7 @@
   <ItemGroup>
     <PackageReference Include="HarmonyX" PrivateAssets="all" ExcludeAssets="runtime" />
     <!-- Its attributes are compiled out; they tell ReSharper that Harmony uses patches through reflection. -->
-    <PackageReference Include="JetBrains.Annotations" PrivateAssets="all" />
+    <PackageReference Include="JetBrains.Annotations" PrivateAssets="all" ExcludeAssets="runtime" />
     <PackageReference Include="Krafs.Publicizer" PrivateAssets="all" />
     <Publicize Include="Assembly-CSharp" />
   </ItemGroup>

@@ -331,8 +331,8 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
   `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` so ReSharper knows Harmony calls it, and
   takes the patched object as `[HarmonyArgument("__instance")]` with a name that follows our naming
   rules. Its body catches and logs every exception: one escaping a patch breaks the game's own code.
-- **Harmony patches are static by nature**; that is the allowed exception to "No mutable static
-  state", limited to what a patch needs.
+  Being static by nature, patches are the allowed exception to "No mutable static state", limited
+  to what a patch needs.
 - **Logging** goes through the game's `HBS.Logging.Logger` under the name `BattleTechInfoExporter`
   and ends up in ModTek's log.
 
@@ -340,8 +340,8 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
 
 One project, `BattleTechInfoExporter/`, in `BattleTechInfoExporter.slnx`. `ModEntryPoint` is the
 only public type; it applies all Harmony patches in the assembly. Folders: `Triggers/` holds the
-patches that decide when to export. The version lives only in `<Version>` in `Directory.Build.props`; the build stamps
-it into the DLL and generates `mod.json` from it.
+patches that decide when to export. The version lives only in `<Version>` in
+`Directory.Build.props`; the build stamps it into the DLL and generates `mod.json` from it.
 
 ## Commands
 
