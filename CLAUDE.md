@@ -365,8 +365,8 @@ and generates `mod.json` from it.
   game's enumeration stands in. Faction names get title case with the short name in brackets
   (`FactionNames`), e.g. "The Local Pirate Organization (Pirates)", because the game's are written
   for use mid-sentence.
-- **Static game tables sit at the root** (e.g. `moraleLevels`), and values in the sections refer to
-  them by name, instead of repeating thresholds per entry.
+- **Game tables sit at the root** (e.g. `moraleLevels`, `reputationLevels`), and values in the
+  sections refer to them by name, instead of repeating thresholds and effects per entry.
 - **Game enums keep the game's values** (e.g. `IN_SYSTEM`, `LIKED`); the UI shows the same. Our own
   enums are camelCase.
 - **JSON:** camelCase properties, indented, `null` written explicitly, through the game's
