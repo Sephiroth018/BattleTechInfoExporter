@@ -120,8 +120,8 @@ internal static class GameStateReader
             simGame.TravelState,
             ReadTravel(simGame));
 
-    // TravelTime only counts the current leg (e.g. to the jump point); the travel order in the work queue
-    // holds one entry per leg, so its remaining cost is the whole trip.
+    // TravelTime only counts the current leg (e.g. to the jump point). The travel order keeps the legs as
+    // internal sub-entries, so its remaining cost is the whole trip, the single entry the queue shows.
     private static Travel? ReadTravel(SimGameState simGame)
     {
         var destination = simGame.Starmap.Destination?.System;
