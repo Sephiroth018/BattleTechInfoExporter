@@ -39,16 +39,15 @@ internal static class GameStateReader
 
     private static Position ReadPosition(SimGameState simGame) =>
         new(
-            new DefinitionReference(simGame.CurSystem.Def.Description.Id, simGame.CurSystem.Def.Description.Name),
+            ReferenceTo(simGame.CurSystem.Def.Description),
             ReferenceTo(simGame.CurSystem.OwnerValue),
             simGame.TravelState);
 
+    private static DefinitionReference ReferenceTo(BaseDescriptionDef description) =>
+        new(description.Id, description.Name);
+
+    // Faction names are written for use mid-sentence ("the Federated Suns"), so the capitalized one.
     // Some factions (e.g. placeholders) have no FactionDef, and with it no display name.
     private static DefinitionReference ReferenceTo(FactionValue faction) =>
-        new(faction.FactionDefID, CapitalizeFirstLetter(faction.FactionDef?.Name));
-
-    // Faction names are written for use mid-sentence ("the Federated Suns"); the UI only hides that
-    // by showing them in uppercase.
-    private static string? CapitalizeFirstLetter(string? text) =>
-        text is null or "" ? text : char.ToUpperInvariant(text[0]) + text.Substring(1);
+        new(faction.FactionDefID, faction.FactionDef?.CapitalizedName);
 }

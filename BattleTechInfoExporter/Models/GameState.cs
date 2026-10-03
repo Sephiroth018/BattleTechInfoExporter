@@ -1,7 +1,5 @@
 using System;
 using JetBrains.Annotations;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace BattleTechInfoExporter.Models;
 
@@ -10,7 +8,6 @@ namespace BattleTechInfoExporter.Models;
 internal sealed record GameState(
     string ModVersion,
     DateTimeOffset ExportedAt,
-    [property: JsonConverter(typeof(StringEnumConverter), true)]
     ExportTrigger Trigger,
     Company Company,
     Position Position);
