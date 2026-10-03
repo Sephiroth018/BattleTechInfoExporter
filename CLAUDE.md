@@ -318,9 +318,10 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
   `net472`. It is loaded by ModTek v4.5.1 or later, which calls every public static `Init` method.
 - **Game assemblies come from the install** (`BattleTechGameDir` in the git-ignored
   `Directory.Build.user.props`) and are never copied into the build output or the repository.
-- **Libraries the game ships are used in the game's version**, not the latest one; this overrides
-  "Latest stable version only" for them. Newtonsoft.Json is the game's 10.0.3. HarmonyX is a
-  compile-only package because ModTek provides it at runtime.
+- **Libraries the game or ModTek ship are used in their version**, not the latest one; this
+  overrides "Latest stable version only" for them. Newtonsoft.Json is the game's 10.0.3. HarmonyX is
+  a compile-only package in the version ModTek ships (2.16.0 with ModTek 4.5.1, in
+  `Mods/ModTek/lib`).
 - **Private game members are accessed through Krafs.Publicizer**, never reflection. This is the
   one allowed escape hatch, and only for game types.
 - **Harmony patches are static by nature**; that is the allowed exception to "No mutable static
@@ -331,7 +332,8 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
 ## Structure
 
 One project, `BattleTechInfoExporter/`, in `BattleTechInfoExporter.slnx`. `ModEntryPoint` is the
-only public type. The version lives only in `<Version>` in `Directory.Build.props`; the build stamps
+only public type; it applies all Harmony patches in the assembly. Folders: `Triggers/` holds the
+patches that decide when to export. The version lives only in `<Version>` in `Directory.Build.props`; the build stamps
 it into the DLL and generates `mod.json` from it.
 
 ## Commands
@@ -349,10 +351,10 @@ it into the DLL and generates `mod.json` from it.
 
 ## Releases
 
-From the first PR after the setup on, every merged PR that changes the mod gets a GitHub release,
-after the merge, from the merged
-`main`: a Release build, then `gh release create v<version>` with the zip attached and release
-notes summarizing the PR (marked as generated with Claude Code).
+From the first PR that exports something on, every merged PR that changes the mod gets a GitHub
+release, after the merge, from the merged `main`: a Release build, then
+`gh release create v<version>` with the zip attached and release notes summarizing the PR (marked as
+generated with Claude Code).
 
 ## Testing and CI
 
@@ -395,4 +397,6 @@ followed by the PR's own feature checks.
 
 Semantic versioning, bumped in every PR as part of its changes: major for breaking changes to the
 exported JSON (its consumers must adapt), minor for new data, files or triggers, patch for fixes.
-The version is defined once (see "Structure") and flows into both the DLL and `mod.json`.
+While the export format is still being worked out, versions stay at 0.x and a breaking format change
+bumps only the minor version; 1.0.0 marks the format as settled. The version is defined once (see
+"Structure") and flows into both the DLL and `mod.json`.
