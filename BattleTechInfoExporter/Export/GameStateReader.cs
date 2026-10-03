@@ -113,12 +113,20 @@ internal static class GameStateReader
         var maxReputation = Mathf.RoundToInt(simGame.Constants.Story.MaxReputation);
         return Enumerable.Range(-maxReputation, 2 * maxReputation + 1)
             .GroupBy(value => simGame.GetReputation(value))
-            .Select(level => new ReputationLevel(
-                level.Key,
-                level.First(),
-                ReadMaxContractDifficulty(simGame, level.Key),
-                simGame.GetReputationShopAdjustment(level.Key)))
+            .Select(level => ReadReputationLevel(simGame, level.Key, level.First()))
             .ToList();
+    }
+
+    // The system owner's store closes at LOATHED (StarSystem.CanUseSystemStore), so its price adjustment never applies.
+    private static ReputationLevel ReadReputationLevel(SimGameState simGame, SimGameReputation level, int startsAt)
+    {
+        var canUseStore = level > SimGameReputation.LOATHED;
+        return new ReputationLevel(
+            level,
+            startsAt,
+            ReadMaxContractDifficulty(simGame, level),
+            canUseStore,
+            canUseStore ? simGame.GetReputationShopAdjustment(level) : null);
     }
 
     // Mirrors SimGameState.ContractUserMeetsReputation_Campaign, which compares the contract's whole-number

@@ -14,7 +14,7 @@ The **game state**, written to `Mods/BattleTechInfoExporter/exports/game-state.j
 overwritten on every export:
 
 - [x] The company: dropship, date, morale, MechTech and MedTech, reputation with every faction,
-      and the reputation levels with their contract difficulty limits and store price adjustments
+      and the reputation levels with their contract difficulty limits, store access and store price adjustments
 - [x] Finances: funds, spending level and its options, the expected expenses of the next report
       with their breakdown
 - [x] The current position: system, travel status, and when travelling the destination and days

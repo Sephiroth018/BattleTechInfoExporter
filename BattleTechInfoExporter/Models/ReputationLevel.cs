@@ -9,12 +9,15 @@ namespace BattleTechInfoExporter.Models;
 ///     The highest difficulty of the faction's contracts offered at this level, including the career's current
 ///     global difficulty. Story, restoration and flashpoint contracts aren't limited.
 /// </param>
+/// <param name="CanUseStore">Whether the system owner's store is open at this level.</param>
 /// <param name="StorePriceAdjustment">
-///     The fraction of an item's cost added to its price in a store of the system owner at this level.
+///     The fraction of an item's cost added to its price in the system owner's store at this level, or
+///     <see langword="null" /> where the store is closed.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ReputationLevel(
     SimGameReputation Level,
     int StartsAt,
     int MaxContractDifficulty,
-    float StorePriceAdjustment);
+    bool CanUseStore,
+    float? StorePriceAdjustment);
