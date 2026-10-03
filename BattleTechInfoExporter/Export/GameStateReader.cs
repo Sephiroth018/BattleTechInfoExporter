@@ -45,5 +45,10 @@ internal static class GameStateReader
 
     // Some factions (e.g. placeholders) have no FactionDef, and with it no display name.
     private static DefinitionReference ReferenceTo(FactionValue faction) =>
-        new(faction.FactionDefID, faction.FactionDef?.Name);
+        new(faction.FactionDefID, CapitalizeFirstLetter(faction.FactionDef?.Name));
+
+    // Faction names are written for use mid-sentence ("the Federated Suns"); the UI only hides that
+    // by showing them in uppercase.
+    private static string? CapitalizeFirstLetter(string? text) =>
+        text is null or "" ? text : char.ToUpperInvariant(text[0]) + text.Substring(1);
 }
