@@ -28,7 +28,8 @@ csharp_style_var_for_built_in_types = true:warning
 csharp_style_var_when_type_is_apparent = true:warning
 csharp_style_var_elsewhere = true:warning
 
-# Expression bodies: properties, and value-returning methods on one line
+# Expression bodies: properties and single-expression value-returning methods; void methods and
+# constructors use blocks (enforced by ReSharper below, which Roslyn's options can't express)
 csharp_style_expression_bodied_properties = true:warning
 csharp_style_expression_bodied_indexers = true:warning
 csharp_style_expression_bodied_accessors = true:warning

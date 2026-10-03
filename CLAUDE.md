@@ -287,8 +287,9 @@ This section holds what needs judgment.
 
 - **`internal` by default**; a type is `public` only when another assembly needs it. Internal
   classes are `sealed` unless designed for inheritance (CA1852 enforces it); public ones stay open.
-- **Expression bodies (`=>`) for properties and for value-returning methods that fit on one line.**
-  Constructors, `void` methods and anything that wraps use a block body.
+- **Expression bodies (`=>`) for properties and for value-returning methods that are a single
+  expression**, even when it wraps. Constructors and `void` methods use a block body. ReSharper's
+  cleanup enforces this (`resharper_use_heuristics_for_body_style`).
 - **Immutable by default:** records for data, `init`/`readonly` where possible, and read-only
   collection interfaces (`IReadOnlyList<T>`, `IReadOnlyDictionary<TKey, TValue>`) in signatures.
 - **Classic constructors with explicit fields**, no primary constructors on classes.
