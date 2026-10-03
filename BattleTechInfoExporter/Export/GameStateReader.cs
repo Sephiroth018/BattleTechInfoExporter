@@ -147,7 +147,7 @@ internal static class GameStateReader
         new(
             pilot.Id,
             $"{pilot.FirstName} {pilot.LastName}".Trim() is { Length: > 0 } fullName ? fullName : pilot.Name,
-            string.IsNullOrEmpty(pilot.Callsign) ? null : pilot.Callsign);
+            pilot.Callsign);
 
     private static DefinitionReference ReferenceTo(FactionValue faction) =>
         new(faction.FactionDefID, FactionNames.Format(faction));
