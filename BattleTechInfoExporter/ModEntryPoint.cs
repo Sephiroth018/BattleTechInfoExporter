@@ -1,5 +1,4 @@
 using System.Reflection;
-using BattleTechInfoExporter.Triggers;
 using HarmonyLib;
 using HBS.Logging;
 
@@ -15,7 +14,6 @@ public static class ModEntryPoint
     public static void Init()
     {
         Harmony.CreateAndPatchAll(typeof(ModEntryPoint).Assembly, ModAssemblyName.Name);
-        CareerLoadedTrigger.SubscribeToCareerScreensAttached();
         Logger.Log($"Loaded version {ModAssemblyName.Version.ToString(3)}");
     }
 }
