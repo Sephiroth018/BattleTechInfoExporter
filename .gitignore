@@ -13,6 +13,9 @@
 *.userosscache
 *.sln.docstates
 
+# Machine-specific build settings (the game install path)
+Directory.Build.user.props
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
