@@ -33,6 +33,39 @@ The game state is exported when:
 - A work queue item finishes
 - Possibly a key combination
 
+## Installing
+
+Requires BattleTech 1.9.1 with [ModTek](https://github.com/BattletechModders/ModTek) v4.5.1 or
+later. Extract a release zip into `BATTLETECH/Mods/`, so the mod ends up in
+`BATTLETECH/Mods/BattleTechInfoExporter/`.
+
+## Building
+
+Requires the .NET SDK version pinned in `global.json` and a local BattleTech install.
+
+1. Create `Directory.Build.user.props` next to the solution (it's git-ignored) and point it at the
+   game:
+
+   ```xml
+   <Project>
+     <PropertyGroup>
+       <BattleTechGameDir>C:\Path\To\BATTLETECH</BattleTechGameDir>
+     </PropertyGroup>
+   </Project>
+   ```
+
+2. Run `dotnet tool restore` once, then `dotnet build`. Every build copies the mod into the game's
+   `Mods/BattleTechInfoExporter/` folder. A Release build (`dotnet build -c Release`) also packages
+   it as `artifacts/BattleTechInfoExporter-<version>.zip`.
+
+## AI disclaimer
+
+This project is developed almost entirely with AI. Code, documentation, issues, pull requests and
+commit messages are written by [Claude Code](https://claude.com/claude-code) under the maintainer's
+direction: the maintainer decides what gets built and how, reviews every change, and tests it in the
+game before it's merged. Commits written by Claude carry a `Co-Authored-By: Claude` trailer, and
+everything it posts on GitHub is marked as generated with Claude Code.
+
 ## License
 
 [MIT](LICENSE)
