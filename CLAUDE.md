@@ -46,9 +46,13 @@ Once per repository, before the rest of the workflow applies:
    from the PR title and description, head branches deleted automatically after merging.
 4. **Ruleset on `main`:** changes only through PRs, signed commits required, no force pushes or
    deletion, and the CI checks required once CI exists.
-5. **CI** is a GitHub Actions workflow, `.github/workflows/ci.yml`, running on PRs and pushes to
+5. **Labels:** delete `good first issue`, `help wanted`, `accessibility` and `invalid`; add `chore`
+   (build, tooling, dependencies), `refactor` (restructuring without behavior change) and
+   `research` (finding out how something works before building on it). Work that is only about
+   tests gets `enhancement` or `chore`.
+6. **CI** is a GitHub Actions workflow, `.github/workflows/ci.yml`, running on PRs and pushes to
    `main`.
-6. **No Dependabot or other scheduled workflows**: they use up Actions minutes even on an abandoned
+7. **No Dependabot or other scheduled workflows**: they use up Actions minutes even on an abandoned
    repository.
 
 ## Source control
@@ -59,7 +63,9 @@ Once per repository, before the rest of the workflow applies:
   before creating it.
 - **The issue records every decision about it.** Signed-off plans and later decisions go into the
   description while work hasn't started, and into a new comment once it has.
-- **Labels:** apply the repo's existing labels that fit; ask before creating a new one.
+- **Labels:** apply the repo's existing labels that fit; ask before creating a new one. They
+  follow the commit types: `feat` → `enhancement`, `fix` → `bug`, `refactor` → `refactor`, `docs` →
+  `documentation`, `chore` → `chore`; `research` has no commit type of its own.
 - **Help manage the GitHub Project** for planned features: break features into issues, add them to
   the project, and keep their status current as work starts and lands.
 
