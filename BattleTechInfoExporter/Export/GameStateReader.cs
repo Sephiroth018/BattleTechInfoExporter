@@ -129,7 +129,10 @@ internal static class GameStateReader
         var travelOrder = simGame.TravelOrder;
         return simGame.TravelState == SimGameTravelStatus.IN_SYSTEM || destination is null || travelOrder is null
             ? null
-            : new Travel(ReferenceTo(destination.Def.Description), travelOrder.GetRemainingCost());
+            : new Travel(
+                ReferenceTo(destination.Def.Description),
+                ReferenceTo(destination.OwnerValue),
+                travelOrder.GetRemainingCost());
     }
 
     private static DefinitionReference ReferenceTo(BaseDescriptionDef description) =>
