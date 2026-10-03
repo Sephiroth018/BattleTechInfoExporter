@@ -20,18 +20,21 @@ internal static class FactionNames
     /// <summary>
     ///     The full name with the short name in brackets, e.g. "The Federated Suns (Davion)". The game's
     ///     names are written for use mid-sentence ("the local pirate organization"), so both get title case.
-    ///     Some factions (e.g. placeholders) have no <see cref="FactionDef" />; the enumeration's name stands in.
+    ///     Factions without a <see cref="FactionDef" /> or its name (e.g. placeholders) get the enumeration's name.
     /// </summary>
     internal static string Format(FactionValue faction)
     {
+        // Mods can add faction definitions without a name or short name.
         var definition = faction.FactionDef;
-        if (definition is null)
+        if (definition is null || string.IsNullOrEmpty(definition.Name))
         {
             return faction.FriendlyName;
         }
 
         var name = ToTitleCase(Strings.T(definition.Name));
-        var shortName = ToTitleCase(WithoutLeadingArticle(Strings.T(definition.ShortName)));
+        var shortName = string.IsNullOrEmpty(definition.ShortName)
+            ? ""
+            : ToTitleCase(WithoutLeadingArticle(Strings.T(definition.ShortName)));
         return shortName.Length == 0 ||
                WithoutLeadingArticle(name).Equals(shortName, StringComparison.OrdinalIgnoreCase)
             ? name
