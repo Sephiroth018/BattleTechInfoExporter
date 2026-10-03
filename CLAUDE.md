@@ -333,8 +333,8 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
   rules. Its body catches and logs every exception: one escaping a patch breaks the game's own code.
   Being static by nature, patches are the allowed exception to "No mutable static state", limited
   to what a patch needs.
-- **Logging** goes through the game's `HBS.Logging.Logger` under the name `BattleTechInfoExporter`
-  and ends up in ModTek's log.
+- **Logging** goes through `ModLog.Logger`, the game's `HBS.Logging` logger under the name
+  `BattleTechInfoExporter`, and ends up in ModTek's log.
 
 ## Structure
 

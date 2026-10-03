@@ -19,12 +19,12 @@ internal static class CareerLoadedTrigger
         // An exception escaping a patch would break the game's career loading; log it instead.
         try
         {
-            ModEntryPoint.Logger.Log(
+            ModLog.Logger.Log(
                 $"Career loaded: company '{simGame.CompanyName}', system '{simGame.CurSystem.Name}'");
         }
         catch (Exception exception)
         {
-            ModEntryPoint.Logger.LogException(exception);
+            ModLog.Logger.LogException(exception);
         }
     }
 }
