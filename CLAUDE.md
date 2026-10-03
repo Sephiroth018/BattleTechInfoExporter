@@ -330,8 +330,9 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
   doesn't exist yet when `Init` runs. A patch class is `internal static` and marked
   `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]`: ReSharper doesn't recognize Harmony's
   attributes and would otherwise report the patch as unused. It takes the patched object as
-  `[HarmonyArgument("__instance")]` with a name that follows our naming rules. Its body catches and logs every exception: one escaping a patch breaks the game's own code.
-  Being static by nature, patches are the allowed exception to "No mutable static state", limited
+  `[HarmonyArgument("__instance")]` with a name that follows our naming rules. A trigger patch only
+  calls `GameStateExporter.Export`, which catches and logs every exception: one escaping a patch
+  breaks the game's own code. A patch doing anything else catches its own. Being static by nature, patches are the allowed exception to "No mutable static state", limited
   to what a patch needs.
 - **Logging** goes through `ModLog.Logger`, the game's `HBS.Logging` logger under the name
   `BattleTechInfoExporter`, and ends up in ModTek's log.
@@ -339,9 +340,27 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
 ## Structure
 
 One project, `BattleTechInfoExporter/`, in `BattleTechInfoExporter.slnx`. `ModEntryPoint` is the
-only public type; it applies all Harmony patches in the assembly. Folders: `Triggers/` holds the
-patches that decide when to export. The version lives only in `<Version>` in
-`Directory.Build.props`; the build stamps it into the DLL and generates `mod.json` from it.
+only public type; it applies all Harmony patches in the assembly. `ModAssembly` holds the mod's
+name, version and folder, `ModLog` its logger. Folders:
+
+- `Triggers/`: the patches that decide when to export.
+- `Export/`: `GameStateExporter`, the single entry point every trigger calls; `GameStateReader`
+  builds the model from the game, `ExportFileWriter` writes it into the mod's `exports/` folder.
+- `Models/`: immutable records, one per JSON object, marked
+  `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` because only the serializer reads them.
+
+The version lives only in `<Version>` in `Directory.Build.props`; the build stamps it into the DLL
+and generates `mod.json` from it.
+
+## Export format
+
+- **References to game definitions are `{ "id", "name" }`:** the id from the game's data files and
+  the name shown in the UI.
+- **Game enums keep the game's values** (e.g. `IN_SYSTEM`, `LIKED`); the UI shows the same. Our own
+  enums are camelCase.
+- **JSON:** camelCase properties, indented, `null` written explicitly, through the game's
+  Newtonsoft.Json.
+- **Files are replaced atomically**, so a tool reading them never sees a half-written file.
 
 ## Commands
 
