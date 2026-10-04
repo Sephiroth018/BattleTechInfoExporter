@@ -36,9 +36,7 @@ overwritten on every export:
       their chassis stats, and the mech parts collected per mech. Stored mechs are bare chassis:
       readying one gives the stock armor and the chassis' fixed equipment, but no weapons
 - [x] The current system's stores (system store, faction store, black market) that the company can
-      use, with the components and mech parts they sell, their stock and prices. Arriving in a
-      system doesn't trigger an export yet, so until the next one the file shows the previous
-      system's stores and hiring hall
+      use, with the components and mech parts they sell, their stock and prices
 - [x] The current system's hiring hall: the pilots for hire with their skills, primary abilities,
       health, hiring cost, salary, and whether the company's rating and morale allow hiring them
 - [x] Contracts: the contracts the Command Center offers, with their mission type, employer and
@@ -47,7 +45,7 @@ overwritten on every export:
       system its planet tags and travel days. The mission types' descriptions are in the rules file.
       **The game only generates a system's contracts when its Command Center's contract screen first
       opens, or after a contract; the mod never generates them itself, so it doesn't change the
-      game. Until then, `contracts` is `null`.**
+      game. Until then, `contracts` is `null`; once the game has generated them, they're exported.**
 - [x] The active contract: the accepted travel contract, with the same details and the terms it was
       accepted with, from accepting it until proceeding with it on arrival. It isn't repeated in
       the contracts. While travelling to it, its travel days are the trip's remaining days
@@ -73,13 +71,19 @@ Written to separate files, if the game makes them accessible:
 
 The game state is exported when:
 
-- [x] The career is loaded: starting a new career, loading a save, and returning to the career
-      screens after a mission
-- [ ] The current system changes
-- [ ] A mission is completed
-- [ ] Salvage is chosen
-- [ ] The financial report is triggered
-- [ ] A work queue item finishes
+- [x] The career is loaded: starting a new career or loading a save
+- [x] The game saves the career, manually or automatically, outside of combat. Among others, it
+      autosaves after arriving in a system, after a contract, after the financial report is closed
+      and after events
+- [x] A contract's results are applied, including the chosen salvage, back on the career screens:
+      through the autosave after it, or directly for the contracts the game doesn't autosave after
+      (flashpoint contracts and those followed by a story contract)
+- [x] The monthly financial report is shown, with the expenses paid, to help choose next month's
+      spending level; the autosave after it is closed exports the chosen level
+- [x] A work order finishes: a mech lab order (once the whole order is done), a heal in the medbay
+      or an Argo upgrade. Orders finishing on the same day are exported together
+- [x] The game finishes generating the contracts of the current system
+- [x] A store is closed, from the main screen or the mech lab
 - [ ] Possibly a key combination
 
 ## Installing
