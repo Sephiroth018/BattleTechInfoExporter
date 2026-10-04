@@ -30,6 +30,10 @@ overwritten on every export:
       refit, loadout problems, armor, structure and hardpoints per location, every mounted
       component with its damage, and the performance summary with its ratings and the numbers
       behind them
+- [x] The last lance: the mechs and pilots last sent on a mission; the game keeps no other
+      assignment of pilots to mechs. A mech or pilot that has left the company since is `null`. The
+      lance configuration pre-fills from it only the mechs that can be fielded and the pilots who
+      can pilot
 - [x] Component definitions: the tonnage, slots, cost, bonuses and weapon, ammunition box or heat
       sink stats of every component the export refers to, listed once per component type by id
 - [x] Storage: the stored components with their working and damaged counts, the stored mechs with

@@ -35,6 +35,9 @@ internal static class MechReader
     internal static DefinitionReference ReferenceTo(MechDef mech) =>
         new(mech.Description.Id, NameWithVariant(mech.Name, mech.Chassis));
 
+    internal static MechReference ReferenceToBayMech(MechDef mech) =>
+        new(mech.GUID, NameWithVariant(mech.Name, mech.Chassis));
+
     /// <summary>The chassis' weapon hardpoints of all locations together.</summary>
     /// <remarks>Summed as TooltipPrefab_Chassis.SetHardpointData does.</remarks>
     internal static Hardpoints ReadHardpoints(ChassisDef chassis)
