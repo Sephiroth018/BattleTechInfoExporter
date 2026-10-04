@@ -93,6 +93,8 @@ internal static class MechReader
                 _ => MechStatus.InMaintenance
             },
             ReadDaysUntilReady(simGame, workOrder),
+            // SimGameState.GetWorkOrderEntryForMech finds the order among the queue's own entries.
+            workOrder is null ? null : simGame.MechLabQueue.IndexOf(workOrder) + 1,
             ReadRefit(simGame, componentDefinitions, mech, workOrder),
             MechValidationRules.ValidateMechCanBeFielded(simGame, mech),
             // The mech lab validates at this level, against the mech's work order (MechLabPanel).
