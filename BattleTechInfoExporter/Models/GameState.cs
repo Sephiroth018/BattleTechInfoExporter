@@ -11,9 +11,11 @@ internal sealed record GameState(
     DateTimeOffset ExportedAt,
     ExportTrigger Trigger,
     Company Company,
-    IReadOnlyList<Pilot> Pilots,
+    IReadOnlyList<BarracksPilot> Pilots,
     IReadOnlyList<Mech> Mechs,
     Storage Storage,
+    Stores Stores,
+    IReadOnlyList<HiringHallPilot> HiringHall,
     ComponentDefinitions ComponentDefinitions,
     Position Position,
     Rules Rules);

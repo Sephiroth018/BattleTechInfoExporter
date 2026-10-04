@@ -6,7 +6,6 @@ using BattleTech;
 using BattleTechInfoExporter.Models;
 using Localize;
 using UnityEngine;
-using Pilot = BattleTechInfoExporter.Models.Pilot;
 
 namespace BattleTechInfoExporter.Export;
 
@@ -21,9 +20,11 @@ internal static class GameStateReader
             DateTimeOffset.Now,
             trigger,
             ReadCompany(simGame),
-            ReadPilots(simGame),
+            PilotReader.ReadPilots(simGame),
             MechReader.ReadMechs(simGame, componentDefinitions),
             StorageReader.ReadStorage(simGame, componentDefinitions),
+            StoreReader.ReadStores(simGame, componentDefinitions),
+            PilotReader.ReadHiringHall(simGame),
             // After every section that references components.
             componentDefinitions.Definitions,
             ReadPosition(simGame),
@@ -52,7 +53,8 @@ internal static class GameStateReader
                 .Select(faction => ReadReputation(simGame, faction))
                 .ToList(),
             simGame.MechTechSkill,
-            simGame.MedTechSkill);
+            simGame.MedTechSkill,
+            simGame.GetMaxMechWarriors());
 
     private static Finances ReadFinances(SimGameState simGame) =>
         new(
@@ -84,8 +86,8 @@ internal static class GameStateReader
                 .ToList(),
             simGame.PilotRoster
                 .Select(pilot => new PilotExpense(
-                    ReferenceTo(pilot.pilotDef.Description),
-                    Mathf.CeilToInt(costModifier * simGame.GetMechWarriorValue(pilot.pilotDef))))
+                    PilotReader.ReferenceTo(pilot.pilotDef.Description),
+                    PilotReader.ReadSalary(simGame, costModifier, pilot.pilotDef)))
                 .ToList());
     }
 
@@ -102,72 +104,10 @@ internal static class GameStateReader
                 upgrade.AdditionalCost * simGame.Constants.CareerMode.ArgoMaintenanceMultiplier)))
             .Where(upgradeUpkeep => upgradeUpkeep.upkeep > 0)
             .Select(upgradeUpkeep => new ShipUpgradeExpense(
-                ReferenceTo(upgradeUpkeep.upgrade.Description),
+                DefinitionReferences.ReferenceTo(upgradeUpkeep.upgrade.Description),
                 Mathf.RoundToInt(costModifier * upgradeUpkeep.upkeep)))
             .ToList();
     }
-
-    // The commander is kept apart from the roster; the barracks lists them first (SGBarracksWidget.Reset).
-    private static List<Pilot> ReadPilots(SimGameState simGame) =>
-        new[] { simGame.Commander }
-            .Concat(simGame.PilotRoster)
-            .Select(pilot => ReadPilot(simGame, pilot))
-            .ToList();
-
-    private static Pilot ReadPilot(SimGameState simGame, BattleTech.Pilot pilot)
-    {
-        var definition = pilot.pilotDef;
-        var description = definition.Description;
-        return new Pilot(
-            description.Id,
-            FullName(description),
-            description.Callsign,
-            ReadPilotType(simGame, pilot),
-            description.Age,
-            description.Gender,
-            simGame.GetPilotFullExpertise(pilot),
-            new Skills(pilot.Gunnery, pilot.Piloting, pilot.Guts, pilot.Tactics),
-            new Experience(pilot.UnspentXP, pilot.SpentXP),
-            SimGameState.GetPrimaryPilotAbilities(definition).Select(ability => ReferenceTo(ability.Description))
-                .ToList(),
-            pilot.Health,
-            pilot.Injuries,
-            ReadPilotStatus(pilot),
-            simGame.GetPilotTimeoutTimeRemaining(pilot),
-            ReadSpirits(simGame, pilot),
-            new ServiceRecord(
-                definition.MissionsPiloted,
-                definition.MechKills,
-                definition.OtherKills,
-                definition.MissionsEjected,
-                definition.LifetimeInjuries,
-                simGame.DaysPassed - definition.DateOfHire));
-    }
-
-    // Mirrors SimGameState.GetPilotTypeColor.
-    private static PilotType ReadPilotType(SimGameState simGame, BattleTech.Pilot pilot) =>
-        pilot == simGame.Commander ? PilotType.Commander
-        : pilot.pilotDef.IsVanguard ? PilotType.Vanguard
-        : pilot.pilotDef.IsRonin ? PilotType.Ronin
-        : PilotType.Regular;
-
-    // Mirrors SGBarracksDossierPanel.SetPilot: injuries take precedence over an event timeout.
-    private static PilotStatus ReadPilotStatus(BattleTech.Pilot pilot) =>
-        pilot.Injuries > 0 ? PilotStatus.Injured
-        : pilot.pilotDef.TimeoutRemaining > 0 ? PilotStatus.Unavailable
-        : PilotStatus.Ready;
-
-    private static Spirits ReadSpirits(SimGameState simGame, BattleTech.Pilot pilot) =>
-        pilot switch
-        {
-            { HasHighMorale: true } => new Spirits(
-                SpiritsLevel.High,
-                simGame.GetTemporaryTagLength(pilot, BattleTech.Pilot.PILOTDEFTAG_HIGH_MORALE)),
-            { HasLowMorale: true } => new Spirits(
-                SpiritsLevel.Low,
-                simGame.GetTemporaryTagLength(pilot, BattleTech.Pilot.PILOTDEFTAG_LOW_MORALE)),
-            _ => new Spirits(SpiritsLevel.Normal, null)
-        };
 
     // The limits are hardcoded in SimGameState.CanPilotTakeAbility.
     private static SkillRules ReadSkillRules(SimGameState simGame)
@@ -197,7 +137,7 @@ internal static class GameStateReader
                         // The per-level accuracy traits have no name or description and aren't shown anywhere.
                         .Where(ability => !string.IsNullOrEmpty(ability.Description.Name))
                         .Select(ability => new SkillLevelAbility(
-                            ReferenceTo(ability.Description),
+                            DefinitionReferences.ReferenceTo(ability.Description),
                             ability.IsPrimaryAbility,
                             ability.Description.Details))
                         .ToList()))
@@ -275,7 +215,7 @@ internal static class GameStateReader
 
     private static FactionReputation ReadReputation(SimGameState simGame, FactionValue faction) =>
         new(
-            ReferenceTo(faction),
+            DefinitionReferences.ReferenceTo(faction),
             simGame.GetRawReputation(faction),
             simGame.GetReputation(faction),
             simGame.IsFactionAlly(faction),
@@ -284,8 +224,8 @@ internal static class GameStateReader
 
     private static Position ReadPosition(SimGameState simGame) =>
         new(
-            ReferenceTo(simGame.CurSystem.Def.Description),
-            ReferenceTo(simGame.CurSystem.OwnerValue),
+            DefinitionReferences.ReferenceTo(simGame.CurSystem.Def.Description),
+            DefinitionReferences.ReferenceTo(simGame.CurSystem.OwnerValue),
             simGame.TravelState,
             ReadTravel(simGame));
 
@@ -298,20 +238,8 @@ internal static class GameStateReader
         return simGame.TravelState == SimGameTravelStatus.IN_SYSTEM || destination is null || travelOrder is null
             ? null
             : new Travel(
-                ReferenceTo(destination.Def.Description),
-                ReferenceTo(destination.OwnerValue),
+                DefinitionReferences.ReferenceTo(destination.Def.Description),
+                DefinitionReferences.ReferenceTo(destination.OwnerValue),
                 travelOrder.GetRemainingCost());
     }
-
-    private static DefinitionReference ReferenceTo(BaseDescriptionDef description) =>
-        new(description.Id, description.Name);
-
-    private static PilotReference ReferenceTo(HumanDescriptionDef pilot) =>
-        new(pilot.Id, FullName(pilot), pilot.Callsign);
-
-    private static string FullName(HumanDescriptionDef pilot) =>
-        $"{pilot.FirstName} {pilot.LastName}".Trim() is { Length: > 0 } fullName ? fullName : pilot.Name;
-
-    private static DefinitionReference ReferenceTo(FactionValue faction) =>
-        new(faction.FactionDefID, FactionNames.Format(faction));
 }

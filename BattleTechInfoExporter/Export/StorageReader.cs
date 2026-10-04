@@ -45,9 +45,7 @@ internal static class StorageReader
                     simGame.GetItemCount(item.Id, item.Type, SimGameState.ItemCountType.UNDAMAGED_ONLY),
                     simGame.GetItemCount(item.Id, item.Type, SimGameState.ItemCountType.DAMAGED_ONLY));
             })
-            .OrderBy(component => component.Component.Type)
-            .ThenBy(component => component.Component.Name, StringComparer.Ordinal)
-            .ThenBy(component => component.Component.Id, StringComparer.Ordinal)
+            .OrderByComponent(component => component.Component)
             .ToList();
 
     // A stored mech's stat is named after its chassis id, though its type is MechDef.
@@ -62,8 +60,7 @@ internal static class StorageReader
                 chassis.MaxJumpjets,
                 // Counted as MechBayMechStorageWidget.InitInventory does.
                 simGame.GetItemCount(chassis.Description, typeof(MechDef), SimGameState.ItemCountType.UNDAMAGED_ONLY)))
-            .OrderBy(mech => mech.Chassis.Name, StringComparer.Ordinal)
-            .ThenBy(mech => mech.Chassis.Id, StringComparer.Ordinal)
+            .OrderByDefinition(mech => mech.Chassis)
             .ToList();
 
     // A mech part's stat is named after the mech the parts assemble into (SimGameState.AddMechPart). Not read from
@@ -77,8 +74,7 @@ internal static class StorageReader
             .Select(item => new StoredMechParts(
                 MechReader.ReferenceTo(simGame.DataManager.MechDefs.Get(item.Id)),
                 simGame.GetItemCount(item.Id, item.Type, SimGameState.ItemCountType.UNDAMAGED_ONLY)))
-            .OrderBy(parts => parts.Mech.Name, StringComparer.Ordinal)
-            .ThenBy(parts => parts.Mech.Id, StringComparer.Ordinal)
+            .OrderByDefinition(parts => parts.Mech)
             .ToList();
 
     // The stats with a count of at least one, as SimGameState.GetAllInventoryItemDefs and GetAllInventoryMechParts

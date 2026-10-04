@@ -13,7 +13,8 @@ Only the story campaign is supported; in career mode the mod exports nothing.
 The **game state**, written to `Mods/BattleTechInfoExporter/exports/game-state.json` and
 overwritten on every export:
 
-- [x] The company: dropship, date, morale, MechTech and MedTech, reputation with every faction
+- [x] The company: dropship, date, morale, MechTech and MedTech, reputation with every faction,
+      and how many pilots the barracks hold
 - [x] Finances: funds, spending level and its options, the expected expenses of the next report
       with their breakdown
 - [x] The current position: system, travel status, and when travelling the destination and days
@@ -34,7 +35,12 @@ overwritten on every export:
 - [x] Storage: the stored components with their working and damaged counts, the stored mechs with
       their chassis stats, and the mech parts collected per mech. Stored mechs are bare chassis:
       readying one gives the stock armor and the chassis' fixed equipment, but no weapons
-- [ ] The current system's store and hiring hall
+- [x] The current system's stores (system store, faction store, black market) that the company can
+      use, with the components and mech parts they sell, their stock and prices. Arriving in a
+      system doesn't trigger an export yet, so until the next one the file shows the previous
+      system's stores and hiring hall
+- [x] The current system's hiring hall: the pilots for hire with their skills, primary abilities,
+      health, hiring cost, salary, and whether the company's rating and morale allow hiring them
 - [ ] Available missions
 - [ ] The work queue
 
