@@ -17,8 +17,8 @@ overwritten on every export:
       and how many pilots the barracks hold
 - [x] Finances: funds, spending level and its options, the expected expenses of the next report
       with their breakdown
-- [x] The current position: system, travel status, and when travelling the destination and days
-      left
+- [x] The current position: system with its planet tags and biomes, travel status, and when
+      travelling the destination and days left
 - [x] Pilots: the commander and the roster with their skills, experience, primary abilities,
       health and injuries, status, spirits and service record
 - [x] Mechs: the active and readying mechs of the mech bay with their status, their position in

@@ -232,6 +232,11 @@ internal static class GameStateReader
         new(
             DefinitionReferences.ReferenceTo(simGame.CurSystem.Def.Description),
             DefinitionReferences.ReferenceTo(simGame.CurSystem.OwnerValue),
+            SystemTags.ReadVisibleTags(simGame.CurSystem),
+            // StarSystemDef.SupportedBiomes limits the maps of the system's contracts (SimGameState.GetSinglePlayerProceduralPlayableMaps).
+            simGame.CurSystem.Def.SupportedBiomes
+                .Select(biome => DefinitionReferences.ReferenceTo(simGame.DataManager, biome))
+                .ToList(),
             simGame.TravelState,
             ReadTravel(simGame));
 
