@@ -71,13 +71,13 @@ Written to separate files, if the game makes them accessible:
 
 The game state is exported when:
 
-- [x] The career is loaded: starting a new career, loading a save, and returning to the career
-      screens after a mission
+- [x] The career is loaded: starting a new career or loading a save
 - [x] The game saves the career, manually or automatically, outside of combat. Among others, it
       autosaves after arriving in a system, after a contract, after the financial report is closed
       and after events
-- [ ] A mission is completed
-- [ ] Salvage is chosen
+- [x] A contract's results are applied, including the chosen salvage, back on the career screens:
+      through the autosave after it, or directly for the contracts the game doesn't autosave after
+      (flashpoint contracts and those followed by a story contract)
 - [ ] The financial report is triggered
 - [ ] A work queue item finishes
 - [ ] Possibly a key combination

@@ -9,5 +9,6 @@ internal enum ExportTrigger
 {
     CareerLoaded,
     ManualSave,
-    Autosave
+    Autosave,
+    ContractCompleted
 }
