@@ -124,8 +124,10 @@ uncommitted changes):
 
 1. **`/simplify`**, then steps 2-7 again for what it changed. A suggested fix that changes design or
    scope is asked about, not applied.
-2. **`/code-review` at medium.** Fix the findings, or explain in the PR why one isn't a problem. Run
-   it again for later commits that change behavior; trivial follow-ups don't need it.
+2. **`/code-review` at medium.** Fix the findings, or explain in the PR why one isn't a problem.
+
+Later commits that change behavior get both again, `/simplify` first; trivial follow-ups need
+neither.
 
 **Merging needs green CI.** If the project's "Verification" section defines manual checks (game
 mods do: the game can't run in CI), they also become a checklist in the PR description, ticked by
