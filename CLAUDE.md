@@ -380,16 +380,18 @@ repository URL and supported game version; the build stamps the version into the
   sections), holding only the definitions the file refers to, so each file stands on its own. The
   entries carry the reference and their own state, instead of repeating the definition's stats; a
   reference whose definition is missing has no entry. Keys keep the game's ids as they are.
-- **Two files, written together on every export:** `game-state.json` for the career state and
+- **Two files, read together on every export:** `game-state.json` for the career state and
   `rules.json` for the game tables (e.g. `moraleLevels`, `reputationLevels` at its root): how the
   game works for this career, which doesn't change between exports. Values in the game state refer
   to them by name, instead of repeating thresholds and effects per entry. Both start with
-  `modVersion` and the same `exportedAt`.
+  `modVersion`; only the game state has an `exportedAt`, since the rules file has no moment of its
+  own.
 - **Game enums keep the game's values** (e.g. `IN_SYSTEM`, `LIKED`); the UI shows the same. Our own
   enums are camelCase.
 - **JSON:** camelCase properties, indented, `null` written explicitly, through the game's
   Newtonsoft.Json.
-- **Files are replaced atomically**, so a tool reading them never sees a half-written file.
+- **Files are replaced atomically**, so a tool reading them never sees a half-written file, and
+  only when their content changed, so a tool watching them sees only real changes.
 
 ## Commands
 

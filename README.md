@@ -50,7 +50,8 @@ overwritten on every export:
 - [ ] The ship and its upgrades (#45); the mech lab queue is part of each mech (#46)
 
 The game's **rules** for this career, written to `Mods/BattleTechInfoExporter/exports/rules.json`
-alongside the game state, which refers to them by name:
+alongside the game state, which refers to them by name. The file is only rewritten when the rules
+change, e.g. after loading another career:
 
 - [x] Morale levels, reputation levels with their contract difficulty limits, system store access
       and store price changes, and the skill training table with the experience cost of each level,

@@ -23,12 +23,12 @@ internal static class GameStateExporter
             }
 
             // Both are read before either is written, so a failing read leaves both files from the same export.
-            var exportedAt = DateTimeOffset.Now;
-            var gameState = GameStateReader.Read(simGame, trigger, exportedAt);
-            var rules = GameStateReader.ReadRules(simGame, exportedAt);
-            var gameStatePath = ExportFileWriter.Write(GameStateFileName, gameState);
-            var rulesPath = ExportFileWriter.Write(RulesFileName, rules);
-            ModLog.Logger.Log($"Exported the game state ({trigger}) to {gameStatePath} and {rulesPath}");
+            var gameState = GameStateReader.Read(simGame, trigger);
+            var rules = GameStateReader.ReadRules(simGame);
+            ExportFileWriter.Write(GameStateFileName, gameState);
+            var rulesChange = ExportFileWriter.Write(RulesFileName, rules) ? "updated" : "unchanged";
+            ModLog.Logger.Log(
+                $"Exported the game state ({trigger}) to {ExportFileWriter.ExportDirectory}; {RulesFileName} {rulesChange}");
         }
         catch (Exception exception)
         {

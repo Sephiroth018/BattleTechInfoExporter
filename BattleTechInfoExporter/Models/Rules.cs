@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 
@@ -17,7 +16,6 @@ namespace BattleTechInfoExporter.Models;
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Rules(
     string ModVersion,
-    DateTimeOffset ExportedAt,
     IReadOnlyList<MoraleLevel> MoraleLevels,
     IReadOnlyList<ReputationLevel> ReputationLevels,
     SkillRules Skills,

@@ -24,16 +24,27 @@ internal static class ExportFileWriter
         Converters = { new StringEnumConverter() }
     };
 
-    private static readonly string ExportDirectory = Path.Combine(ModAssembly.Directory, "exports");
+    internal static readonly string ExportDirectory = Path.Combine(ModAssembly.Directory, "exports");
 
-    /// <summary>Replaces the file in one step, so a tool reading it never sees a half-written file.</summary>
-    internal static string Write(string fileName, object content)
+    /// <summary>
+    ///     Replaces the file in one step, so a tool reading it never sees a half-written file. Leaves it untouched
+    ///     when its content is the same, so tools watching it only see real changes.
+    /// </summary>
+    /// <returns>Whether the file was written.</returns>
+    internal static bool Write(string fileName, object content)
     {
         Directory.CreateDirectory(ExportDirectory);
         var path = Path.Combine(ExportDirectory, fileName);
+        var json = JsonConvert.SerializeObject(content, SerializerSettings);
+        var fileExists = File.Exists(path);
+        if (fileExists && File.ReadAllText(path) == json)
+        {
+            return false;
+        }
+
         var temporaryPath = path + ".tmp";
-        File.WriteAllText(temporaryPath, JsonConvert.SerializeObject(content, SerializerSettings));
-        if (File.Exists(path))
+        File.WriteAllText(temporaryPath, json);
+        if (fileExists)
         {
             File.Replace(temporaryPath, path, null);
         }
@@ -42,7 +53,7 @@ internal static class ExportFileWriter
             File.Move(temporaryPath, path);
         }
 
-        return path;
+        return true;
     }
 
     /// <summary>
