@@ -43,7 +43,7 @@ internal static class StoreReader
 
         var items = shop.ActiveInventory.Where(item => IsReadable(simGame, shop, item)).ToList();
         return new Store(
-            GameStateReader.ReferenceTo(priceFaction),
+            DefinitionReferences.ReferenceTo(priceFaction),
             items
                 .Where(item => item.Type != ShopItemType.MechPart)
                 .Select(item => new ComponentForSale(

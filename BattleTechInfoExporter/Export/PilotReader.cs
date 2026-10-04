@@ -98,7 +98,7 @@ internal static class PilotReader
 
     private static List<DefinitionReference> ReadAbilities(PilotDef pilot) =>
         SimGameState.GetPrimaryPilotAbilities(pilot)
-            .Select(ability => GameStateReader.ReferenceTo(ability.Description))
+            .Select(ability => DefinitionReferences.ReferenceTo(ability.Description))
             .ToList();
 
     // Mirrors SimGameState.GetPilotTypeColor.

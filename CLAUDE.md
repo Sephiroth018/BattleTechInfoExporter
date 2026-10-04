@@ -355,7 +355,8 @@ name, version and folder, `ModLog` its logger. Folders:
 - `Export/`: `GameStateExporter`, the single entry point every trigger calls; `GameStateReader`
   builds the model from the game, with `PilotReader` for the barracks and hiring hall pilots,
   `MechReader` and `MechStatsReader` for the mechs, `StorageReader` for the storage and
-  `StoreReader` for the stores; `ComponentDefinitionReader`, one per export file, makes every reference to a component and
+  `StoreReader` for the stores; `DefinitionReferences` makes the references to definitions all of
+  them share; `ComponentDefinitionReader`, one per export file, makes every reference to a component and
   collects the definitions referenced, needing only the game's `DataManager`; `ExportFileWriter`
   writes it into the mod's `exports/` folder.
 - `Models/`: immutable records, one per JSON object, marked

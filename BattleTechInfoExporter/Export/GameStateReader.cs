@@ -104,7 +104,7 @@ internal static class GameStateReader
                 upgrade.AdditionalCost * simGame.Constants.CareerMode.ArgoMaintenanceMultiplier)))
             .Where(upgradeUpkeep => upgradeUpkeep.upkeep > 0)
             .Select(upgradeUpkeep => new ShipUpgradeExpense(
-                ReferenceTo(upgradeUpkeep.upgrade.Description),
+                DefinitionReferences.ReferenceTo(upgradeUpkeep.upgrade.Description),
                 Mathf.RoundToInt(costModifier * upgradeUpkeep.upkeep)))
             .ToList();
     }
@@ -137,7 +137,7 @@ internal static class GameStateReader
                         // The per-level accuracy traits have no name or description and aren't shown anywhere.
                         .Where(ability => !string.IsNullOrEmpty(ability.Description.Name))
                         .Select(ability => new SkillLevelAbility(
-                            ReferenceTo(ability.Description),
+                            DefinitionReferences.ReferenceTo(ability.Description),
                             ability.IsPrimaryAbility,
                             ability.Description.Details))
                         .ToList()))
@@ -215,7 +215,7 @@ internal static class GameStateReader
 
     private static FactionReputation ReadReputation(SimGameState simGame, FactionValue faction) =>
         new(
-            ReferenceTo(faction),
+            DefinitionReferences.ReferenceTo(faction),
             simGame.GetRawReputation(faction),
             simGame.GetReputation(faction),
             simGame.IsFactionAlly(faction),
@@ -224,8 +224,8 @@ internal static class GameStateReader
 
     private static Position ReadPosition(SimGameState simGame) =>
         new(
-            ReferenceTo(simGame.CurSystem.Def.Description),
-            ReferenceTo(simGame.CurSystem.OwnerValue),
+            DefinitionReferences.ReferenceTo(simGame.CurSystem.Def.Description),
+            DefinitionReferences.ReferenceTo(simGame.CurSystem.OwnerValue),
             simGame.TravelState,
             ReadTravel(simGame));
 
@@ -238,14 +238,8 @@ internal static class GameStateReader
         return simGame.TravelState == SimGameTravelStatus.IN_SYSTEM || destination is null || travelOrder is null
             ? null
             : new Travel(
-                ReferenceTo(destination.Def.Description),
-                ReferenceTo(destination.OwnerValue),
+                DefinitionReferences.ReferenceTo(destination.Def.Description),
+                DefinitionReferences.ReferenceTo(destination.OwnerValue),
                 travelOrder.GetRemainingCost());
     }
-
-    internal static DefinitionReference ReferenceTo(BaseDescriptionDef description) =>
-        new(description.Id, description.Name);
-
-    internal static DefinitionReference ReferenceTo(FactionValue faction) =>
-        new(faction.FactionDefID, FactionNames.Format(faction));
 }
