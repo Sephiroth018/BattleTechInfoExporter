@@ -9,10 +9,12 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Skills">The training table behind <see cref="Pilot.Skills" /> and <see cref="Pilot.Abilities" />.</param>
 /// <param name="SpiritsLevels">The effects of each spirits level, which <see cref="Spirits.Level" /> refers to.</param>
 /// <param name="MechPartsPerMech">The <see cref="StoredMechParts" /> needed to assemble a mech.</param>
+/// <param name="ContractTypes">The mission types, which <see cref="Contract.Type" /> refers to.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Rules(
     IReadOnlyList<MoraleLevel> MoraleLevels,
     IReadOnlyList<ReputationLevel> ReputationLevels,
     SkillRules Skills,
     IReadOnlyList<SpiritsLevelCosts> SpiritsLevels,
-    int MechPartsPerMech);
+    int MechPartsPerMech,
+    IReadOnlyList<ContractTypeDescription> ContractTypes);
