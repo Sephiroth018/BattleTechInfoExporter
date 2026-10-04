@@ -11,7 +11,7 @@ internal sealed record GameState(
     DateTimeOffset ExportedAt,
     ExportTrigger Trigger,
     Company Company,
-    IReadOnlyList<Pilot> Pilots,
+    IReadOnlyList<BarracksPilot> Pilots,
     IReadOnlyList<Mech> Mechs,
     Storage Storage,
     ComponentDefinitions ComponentDefinitions,

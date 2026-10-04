@@ -14,7 +14,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Health">The injuries the pilot can take before being incapacitated.</param>
 /// <param name="DaysUntilReady">Zero when the pilot is <see cref="PilotStatus.Ready" />.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record Pilot(
+internal sealed record BarracksPilot(
     string Id,
     string Name,
     string Callsign,

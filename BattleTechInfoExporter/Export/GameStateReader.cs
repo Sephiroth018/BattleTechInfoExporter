@@ -6,7 +6,6 @@ using BattleTech;
 using BattleTechInfoExporter.Models;
 using Localize;
 using UnityEngine;
-using Pilot = BattleTechInfoExporter.Models.Pilot;
 
 namespace BattleTechInfoExporter.Export;
 
@@ -108,17 +107,17 @@ internal static class GameStateReader
     }
 
     // The commander is kept apart from the roster; the barracks lists them first (SGBarracksWidget.Reset).
-    private static List<Pilot> ReadPilots(SimGameState simGame) =>
+    private static List<BarracksPilot> ReadPilots(SimGameState simGame) =>
         new[] { simGame.Commander }
             .Concat(simGame.PilotRoster)
             .Select(pilot => ReadPilot(simGame, pilot))
             .ToList();
 
-    private static Pilot ReadPilot(SimGameState simGame, BattleTech.Pilot pilot)
+    private static BarracksPilot ReadPilot(SimGameState simGame, BattleTech.Pilot pilot)
     {
         var definition = pilot.pilotDef;
         var description = definition.Description;
-        return new Pilot(
+        return new BarracksPilot(
             description.Id,
             FullName(description),
             description.Callsign,
