@@ -28,6 +28,32 @@ internal static class MechReader
     /// <remarks>The variant identifies the mech, as in the game's lance and store lists.</remarks>
     internal static string NameWithVariant(string name, ChassisDef chassis) => $"{name} ({chassis.VariantName})";
 
+    internal static DefinitionReference ReferenceTo(ChassisDef chassis) =>
+        new(chassis.Description.Id, NameWithVariant(chassis.Description.Name, chassis));
+
+    // A mech's name is its nickname (renameable in the mech lab).
+    internal static DefinitionReference ReferenceTo(MechDef mech) =>
+        new(mech.Description.Id, NameWithVariant(mech.Name, mech.Chassis));
+
+    /// <summary>The chassis' weapon hardpoints of all locations together.</summary>
+    /// <remarks>Summed as TooltipPrefab_Chassis.SetHardpointData does.</remarks>
+    internal static Hardpoints ReadHardpoints(ChassisDef chassis)
+    {
+        int ballistic = 0, energy = 0, missile = 0, support = 0;
+        foreach (var location in Locations)
+        {
+            MechStatisticsRules.GetHardpointCountForLocation(
+                chassis,
+                location,
+                ref ballistic,
+                ref energy,
+                ref missile,
+                ref support);
+        }
+
+        return new Hardpoints(ballistic, energy, missile, support);
+    }
+
     // Both dictionaries are keyed by the mech bay slot; a slot is in one of them at most.
     internal static List<Mech> ReadMechs(SimGameState simGame, ComponentDefinitionReader componentDefinitions) =>
         simGame.ActiveMechs
@@ -52,7 +78,7 @@ internal static class MechReader
         return new Mech(
             mech.GUID,
             mech.Name,
-            new DefinitionReference(chassis.Description.Id, NameWithVariant(chassis.Description.Name, chassis)),
+            ReferenceTo(chassis),
             chassis.weightClass,
             chassis.StockRole,
             slot / slotsPerBay + 1,

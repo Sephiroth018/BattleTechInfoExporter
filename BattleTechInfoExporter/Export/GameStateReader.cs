@@ -23,13 +23,16 @@ internal static class GameStateReader
             ReadCompany(simGame),
             ReadPilots(simGame),
             MechReader.ReadMechs(simGame, componentDefinitions),
+            StorageReader.ReadStorage(simGame, componentDefinitions),
+            // After every section that references components.
             componentDefinitions.Definitions,
             ReadPosition(simGame),
             new Rules(
                 ReadMoraleLevels(simGame),
                 ReadReputationLevels(simGame),
                 ReadSkillRules(simGame),
-                ReadSpiritsLevels(simGame)));
+                ReadSpiritsLevels(simGame),
+                simGame.Constants.Story.DefaultMechPartMax));
     }
 
     private static Company ReadCompany(SimGameState simGame) =>
@@ -76,7 +79,7 @@ internal static class GameStateReader
             ReadShipUpgradeExpenses(simGame, costModifier),
             simGame.ActiveMechs.Values
                 .Select(mech => new MechExpense(
-                    ReferenceTo(mech),
+                    MechReader.ReferenceTo(mech),
                     Mathf.RoundToInt(costModifier * simGame.Constants.Finances.MechCostPerQuarter)))
                 .ToList(),
             simGame.PilotRoster
@@ -302,10 +305,6 @@ internal static class GameStateReader
 
     private static DefinitionReference ReferenceTo(BaseDescriptionDef description) =>
         new(description.Id, description.Name);
-
-    // A mech's name is its nickname (renameable in the mech lab).
-    private static DefinitionReference ReferenceTo(MechDef mech) =>
-        new(mech.Description.Id, MechReader.NameWithVariant(mech.Name, mech.Chassis));
 
     private static PilotReference ReferenceTo(HumanDescriptionDef pilot) =>
         new(pilot.Id, FullName(pilot), pilot.Callsign);
