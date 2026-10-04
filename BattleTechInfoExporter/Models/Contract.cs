@@ -33,6 +33,30 @@ internal sealed record Contract(
     DefinitionReference? Biome,
     ContractTravel? Travel);
 
+/// <summary>The accepted travel contract, until the company proceeds with it on arrival or breaks it.</summary>
+/// <param name="Id">The contract's data file; <c>null</c> where the game keeps no reference to it.</param>
+/// <param name="Type">The mission type, described in <see cref="Rules.ContractTypes" />.</param>
+/// <param name="Difficulty">On the scale of <see cref="ReputationLevel.MaxContractDifficulty" />.</param>
+/// <param name="Terms">The terms the contract was accepted with.</param>
+/// <param name="Biome"><c>null</c> where the game has no biome for the contract.</param>
+/// <param name="Travel">
+///     <c>null</c> once the company has arrived at the contract's planet; while travelling there, its days are
+///     those of <see cref="Models.Travel.DaysLeft" />.
+/// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record ActiveContract(
+    string? Id,
+    string Name,
+    DefinitionReference Type,
+    ContractDisplayStyle DisplayStyle,
+    DefinitionReference Employer,
+    DefinitionReference Target,
+    int Difficulty,
+    NegotiationOption Terms,
+    LanceLimits LanceLimits,
+    DefinitionReference? Biome,
+    ContractTravel? Travel);
+
 /// <summary>The contract's terms.</summary>
 /// <param name="Options">
 ///     Every combination of the pay and salvage sliders the negotiation allows: their shares add up to at most 100,
