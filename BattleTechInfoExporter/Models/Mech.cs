@@ -17,6 +17,10 @@ namespace BattleTechInfoExporter.Models;
 ///     The days until the mech lab finishes its work order; zero when
 ///     <see cref="MechStatus.Ready" />.
 /// </param>
+/// <param name="WorkQueuePosition">
+///     The position of the mech's work order in the mech lab queue, counted from 1; the mech techs work on the
+///     first one only. <c>null</c> without a work order.
+/// </param>
 /// <param name="Refit">
 ///     The steps of the mech's mech lab work order, in order; finished steps are already part of the loadout.
 ///     <c>null</c> without a work order and while readying.
@@ -36,6 +40,7 @@ internal sealed record Mech(
     int Position,
     MechStatus Status,
     int DaysUntilReady,
+    int? WorkQueuePosition,
     IReadOnlyList<RefitChange>? Refit,
     bool IsFieldable,
     IReadOnlyList<string> Problems,

@@ -21,10 +21,10 @@ overwritten on every export:
       left
 - [x] Pilots: the commander and the roster with their skills, experience, primary abilities,
       health and injuries, status, spirits and service record
-- [x] Mechs: the active and readying mechs of the mech bay with their status, the steps of a queued
-      refit, loadout problems, armor, structure and hardpoints per location, every mounted
-      component with its damage, and the performance summary with its ratings and the numbers
-      behind them
+- [x] Mechs: the active and readying mechs of the mech bay with their status, their position in
+      the mech lab queue, the steps of a queued refit, loadout problems, armor, structure and
+      hardpoints per location, every mounted component with its damage, and the performance
+      summary with its ratings and the numbers behind them
 - [x] The last lance: the mechs and pilots last sent on a mission; the game keeps no other
       assignment of pilots to mechs. A mech or pilot that has left the company since is `null`. The
       lance configuration pre-fills from it only the mechs that can be fielded and the pilots who
