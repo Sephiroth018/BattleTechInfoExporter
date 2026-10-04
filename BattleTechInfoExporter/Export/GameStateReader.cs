@@ -15,7 +15,7 @@ internal static class GameStateReader
 {
     internal static GameState Read(SimGameState simGame, ExportTrigger trigger)
     {
-        var componentDefinitions = new ComponentDefinitionReader(simGame);
+        var componentDefinitions = new ComponentDefinitionReader(simGame.DataManager);
         return new GameState(
             ModAssembly.Version,
             DateTimeOffset.Now,
