@@ -44,7 +44,6 @@ internal sealed record Negotiation(bool CanNegotiate, IReadOnlyList<NegotiationO
 
 /// <param name="PayShare">The pay slider's position in percent; <c>null</c> for fixed terms.</param>
 /// <param name="SalvageShare">The salvage slider's position in percent; <c>null</c> for fixed terms.</param>
-/// <param name="Pay">The C-Bills.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record NegotiationOption(
     int? PayShare,
