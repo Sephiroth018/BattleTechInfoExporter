@@ -29,7 +29,7 @@ internal sealed record Contract(
     int Difficulty,
     bool MeetsReputation,
     Negotiation Negotiation,
-    LanceRestrictions Lance,
+    LanceLimits Lance,
     DefinitionReference? Biome,
     ContractTravel? Travel);
 
@@ -65,19 +65,17 @@ internal sealed record ReputationChange(int? Employer, int? Target);
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Salvage(int Total, int Priority);
 
-/// <summary>The lance the contract allows; every restriction is <c>null</c> when there is none.</summary>
-/// <param name="Mechs">
-///     The tonnage restrictions of each mech slot, one per mech allowed; <c>null</c> when no slot has any.
-/// </param>
+/// <summary>The lance the contract allows; every limit is <c>null</c> when there is none.</summary>
+/// <param name="Mechs">The tonnage limits of each mech slot, one per mech allowed; <c>null</c> when no slot has any.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record LanceRestrictions(
+internal sealed record LanceLimits(
     int MaxMechs,
     float? MinTonnage,
     float? MaxTonnage,
-    IReadOnlyList<MechSlotRestrictions>? Mechs);
+    IReadOnlyList<MechSlotLimits>? Mechs);
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record MechSlotRestrictions(float? MinTonnage, float? MaxTonnage);
+internal sealed record MechSlotLimits(float? MinTonnage, float? MaxTonnage);
 
 /// <param name="Tags">The planet tags the starmap shows for the system, e.g. its industry.</param>
 /// <param name="Days">

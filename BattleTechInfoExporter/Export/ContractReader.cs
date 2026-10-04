@@ -62,7 +62,7 @@ internal static class ContractReader
                 (int)simGame.Constants.Story.GlobalContractDifficultyMax),
             simGame.ContractUserMeetsReputation(contract),
             ReadNegotiation(simGame, contract, employer, target),
-            ReadLanceRestrictions(contractOverride),
+            ReadLanceLimits(contractOverride),
             ReadBiome(simGame, contract.ContractBiome),
             ReadTravel(simGame, contract));
     }
@@ -157,25 +157,23 @@ internal static class ContractReader
                 : null);
     }
 
-    // As SGContractsWidget.PopulateContract passes them to the lance tonnage icons; -1 means no restriction.
-    private static LanceRestrictions ReadLanceRestrictions(ContractOverride contractOverride)
+    // As SGContractsWidget.PopulateContract passes them to the lance tonnage icons; -1 means no limit.
+    private static LanceLimits ReadLanceLimits(ContractOverride contractOverride)
     {
         var mechs = Enumerable.Range(0,
                 Math.Min(contractOverride.maxNumberOfPlayerUnits, contractOverride.mechMinTonnages.Length))
-            .Select(slot => new MechSlotRestrictions(
-                RestrictionOf(contractOverride.mechMinTonnages[slot]),
-                RestrictionOf(contractOverride.mechMaxTonnages[slot])))
+            .Select(slot => new MechSlotLimits(
+                LimitOf(contractOverride.mechMinTonnages[slot]),
+                LimitOf(contractOverride.mechMaxTonnages[slot])))
             .ToList();
-        return new LanceRestrictions(
+        return new LanceLimits(
             contractOverride.maxNumberOfPlayerUnits,
-            RestrictionOf(contractOverride.lanceMinTonnage),
-            RestrictionOf(contractOverride.lanceMaxTonnage),
-            mechs.Any(restrictions => restrictions.MinTonnage is not null || restrictions.MaxTonnage is not null)
-                ? mechs
-                : null);
+            LimitOf(contractOverride.lanceMinTonnage),
+            LimitOf(contractOverride.lanceMaxTonnage),
+            mechs.Any(limits => limits.MinTonnage is not null || limits.MaxTonnage is not null) ? mechs : null);
     }
 
-    private static float? RestrictionOf(float tonnage) => tonnage < 0 ? null : tonnage;
+    private static float? LimitOf(float tonnage) => tonnage < 0 ? null : tonnage;
 
     // Mirrors LanceHeaderWidget, which names the biome by its description and falls back to the skin's name.
     private static DefinitionReference? ReadBiome(SimGameState simGame, Biome.BIOMESKIN biome)
