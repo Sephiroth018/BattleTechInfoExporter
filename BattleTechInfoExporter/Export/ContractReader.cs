@@ -104,11 +104,13 @@ internal static class ContractReader
         // reputation share to the rest (Contract.SetNegotiatedValues).
         return new Negotiation(
             true,
-            (from pay in NegotiationShares
-                from salvage in NegotiationShares
-                where employer.DoesGainReputation ? pay + salvage <= 100 : pay + salvage == 100
-                select Option(pay, salvage, pay / 100f, salvage / 100f))
-            .ToList());
+            NegotiationShares
+                .SelectMany(pay => NegotiationShares.Select(salvage => (pay, salvage)))
+                .Where(shares => employer.DoesGainReputation
+                    ? shares.pay + shares.salvage <= 100
+                    : shares.pay + shares.salvage == 100)
+                .Select(shares => Option(shares.pay, shares.salvage, shares.pay / 100f, shares.salvage / 100f))
+                .ToList());
 
         NegotiationOption Option(int? payPercent, int? salvagePercent, float payShare, float salvageShare) =>
             new(
