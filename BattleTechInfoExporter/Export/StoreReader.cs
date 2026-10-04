@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using BattleTech;
 using BattleTechInfoExporter.Models;
@@ -50,9 +49,7 @@ internal static class StoreReader
                     componentDefinitions.ReferenceTo(Shop.ShopItemTypeToComponentType(item.Type), item.ID),
                     CountOf(item),
                     PriceOf(shop, item)))
-                .OrderBy(component => component.Component.Type)
-                .ThenBy(component => component.Component.Name, StringComparer.Ordinal)
-                .ThenBy(component => component.Component.Id, StringComparer.Ordinal)
+                .OrderByComponent(component => component.Component)
                 .ToList(),
             items
                 .Where(item => item.Type == ShopItemType.MechPart)
@@ -60,8 +57,7 @@ internal static class StoreReader
                     MechReader.ReferenceTo(simGame.DataManager.MechDefs.Get(item.ID)),
                     CountOf(item),
                     PriceOf(shop, item)))
-                .OrderBy(parts => parts.Mech.Name, StringComparer.Ordinal)
-                .ThenBy(parts => parts.Mech.Id, StringComparer.Ordinal)
+                .OrderByDefinition(parts => parts.Mech)
                 .ToList());
     }
 
