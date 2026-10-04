@@ -23,5 +23,4 @@ internal sealed record GameState(
     IReadOnlyList<HiringHallPilot> HiringHall,
     IReadOnlyList<Contract>? Contracts,
     ComponentDefinitions ComponentDefinitions,
-    Position Position,
-    Rules Rules);
+    Position Position);

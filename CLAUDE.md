@@ -353,13 +353,14 @@ name, version and folder, `ModLog` its logger. Folders:
 
 - `Triggers/`: the patches that decide when to export.
 - `Export/`: `GameStateExporter`, the single entry point every trigger calls; `GameStateReader`
-  builds the model from the game, with `PilotReader` for the barracks and hiring hall pilots,
-  `MechReader` and `MechStatsReader` for the mechs, `LanceReader` for the last lance,
-  `StorageReader` for the storage, `StoreReader` for the stores and `ContractReader` for the contracts, with `SystemTags` for a
+  builds the models of both export files from the game, with `PilotReader` for the barracks and
+  hiring hall pilots, `MechReader` and `MechStatsReader` for the mechs, `LanceReader` for the last
+  lance, `StorageReader` for the storage, `StoreReader` for the stores and `ContractReader` for the
+  contracts, with `SystemTags` for a
   system's planet tags; `DefinitionReferences` makes the references to definitions all of
   them share; `ComponentDefinitionReader`, one per export file, makes every reference to a component and
   collects the definitions referenced, needing only the game's `DataManager`; `ExportFileWriter`
-  writes it into the mod's `exports/` folder.
+  writes them into the mod's `exports/` folder.
 - `Models/`: immutable records, one per JSON object, marked
   `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` because only the serializer reads them.
 
@@ -379,9 +380,11 @@ repository URL and supported game version; the build stamps the version into the
   sections), holding only the definitions the file refers to, so each file stands on its own. The
   entries carry the reference and their own state, instead of repeating the definition's stats; a
   reference whose definition is missing has no entry. Keys keep the game's ids as they are.
-- **Game tables sit in `rules`** (e.g. `rules.moraleLevels`, `rules.reputationLevels`): how the
-  game works for this career, apart from its state. Values in the other sections refer to them by
-  name, instead of repeating thresholds and effects per entry.
+- **Two files, written together on every export:** `game-state.json` for the career state and
+  `rules.json` for the game tables (e.g. `moraleLevels`, `reputationLevels` at its root): how the
+  game works for this career, which doesn't change between exports. Values in the game state refer
+  to them by name, instead of repeating thresholds and effects per entry. Both start with
+  `modVersion` and the same `exportedAt`.
 - **Game enums keep the game's values** (e.g. `IN_SYSTEM`, `LIKED`); the UI shows the same. Our own
   enums are camelCase.
 - **JSON:** camelCase properties, indented, `null` written explicitly, through the game's

@@ -7,7 +7,8 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>The single entry point every trigger calls to export the career state.</summary>
 internal static class GameStateExporter
 {
-    private const string FileName = "game-state.json";
+    private const string GameStateFileName = "game-state.json";
+    private const string RulesFileName = "rules.json";
 
     internal static void Export(SimGameState simGame, ExportTrigger trigger)
     {
@@ -21,8 +22,13 @@ internal static class GameStateExporter
                 return;
             }
 
-            var path = ExportFileWriter.Write(FileName, GameStateReader.Read(simGame, trigger));
-            ModLog.Logger.Log($"Exported the game state ({trigger}) to {path}");
+            // Both are read before either is written, so a failing read leaves both files from the same export.
+            var exportedAt = DateTimeOffset.Now;
+            var gameState = GameStateReader.Read(simGame, trigger, exportedAt);
+            var rules = GameStateReader.ReadRules(simGame, exportedAt);
+            var gameStatePath = ExportFileWriter.Write(GameStateFileName, gameState);
+            var rulesPath = ExportFileWriter.Write(RulesFileName, rules);
+            ModLog.Logger.Log($"Exported the game state ({trigger}) to {gameStatePath} and {rulesPath}");
         }
         catch (Exception exception)
         {
