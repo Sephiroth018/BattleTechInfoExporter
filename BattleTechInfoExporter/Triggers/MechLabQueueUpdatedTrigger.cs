@@ -8,8 +8,9 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Triggers;
 
 /// <summary>
-///     Fires when mech lab orders with no cost left complete right away from the mech bay, outside a day passing,
-///     which <see cref="DayPassedTrigger" /> covers.
+///     Fires when the mech lab queue is updated outside a day passing, which <see cref="DayPassedTrigger" /> covers:
+///     the game does so after an order is queued, a mech is readied or an order is cancelled from the mech bay, and
+///     orders with no cost left complete right away.
 /// </summary>
 [HarmonyPatch(typeof(SimGameState), nameof(SimGameState.UpdateMechLabWorkQueue))]
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -29,9 +30,12 @@ internal static class MechLabQueueUpdatedTrigger
     {
         try
         {
-            if (!passDay && WorkOrderCompletionRecorder.CompletedCount != completedCountBefore)
+            if (!passDay)
             {
-                GameStateExporter.Export(simGame, ExportTrigger.WorkOrderCompleted);
+                GameStateExporter.Export(simGame,
+                    WorkOrderCompletionRecorder.CompletedCount != completedCountBefore
+                        ? ExportTrigger.WorkOrderCompleted
+                        : ExportTrigger.MechBayChanged);
             }
         }
         catch (Exception exception)
