@@ -29,7 +29,7 @@ internal sealed record Contract(
     int Difficulty,
     bool MeetsReputation,
     Negotiation Negotiation,
-    LanceLimits LanceRestrictions,
+    LanceLimits LanceLimits,
     DefinitionReference? Biome,
     ContractTravel? Travel);
 
