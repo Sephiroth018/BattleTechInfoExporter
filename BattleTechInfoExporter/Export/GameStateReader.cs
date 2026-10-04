@@ -23,6 +23,8 @@ internal static class GameStateReader
             PilotReader.ReadPilots(simGame),
             MechReader.ReadMechs(simGame, componentDefinitions),
             StorageReader.ReadStorage(simGame, componentDefinitions),
+            StoreReader.ReadStores(simGame, componentDefinitions),
+            PilotReader.ReadHiringHall(simGame),
             // After every section that references components.
             componentDefinitions.Definitions,
             ReadPosition(simGame),
@@ -51,7 +53,8 @@ internal static class GameStateReader
                 .Select(faction => ReadReputation(simGame, faction))
                 .ToList(),
             simGame.MechTechSkill,
-            simGame.MedTechSkill);
+            simGame.MedTechSkill,
+            simGame.GetMaxMechWarriors());
 
     private static Finances ReadFinances(SimGameState simGame) =>
         new(
@@ -84,7 +87,7 @@ internal static class GameStateReader
             simGame.PilotRoster
                 .Select(pilot => new PilotExpense(
                     PilotReader.ReferenceTo(pilot.pilotDef.Description),
-                    Mathf.CeilToInt(costModifier * simGame.GetMechWarriorValue(pilot.pilotDef))))
+                    PilotReader.ReadSalary(simGame, costModifier, pilot.pilotDef)))
                 .ToList());
     }
 
@@ -243,6 +246,6 @@ internal static class GameStateReader
     internal static DefinitionReference ReferenceTo(BaseDescriptionDef description) =>
         new(description.Id, description.Name);
 
-    private static DefinitionReference ReferenceTo(FactionValue faction) =>
+    internal static DefinitionReference ReferenceTo(FactionValue faction) =>
         new(faction.FactionDefID, FactionNames.Format(faction));
 }
