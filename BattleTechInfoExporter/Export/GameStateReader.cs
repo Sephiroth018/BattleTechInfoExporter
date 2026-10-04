@@ -19,7 +19,7 @@ internal static class GameStateReader
             trigger,
             ReadCompany(simGame),
             ReadPosition(simGame),
-            ReadMoraleLevels(simGame));
+            new Rules(ReadMoraleLevels(simGame), ReadReputationLevels(simGame)));
 
     private static Company ReadCompany(SimGameState simGame) =>
         new(
@@ -103,6 +103,44 @@ internal static class GameStateReader
         return Enumerable.Range(0, Math.Min(names.Length, Math.Min(thresholds.Length, resolvePerTurn.Length)))
             .Select(level => new MoraleLevel(names[level], thresholds[level], resolvePerTurn[level]))
             .ToList();
+    }
+
+    // The game's level bounds are mixed (upper bounds below INDIFFERENT, lower ones above it), so each level's start
+    // is found by classifying every reputation value SimGameState.ClampNewRepValue allows.
+    private static List<ReputationLevel> ReadReputationLevels(SimGameState simGame)
+    {
+        var maxReputation = Mathf.RoundToInt(simGame.Constants.Story.MaxReputation);
+        return Enumerable.Range(-maxReputation, 2 * maxReputation + 1)
+            .GroupBy(value => simGame.GetReputation(value))
+            .Select(level => new ReputationLevel(
+                level.Key,
+                level.First(),
+                ReadMaxContractDifficulty(simGame, level.Key),
+                // Mirrors StarSystem.CanUseSystemStore.
+                level.Key > SimGameReputation.LOATHED,
+                // Rounded as SG_Stores_MiniFactionWidget shows it.
+                Mathf.RoundToInt(simGame.GetReputationShopAdjustment(level.Key) * 100f)))
+            .ToList();
+    }
+
+    // Mirrors SimGameState.ContractUserMeetsReputation_Campaign, which compares the contract's whole-number
+    // difficulty with this sum. The reputation tooltip (ReputationTooltipData) rounds it instead, so it can
+    // show one more.
+    private static int ReadMaxContractDifficulty(SimGameState simGame, SimGameReputation level)
+    {
+        var story = simGame.Constants.Story;
+        return Mathf.FloorToInt(
+            level switch
+            {
+                SimGameReputation.LOATHED => story.LoathedMaxContractDifficulty,
+                SimGameReputation.HATED => story.HatedMaxContractDifficulty,
+                SimGameReputation.DISLIKED => story.DislikedMaxContractDifficulty,
+                SimGameReputation.INDIFFERENT => story.IndifferentMaxContractDifficulty,
+                SimGameReputation.LIKED => story.LikedMaxContractDifficulty,
+                SimGameReputation.FRIENDLY => story.FriendlyMaxContractDifficulty,
+                _ => story.HonoredMaxContractDifficulty
+            }
+            + simGame.GlobalDifficulty);
     }
 
     private static FactionReputation ReadReputation(SimGameState simGame, FactionValue faction) =>

@@ -124,8 +124,10 @@ uncommitted changes):
 
 1. **`/simplify`**, then steps 2-7 again for what it changed. A suggested fix that changes design or
    scope is asked about, not applied.
-2. **`/code-review` at medium.** Fix the findings, or explain in the PR why one isn't a problem. Run
-   it again for later commits that change behavior; trivial follow-ups don't need it.
+2. **`/code-review` at medium.** Fix the findings, or explain in the PR why one isn't a problem.
+
+Later commits that change behavior get both again, `/simplify` first; trivial follow-ups need
+neither.
 
 **Merging needs green CI.** If the project's "Verification" section defines manual checks (game
 mods do: the game can't run in CI), they also become a checklist in the PR description, ticked by
@@ -365,8 +367,9 @@ and generates `mod.json` from it.
   game's enumeration stands in. Faction names get title case with the short name in brackets
   (`FactionNames`), e.g. "The Local Pirate Organization (Pirates)", because the game's are written
   for use mid-sentence.
-- **Static game tables sit at the root** (e.g. `moraleLevels`), and values in the sections refer to
-  them by name, instead of repeating thresholds per entry.
+- **Game tables sit in `rules`** (e.g. `rules.moraleLevels`, `rules.reputationLevels`): how the
+  game works for this career, apart from its state. Values in the other sections refer to them by
+  name, instead of repeating thresholds and effects per entry.
 - **Game enums keep the game's values** (e.g. `IN_SYSTEM`, `LIKED`); the UI shows the same. Our own
   enums are camelCase.
 - **JSON:** camelCase properties, indented, `null` written explicitly, through the game's
@@ -425,8 +428,9 @@ In the game, by the user. Every PR's description lists what to check in the game
 before the go-ahead. Every checklist starts with the standard checks:
 
 1. The game starts and the main menu shows `/W MODTEK`.
-2. ModTek's log (`Mods/.modtek/battletech_log.txt`) shows the mod loaded with the PR's version,
-   without errors or exceptions from it.
+2. ModTek's log (`Mods/.modtek/battletech_log.txt`) shows ModTek loading the mod with the PR's
+   version (`"BattleTechInfoExporter" <version>` and `Loaded assembly BattleTechInfoExporter
+   (v<version>.0)`), without errors or exceptions from it.
 
 followed by the PR's own feature checks.
 

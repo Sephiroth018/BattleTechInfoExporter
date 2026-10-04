@@ -18,6 +18,8 @@ overwritten on every export:
       with their breakdown
 - [x] The current position: system, travel status, and when travelling the destination and days
       left
+- [x] The game's rules for this career: morale levels, and reputation levels with their contract
+      difficulty limits, system store access and store price changes
 - [ ] Pilots
 - [ ] Mechs with all their equipment and stats
 - [ ] Storage: equipment, mechs and mech parts
