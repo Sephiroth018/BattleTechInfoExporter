@@ -13,5 +13,6 @@ internal sealed record GameState(
     Company Company,
     IReadOnlyList<Pilot> Pilots,
     IReadOnlyList<Mech> Mechs,
+    ComponentDefinitions ComponentDefinitions,
     Position Position,
     Rules Rules);

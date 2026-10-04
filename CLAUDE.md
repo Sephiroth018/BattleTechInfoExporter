@@ -354,7 +354,9 @@ name, version and folder, `ModLog` its logger. Folders:
 - `Triggers/`: the patches that decide when to export.
 - `Export/`: `GameStateExporter`, the single entry point every trigger calls; `GameStateReader`
   builds the model from the game, with `MechReader` and `MechStatsReader` for the mechs;
-  `ExportFileWriter` writes it into the mod's `exports/` folder.
+  `ComponentDefinitionReader`, one per export file, makes every reference to a component and
+  collects the definitions referenced, needing only the game's `DataManager`; `ExportFileWriter`
+  writes it into the mod's `exports/` folder.
 - `Models/`: immutable records, one per JSON object, marked
   `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` because only the serializer reads them.
 
@@ -367,7 +369,13 @@ repository URL and supported game version; the build stamps the version into the
   the name shown in the UI. Both are always set; where a definition is missing, a name from the
   game's enumeration stands in. Faction names get title case with the short name in brackets
   (`FactionNames`), e.g. "The Local Pirate Organization (Pirates)", because the game's are written
-  for use mid-sentence.
+  for use mid-sentence. Component references also carry the game's component `type`, which names
+  their group in `componentDefinitions`.
+- **Definitions many entries share sit in a root object keyed by id** (e.g.
+  `componentDefinitions`, grouped by component type with one entry shape per group and no null
+  sections), holding only the definitions the file refers to, so each file stands on its own. The
+  entries carry the reference and their own state, instead of repeating the definition's stats; a
+  reference whose definition is missing has no entry. Keys keep the game's ids as they are.
 - **Game tables sit in `rules`** (e.g. `rules.moraleLevels`, `rules.reputationLevels`): how the
   game works for this career, apart from its state. Values in the other sections refer to them by
   name, instead of repeating thresholds and effects per entry.

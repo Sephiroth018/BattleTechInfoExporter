@@ -29,14 +29,18 @@ internal static class MechReader
     internal static string NameWithVariant(string name, ChassisDef chassis) => $"{name} ({chassis.VariantName})";
 
     // Both dictionaries are keyed by the mech bay slot; a slot is in one of them at most.
-    internal static List<Mech> ReadMechs(SimGameState simGame) =>
+    internal static List<Mech> ReadMechs(SimGameState simGame, ComponentDefinitionReader componentDefinitions) =>
         simGame.ActiveMechs
             .Concat(simGame.ReadyingMechs)
             .OrderBy(slot => slot.Key)
-            .Select(slot => ReadMech(simGame, slot.Key, slot.Value))
+            .Select(slot => ReadMech(simGame, componentDefinitions, slot.Key, slot.Value))
             .ToList();
 
-    private static Mech ReadMech(SimGameState simGame, int slot, MechDef mech)
+    private static Mech ReadMech(
+        SimGameState simGame,
+        ComponentDefinitionReader componentDefinitions,
+        int slot,
+        MechDef mech)
     {
         var chassis = mech.Chassis;
         var workOrder = simGame.GetWorkOrderEntryForMech(mech);
@@ -60,7 +64,7 @@ internal static class MechReader
                 _ => MechStatus.InMaintenance
             },
             ReadDaysUntilReady(simGame, workOrder),
-            ReadRefit(simGame, mech, workOrder),
+            ReadRefit(simGame, componentDefinitions, mech, workOrder),
             MechValidationRules.ValidateMechCanBeFielded(simGame, mech),
             // The mech lab validates at this level, against the mech's work order (MechLabPanel).
             MechValidationRules.ValidateMechDef(MechValidationLevel.MechLab, simGame.DataManager, mech, workOrder)
@@ -72,7 +76,7 @@ internal static class MechReader
             // Recomputed by MechDef.RefreshBattleValue whenever the loadout changes; the mech bay shows it.
             mech.Description.Cost,
             MechStatsReader.Read(mech),
-            Locations.Select(location => ReadLocation(simGame, mech, location)).ToList());
+            Locations.Select(location => ReadLocation(componentDefinitions, mech, location)).ToList());
     }
 
     // Mirrors TaskTimelineWidget.RefreshEntries and TaskManagementElement.UpdateItem: the mech techs work on
@@ -101,7 +105,10 @@ internal static class MechReader
         return days;
     }
 
-    private static MechLocation ReadLocation(SimGameState simGame, MechDef mech, ChassisLocations location)
+    private static MechLocation ReadLocation(
+        ComponentDefinitionReader componentDefinitions,
+        MechDef mech,
+        ChassisLocations location)
     {
         var loadout = mech.GetLocationLoadoutDef(location);
         var definition = mech.GetChassisLocationDef(location);
@@ -124,60 +131,20 @@ internal static class MechReader
             new Structure(loadout.CurrentInternalStructure, definition.InternalStructure),
             new Hardpoints(ballistic, energy, missile, support),
             new Slots(components.Sum(component => component.Def.InventorySize), definition.InventorySlots),
-            components.Select(component => ReadEquipment(simGame, component)).ToList());
+            components.Select(component => new Equipment(
+                    componentDefinitions.ReferenceTo(
+                        component.ComponentDefType,
+                        component.ComponentDefID,
+                        component.Def),
+                    component.DamageLevel,
+                    component.IsFixed))
+                .ToList());
     }
-
-    private static Equipment ReadEquipment(SimGameState simGame, MechComponentRef component)
-    {
-        var definition = component.Def;
-        var description = definition.Description;
-        return new Equipment(
-            ReferenceTo(component.ComponentDefID, definition),
-            component.ComponentDefType,
-            component.DamageLevel,
-            component.IsFixed,
-            definition.Tonnage,
-            definition.InventorySize,
-            description.Cost,
-            new[] { definition.BonusValueA, definition.BonusValueB }.Where(bonus => !string.IsNullOrEmpty(bonus))
-                .ToList(),
-            description.Details,
-            definition is WeaponDef weapon ? ReadWeapon(weapon) : null,
-            // The box's own Ammo is only set once the game has needed it (AmmunitionBoxDef.refreshAmmo).
-            definition is AmmunitionBoxDef ammoBox
-                ? new AmmoBoxStats(
-                    simGame.DataManager.AmmoDefs.Get(ammoBox.AmmoID).AmmoCategoryValue.FriendlyName,
-                    ammoBox.Capacity)
-                : null,
-            definition is HeatSinkDef heatSink ? new HeatSinkStats(heatSink.DissipationCapacity) : null);
-    }
-
-    private static WeaponStats ReadWeapon(WeaponDef weapon) =>
-        new(
-            weapon.WeaponCategoryValue.FriendlyName,
-            weapon.AmmoCategoryValue.Is_NotSet || weapon.AmmoCategoryValue.UsesInternalAmmo
-                ? null
-                : weapon.AmmoCategoryValue.FriendlyName,
-            weapon.Damage,
-            weapon.Instability,
-            weapon.ShotsWhenFired,
-            weapon.ProjectilesPerShot,
-            weapon.HeatDamage,
-            weapon.HeatGenerated,
-            new WeaponRanges(
-                weapon.MinRange,
-                weapon.ShortRange,
-                weapon.MediumRange,
-                weapon.LongRange,
-                weapon.MaxRange),
-            weapon.AccuracyModifier,
-            weapon.CriticalChanceMultiplier,
-            weapon.RefireModifier,
-            weapon.IndirectFireCapable);
 
     // A readying mech's work order has no steps: it is the readying itself.
     private static List<RefitChange>? ReadRefit(
         SimGameState simGame,
+        ComponentDefinitionReader componentDefinitions,
         MechDef mech,
         WorkOrderEntry_MechLab? workOrder) =>
         workOrder is null or WorkOrderEntry_ReadyMech
@@ -185,26 +152,32 @@ internal static class MechReader
             : workOrder.SubEntries
                 // SimGameState.UpdateMechLabWorkQueue relies on the same.
                 .Cast<WorkOrderEntry_MechLab>()
-                .Select(step => ReadRefitChange(simGame, mech, step))
+                .Select(step => ReadRefitChange(simGame, componentDefinitions, mech, step))
                 .ToList();
 
-    private static RefitChange ReadRefitChange(SimGameState simGame, MechDef mech, WorkOrderEntry_MechLab step) =>
+    private static RefitChange ReadRefitChange(
+        SimGameState simGame,
+        ComponentDefinitionReader componentDefinitions,
+        MechDef mech,
+        WorkOrderEntry_MechLab step) =>
         step switch
         {
+            // An install step's MechComponentRef is restored from the save without a DataManager, so its Def stays
+            // null; the definition is resolved from the type and id instead.
             // A removal has no desired location (SimGameState.CreateComponentInstallWorkOrder).
             WorkOrderEntry_InstallComponent { DesiredLocation: ChassisLocations.None } removal => new RefitChange(
                 RefitChangeType.RemoveComponent,
                 step.IsMechLabComplete,
-                ReferenceTo(simGame, removal),
+                componentDefinitions.ReferenceTo(removal.ComponentType, removal.MechComponentID),
                 removal.DamageLevel,
                 removal.PreviousLocation),
             WorkOrderEntry_InstallComponent installation => new RefitChange(
                 RefitChangeType.InstallComponent,
                 step.IsMechLabComplete,
-                ReferenceTo(simGame, installation),
+                componentDefinitions.ReferenceTo(installation.ComponentType, installation.MechComponentID),
                 installation.DamageLevel,
                 installation.DesiredLocation),
-            WorkOrderEntry_RepairComponent repair => ReadRepair(simGame, mech, repair),
+            WorkOrderEntry_RepairComponent repair => ReadRepair(simGame, componentDefinitions, mech, repair),
             WorkOrderEntry_ModifyMechArmor armor => new RefitChange(
                 RefitChangeType.ModifyArmor,
                 step.IsMechLabComplete,
@@ -223,7 +196,11 @@ internal static class MechReader
 
     // Finds the component as SimGameState.ML_RepairComponent does: on the mech, among the parts held for the work
     // order, or in storage, where it isn't mounted.
-    private static RefitChange ReadRepair(SimGameState simGame, MechDef mech, WorkOrderEntry_RepairComponent repair)
+    private static RefitChange ReadRepair(
+        SimGameState simGame,
+        ComponentDefinitionReader componentDefinitions,
+        MechDef mech,
+        WorkOrderEntry_RepairComponent repair)
     {
         var isFromStorage = false;
         var component = simGame.GetMechComponentRefForUID(
@@ -238,28 +215,8 @@ internal static class MechReader
         return new RefitChange(
             RefitChangeType.RepairComponent,
             repair.IsMechLabComplete,
-            ReferenceTo(repair.MechComponentID, component?.Def),
+            componentDefinitions.ReferenceTo(repair.ComponentType, repair.MechComponentID, component?.Def),
             repair.DamageLevel,
             component?.MountedLocation is { } location and not ChassisLocations.None ? location : null);
     }
-
-    // The step's MechComponentRef is restored from the save without a DataManager, so its Def stays null; this
-    // resolves the definition as BaseComponentRef.RefreshComponentDef does.
-    private static DefinitionReference ReferenceTo(SimGameState simGame, WorkOrderEntry_InstallComponent step)
-    {
-        var resourceType = SimGameState.ComponentTypeToBattleTechResourceType(step.ComponentType);
-        return ReferenceTo(
-            step.MechComponentID,
-            simGame.DataManager.Exists(resourceType, step.MechComponentID)
-                ? simGame.GetComponentDef(resourceType, step.MechComponentID)
-                : null);
-    }
-
-    // The mech lab shows the short UI name (MechLabItemSlotElement); the id stands in for a missing definition.
-    private static DefinitionReference ReferenceTo(string componentId, MechComponentDef? definition) =>
-        new(
-            componentId,
-            definition is null ? componentId
-            : string.IsNullOrEmpty(definition.Description.UIName) ? definition.Description.Name
-            : definition.Description.UIName);
 }

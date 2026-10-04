@@ -13,20 +13,24 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>Builds the export's model from the game's career state.</summary>
 internal static class GameStateReader
 {
-    internal static GameState Read(SimGameState simGame, ExportTrigger trigger) =>
-        new(
+    internal static GameState Read(SimGameState simGame, ExportTrigger trigger)
+    {
+        var componentDefinitions = new ComponentDefinitionReader(simGame.DataManager);
+        return new GameState(
             ModAssembly.Version,
             DateTimeOffset.Now,
             trigger,
             ReadCompany(simGame),
             ReadPilots(simGame),
-            MechReader.ReadMechs(simGame),
+            MechReader.ReadMechs(simGame, componentDefinitions),
+            componentDefinitions.Definitions,
             ReadPosition(simGame),
             new Rules(
                 ReadMoraleLevels(simGame),
                 ReadReputationLevels(simGame),
                 ReadSkillRules(simGame),
                 ReadSpiritsLevels(simGame)));
+    }
 
     private static Company ReadCompany(SimGameState simGame) =>
         new(

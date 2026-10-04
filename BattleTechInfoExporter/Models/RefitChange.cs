@@ -18,7 +18,7 @@ namespace BattleTechInfoExporter.Models;
 internal sealed record RefitChange(
     RefitChangeType Type,
     bool IsDone,
-    DefinitionReference? Component = null,
+    ComponentReference? Component = null,
     ComponentDamageLevel? DamageLevel = null,
     ChassisLocations? Location = null,
     int? FrontArmor = null,
