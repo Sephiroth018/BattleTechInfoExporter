@@ -12,6 +12,7 @@ internal enum ExportTrigger
     Autosave,
     ContractCompleted,
     MonthlyExpensesPaid,
+    FinancialReportShown,
     WorkOrderCompleted,
     ContractsGenerated
 }

@@ -80,6 +80,7 @@ The game state is exported when:
       (flashpoint contracts and those followed by a story contract)
 - [x] The monthly expenses are paid, before the financial report is closed with next month's
       spending level
+- [x] The financial report is shown, to help choose next month's spending level
 - [x] A work order finishes: a mech lab order (once the whole order is done), a heal in the medbay
       or an Argo upgrade. Orders finishing on the same day are exported together
 - [x] The game finishes generating the contracts of the current system
