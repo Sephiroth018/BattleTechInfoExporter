@@ -78,7 +78,8 @@ The game state is exported when:
 - [x] A contract's results are applied, including the chosen salvage, back on the career screens:
       through the autosave after it, or directly for the contracts the game doesn't autosave after
       (flashpoint contracts and those followed by a story contract)
-- [ ] The financial report is triggered
+- [x] The monthly expenses are paid, before the financial report is closed with next month's
+      spending level
 - [ ] A work queue item finishes
 - [ ] Possibly a key combination
 
