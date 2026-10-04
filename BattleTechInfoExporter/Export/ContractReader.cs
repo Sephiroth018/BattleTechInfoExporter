@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BattleTech;
-using BattleTech.Data;
 using BattleTech.Framework;
 using BattleTechInfoExporter.Models;
 using HBS.Nav;
@@ -175,17 +174,8 @@ internal static class ContractReader
 
     private static float? LimitOf(float tonnage) => tonnage < 0 ? null : tonnage;
 
-    // Mirrors LanceHeaderWidget, which names the biome by its description and falls back to the skin's name.
-    private static DefinitionReference? ReadBiome(SimGameState simGame, Biome.BIOMESKIN biome)
-    {
-        if (biome == Biome.BIOMESKIN.generic)
-        {
-            return null;
-        }
-
-        var name = simGame.DataManager.GetBaseDescriptionDef(biome)?.Name ?? Utilities.BeautifyName(biome.ToString());
-        return new DefinitionReference(biome.ToString(), name);
-    }
+    private static DefinitionReference? ReadBiome(SimGameState simGame, Biome.BIOMESKIN biome) =>
+        biome == Biome.BIOMESKIN.generic ? null : DefinitionReferences.ReferenceTo(simGame.DataManager, biome);
 
     // The contract list marks travel contracts by the target system in the contract's context (SGContractsListItem).
     private static ContractTravel? ReadTravel(SimGameState simGame, BattleTech.Contract contract)
