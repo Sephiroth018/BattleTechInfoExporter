@@ -8,11 +8,15 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>Writes export files into the mod's <c>exports</c> folder.</summary>
 internal static class ExportFileWriter
 {
-    // Game enums keep the game's own values (e.g. IN_SYSTEM), which is what the UI shows.
+    // Game enums keep the game's own values (e.g. IN_SYSTEM), which is what the UI shows. Dictionary keys are
+    // game ids, kept as they are; CamelCasePropertyNamesContractResolver would camel-case them too.
     private static readonly JsonSerializerSettings SerializerSettings = new()
     {
         Formatting = Formatting.Indented,
-        ContractResolver = new CamelCasePropertyNamesContractResolver(),
+        ContractResolver = new DefaultContractResolver
+        {
+            NamingStrategy = new CamelCaseNamingStrategy { ProcessDictionaryKeys = false }
+        },
         NullValueHandling = NullValueHandling.Include,
         Converters = { new StringEnumConverter() }
     };
