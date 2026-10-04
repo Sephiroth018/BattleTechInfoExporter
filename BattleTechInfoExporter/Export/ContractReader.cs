@@ -21,7 +21,9 @@ internal static class ContractReader
 
     // An accepted travel contract stays active until the company proceeds with it on arrival or breaks it
     // (SimGameState.FinishCompleteBreadcrumbProcess, FailBreadcrumb).
-    internal static ActiveContract? ReadActiveContract(SimGameState simGame)
+    internal static ActiveContract? ReadActiveContract(
+        SimGameState simGame,
+        (StarSystem Destination, int DaysLeft)? travelInProgress)
     {
         if (simGame.ActiveTravelContract is not { } contract)
         {
@@ -42,7 +44,7 @@ internal static class ContractReader
             ReadTerms(simGame, contract, employer, target),
             ReadLanceLimits(contractOverride),
             ReadBiome(simGame, contract.ContractBiome),
-            ReadActiveContractTravel(simGame, contract));
+            ReadActiveContractTravel(simGame, contract, travelInProgress));
     }
 
     // The game generates a system's contracts when the contract screen first opens there
@@ -134,10 +136,7 @@ internal static class ContractReader
         {
             return new Negotiation(
                 false,
-                [
-                    ReadNegotiationOption(simGame, contract, employer, target, null, null,
-                        contract.Override.negotiatedSalary, contract.Override.negotiatedSalvage)
-                ]);
+                [Option(null, null, contract.Override.negotiatedSalary, contract.Override.negotiatedSalvage)]);
         }
 
         // The sliders' shares can't exceed 100 together; without employer reputation they are coupled and leave
@@ -150,9 +149,12 @@ internal static class ContractReader
                 .Where(shares => employer.DoesGainReputation
                     ? shares.pay + shares.salvage <= 100
                     : shares.pay + shares.salvage == 100)
-                .Select(shares => ReadNegotiationOption(simGame, contract, employer, target, shares.pay,
-                    shares.salvage, shares.pay / 100f, shares.salvage / 100f))
+                .Select(shares => Option(shares.pay, shares.salvage, shares.pay / 100f, shares.salvage / 100f))
                 .ToList());
+
+        NegotiationOption Option(int? payPercent, int? salvagePercent, float payShare, float salvageShare) =>
+            ReadNegotiationOption(simGame, contract, employer, target, payPercent, salvagePercent, payShare,
+                salvageShare);
     }
 
     // Accepting a contract stores the shares it was accepted with (SGContractsWidget.OnContractAccepted).
@@ -251,20 +253,13 @@ internal static class ContractReader
 
     // While travelling to the contract's system, the days are the trip's as the position has them, also on the last
     // leg from the jump point to the planet.
-    private static ContractTravel? ReadActiveContractTravel(SimGameState simGame, BattleTech.Contract contract)
-    {
-        if (ReadTargetSystem(contract) is not { } system)
-        {
-            return null;
-        }
-
-        if (GameStateReader.ReadTravelInProgress(simGame) is { } travel && travel.Destination.ID == system.ID)
-        {
-            return CreateTravel(system, travel.DaysLeft);
-        }
-
-        return system != simGame.CurSystem ? CreateTravel(system, ReadTravelDays(simGame, system)) : null;
-    }
+    private static ContractTravel? ReadActiveContractTravel(
+        SimGameState simGame,
+        BattleTech.Contract contract,
+        (StarSystem Destination, int DaysLeft)? travelInProgress) =>
+        ReadTargetSystem(contract) is { } system && travelInProgress?.Destination.ID == system.ID
+            ? CreateTravel(system, travelInProgress.Value.DaysLeft)
+            : ReadTravel(simGame, contract);
 
     // The contract list marks travel contracts by the target system in the contract's context (SGContractsListItem).
     private static StarSystem? ReadTargetSystem(BattleTech.Contract contract) =>
