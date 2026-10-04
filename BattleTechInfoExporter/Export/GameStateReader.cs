@@ -150,7 +150,7 @@ internal static class GameStateReader
         : pilot.pilotDef.TimeoutRemaining > 0 ? PilotStatus.Unavailable
         : PilotStatus.Ready;
 
-    private static Spirits? ReadSpirits(SimGameState simGame, BattleTech.Pilot pilot) =>
+    private static Spirits ReadSpirits(SimGameState simGame, BattleTech.Pilot pilot) =>
         pilot switch
         {
             { HasHighMorale: true } => new Spirits(
@@ -159,7 +159,7 @@ internal static class GameStateReader
             { HasLowMorale: true } => new Spirits(
                 SpiritsLevel.Low,
                 simGame.GetTemporaryTagLength(pilot, BattleTech.Pilot.PILOTDEFTAG_LOW_MORALE)),
-            _ => null
+            _ => new Spirits(SpiritsLevel.Normal, null)
         };
 
     // The limits are hardcoded in SimGameState.CanPilotTakeAbility.
