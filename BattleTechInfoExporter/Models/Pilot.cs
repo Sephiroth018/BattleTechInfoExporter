@@ -13,7 +13,6 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="Health">The injuries the pilot can take before being incapacitated.</param>
 /// <param name="DaysUntilReady">Zero when the pilot is <see cref="PilotStatus.Ready" />.</param>
-/// <param name="Spirits"><c>null</c> unless an event left the pilot in high or low spirits.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Pilot(
     string Id,
@@ -30,7 +29,7 @@ internal sealed record Pilot(
     int Injuries,
     PilotStatus Status,
     int DaysUntilReady,
-    Spirits? Spirits,
+    Spirits Spirits,
     ServiceRecord ServiceRecord);
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -39,8 +38,9 @@ internal sealed record Skills(int Gunnery, int Piloting, int Guts, int Tactics);
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Experience(int Unspent, int Spent);
 
+/// <param name="DaysRemaining">Until high or low spirits end; <c>null</c> for normal spirits, which don't.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record Spirits(SpiritsLevel Level, int DaysRemaining);
+internal sealed record Spirits(SpiritsLevel Level, int? DaysRemaining);
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ServiceRecord(

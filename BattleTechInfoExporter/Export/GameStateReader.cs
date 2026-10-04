@@ -22,7 +22,11 @@ internal static class GameStateReader
             ReadPilots(simGame),
             MechReader.ReadMechs(simGame),
             ReadPosition(simGame),
-            new Rules(ReadMoraleLevels(simGame), ReadReputationLevels(simGame), ReadSkillRules(simGame)));
+            new Rules(
+                ReadMoraleLevels(simGame),
+                ReadReputationLevels(simGame),
+                ReadSkillRules(simGame),
+                ReadSpiritsLevels(simGame)));
 
     private static Company ReadCompany(SimGameState simGame) =>
         new(
@@ -146,7 +150,7 @@ internal static class GameStateReader
         : pilot.pilotDef.TimeoutRemaining > 0 ? PilotStatus.Unavailable
         : PilotStatus.Ready;
 
-    private static Spirits? ReadSpirits(SimGameState simGame, BattleTech.Pilot pilot) =>
+    private static Spirits ReadSpirits(SimGameState simGame, BattleTech.Pilot pilot) =>
         pilot switch
         {
             { HasHighMorale: true } => new Spirits(
@@ -155,7 +159,7 @@ internal static class GameStateReader
             { HasLowMorale: true } => new Spirits(
                 SpiritsLevel.Low,
                 simGame.GetTemporaryTagLength(pilot, BattleTech.Pilot.PILOTDEFTAG_LOW_MORALE)),
-            _ => null
+            _ => new Spirits(SpiritsLevel.Normal, null)
         };
 
     // The limits are hardcoded in SimGameState.CanPilotTakeAbility.
@@ -203,6 +207,25 @@ internal static class GameStateReader
         return Enumerable.Range(0, Math.Min(names.Length, Math.Min(thresholds.Length, resolvePerTurn.Length)))
             .Select(level => new MoraleLevel(names[level], thresholds[level], resolvePerTurn[level]))
             .ToList();
+    }
+
+    // Mirrors AbstractActor.OffensivePushCost (Precision Strike) and DefensivePushCost (Vigilance). Combat reads
+    // them from CombatGameConstants.GetActiveMoraleDef, which only returns FuryConstants in Arena Skirmish.
+    private static List<SpiritsLevelCosts> ReadSpiritsLevels(SimGameState simGame)
+    {
+        var morale = simGame.CombatConstants.MoraleConstants;
+        return
+        [
+            new SpiritsLevelCosts(SpiritsLevel.Normal, morale.OffensivePushCost, morale.DefensivePushCost),
+            new SpiritsLevelCosts(
+                SpiritsLevel.High,
+                morale.OffensivePushHighMoraleCost,
+                morale.DefensivePushHighMoraleCost),
+            new SpiritsLevelCosts(
+                SpiritsLevel.Low,
+                morale.OffensivePushLowMoraleCost,
+                morale.DefensivePushLowMoraleCost)
+        ];
     }
 
     // The game's level bounds are mixed (upper bounds below INDIFFERENT, lower ones above it), so each level's start

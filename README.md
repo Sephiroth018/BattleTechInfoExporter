@@ -23,7 +23,8 @@ overwritten on every export:
 - [x] The game's rules for this career: morale levels, reputation levels with their contract
       difficulty limits, system store access and store price changes, and the skill training table
       with the experience cost of each level, the abilities and traits it unlocks, and the limits on
-      choosing primary abilities
+      choosing primary abilities, and the resolve cost of Precision Strike and Vigilance in normal,
+      high and low spirits
 - [x] Mechs: the active and readying mechs of the mech bay with their status, the steps of a queued
       refit, loadout problems, armor, structure and hardpoints per location, every mounted
       component with its stats, and the performance summary with its ratings and the numbers
