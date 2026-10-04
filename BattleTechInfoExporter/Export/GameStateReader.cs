@@ -276,10 +276,9 @@ internal static class GameStateReader
     private static DefinitionReference ReferenceTo(BaseDescriptionDef description) =>
         new(description.Id, description.Name);
 
-    // A mech's name is its nickname (renameable in the mech lab); the variant (e.g. "PXH-1") identifies it,
-    // as in the game's lance and store lists.
+    // A mech's name is its nickname (renameable in the mech lab).
     private static DefinitionReference ReferenceTo(MechDef mech) =>
-        new(mech.Description.Id, $"{mech.Name} ({mech.Chassis.VariantName})");
+        new(mech.Description.Id, MechReader.NameWithVariant(mech.Name, mech.Chassis));
 
     private static PilotReference ReferenceTo(HumanDescriptionDef pilot) =>
         new(pilot.Id, FullName(pilot), pilot.Callsign);

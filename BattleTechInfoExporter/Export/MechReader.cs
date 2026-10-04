@@ -24,6 +24,10 @@ internal static class MechReader
         ChassisLocations.RightLeg
     ];
 
+    /// <summary>A mech or chassis name followed by the variant, e.g. "Atlas (AS7-D)".</summary>
+    /// <remarks>The variant identifies the mech, as in the game's lance and store lists.</remarks>
+    internal static string NameWithVariant(string name, ChassisDef chassis) => $"{name} ({chassis.VariantName})";
+
     // Both dictionaries are keyed by the mech bay slot; a slot is in one of them at most.
     internal static List<Mech> ReadMechs(SimGameState simGame) =>
         simGame.ActiveMechs
@@ -44,8 +48,7 @@ internal static class MechReader
         return new Mech(
             mech.GUID,
             mech.Name,
-            // E.g. "Atlas AS7-D", like the UI names of the stock mechs.
-            new DefinitionReference(chassis.Description.Id, $"{chassis.Description.Name} {chassis.VariantName}"),
+            new DefinitionReference(chassis.Description.Id, NameWithVariant(chassis.Description.Name, chassis)),
             chassis.weightClass,
             chassis.StockRole,
             slot / slotsPerBay + 1,
