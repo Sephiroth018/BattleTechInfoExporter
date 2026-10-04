@@ -4,7 +4,6 @@ using System.Linq;
 using BattleTech;
 using BattleTech.Data;
 using BattleTechInfoExporter.Models;
-using HBS.Data;
 
 namespace BattleTechInfoExporter.Export;
 
@@ -25,22 +24,12 @@ internal sealed class ComponentDefinitionReader
 
     internal IReadOnlyDictionary<string, ComponentDefinition> Definitions => _definitions;
 
-    // Resolves the definition as BaseComponentRef.RefreshComponentDef does.
+    // DataManager.Get returns null for a missing definition; the type mapping is static, so no SimGameState is needed.
     internal DefinitionReference ReferenceTo(ComponentType componentType, string componentId) =>
         ReferenceTo(
             componentId,
-            componentType switch
-            {
-                ComponentType.AmmunitionBox => Find(_dataManager.AmmoBoxDefs, componentId),
-                ComponentType.HeatSink => Find(_dataManager.HeatSinkDefs, componentId),
-                ComponentType.JumpJet => Find(_dataManager.JumpJetDefs, componentId),
-                ComponentType.Upgrade => Find(_dataManager.UpgradeDefs, componentId),
-                ComponentType.Weapon => Find(_dataManager.WeaponDefs, componentId),
-                _ => throw new ArgumentOutOfRangeException(
-                    nameof(componentType),
-                    componentType,
-                    "Not a component definition type")
-            });
+            _dataManager.Get(SimGameState.ComponentTypeToBattleTechResourceType(componentType), componentId)
+                as MechComponentDef);
 
     // The id stands in for the name of a missing definition, which gets no entry.
     internal DefinitionReference ReferenceTo(string componentId, MechComponentDef? definition)
@@ -86,10 +75,6 @@ internal sealed class ComponentDefinitionReader
                 : null,
             definition is HeatSinkDef heatSink ? new HeatSinkStats(heatSink.DissipationCapacity) : null);
     }
-
-    private static MechComponentDef? Find<TDefinition>(IDataItemStore<string, TDefinition> store, string componentId)
-        where TDefinition : MechComponentDef, new() =>
-        store.Exists(componentId) ? store.Get(componentId) : null;
 
     private static WeaponStats ReadWeapon(WeaponDef weapon) =>
         new(
