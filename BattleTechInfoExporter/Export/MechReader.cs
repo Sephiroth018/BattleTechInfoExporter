@@ -73,9 +73,8 @@ internal static class MechReader
     {
         var chassis = mech.Chassis;
         var workOrder = simGame.GetWorkOrderEntryForMech(mech);
-        // The maximum it returns is the stat bar's scale, not the chassis tonnage.
-        float usedTonnage = 0, ignoredMax = 0;
-        MechStatisticsRules.CalculateTonnage(mech, ref usedTonnage, ref ignoredMax);
+        // A readying mech's work order has no steps: it is the readying itself.
+        var refitOrder = workOrder is WorkOrderEntry_ReadyMech ? null : workOrder;
         // MechBayRowGroupWidget.SetData fills each bay row with this many slots.
         var slotsPerBay = simGame.Constants.Story.MaxMechsPerPod;
         return new Mech(
@@ -95,7 +94,7 @@ internal static class MechReader
             ReadDaysUntilReady(simGame, workOrder),
             // SimGameState.GetWorkOrderEntryForMech finds the order among the queue's own entries.
             workOrder is null ? null : simGame.MechLabQueue.IndexOf(workOrder) + 1,
-            ReadRefit(simGame, componentDefinitions, mech, workOrder),
+            ReadRefit(simGame, componentDefinitions, mech, refitOrder),
             MechValidationRules.ValidateMechCanBeFielded(simGame, mech),
             // The mech lab validates at this level, against the mech's work order (MechLabPanel).
             MechValidationRules.ValidateMechDef(MechValidationLevel.MechLab, simGame.DataManager, mech, workOrder)
@@ -103,7 +102,19 @@ internal static class MechReader
                 .SelectMany(problems => problems)
                 .Select(problem => problem.ToString())
                 .ToList(),
-            new Tonnage(usedTonnage, chassis.Tonnage),
+            ReadLoadout(componentDefinitions, mech),
+            refitOrder is null
+                ? null
+                : ReadLoadout(componentDefinitions, MechRefit.CopyWithPendingSteps(simGame, mech, refitOrder)));
+    }
+
+    private static MechLoadout ReadLoadout(ComponentDefinitionReader componentDefinitions, MechDef mech)
+    {
+        // The maximum it returns is the stat bar's scale, not the chassis tonnage.
+        float usedTonnage = 0, ignoredMax = 0;
+        MechStatisticsRules.CalculateTonnage(mech, ref usedTonnage, ref ignoredMax);
+        return new MechLoadout(
+            new Tonnage(usedTonnage, mech.Chassis.Tonnage),
             // Recomputed by MechDef.RefreshBattleValue whenever the loadout changes; the mech bay shows it.
             mech.Description.Cost,
             MechStatsReader.Read(mech),
@@ -172,19 +183,16 @@ internal static class MechReader
                 .ToList());
     }
 
-    // A readying mech's work order has no steps: it is the readying itself.
     private static List<RefitChange>? ReadRefit(
         SimGameState simGame,
         ComponentDefinitionReader componentDefinitions,
         MechDef mech,
-        WorkOrderEntry_MechLab? workOrder) =>
-        workOrder is null or WorkOrderEntry_ReadyMech
-            ? null
-            : workOrder.SubEntries
-                // SimGameState.UpdateMechLabWorkQueue relies on the same.
-                .Cast<WorkOrderEntry_MechLab>()
-                .Select(step => ReadRefitChange(simGame, componentDefinitions, mech, step))
-                .ToList();
+        WorkOrderEntry_MechLab? refitOrder) =>
+        refitOrder?.SubEntries
+            // SimGameState.UpdateMechLabWorkQueue relies on the same.
+            .Cast<WorkOrderEntry_MechLab>()
+            .Select(step => ReadRefitChange(simGame, componentDefinitions, mech, step))
+            .ToList();
 
     private static RefitChange ReadRefitChange(
         SimGameState simGame,
