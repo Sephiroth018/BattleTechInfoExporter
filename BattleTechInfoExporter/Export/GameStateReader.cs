@@ -26,6 +26,7 @@ internal static class GameStateReader
             StorageReader.ReadStorage(simGame, componentDefinitions),
             StoreReader.ReadStores(simGame, componentDefinitions),
             PilotReader.ReadHiringHall(simGame),
+            ContractReader.ReadActiveContract(simGame),
             ContractReader.ReadContracts(simGame),
             // After every section that references components.
             componentDefinitions.Definitions,
@@ -242,15 +243,20 @@ internal static class GameStateReader
 
     // TravelTime only counts the current leg (e.g. to the jump point). The travel order keeps the legs as
     // internal sub-entries, so its remaining cost is the whole trip, the single entry the queue shows.
-    private static Travel? ReadTravel(SimGameState simGame)
+    internal static (StarSystem Destination, int DaysLeft)? ReadTravelInProgress(SimGameState simGame)
     {
         var destination = simGame.Starmap?.Destination?.System;
         var travelOrder = simGame.TravelOrder;
         return simGame.TravelState == SimGameTravelStatus.IN_SYSTEM || destination is null || travelOrder is null
             ? null
-            : new Travel(
-                DefinitionReferences.ReferenceTo(destination.Def.Description),
-                DefinitionReferences.ReferenceTo(destination.OwnerValue),
-                travelOrder.GetRemainingCost());
+            : (destination, travelOrder.GetRemainingCost());
     }
+
+    private static Travel? ReadTravel(SimGameState simGame) =>
+        ReadTravelInProgress(simGame) is { } travel
+            ? new Travel(
+                DefinitionReferences.ReferenceTo(travel.Destination.Def.Description),
+                DefinitionReferences.ReferenceTo(travel.Destination.OwnerValue),
+                travel.DaysLeft)
+            : null;
 }

@@ -47,6 +47,10 @@ overwritten on every export:
       **The game only generates a system's contracts when its Command Center's contract screen first
       opens, or after a contract; the mod never generates them itself, so it doesn't change the
       game. Until then, `contracts` is `null`.**
+- [x] The active contract: the accepted travel contract, with the same details and the terms it was
+      accepted with, from accepting it until proceeding with it on arrival. It isn't repeated in
+      the contracts. While travelling to it, its travel days are the trip's remaining days
+- [ ] The active flashpoint (#56)
 - [ ] The ship and its upgrades (#45); the mech lab queue is part of each mech (#46)
 
 The game's **rules** for this career, written to `Mods/BattleTechInfoExporter/exports/rules.json`
