@@ -20,6 +20,7 @@ internal static class GameStateReader
             trigger,
             ReadCompany(simGame),
             ReadPilots(simGame),
+            MechReader.ReadMechs(simGame),
             ReadPosition(simGame),
             new Rules(ReadMoraleLevels(simGame), ReadReputationLevels(simGame), ReadSkillRules(simGame)));
 

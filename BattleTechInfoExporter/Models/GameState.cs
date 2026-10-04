@@ -12,5 +12,6 @@ internal sealed record GameState(
     ExportTrigger Trigger,
     Company Company,
     IReadOnlyList<Pilot> Pilots,
+    IReadOnlyList<Mech> Mechs,
     Position Position,
     Rules Rules);

@@ -353,7 +353,8 @@ name, version and folder, `ModLog` its logger. Folders:
 
 - `Triggers/`: the patches that decide when to export.
 - `Export/`: `GameStateExporter`, the single entry point every trigger calls; `GameStateReader`
-  builds the model from the game, `ExportFileWriter` writes it into the mod's `exports/` folder.
+  builds the model from the game, with `MechReader` and `MechStatsReader` for the mechs;
+  `ExportFileWriter` writes it into the mod's `exports/` folder.
 - `Models/`: immutable records, one per JSON object, marked
   `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` because only the serializer reads them.
 
