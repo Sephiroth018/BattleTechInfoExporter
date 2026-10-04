@@ -84,6 +84,8 @@ The game state is exported when:
       or an Argo upgrade. Orders finishing on the same day are exported together
 - [x] The game finishes generating the contracts of the current system
 - [x] A store is closed, from the main screen or the mech lab
+- [x] The mech bay changes: a refit or repair is queued, a mech is readied or stored, an order is
+      cancelled, the queue is reordered, or a mech, a stored chassis or mech parts are scrapped
 - [ ] Possibly a key combination
 
 ## Installing

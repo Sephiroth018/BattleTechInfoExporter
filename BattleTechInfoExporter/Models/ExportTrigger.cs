@@ -14,5 +14,6 @@ internal enum ExportTrigger
     FinancialReportShown,
     WorkOrderCompleted,
     ContractsGenerated,
-    StoreClosed
+    StoreClosed,
+    MechBayChanged
 }
