@@ -25,6 +25,7 @@ internal static class GameStateReader
             StorageReader.ReadStorage(simGame, componentDefinitions),
             StoreReader.ReadStores(simGame, componentDefinitions),
             PilotReader.ReadHiringHall(simGame),
+            ContractReader.ReadContracts(simGame),
             // After every section that references components.
             componentDefinitions.Definitions,
             ReadPosition(simGame),
@@ -33,7 +34,8 @@ internal static class GameStateReader
                 ReadReputationLevels(simGame),
                 ReadSkillRules(simGame),
                 ReadSpiritsLevels(simGame),
-                simGame.Constants.Story.DefaultMechPartMax));
+                simGame.Constants.Story.DefaultMechPartMax,
+                ContractReader.ReadContractTypes(simGame)));
     }
 
     private static Company ReadCompany(SimGameState simGame) =>

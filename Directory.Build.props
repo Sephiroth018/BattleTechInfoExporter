@@ -4,7 +4,7 @@
           Condition="Exists('$(MSBuildThisFileDirectory)Directory.Build.user.props')" />
 
   <PropertyGroup>
-    <Version>0.11.0</Version>
+    <Version>0.12.0</Version>
     <Description>Exports the story campaign's career state as JSON for tools to read.</Description>
     <Authors>Sephiroth018</Authors>
     <RepositoryUrl>https://github.com/Sephiroth018/BattleTechInfoExporter</RepositoryUrl>
