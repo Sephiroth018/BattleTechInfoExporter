@@ -13,5 +13,6 @@ internal enum ExportTrigger
     ContractCompleted,
     FinancialReportShown,
     WorkOrderCompleted,
-    ContractsGenerated
+    ContractsGenerated,
+    StoreClosed
 }

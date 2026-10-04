@@ -83,6 +83,7 @@ The game state is exported when:
 - [x] A work order finishes: a mech lab order (once the whole order is done), a heal in the medbay
       or an Argo upgrade. Orders finishing on the same day are exported together
 - [x] The game finishes generating the contracts of the current system
+- [x] A store is closed, from the main screen or the mech lab
 - [ ] Possibly a key combination
 
 ## Installing
