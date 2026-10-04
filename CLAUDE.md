@@ -435,6 +435,10 @@ before the go-ahead. Every checklist starts with the standard checks:
 
 followed by the PR's own feature checks.
 
+Check 2 is Claude's, not the user's: when the user says to merge or that they've verified the other
+checks, the game has run with the PR's build, so Claude reads the log then, ticks the check, and
+stops and reports instead of merging if it fails.
+
 ## Versioning
 
 Semantic versioning, bumped in every PR as part of its changes: major for breaking changes to the
