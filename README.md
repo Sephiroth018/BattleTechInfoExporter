@@ -18,9 +18,12 @@ overwritten on every export:
       with their breakdown
 - [x] The current position: system, travel status, and when travelling the destination and days
       left
-- [x] The game's rules for this career: morale levels, and reputation levels with their contract
-      difficulty limits, system store access and store price changes
-- [ ] Pilots
+- [x] Pilots: the commander and the roster with their skills, experience, primary abilities,
+      health and injuries, status, spirits and service record
+- [x] The game's rules for this career: morale levels, reputation levels with their contract
+      difficulty limits, system store access and store price changes, and the skill training table
+      with the experience cost of each level, the abilities and traits it unlocks, and the limits on
+      choosing primary abilities
 - [ ] Mechs with all their equipment and stats
 - [ ] Storage: equipment, mechs and mech parts
 - [ ] The current system's store and hiring hall

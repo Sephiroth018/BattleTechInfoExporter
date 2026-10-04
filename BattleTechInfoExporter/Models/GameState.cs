@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
@@ -10,5 +11,6 @@ internal sealed record GameState(
     DateTimeOffset ExportedAt,
     ExportTrigger Trigger,
     Company Company,
+    IReadOnlyList<Pilot> Pilots,
     Position Position,
     Rules Rules);
