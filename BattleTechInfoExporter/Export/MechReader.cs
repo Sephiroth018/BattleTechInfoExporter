@@ -195,13 +195,13 @@ internal static class MechReader
             WorkOrderEntry_InstallComponent { DesiredLocation: ChassisLocations.None } removal => new RefitChange(
                 RefitChangeType.RemoveComponent,
                 step.IsMechLabComplete,
-                ReferenceTo(removal.MechComponentID, removal.MechComponentRef.Def),
+                ReferenceTo(simGame, removal),
                 removal.DamageLevel,
                 removal.PreviousLocation),
             WorkOrderEntry_InstallComponent installation => new RefitChange(
                 RefitChangeType.InstallComponent,
                 step.IsMechLabComplete,
-                ReferenceTo(installation.MechComponentID, installation.MechComponentRef.Def),
+                ReferenceTo(simGame, installation),
                 installation.DamageLevel,
                 installation.DesiredLocation),
             WorkOrderEntry_RepairComponent repair => ReadRepair(simGame, mech, repair),
@@ -241,6 +241,18 @@ internal static class MechReader
             ReferenceTo(repair.MechComponentID, component?.Def),
             repair.DamageLevel,
             component?.MountedLocation is { } location and not ChassisLocations.None ? location : null);
+    }
+
+    // The step's MechComponentRef is restored from the save without a DataManager, so its Def stays null; this
+    // resolves the definition as BaseComponentRef.RefreshComponentDef does.
+    private static DefinitionReference ReferenceTo(SimGameState simGame, WorkOrderEntry_InstallComponent step)
+    {
+        var resourceType = SimGameState.ComponentTypeToBattleTechResourceType(step.ComponentType);
+        return ReferenceTo(
+            step.MechComponentID,
+            simGame.DataManager.Exists(resourceType, step.MechComponentID)
+                ? simGame.GetComponentDef(resourceType, step.MechComponentID)
+                : null);
     }
 
     // The mech lab shows the short UI name (MechLabItemSlotElement); the id stands in for a missing definition.
