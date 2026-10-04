@@ -4,7 +4,10 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
-/// <summary>A mech in the mech bay, with its current loadout; changes still queued in the mech lab aren't in it.</summary>
+/// <summary>
+///     A mech in the mech bay, with its current loadout; the changes still queued in the mech lab are in
+///     <see cref="Refit" />.
+/// </summary>
 /// <param name="Id">The mech's own id, unique among the company's mechs.</param>
 /// <param name="Name">The mech's name, which the player can change in the mech lab.</param>
 /// <param name="Bay">The mech bay row, counted from 1, as the mech bay shows it.</param>
@@ -13,6 +16,10 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="DaysUntilReady">
 ///     The days until the mech lab finishes its work order; zero when
 ///     <see cref="MechStatus.Ready" />.
+/// </param>
+/// <param name="Refit">
+///     The steps of the mech's mech lab work order, in order; finished steps are already part of the loadout.
+///     <c>null</c> without a work order and while readying.
 /// </param>
 /// <param name="IsFieldable">Whether the mech can be taken on a mission, as the lance configuration decides.</param>
 /// <param name="Problems">The loadout problems the mech lab warns about, e.g. missing ammo, in the game's words.</param>
@@ -29,6 +36,7 @@ internal sealed record Mech(
     int Position,
     MechStatus Status,
     int DaysUntilReady,
+    IReadOnlyList<RefitChange>? Refit,
     bool IsFieldable,
     IReadOnlyList<string> Problems,
     Tonnage Tonnage,

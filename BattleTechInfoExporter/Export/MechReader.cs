@@ -57,6 +57,7 @@ internal static class MechReader
                 _ => MechStatus.InMaintenance
             },
             ReadDaysUntilReady(simGame, workOrder),
+            ReadRefit(simGame, mech, workOrder),
             MechValidationRules.ValidateMechCanBeFielded(simGame, mech),
             // The mech lab validates at this level, against the mech's work order (MechLabPanel).
             MechValidationRules.ValidateMechDef(MechValidationLevel.MechLab, simGame.DataManager, mech, workOrder)
@@ -128,10 +129,7 @@ internal static class MechReader
         var definition = component.Def;
         var description = definition.Description;
         return new Equipment(
-            // The mech lab shows the short UI name (MechLabItemSlotElement).
-            new DefinitionReference(
-                component.ComponentDefID,
-                string.IsNullOrEmpty(description.UIName) ? description.Name : description.UIName),
+            ReferenceTo(component.ComponentDefID, definition),
             component.ComponentDefType,
             component.DamageLevel,
             component.IsFixed,
@@ -173,4 +171,89 @@ internal static class MechReader
             weapon.CriticalChanceMultiplier,
             weapon.RefireModifier,
             weapon.IndirectFireCapable);
+
+    // A readying mech's work order has no steps: it is the readying itself.
+    private static List<RefitChange>? ReadRefit(
+        SimGameState simGame,
+        MechDef mech,
+        WorkOrderEntry_MechLab? workOrder) =>
+        workOrder is null or WorkOrderEntry_ReadyMech
+            ? null
+            : workOrder.SubEntries
+                // SimGameState.UpdateMechLabWorkQueue relies on the same.
+                .Cast<WorkOrderEntry_MechLab>()
+                .Select(step => ReadRefitChange(simGame, mech, step))
+                .ToList();
+
+    private static RefitChange ReadRefitChange(SimGameState simGame, MechDef mech, WorkOrderEntry_MechLab step) =>
+        step switch
+        {
+            // A removal has no desired location (SimGameState.CreateComponentInstallWorkOrder).
+            WorkOrderEntry_InstallComponent { DesiredLocation: ChassisLocations.None } removal => new RefitChange(
+                RefitChangeType.RemoveComponent,
+                step.IsMechLabComplete,
+                ReferenceTo(simGame, removal.MechComponentID, removal.ComponentType),
+                removal.DamageLevel,
+                removal.PreviousLocation,
+                null,
+                null,
+                null),
+            WorkOrderEntry_InstallComponent installation => new RefitChange(
+                RefitChangeType.InstallComponent,
+                step.IsMechLabComplete,
+                ReferenceTo(simGame, installation.MechComponentID, installation.ComponentType),
+                installation.DamageLevel,
+                installation.DesiredLocation,
+                null,
+                null,
+                null),
+            WorkOrderEntry_RepairComponent repair => new RefitChange(
+                RefitChangeType.RepairComponent,
+                step.IsMechLabComplete,
+                ReferenceTo(simGame, repair.MechComponentID, repair.ComponentType),
+                repair.DamageLevel,
+                mech.Inventory.FirstOrDefault(component => component.SimGameUID == repair.ComponentSimGameUID)
+                    ?.MountedLocation,
+                null,
+                null,
+                null),
+            WorkOrderEntry_ModifyMechArmor armor => new RefitChange(
+                RefitChangeType.ModifyArmor,
+                step.IsMechLabComplete,
+                null,
+                null,
+                armor.Location,
+                armor.DesiredFrontArmor,
+                mech.GetChassisLocationDef(armor.Location).MaxRearArmor < 0 ? null : armor.DesiredRearArmor,
+                null),
+            WorkOrderEntry_RepairMechStructure structure => new RefitChange(
+                RefitChangeType.RepairStructure,
+                step.IsMechLabComplete,
+                null,
+                null,
+                structure.Location,
+                null,
+                null,
+                structure.StructureAmount),
+            _ => throw new InvalidOperationException($"Unexpected mech lab work order type {step.Type}")
+        };
+
+    // Resolves the definition as SimGameState.GetMechComponentRefForUID does for a part taken from storage.
+    private static DefinitionReference ReferenceTo(SimGameState simGame, string componentId, ComponentType type)
+    {
+        var component = new MechComponentRef(componentId, null, type, ChassisLocations.None)
+        {
+            DataManager = simGame.DataManager
+        };
+        component.RefreshComponentDef();
+        return ReferenceTo(componentId, component.Def);
+    }
+
+    // The mech lab shows the short UI name (MechLabItemSlotElement); the id stands in for a missing definition.
+    private static DefinitionReference ReferenceTo(string componentId, MechComponentDef? definition) =>
+        new(
+            componentId,
+            definition is null ? componentId
+            : string.IsNullOrEmpty(definition.Description.UIName) ? definition.Description.Name
+            : definition.Description.UIName);
 }
