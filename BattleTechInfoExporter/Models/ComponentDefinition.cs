@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using Newtonsoft.Json;
 
 namespace BattleTechInfoExporter.Models;
 
@@ -11,17 +10,13 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Name">The name the mech lab shows, as in the references to the component.</param>
 /// <param name="Cost">The C-Bill value of the component.</param>
 /// <param name="Bonuses">The short bonus texts shown on the component, e.g. "+ 5 Dmg.".</param>
-/// <remarks>
-///     Newtonsoft.Json writes a derived record's own properties before the inherited ones; the order puts these
-///     first, ahead of the default -1.
-/// </remarks>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal record ComponentDefinition(
-    [property: JsonProperty(Order = -2)] string Name,
-    [property: JsonProperty(Order = -2)] float Tonnage,
-    [property: JsonProperty(Order = -2)] int Slots,
-    [property: JsonProperty(Order = -2)] int Cost,
-    [property: JsonProperty(Order = -2)] IReadOnlyList<string> Bonuses);
+    string Name,
+    float Tonnage,
+    int Slots,
+    int Cost,
+    IReadOnlyList<string> Bonuses);
 
 /// <param name="Category">The hardpoint kind the weapon needs, e.g. "Ballistic" or "Support".</param>
 /// <param name="AmmoCategory">

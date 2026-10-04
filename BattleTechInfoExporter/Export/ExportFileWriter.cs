@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -13,7 +16,7 @@ internal static class ExportFileWriter
     private static readonly JsonSerializerSettings SerializerSettings = new()
     {
         Formatting = Formatting.Indented,
-        ContractResolver = new DefaultContractResolver
+        ContractResolver = new InheritedFirstContractResolver
         {
             NamingStrategy = new CamelCaseNamingStrategy { ProcessDictionaryKeys = false }
         },
@@ -40,5 +43,22 @@ internal static class ExportFileWriter
         }
 
         return path;
+    }
+
+    /// <summary>
+    ///     Writes inherited properties before a type's own, base type first, so e.g. every component definition
+    ///     starts with its name; Newtonsoft.Json writes them the other way round.
+    /// </summary>
+    private sealed class InheritedFirstContractResolver : DefaultContractResolver
+    {
+        // OrderBy is stable, so the properties keep their declaration order within each type.
+        protected override IList<JsonProperty> CreateProperties(
+            Type type,
+            MemberSerialization memberSerialization) =>
+            base.CreateProperties(type, memberSerialization)
+                .OrderBy(property => InheritanceDepth(property.DeclaringType))
+                .ToList();
+
+        private static int InheritanceDepth(Type? type) => type is null ? 0 : 1 + InheritanceDepth(type.BaseType);
     }
 }
