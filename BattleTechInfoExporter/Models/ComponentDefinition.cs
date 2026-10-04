@@ -1,22 +1,27 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     The fields every component definition has, first in each group's entries; jump jets and upgrades have no
-///     others.
+///     The fields every component definition has; the definitions of types with stats of their own derive from
+///     it. Jump jets and upgrades have no others.
 /// </summary>
 /// <param name="Name">The name the mech lab shows, as in the references to the component.</param>
 /// <param name="Cost">The C-Bill value of the component.</param>
 /// <param name="Bonuses">The short bonus texts shown on the component, e.g. "+ 5 Dmg.".</param>
+/// <remarks>
+///     Newtonsoft.Json writes a derived record's own properties before the inherited ones; the order puts these
+///     first, ahead of the default -1.
+/// </remarks>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record ComponentDefinition(
-    string Name,
-    float Tonnage,
-    int Slots,
-    int Cost,
-    IReadOnlyList<string> Bonuses);
+internal record ComponentDefinition(
+    [property: JsonProperty(Order = -2)] string Name,
+    [property: JsonProperty(Order = -2)] float Tonnage,
+    [property: JsonProperty(Order = -2)] int Slots,
+    [property: JsonProperty(Order = -2)] int Cost,
+    [property: JsonProperty(Order = -2)] IReadOnlyList<string> Bonuses);
 
 /// <param name="Category">The hardpoint kind the weapon needs, e.g. "Ballistic" or "Support".</param>
 /// <param name="AmmoCategory">
@@ -50,7 +55,7 @@ internal sealed record WeaponDefinition(
     float AccuracyModifier,
     float CriticalChanceMultiplier,
     int RefireModifier,
-    bool IsIndirectFireCapable);
+    bool IsIndirectFireCapable) : ComponentDefinition(Name, Tonnage, Slots, Cost, Bonuses);
 
 /// <summary>The range brackets in meters: the weapon is less accurate below short range and beyond long range.</summary>
 /// <param name="Min">Below it the weapon can't fire.</param>
@@ -67,7 +72,7 @@ internal sealed record AmmunitionBoxDefinition(
     int Cost,
     IReadOnlyList<string> Bonuses,
     string AmmoCategory,
-    int Capacity);
+    int Capacity) : ComponentDefinition(Name, Tonnage, Slots, Cost, Bonuses);
 
 /// <param name="Dissipation">The heat the heat sink removes per round.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -77,4 +82,4 @@ internal sealed record HeatSinkDefinition(
     int Slots,
     int Cost,
     IReadOnlyList<string> Bonuses,
-    float Dissipation);
+    float Dissipation) : ComponentDefinition(Name, Tonnage, Slots, Cost, Bonuses);
