@@ -43,7 +43,7 @@ overwritten on every export:
       health, hiring cost, salary, and whether the company's rating and morale allow hiring them
 - [x] Contracts: the contracts the Command Center offers, with their mission type, employer and
       target, difficulty and whether the reputation allows them, the pay, salvage and reputation
-      changes of each negotiation step, the lance limits, the biome, and for contracts in another
+      changes of every combination the negotiation allows, the lance limits, the biome, and for contracts in another
       system its planet tags and travel days. The mission types' descriptions are in the rules.
       **The game only generates a system's contracts when its Command Center's contract screen first
       opens, or after a contract; the mod never generates them itself, so it doesn't change the

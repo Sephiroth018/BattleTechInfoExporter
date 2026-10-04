@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>A contract the Command Center offers, as its contract list and details show it.</summary>
+/// <param name="Id">The contract's data file; <c>null</c> where the game keeps no reference to it.</param>
 /// <param name="Type">The mission type, described in <see cref="Rules.ContractTypes" />.</param>
 /// <param name="DisplayStyle">Whether it's a regular, story, restoration or flashpoint contract.</param>
 /// <param name="Difficulty">
@@ -19,7 +20,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Travel"><c>null</c> for a contract in the current system.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Contract(
-    string Id,
+    string? Id,
     string Name,
     DefinitionReference Type,
     ContractDisplayStyle DisplayStyle,
@@ -27,29 +28,30 @@ internal sealed record Contract(
     DefinitionReference Target,
     int Difficulty,
     bool MeetsReputation,
-    string Description,
     Negotiation Negotiation,
     LanceLimits Lance,
     DefinitionReference? Biome,
     ContractTravel? Travel);
 
-/// <summary>
-///     The contract's terms. Pay and salvage each pick one of <see cref="Steps" />; reputation gets the share they
-///     leave, so the three shares add up to 100. Without reputation, pay and salvage add up to 100.
-/// </summary>
-/// <param name="Steps">One per slider position; a single fixed one when the contract can't be negotiated.</param>
-[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record Negotiation(bool CanNegotiate, IReadOnlyList<NegotiationStep> Steps);
-
-/// <param name="Share">The slider position in percent; <c>null</c> for fixed terms.</param>
-/// <param name="Pay">The C-Bills at this share of pay.</param>
-/// <param name="Salvage">The salvage at this share of salvage.</param>
-/// <param name="Reputation">
-///     The reputation changes at this share of reputation; the same in every step when the employer doesn't gain
-///     reputation, since then no share is left for it.
+/// <summary>The contract's terms.</summary>
+/// <param name="Options">
+///     Every combination of the pay and salvage sliders the negotiation allows: their shares add up to at most 100,
+///     reputation gets the rest. When the employer doesn't gain reputation, they always add up to 100. A single
+///     option with the fixed terms when the contract can't be negotiated.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record NegotiationStep(int? Share, int Pay, Salvage Salvage, ReputationChange Reputation);
+internal sealed record Negotiation(bool CanNegotiate, IReadOnlyList<NegotiationOption> Options);
+
+/// <param name="PayShare">The pay slider's position in percent; <c>null</c> for fixed terms.</param>
+/// <param name="SalvageShare">The salvage slider's position in percent; <c>null</c> for fixed terms.</param>
+/// <param name="Pay">The C-Bills.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record NegotiationOption(
+    int? PayShare,
+    int? SalvageShare,
+    int Pay,
+    Salvage Salvage,
+    ReputationChange Reputation);
 
 /// <summary>The reputation changes of a successful contract, as the negotiation shows them.</summary>
 /// <param name="Employer">The gain with the employer; <c>null</c> when the employer doesn't gain reputation.</param>
@@ -65,13 +67,13 @@ internal sealed record ReputationChange(int? Employer, int? Target);
 internal sealed record Salvage(int Total, int Priority);
 
 /// <summary>The lance the contract allows; every limit is <c>null</c> when there is none.</summary>
-/// <param name="Mechs">The tonnage limits of each mech slot, one per mech allowed.</param>
+/// <param name="Mechs">The tonnage limits of each mech slot, one per mech allowed; <c>null</c> when no slot has any.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record LanceLimits(
     int MaxMechs,
     float? MinTonnage,
     float? MaxTonnage,
-    IReadOnlyList<MechSlotLimits> Mechs);
+    IReadOnlyList<MechSlotLimits>? Mechs);
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechSlotLimits(float? MinTonnage, float? MaxTonnage);

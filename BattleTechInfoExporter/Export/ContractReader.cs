@@ -47,7 +47,7 @@ internal static class ContractReader
         var employer = contract.GetTeamFaction(contractOverride.employerTeam.teamGuid);
         var target = contract.GetTeamFaction(contractOverride.targetTeam.teamGuid);
         return new Contract(
-            contractOverride.ID,
+            ReadId(contractOverride),
             // The contract list and details show the raw name; Contract.Name interpolates it, which the game's
             // contracts don't need.
             contractOverride.contractName,
@@ -61,12 +61,23 @@ internal static class ContractReader
                 contractOverride.finalDifficulty + contractOverride.difficultyUIModifier,
                 (int)simGame.Constants.Story.GlobalContractDifficultyMax),
             simGame.ContractUserMeetsReputation(contract),
-            contract.ShortDescription,
             ReadNegotiation(simGame, contract, employer, target),
             ReadLanceLimits(contractOverride),
             ReadBiome(simGame, contract.ContractBiome),
             ReadTravel(simGame, contract));
     }
+
+    // A travel contract gets a new override without an id (SimGameState.CreateTravelContract); the original's id
+    // is only kept in the success action that starts the contract on arrival.
+    private static string? ReadId(ContractOverride contractOverride) =>
+        !string.IsNullOrEmpty(contractOverride.ID)
+            ? contractOverride.ID
+            : contractOverride.OnContractSuccessResults
+                .Where(result => result.Actions is not null)
+                .SelectMany(result => result.Actions)
+                .FirstOrDefault(action =>
+                    action.Type == SimGameResultAction.ActionType.System_StartNonProceduralContract)
+                ?.additionalValues[3];
 
     private static DefinitionReference ReferenceTo(ContractTypeValue contractType) =>
         new(contractType.Name, contractType.FriendlyName);
@@ -83,29 +94,35 @@ internal static class ContractReader
     {
         if (!contract.CanNegotiate)
         {
-            var salaryShare = contract.Override.negotiatedSalary;
-            var salvageShare = contract.Override.negotiatedSalvage;
-            return new Negotiation(false, [Step(null, salaryShare, salvageShare, 1f - (salaryShare + salvageShare))]);
+            return new Negotiation(
+                false,
+                [Option(null, null, contract.Override.negotiatedSalary, contract.Override.negotiatedSalvage)]);
         }
 
-        // Without employer reputation the two sliders are coupled and leave no share for it
-        // (SGContractsWidget.ShouldAdjustReputation).
+        // The sliders' shares can't exceed 100 together; without employer reputation they are coupled and leave
+        // nothing for it (SGContractsWidget.OnNegPaymentChange, ShouldAdjustReputation). Accepting sets the
+        // reputation share to the rest (Contract.SetNegotiatedValues).
         return new Negotiation(
             true,
             NegotiationShares
-                .Select(share => Step(
-                    share,
-                    share / 100f,
-                    share / 100f,
-                    employer.DoesGainReputation ? share / 100f : 0f))
+                .SelectMany(_ => NegotiationShares, (payShare, salvageShare) => (payShare, salvageShare))
+                .Where(shares => employer.DoesGainReputation
+                    ? shares.payShare + shares.salvageShare <= 100
+                    : shares.payShare + shares.salvageShare == 100)
+                .Select(shares => Option(
+                    shares.payShare,
+                    shares.salvageShare,
+                    shares.payShare / 100f,
+                    shares.salvageShare / 100f))
                 .ToList());
 
-        NegotiationStep Step(int? share, float payShare, float salvageShare, float reputationShare) =>
+        NegotiationOption Option(int? payPercent, int? salvagePercent, float payShare, float salvageShare) =>
             new(
-                share,
+                payPercent,
+                salvagePercent,
                 ReadPay(simGame, contract, payShare),
                 ReadSalvage(simGame, contract, salvageShare),
-                ReadReputation(simGame, contract, employer, target, reputationShare));
+                ReadReputation(simGame, contract, employer, target, 1f - (payShare + salvageShare)));
     }
 
     // Mirrors SimGameState.GetScaledCBillValue, as SGContractsWidget.UpdateCurrentValues shows the pay.
@@ -145,17 +162,20 @@ internal static class ContractReader
     }
 
     // As SGContractsWidget.PopulateContract passes them to the lance tonnage icons; -1 means no limit.
-    private static LanceLimits ReadLanceLimits(ContractOverride contractOverride) =>
-        new(
+    private static LanceLimits ReadLanceLimits(ContractOverride contractOverride)
+    {
+        var mechs = Enumerable.Range(0,
+                Math.Min(contractOverride.maxNumberOfPlayerUnits, contractOverride.mechMinTonnages.Length))
+            .Select(slot => new MechSlotLimits(
+                LimitOf(contractOverride.mechMinTonnages[slot]),
+                LimitOf(contractOverride.mechMaxTonnages[slot])))
+            .ToList();
+        return new LanceLimits(
             contractOverride.maxNumberOfPlayerUnits,
             LimitOf(contractOverride.lanceMinTonnage),
             LimitOf(contractOverride.lanceMaxTonnage),
-            Enumerable.Range(0,
-                    Math.Min(contractOverride.maxNumberOfPlayerUnits, contractOverride.mechMinTonnages.Length))
-                .Select(slot => new MechSlotLimits(
-                    LimitOf(contractOverride.mechMinTonnages[slot]),
-                    LimitOf(contractOverride.mechMaxTonnages[slot])))
-                .ToList());
+            mechs.Any(limits => limits.MinTonnage is not null || limits.MaxTonnage is not null) ? mechs : null);
+    }
 
     private static float? LimitOf(float tonnage) => tonnage < 0 ? null : tonnage;
 
