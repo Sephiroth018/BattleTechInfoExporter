@@ -13,12 +13,13 @@ Only the story campaign is supported; in career mode the mod exports nothing.
 The **game state**, written to `Mods/BattleTechInfoExporter/exports/game-state.json` and
 overwritten on every export:
 
-- [x] The company: dropship, date, morale, MechTech and MedTech, reputation with every faction,
-      and the reputation levels with their contract difficulty limits, system store access and store price changes
+- [x] The company: dropship, date, morale, MechTech and MedTech, reputation with every faction
 - [x] Finances: funds, spending level and its options, the expected expenses of the next report
       with their breakdown
 - [x] The current position: system, travel status, and when travelling the destination and days
       left
+- [x] The game's rules for this career: morale levels, and reputation levels with their contract
+      difficulty limits, system store access and store price changes
 - [ ] Pilots
 - [ ] Mechs with all their equipment and stats
 - [ ] Storage: equipment, mechs and mech parts
