@@ -45,7 +45,7 @@ overwritten on every export:
       system its planet tags and travel days. The mission types' descriptions are in the rules file.
       **The game only generates a system's contracts when its Command Center's contract screen first
       opens, or after a contract; the mod never generates them itself, so it doesn't change the
-      game. Until then, `contracts` is `null`.**
+      game. Until then, `contracts` is `null`; once the game has generated them, they're exported.**
 - [x] The active contract: the accepted travel contract, with the same details and the terms it was
       accepted with, from accepting it until proceeding with it on arrival. It isn't repeated in
       the contracts. While travelling to it, its travel days are the trip's remaining days
@@ -82,6 +82,7 @@ The game state is exported when:
       spending level
 - [x] A work order finishes: a mech lab order (once the whole order is done), a heal in the medbay
       or an Argo upgrade. Orders finishing on the same day are exported together
+- [x] The game finishes generating the contracts of the current system
 - [ ] Possibly a key combination
 
 ## Installing
