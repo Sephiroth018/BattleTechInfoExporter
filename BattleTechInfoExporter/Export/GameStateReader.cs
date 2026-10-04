@@ -20,7 +20,7 @@ internal static class GameStateReader
             DateTimeOffset.Now,
             trigger,
             ReadCompany(simGame),
-            ReadPilots(simGame),
+            PilotReader.ReadPilots(simGame),
             MechReader.ReadMechs(simGame, componentDefinitions),
             StorageReader.ReadStorage(simGame, componentDefinitions),
             // After every section that references components.
@@ -83,7 +83,7 @@ internal static class GameStateReader
                 .ToList(),
             simGame.PilotRoster
                 .Select(pilot => new PilotExpense(
-                    ReferenceTo(pilot.pilotDef.Description),
+                    PilotReader.ReferenceTo(pilot.pilotDef.Description),
                     Mathf.CeilToInt(costModifier * simGame.GetMechWarriorValue(pilot.pilotDef))))
                 .ToList());
     }
@@ -105,68 +105,6 @@ internal static class GameStateReader
                 Mathf.RoundToInt(costModifier * upgradeUpkeep.upkeep)))
             .ToList();
     }
-
-    // The commander is kept apart from the roster; the barracks lists them first (SGBarracksWidget.Reset).
-    private static List<BarracksPilot> ReadPilots(SimGameState simGame) =>
-        new[] { simGame.Commander }
-            .Concat(simGame.PilotRoster)
-            .Select(pilot => ReadPilot(simGame, pilot))
-            .ToList();
-
-    private static BarracksPilot ReadPilot(SimGameState simGame, BattleTech.Pilot pilot)
-    {
-        var definition = pilot.pilotDef;
-        var description = definition.Description;
-        return new BarracksPilot(
-            description.Id,
-            FullName(description),
-            description.Callsign,
-            ReadPilotType(simGame, pilot),
-            description.Age,
-            description.Gender,
-            simGame.GetPilotFullExpertise(pilot),
-            new Skills(pilot.Gunnery, pilot.Piloting, pilot.Guts, pilot.Tactics),
-            new Experience(pilot.UnspentXP, pilot.SpentXP),
-            SimGameState.GetPrimaryPilotAbilities(definition).Select(ability => ReferenceTo(ability.Description))
-                .ToList(),
-            pilot.Health,
-            pilot.Injuries,
-            ReadPilotStatus(pilot),
-            simGame.GetPilotTimeoutTimeRemaining(pilot),
-            ReadSpirits(simGame, pilot),
-            new ServiceRecord(
-                definition.MissionsPiloted,
-                definition.MechKills,
-                definition.OtherKills,
-                definition.MissionsEjected,
-                definition.LifetimeInjuries,
-                simGame.DaysPassed - definition.DateOfHire));
-    }
-
-    // Mirrors SimGameState.GetPilotTypeColor.
-    private static PilotType ReadPilotType(SimGameState simGame, BattleTech.Pilot pilot) =>
-        pilot == simGame.Commander ? PilotType.Commander
-        : pilot.pilotDef.IsVanguard ? PilotType.Vanguard
-        : pilot.pilotDef.IsRonin ? PilotType.Ronin
-        : PilotType.Regular;
-
-    // Mirrors SGBarracksDossierPanel.SetPilot: injuries take precedence over an event timeout.
-    private static PilotStatus ReadPilotStatus(BattleTech.Pilot pilot) =>
-        pilot.Injuries > 0 ? PilotStatus.Injured
-        : pilot.pilotDef.TimeoutRemaining > 0 ? PilotStatus.Unavailable
-        : PilotStatus.Ready;
-
-    private static Spirits ReadSpirits(SimGameState simGame, BattleTech.Pilot pilot) =>
-        pilot switch
-        {
-            { HasHighMorale: true } => new Spirits(
-                SpiritsLevel.High,
-                simGame.GetTemporaryTagLength(pilot, BattleTech.Pilot.PILOTDEFTAG_HIGH_MORALE)),
-            { HasLowMorale: true } => new Spirits(
-                SpiritsLevel.Low,
-                simGame.GetTemporaryTagLength(pilot, BattleTech.Pilot.PILOTDEFTAG_LOW_MORALE)),
-            _ => new Spirits(SpiritsLevel.Normal, null)
-        };
 
     // The limits are hardcoded in SimGameState.CanPilotTakeAbility.
     private static SkillRules ReadSkillRules(SimGameState simGame)
@@ -302,14 +240,8 @@ internal static class GameStateReader
                 travelOrder.GetRemainingCost());
     }
 
-    private static DefinitionReference ReferenceTo(BaseDescriptionDef description) =>
+    internal static DefinitionReference ReferenceTo(BaseDescriptionDef description) =>
         new(description.Id, description.Name);
-
-    private static PilotReference ReferenceTo(HumanDescriptionDef pilot) =>
-        new(pilot.Id, FullName(pilot), pilot.Callsign);
-
-    private static string FullName(HumanDescriptionDef pilot) =>
-        $"{pilot.FirstName} {pilot.LastName}".Trim() is { Length: > 0 } fullName ? fullName : pilot.Name;
 
     private static DefinitionReference ReferenceTo(FactionValue faction) =>
         new(faction.FactionDefID, FactionNames.Format(faction));
