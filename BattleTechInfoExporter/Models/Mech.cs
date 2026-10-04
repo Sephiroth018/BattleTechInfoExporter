@@ -27,8 +27,7 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="IsFieldable">Whether the mech can be taken on a mission, as the lance configuration decides.</param>
 /// <param name="Problems">The loadout problems the mech lab warns about, e.g. missing ammo, in the game's words.</param>
-/// <param name="Value">The C-Bill value the game computes from the chassis, armor and equipment.</param>
-/// <param name="Locations">The body locations with their armor, structure and equipment, from head to legs.</param>
+/// <param name="Loadout">The current loadout, as the mech bay shows it.</param>
 /// <param name="AfterRefit">
 ///     The loadout once every step of <see cref="Refit" /> is finished, as the mech lab shows it. <c>null</c>
 ///     without a work order and while readying.
@@ -48,10 +47,7 @@ internal sealed record Mech(
     IReadOnlyList<RefitChange>? Refit,
     bool IsFieldable,
     IReadOnlyList<string> Problems,
-    Tonnage Tonnage,
-    int Value,
-    MechStats Stats,
-    IReadOnlyList<MechLocation> Locations,
+    MechLoadout Loadout,
     MechLoadout? AfterRefit);
 
 /// <summary>A mech's loadout with the tonnage, value and stats that follow from it.</summary>

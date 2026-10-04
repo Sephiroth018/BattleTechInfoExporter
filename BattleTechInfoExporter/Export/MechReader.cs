@@ -75,7 +75,6 @@ internal static class MechReader
         var workOrder = simGame.GetWorkOrderEntryForMech(mech);
         // A readying mech's work order has no steps: it is the readying itself.
         var refitOrder = workOrder is WorkOrderEntry_ReadyMech ? null : workOrder;
-        var loadout = ReadLoadout(componentDefinitions, mech);
         // MechBayRowGroupWidget.SetData fills each bay row with this many slots.
         var slotsPerBay = simGame.Constants.Story.MaxMechsPerPod;
         return new Mech(
@@ -103,10 +102,7 @@ internal static class MechReader
                 .SelectMany(problems => problems)
                 .Select(problem => problem.ToString())
                 .ToList(),
-            loadout.Tonnage,
-            loadout.Value,
-            loadout.Stats,
-            loadout.Locations,
+            ReadLoadout(componentDefinitions, mech),
             refitOrder is null
                 ? null
                 : ReadLoadout(componentDefinitions, MechRefit.CopyWithPendingSteps(simGame, mech, refitOrder)));
