@@ -24,14 +24,16 @@ overwritten on every export:
       difficulty limits, system store access and store price changes, and the skill training table
       with the experience cost of each level, the abilities and traits it unlocks, and the limits on
       choosing primary abilities, and the resolve cost of Precision Strike and Vigilance in normal,
-      high and low spirits
+      high and low spirits, and the number of mech parts that make a mech
 - [x] Mechs: the active and readying mechs of the mech bay with their status, the steps of a queued
       refit, loadout problems, armor, structure and hardpoints per location, every mounted
       component with its damage, and the performance summary with its ratings and the numbers
       behind them
 - [x] Component definitions: the tonnage, slots, cost, bonuses and weapon, ammunition box or heat
       sink stats of every component the export refers to, listed once per component type by id
-- [ ] Storage: equipment, mechs and mech parts
+- [x] Storage: the stored components with their working and damaged counts, the stored mechs with
+      their chassis stats, and the mech parts collected per mech. Stored mechs are bare chassis:
+      readying one gives the stock armor and the chassis' fixed equipment, but no weapons
 - [ ] The current system's store and hiring hall
 - [ ] Available missions
 - [ ] The work queue
