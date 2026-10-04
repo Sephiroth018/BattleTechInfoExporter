@@ -192,61 +192,52 @@ internal static class MechReader
             WorkOrderEntry_InstallComponent { DesiredLocation: ChassisLocations.None } removal => new RefitChange(
                 RefitChangeType.RemoveComponent,
                 step.IsMechLabComplete,
-                ReferenceTo(simGame, removal.MechComponentID, removal.ComponentType),
+                ReferenceTo(removal.MechComponentID, removal.MechComponentRef.Def),
                 removal.DamageLevel,
-                removal.PreviousLocation,
-                null,
-                null,
-                null),
+                removal.PreviousLocation),
             WorkOrderEntry_InstallComponent installation => new RefitChange(
                 RefitChangeType.InstallComponent,
                 step.IsMechLabComplete,
-                ReferenceTo(simGame, installation.MechComponentID, installation.ComponentType),
+                ReferenceTo(installation.MechComponentID, installation.MechComponentRef.Def),
                 installation.DamageLevel,
-                installation.DesiredLocation,
-                null,
-                null,
-                null),
-            WorkOrderEntry_RepairComponent repair => new RefitChange(
-                RefitChangeType.RepairComponent,
-                step.IsMechLabComplete,
-                ReferenceTo(simGame, repair.MechComponentID, repair.ComponentType),
-                repair.DamageLevel,
-                mech.Inventory.FirstOrDefault(component => component.SimGameUID == repair.ComponentSimGameUID)
-                    ?.MountedLocation,
-                null,
-                null,
-                null),
+                installation.DesiredLocation),
+            WorkOrderEntry_RepairComponent repair => ReadRepair(simGame, mech, repair),
             WorkOrderEntry_ModifyMechArmor armor => new RefitChange(
                 RefitChangeType.ModifyArmor,
                 step.IsMechLabComplete,
-                null,
-                null,
-                armor.Location,
-                armor.DesiredFrontArmor,
-                mech.GetChassisLocationDef(armor.Location).MaxRearArmor < 0 ? null : armor.DesiredRearArmor,
-                null),
+                Location: armor.Location,
+                FrontArmor: armor.DesiredFrontArmor,
+                RearArmor: mech.GetChassisLocationDef(armor.Location).MaxRearArmor < 0
+                    ? null
+                    : armor.DesiredRearArmor),
             WorkOrderEntry_RepairMechStructure structure => new RefitChange(
                 RefitChangeType.RepairStructure,
                 step.IsMechLabComplete,
-                null,
-                null,
-                structure.Location,
-                null,
-                null,
-                structure.StructureAmount),
+                Location: structure.Location,
+                Structure: structure.StructureAmount),
             _ => throw new InvalidOperationException($"Unexpected mech lab work order type {step.Type}")
         };
 
-    // Resolves the definition as SimGameState.GetMechComponentRefForUID does for a part taken from storage.
-    private static DefinitionReference ReferenceTo(SimGameState simGame, string componentId, ComponentType type)
+    // Finds the component as SimGameState.ML_RepairComponent does: on the mech, among the parts held for the work
+    // order, or in storage, where it isn't mounted.
+    private static RefitChange ReadRepair(SimGameState simGame, MechDef mech, WorkOrderEntry_RepairComponent repair)
     {
-        var component = new MechComponentRef(componentId, null, type, ChassisLocations.None)
-        {
-            DataManager = simGame.DataManager
-        };
-        component.RefreshComponentDef();
-        return ReferenceTo(componentId, component.Def);
+        var isFromStorage = false;
+        var component = simGame.GetMechComponentRefForUID(
+            mech,
+            repair.ComponentSimGameUID,
+            repair.MechComponentID,
+            repair.ComponentType,
+            repair.DamageLevel,
+            ChassisLocations.None,
+            -1,
+            ref isFromStorage);
+        return new RefitChange(
+            RefitChangeType.RepairComponent,
+            repair.IsMechLabComplete,
+            ReferenceTo(repair.MechComponentID, component?.Def),
+            repair.DamageLevel,
+            component?.MountedLocation is { } location and not ChassisLocations.None ? location : null);
     }
 
     // The mech lab shows the short UI name (MechLabItemSlotElement); the id stands in for a missing definition.
