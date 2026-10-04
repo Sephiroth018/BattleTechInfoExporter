@@ -24,7 +24,10 @@ overwritten on every export:
       difficulty limits, system store access and store price changes, and the skill training table
       with the experience cost of each level, the abilities and traits it unlocks, and the limits on
       choosing primary abilities
-- [ ] Mechs with all their equipment and stats
+- [x] Mechs: the active and readying mechs of the mech bay with their status, the steps of a queued
+      refit, loadout problems, armor, structure and hardpoints per location, every mounted
+      component with its stats, and the performance summary with its ratings and the numbers
+      behind them
 - [ ] Storage: equipment, mechs and mech parts
 - [ ] The current system's store and hiring hall
 - [ ] Available missions
