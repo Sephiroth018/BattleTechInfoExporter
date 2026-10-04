@@ -21,11 +21,6 @@ overwritten on every export:
       left
 - [x] Pilots: the commander and the roster with their skills, experience, primary abilities,
       health and injuries, status, spirits and service record
-- [x] The game's rules for this career: morale levels, reputation levels with their contract
-      difficulty limits, system store access and store price changes, and the skill training table
-      with the experience cost of each level, the abilities and traits it unlocks, and the limits on
-      choosing primary abilities, and the resolve cost of Precision Strike and Vigilance in normal,
-      high and low spirits, and the number of mech parts that make a mech
 - [x] Mechs: the active and readying mechs of the mech bay with their status, the steps of a queued
       refit, loadout problems, armor, structure and hardpoints per location, every mounted
       component with its damage, and the performance summary with its ratings and the numbers
@@ -48,11 +43,21 @@ overwritten on every export:
 - [x] Contracts: the contracts the Command Center offers, with their mission type, employer and
       target, difficulty and whether the reputation allows them, the pay, salvage and reputation
       changes of every combination the negotiation allows, the lance limits, the biome, and for contracts in another
-      system its planet tags and travel days. The mission types' descriptions are in the rules.
+      system its planet tags and travel days. The mission types' descriptions are in the rules file.
       **The game only generates a system's contracts when its Command Center's contract screen first
       opens, or after a contract; the mod never generates them itself, so it doesn't change the
       game. Until then, `contracts` is `null`.**
 - [ ] The ship and its upgrades (#45); the mech lab queue is part of each mech (#46)
+
+The game's **rules** for this career, written to `Mods/BattleTechInfoExporter/exports/rules.json`
+alongside the game state, which refers to them by name. The file is only rewritten when the rules
+change, e.g. after loading another career:
+
+- [x] Morale levels, reputation levels with their contract difficulty limits, system store access
+      and store price changes, and the skill training table with the experience cost of each level,
+      the abilities and traits it unlocks, and the limits on choosing primary abilities, and the
+      resolve cost of Precision Strike and Vigilance in normal, high and low spirits, the number of
+      mech parts that make a mech, and the mission types' descriptions
 
 Written to separate files, if the game makes them accessible:
 

@@ -3,7 +3,10 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
-/// <summary>How the game works for this career: level tables that values in the other sections refer to.</summary>
+/// <summary>
+///     The root of <c>rules.json</c>: how the game works for this career, level tables that values in
+///     <see cref="GameState" /> refer to.
+/// </summary>
 /// <param name="MoraleLevels">The morale levels, which <see cref="Morale.Level" /> refers to.</param>
 /// <param name="ReputationLevels">The reputation levels, which <see cref="FactionReputation.Level" /> refers to.</param>
 /// <param name="Skills">The training table behind <see cref="Pilot.Skills" /> and <see cref="Pilot.Abilities" />.</param>
@@ -12,6 +15,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="ContractTypes">The mission types, which <see cref="Contract.Type" /> refers to.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Rules(
+    string ModVersion,
     IReadOnlyList<MoraleLevel> MoraleLevels,
     IReadOnlyList<ReputationLevel> ReputationLevels,
     SkillRules Skills,

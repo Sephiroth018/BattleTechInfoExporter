@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Builds the export's model from the game's career state.</summary>
+/// <summary>Builds the export's models from the game's career state and rules.</summary>
 internal static class GameStateReader
 {
     internal static GameState Read(SimGameState simGame, ExportTrigger trigger)
@@ -29,15 +29,18 @@ internal static class GameStateReader
             ContractReader.ReadContracts(simGame),
             // After every section that references components.
             componentDefinitions.Definitions,
-            ReadPosition(simGame),
-            new Rules(
-                ReadMoraleLevels(simGame),
-                ReadReputationLevels(simGame),
-                ReadSkillRules(simGame),
-                ReadSpiritsLevels(simGame),
-                simGame.Constants.Story.DefaultMechPartMax,
-                ContractReader.ReadContractTypes(simGame)));
+            ReadPosition(simGame));
     }
+
+    internal static Rules ReadRules(SimGameState simGame) =>
+        new(
+            ModAssembly.Version,
+            ReadMoraleLevels(simGame),
+            ReadReputationLevels(simGame),
+            ReadSkillRules(simGame),
+            ReadSpiritsLevels(simGame),
+            simGame.Constants.Story.DefaultMechPartMax,
+            ContractReader.ReadContractTypes(simGame));
 
     private static Company ReadCompany(SimGameState simGame) =>
         new(
