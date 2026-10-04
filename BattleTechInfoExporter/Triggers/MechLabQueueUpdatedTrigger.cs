@@ -13,7 +13,7 @@ namespace BattleTechInfoExporter.Triggers;
 /// </summary>
 [HarmonyPatch(typeof(SimGameState), nameof(SimGameState.UpdateMechLabWorkQueue))]
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal static class MechBayWorkOrderTrigger
+internal static class MechLabQueueUpdatedTrigger
 {
     [HarmonyPrefix]
     private static void RememberCompletedCount([HarmonyArgument("__state")] out int completedCountBefore)
