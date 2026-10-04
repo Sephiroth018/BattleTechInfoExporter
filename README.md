@@ -29,8 +29,8 @@ overwritten on every export:
       refit, loadout problems, armor, structure and hardpoints per location, every mounted
       component with its damage, and the performance summary with its ratings and the numbers
       behind them
-- [x] Component definitions: the tonnage, slots, cost, bonuses and weapon, ammo box or heat sink
-      stats of every component the export refers to, listed once by component id
+- [x] Component definitions: the tonnage, slots, cost, bonuses and weapon, ammunition box or heat
+      sink stats of every component the export refers to, listed once per component type by id
 - [ ] Storage: equipment, mechs and mech parts
 - [ ] The current system's store and hiring hall
 - [ ] Available missions

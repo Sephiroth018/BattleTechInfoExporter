@@ -132,7 +132,10 @@ internal static class MechReader
             new Hardpoints(ballistic, energy, missile, support),
             new Slots(components.Sum(component => component.Def.InventorySize), definition.InventorySlots),
             components.Select(component => new Equipment(
-                    componentDefinitions.ReferenceTo(component.ComponentDefID, component.Def),
+                    componentDefinitions.ReferenceTo(
+                        component.ComponentDefType,
+                        component.ComponentDefID,
+                        component.Def),
                     component.DamageLevel,
                     component.IsFixed))
                 .ToList());
@@ -212,7 +215,7 @@ internal static class MechReader
         return new RefitChange(
             RefitChangeType.RepairComponent,
             repair.IsMechLabComplete,
-            componentDefinitions.ReferenceTo(repair.MechComponentID, component?.Def),
+            componentDefinitions.ReferenceTo(repair.ComponentType, repair.MechComponentID, component?.Def),
             repair.DamageLevel,
             component?.MountedLocation is { } location and not ChassisLocations.None ? location : null);
     }
