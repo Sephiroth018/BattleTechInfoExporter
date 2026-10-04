@@ -3,9 +3,10 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
-// Every definition starts with the same fields as ComponentDefinition: Name, Tonnage, Slots, Cost and Bonuses.
-
-/// <summary>The fields every component definition has; jump jets and upgrades have no others.</summary>
+/// <summary>
+///     The fields every component definition has, first in each group's entries; jump jets and upgrades have no
+///     others.
+/// </summary>
 /// <param name="Name">The name the mech lab shows, as in the references to the component.</param>
 /// <param name="Cost">The C-Bill value of the component.</param>
 /// <param name="Bonuses">The short bonus texts shown on the component, e.g. "+ 5 Dmg.".</param>

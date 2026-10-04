@@ -69,7 +69,8 @@ internal sealed class ComponentDefinitionReader
                     $"Unexpected component definition type {definition.GetType().Name} for {componentId}");
         }
 
-        return new ComponentReference(componentId, NameOf(definition), componentType);
+        // The definition's own type, so the reference names the group that holds it.
+        return new ComponentReference(componentId, NameOf(definition), definition.ComponentType);
     }
 
     private static void AddOnce<TDefinition>(
