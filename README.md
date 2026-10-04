@@ -36,9 +36,7 @@ overwritten on every export:
       their chassis stats, and the mech parts collected per mech. Stored mechs are bare chassis:
       readying one gives the stock armor and the chassis' fixed equipment, but no weapons
 - [x] The current system's stores (system store, faction store, black market) that the company can
-      use, with the components and mech parts they sell, their stock and prices. Arriving in a
-      system doesn't trigger an export yet, so until the next one the file shows the previous
-      system's stores and hiring hall
+      use, with the components and mech parts they sell, their stock and prices
 - [x] The current system's hiring hall: the pilots for hire with their skills, primary abilities,
       health, hiring cost, salary, and whether the company's rating and morale allow hiring them
 - [x] Contracts: the contracts the Command Center offers, with their mission type, employer and
@@ -75,7 +73,9 @@ The game state is exported when:
 
 - [x] The career is loaded: starting a new career, loading a save, and returning to the career
       screens after a mission
-- [ ] The current system changes
+- [x] The game saves the career, manually or automatically, outside of combat. Among others, it
+      autosaves after arriving in a system, after a contract, after the financial report is closed
+      and after events
 - [ ] A mission is completed
 - [ ] Salvage is chosen
 - [ ] The financial report is triggered

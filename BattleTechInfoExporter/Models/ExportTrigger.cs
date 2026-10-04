@@ -7,5 +7,7 @@ namespace BattleTechInfoExporter.Models;
 [JsonConverter(typeof(StringEnumConverter), true)]
 internal enum ExportTrigger
 {
-    CareerLoaded
+    CareerLoaded,
+    ManualSave,
+    Autosave
 }
