@@ -29,6 +29,10 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Problems">The loadout problems the mech lab warns about, e.g. missing ammo, in the game's words.</param>
 /// <param name="Value">The C-Bill value the game computes from the chassis, armor and equipment.</param>
 /// <param name="Locations">The body locations with their armor, structure and equipment, from head to legs.</param>
+/// <param name="AfterRefit">
+///     The loadout once every step of <see cref="Refit" /> is finished, as the mech lab shows it. <c>null</c>
+///     without a work order and while readying.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Mech(
     string Id,
@@ -44,6 +48,17 @@ internal sealed record Mech(
     IReadOnlyList<RefitChange>? Refit,
     bool IsFieldable,
     IReadOnlyList<string> Problems,
+    Tonnage Tonnage,
+    int Value,
+    MechStats Stats,
+    IReadOnlyList<MechLocation> Locations,
+    MechLoadout? AfterRefit);
+
+/// <summary>A mech's loadout with the tonnage, value and stats that follow from it.</summary>
+/// <param name="Value">The C-Bill value the game computes from the chassis, armor and equipment.</param>
+/// <param name="Locations">The body locations with their armor, structure and equipment, from head to legs.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record MechLoadout(
     Tonnage Tonnage,
     int Value,
     MechStats Stats,
