@@ -11,7 +11,9 @@ namespace BattleTechInfoExporter.Models;
 internal sealed record Stores(Store? System, Store? Faction, Store? BlackMarket);
 
 /// <param name="Faction">
-///     The faction whose reputation sets the prices, by the price change in <see cref="Rules.ReputationLevels" />.
+///     The faction whose reputation sets the prices, by the price change in <see cref="Rules.ReputationLevels" />:
+///     for the system store the system's owner, for the faction store its owner (usually the system's owner too,
+///     and the faction the company must be allied with to use it), for the black market the pirates.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Store(
