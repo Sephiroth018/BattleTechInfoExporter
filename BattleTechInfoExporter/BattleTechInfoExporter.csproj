@@ -44,12 +44,22 @@
     <Error Text="BattleTechGameDir must point to the BattleTech install; see README.md." />
   </Target>
 
-  <!-- mod.json is generated so the version has a single source: $(Version). -->
+  <!-- mod.json is generated so its metadata has a single source: the properties in Directory.Build.props. -->
   <Target Name="WriteModJson" AfterTargets="Build">
+    <!-- Release only: a timestamp in every build would rewrite and redeploy mod.json each time. -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+      <ModJsonPackagedOn>
+  "PackagedOn": "$([System.DateTime]::UtcNow.ToString('o'))",</ModJsonPackagedOn>
+    </PropertyGroup>
     <PropertyGroup>
       <ModJson>{
   "Name": "$(MSBuildProjectName)",
-  "Version": "$(Version)",
+  "Enabled": true,
+  "Version": "$(Version)",$(ModJsonPackagedOn)
+  "Description": "$(Description)",
+  "Author": "$(Authors)",
+  "Website": "$(RepositoryUrl)",
+  "BattleTechVersion": "$(BattleTechVersion)",
   "DLL": "$(TargetFileName)"
 }</ModJson>
     </PropertyGroup>

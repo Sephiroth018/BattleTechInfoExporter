@@ -358,8 +358,8 @@ name, version and folder, `ModLog` its logger. Folders:
 - `Models/`: immutable records, one per JSON object, marked
   `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` because only the serializer reads them.
 
-The version lives only in `<Version>` in `Directory.Build.props`; the build stamps it into the DLL
-and generates `mod.json` from it.
+The version lives only in `<Version>` in `Directory.Build.props`, next to the description, author,
+repository URL and supported game version; the build stamps the version into the DLL and generates `mod.json` from them.
 
 ## Export format
 
