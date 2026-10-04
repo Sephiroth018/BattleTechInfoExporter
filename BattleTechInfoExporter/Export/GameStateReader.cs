@@ -6,6 +6,7 @@ using BattleTech;
 using BattleTechInfoExporter.Models;
 using Localize;
 using UnityEngine;
+using Pilot = BattleTechInfoExporter.Models.Pilot;
 
 namespace BattleTechInfoExporter.Export;
 
@@ -18,8 +19,9 @@ internal static class GameStateReader
             DateTimeOffset.Now,
             trigger,
             ReadCompany(simGame),
+            ReadPilots(simGame),
             ReadPosition(simGame),
-            new Rules(ReadMoraleLevels(simGame), ReadReputationLevels(simGame)));
+            new Rules(ReadMoraleLevels(simGame), ReadReputationLevels(simGame), ReadSkillRules(simGame)));
 
     private static Company ReadCompany(SimGameState simGame) =>
         new(
@@ -91,6 +93,103 @@ internal static class GameStateReader
                 ReferenceTo(upgradeUpkeep.upgrade.Description),
                 Mathf.RoundToInt(costModifier * upgradeUpkeep.upkeep)))
             .ToList();
+    }
+
+    // The commander is kept apart from the roster; the barracks lists them first (SGBarracksWidget.Reset).
+    private static List<Pilot> ReadPilots(SimGameState simGame) =>
+        new[] { simGame.Commander }
+            .Concat(simGame.PilotRoster)
+            .Select(pilot => ReadPilot(simGame, pilot))
+            .ToList();
+
+    private static Pilot ReadPilot(SimGameState simGame, BattleTech.Pilot pilot)
+    {
+        var definition = pilot.pilotDef;
+        var description = definition.Description;
+        return new Pilot(
+            description.Id,
+            FullName(description),
+            description.Callsign,
+            ReadPilotType(simGame, pilot),
+            description.Age,
+            description.Gender,
+            simGame.GetPilotFullExpertise(pilot),
+            new Skills(pilot.Gunnery, pilot.Piloting, pilot.Guts, pilot.Tactics),
+            new Experience(pilot.UnspentXP, pilot.SpentXP),
+            SimGameState.GetPrimaryPilotAbilities(definition).Select(ability => ReferenceTo(ability.Description))
+                .ToList(),
+            pilot.Health,
+            pilot.Injuries,
+            ReadPilotStatus(pilot),
+            simGame.GetPilotTimeoutTimeRemaining(pilot),
+            ReadSpirits(simGame, pilot),
+            new ServiceRecord(
+                definition.MissionsPiloted,
+                definition.MechKills,
+                definition.OtherKills,
+                definition.MissionsEjected,
+                definition.LifetimeInjuries,
+                simGame.DaysPassed - definition.DateOfHire));
+    }
+
+    // Mirrors SimGameState.GetPilotTypeColor.
+    private static PilotType ReadPilotType(SimGameState simGame, BattleTech.Pilot pilot) =>
+        pilot == simGame.Commander ? PilotType.Commander
+        : pilot.pilotDef.IsVanguard ? PilotType.Vanguard
+        : pilot.pilotDef.IsRonin ? PilotType.Ronin
+        : PilotType.Regular;
+
+    // Mirrors SGBarracksDossierPanel.SetPilot: injuries take precedence over an event timeout.
+    private static PilotStatus ReadPilotStatus(BattleTech.Pilot pilot) =>
+        pilot.Injuries > 0 ? PilotStatus.Injured
+        : pilot.pilotDef.TimeoutRemaining > 0 ? PilotStatus.Unavailable
+        : PilotStatus.Ready;
+
+    private static Spirits? ReadSpirits(SimGameState simGame, BattleTech.Pilot pilot) =>
+        pilot switch
+        {
+            { HasHighMorale: true } => new Spirits(
+                SpiritsLevel.High,
+                simGame.GetTemporaryTagLength(pilot, BattleTech.Pilot.PILOTDEFTAG_HIGH_MORALE)),
+            { HasLowMorale: true } => new Spirits(
+                SpiritsLevel.Low,
+                simGame.GetTemporaryTagLength(pilot, BattleTech.Pilot.PILOTDEFTAG_LOW_MORALE)),
+            _ => null
+        };
+
+    // The limits are hardcoded in SimGameState.CanPilotTakeAbility.
+    private static SkillRules ReadSkillRules(SimGameState simGame)
+    {
+        var progression = simGame.Constants.Progression;
+        return new SkillRules(
+            3,
+            2,
+            ReadSkill(simGame, SkillType.Gunnery, progression.GunneryDefaultTooltip),
+            ReadSkill(simGame, SkillType.Piloting, progression.PilotingDefaultTooltip),
+            ReadSkill(simGame, SkillType.Guts, progression.GutsDefaultTooltip),
+            ReadSkill(simGame, SkillType.Tactics, progression.TacticsDefaultTooltip));
+    }
+
+    // SimGameState.AbilityTree is keyed by the skill's name and indexed by level - 1; the barracks prices the
+    // pip for level n at GetLevelCost(n - 1). Level 1 is where every pilot starts, so the table begins at 2.
+    private static Skill ReadSkill(SimGameState simGame, SkillType skill, string description)
+    {
+        var abilitiesByLevel = simGame.AbilityTree[skill.ToString()];
+        return new Skill(
+            description,
+            Enumerable.Range(2, Math.Max(0, abilitiesByLevel.Count - 1))
+                .Select(level => new SkillLevel(
+                    level,
+                    simGame.GetLevelCost(level - 1),
+                    abilitiesByLevel[level - 1]
+                        // The per-level accuracy traits have no name or description and aren't shown anywhere.
+                        .Where(ability => !string.IsNullOrEmpty(ability.Description.Name))
+                        .Select(ability => new SkillLevelAbility(
+                            ReferenceTo(ability.Description),
+                            ability.IsPrimaryAbility,
+                            ability.Description.Details))
+                        .ToList()))
+                .ToList());
     }
 
     // Names, thresholds and resolve come from two constant files that mods can change separately;
@@ -182,10 +281,10 @@ internal static class GameStateReader
         new(mech.Description.Id, $"{mech.Name} ({mech.Chassis.VariantName})");
 
     private static PilotReference ReferenceTo(HumanDescriptionDef pilot) =>
-        new(
-            pilot.Id,
-            $"{pilot.FirstName} {pilot.LastName}".Trim() is { Length: > 0 } fullName ? fullName : pilot.Name,
-            pilot.Callsign);
+        new(pilot.Id, FullName(pilot), pilot.Callsign);
+
+    private static string FullName(HumanDescriptionDef pilot) =>
+        $"{pilot.FirstName} {pilot.LastName}".Trim() is { Length: > 0 } fullName ? fullName : pilot.Name;
 
     private static DefinitionReference ReferenceTo(FactionValue faction) =>
         new(faction.FactionDefID, FactionNames.Format(faction));
