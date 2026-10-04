@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BattleTech;
 using BattleTechInfoExporter.Models;
+using Pilot = BattleTech.Pilot;
 
 namespace BattleTechInfoExporter.Export;
 
@@ -31,11 +32,11 @@ internal static class PilotReader
             description.Gender,
             simGame.GetPilotFullExpertise(pilot),
             new Skills(pilot.Gunnery, pilot.Piloting, pilot.Guts, pilot.Tactics),
-            new Experience(pilot.UnspentXP, pilot.SpentXP),
             SimGameState.GetPrimaryPilotAbilities(definition)
                 .Select(ability => GameStateReader.ReferenceTo(ability.Description))
                 .ToList(),
             pilot.Health,
+            new Experience(pilot.UnspentXP, pilot.SpentXP),
             pilot.Injuries,
             ReadPilotStatus(pilot),
             simGame.GetPilotTimeoutTimeRemaining(pilot),
