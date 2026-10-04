@@ -22,7 +22,7 @@ internal sealed record ShipExpense(string Name, int Amount);
 internal sealed record ShipUpgradeExpense(DefinitionReference Upgrade, int Amount);
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record MechExpense(DefinitionReference Mech, int Amount);
+internal sealed record MechExpense(MechReference Mech, int Amount);
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record PilotExpense(PilotReference Pilot, int Amount);
