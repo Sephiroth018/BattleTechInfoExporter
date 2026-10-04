@@ -87,7 +87,7 @@ internal static class GameStateReader
             ReadShipUpgradeExpenses(simGame, costModifier),
             simGame.ActiveMechs.Values
                 .Select(mech => new MechExpense(
-                    MechReader.ReferenceTo(mech),
+                    MechReader.ReferenceToBayMech(mech),
                     Mathf.RoundToInt(costModifier * simGame.Constants.Finances.MechCostPerQuarter)))
                 .ToList(),
             simGame.PilotRoster
