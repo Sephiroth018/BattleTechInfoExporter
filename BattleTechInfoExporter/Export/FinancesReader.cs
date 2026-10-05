@@ -51,7 +51,7 @@ internal static class FinancesReader
                 .ToList(),
             simGame.PilotRoster
                 .Select(pilot => new PilotExpense(
-                    PilotReader.ReferenceTo(pilot.pilotDef.Description),
+                    PilotReader.ReferenceTo(pilot),
                     ReadSalary(simGame, pilot.pilotDef)))
                 .ToList());
     }

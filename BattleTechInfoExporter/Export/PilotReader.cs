@@ -24,8 +24,11 @@ internal static class PilotReader
                 new Pilot(definition, definition.Description.FullName(), true)))
             .ToList();
 
-    internal static PilotReference ReferenceTo(HumanDescriptionDef pilot) =>
-        new(pilot.Id, FullName(pilot), pilot.Callsign);
+    internal static PilotReference ReferenceTo(Pilot pilot)
+    {
+        var description = pilot.pilotDef.Description;
+        return new PilotReference(description.Id, FullName(description), description.Callsign);
+    }
 
     private static HiringHallPilot ReadHiringHallPilot(SimGameState simGame, Pilot pilot)
     {

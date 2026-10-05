@@ -21,6 +21,6 @@ internal static class LanceReader
                 .Where(unit => unit.mech is not null || unit.pilot is not null)
                 .Select(unit => new LastLanceUnit(
                     unit.mech is null ? null : MechReader.ReferenceToBayMech(unit.mech),
-                    unit.pilot is null ? null : PilotReader.ReferenceTo(unit.pilot.pilotDef.Description)))
+                    unit.pilot is null ? null : PilotReader.ReferenceTo(unit.pilot)))
                 .ToList();
 }
