@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -242,11 +241,9 @@ internal static class ContractReader
     // As SGContractsWidget.PopulateContract passes them to the lance tonnage icons; -1 means no limit.
     private static LanceLimits ReadLanceLimits(ContractOverride contractOverride)
     {
-        var mechs = Enumerable.Range(0,
-                Math.Min(contractOverride.maxNumberOfPlayerUnits, contractOverride.mechMinTonnages.Length))
-            .Select(slot => new MechSlotLimits(
-                LimitOf(contractOverride.mechMinTonnages[slot]),
-                LimitOf(contractOverride.mechMaxTonnages[slot])))
+        var mechs = contractOverride.mechMinTonnages
+            .Zip(contractOverride.mechMaxTonnages, (min, max) => new MechSlotLimits(LimitOf(min), LimitOf(max)))
+            .Take(contractOverride.maxNumberOfPlayerUnits)
             .ToList();
         return new LanceLimits(
             contractOverride.maxNumberOfPlayerUnits,
