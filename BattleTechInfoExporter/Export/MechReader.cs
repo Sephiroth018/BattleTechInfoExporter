@@ -73,19 +73,19 @@ internal static class MechReader
         Locations
             .Select(location =>
             {
-                var definition = chassis.GetLocationDef(location);
-                return new LocationMaxArmor(
-                    location,
-                    definition.MaxArmor,
-                    HasRearArmor(definition) ? definition.MaxRearArmor : null);
+                var maxArmor = ReadMaxArmor(chassis.GetLocationDef(location));
+                return new LocationMaxArmor(location, maxArmor.Front, maxArmor.Rear);
             })
             .ToList();
+
+    internal static LocationArmor ReadMaxArmor(LocationDef location) =>
+        new(location.MaxArmor, HasRearArmor(location) ? location.MaxRearArmor : null);
 
     /// <summary>The chassis' weapon hardpoints of all locations together.</summary>
     internal static Hardpoints ReadHardpoints(ChassisDef chassis) => ReadHardpoints(chassis, Locations);
 
     // Summed as TooltipPrefab_Chassis.SetHardpointData does.
-    private static Hardpoints ReadHardpoints(ChassisDef chassis, IEnumerable<ChassisLocations> locations)
+    internal static Hardpoints ReadHardpoints(ChassisDef chassis, IEnumerable<ChassisLocations> locations)
     {
         int ballistic = 0, energy = 0, missile = 0, support = 0;
         foreach (var location in locations)
@@ -131,7 +131,6 @@ internal static class MechReader
             mech.Name,
             ReferenceTo(chassis),
             chassis.weightClass,
-            chassis.StockRole,
             slot / slotsPerBay + 1,
             slot % slotsPerBay + 1,
             workOrder switch
@@ -172,23 +171,29 @@ internal static class MechReader
             .Select(mech => new MechAwaitingPlacement(
                 ReferenceTo(mech.Chassis),
                 mech.Chassis.weightClass,
-                mech.Chassis.StockRole,
                 ReadLoadout(componentReferences, mech)))
             .ToList();
     }
 
-    private static MechLoadout ReadLoadout(ComponentReferences componentReferences, MechDef mech)
-    {
-        // The maximum it returns is the stat bar's scale, not the chassis tonnage.
-        float usedTonnage = 0, ignoredMax = 0;
-        MechStatisticsRules.CalculateTonnage(mech, ref usedTonnage, ref ignoredMax);
-        return new MechLoadout(
-            new Tonnage(usedTonnage, mech.Chassis.Tonnage),
+    private static MechLoadout ReadLoadout(ComponentReferences componentReferences, MechDef mech) =>
+        new(
+            new Tonnage(ReadUsedTonnage(mech), mech.Chassis.Tonnage),
             // Recomputed by MechDef.RefreshBattleValue whenever the loadout changes; the mech bay shows it.
             mech.Description.Cost,
             MechStatsReader.Read(mech),
             Locations.Select(location => ReadLocation(componentReferences, mech, location)).ToList());
+
+    /// <summary>The tonnage of the chassis, armor and components.</summary>
+    internal static float ReadUsedTonnage(MechDef mech)
+    {
+        // The maximum it returns is the stat bar's scale, not the chassis tonnage.
+        float usedTonnage = 0, ignoredMax = 0;
+        MechStatisticsRules.CalculateTonnage(mech, ref usedTonnage, ref ignoredMax);
+        return usedTonnage;
     }
+
+    internal static IEnumerable<MechComponentRef> ComponentsMountedIn(MechDef mech, ChassisLocations location) =>
+        mech.Inventory.Where(component => component.MountedLocation == location);
 
     private static MechLocation ReadLocation(
         ComponentReferences componentReferences,
@@ -197,7 +202,7 @@ internal static class MechReader
     {
         var loadout = mech.GetLocationLoadoutDef(location);
         var definition = mech.GetChassisLocationDef(location);
-        var components = mech.Inventory.Where(component => component.MountedLocation == location).ToList();
+        var components = ComponentsMountedIn(mech, location).ToList();
         return new MechLocation(
             location,
             new Armor(loadout.CurrentArmor, loadout.AssignedArmor, definition.MaxArmor),
@@ -270,7 +275,7 @@ internal static class MechReader
     }
 
     // Locations without rear armor have -1 for it.
-    private static bool HasRearArmor(LocationDef location) => location.MaxRearArmor >= 0;
+    internal static bool HasRearArmor(LocationDef location) => location.MaxRearArmor >= 0;
 
     // Finds the component as SimGameState.ML_RepairComponent does: on the mech, among the parts held for the work
     // order, or in storage, where it isn't mounted.

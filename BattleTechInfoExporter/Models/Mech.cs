@@ -12,7 +12,6 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Name">The mech's name, which the player can change in the mech lab.</param>
 /// <param name="Bay">The mech bay row, counted from 1, as the mech bay shows it.</param>
 /// <param name="Position">The position in the bay row, counted from 1.</param>
-/// <param name="Role">The chassis' stock role, e.g. "Brawler".</param>
 /// <param name="ReadyOnDay">
 ///     The day the mech lab finishes its work order, as in <see cref="GameState.WorkQueue" />; <c>null</c> when
 ///     <see cref="MechStatus.Ready" />.
@@ -38,7 +37,6 @@ internal sealed record Mech(
     string Name,
     DefinitionReference Chassis,
     WeightClass WeightClass,
-    string Role,
     int Bay,
     int Position,
     MechStatus Status,

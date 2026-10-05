@@ -354,15 +354,16 @@ name, version and folder, `ModLog` its logger. Folders:
 
 - `Triggers/`: the patches that decide when to export, and the recorder patches they share.
 - `Export/`: the exporters, the single entry points the triggers call: `GameStateExporter` for the
-  career state, `MissionExporter` for the mission files, one method per file. Both run their export
-  inside `CampaignExport`. `GameStateReader` builds the game state file's models from the game, one
-  reader per section of the file; `RulesReader` builds the rules file's tables; `MissionReader`
-  builds the mission files' models from the completed contract. `DefinitionReferences` makes the
+  career state, `MissionExporter` for the mission files, one method per file, and `CatalogExporter`
+  for the catalog. All run their export inside `CampaignExport`. `GameStateReader` builds the game
+  state file's models from the game, one reader per section of the file; `RulesReader` builds the
+  rules file's tables; `MissionReader` builds the mission files' models from the completed
+  contract; `CatalogReader` builds the catalog from the definitions the game has loaded. `DefinitionReferences` makes the
   references that need only a description, a faction, a biome or a data-driven enum value, and
   `ComponentReferences`, one per
   export file, every reference to a component, collecting the definitions referenced; a reference
-  with a naming rule of its own is made by the reader that owns it. `ReferenceOrder` orders every
-  list of entries that refer to a definition, and `GameText` makes every exported game text plain.
+  with a naming rule of its own is made by the reader that owns it. `ReferenceOrder` orders the
+  lists of entries that refer to a definition, and `GameText` makes every exported game text plain.
   `ExportFileWriter` writes and deletes the files in
   the mod's `exports/` folder.
 - `Models/`: immutable records, one per JSON object, and the mod's own enums. The records are
@@ -386,11 +387,14 @@ General rule on managing one doesn't apply.
   their group in `componentDefinitions`.
 - **Definitions many entries share sit in a root object keyed by id** (e.g.
   `componentDefinitions`, grouped by component type with one entry shape per group and no null
-  sections), holding only the definitions the file refers to, so each file stands on its own. The
+  sections), holding only the definitions the file refers to, so each file stands on its own; the
+  catalog holds every definition instead. The
   entries carry the reference and their own state, instead of repeating the definition's stats; a
   reference whose definition is missing has no entry. Keys keep the game's ids as they are.
-- **Lists of entries that refer to a definition are ordered the same way everywhere**
-  (`ReferenceOrder`): by component type for components, then by name, with the id breaking ties.
+- **Lists of entries that refer to a definition, which the game keeps in no meaningful order**
+  (storage, stores, salvage), are ordered the same way everywhere (`ReferenceOrder`): by component
+  type for components, then by name, with the id breaking ties. A mech's components keep the game's
+  order.
 - **The career state is two files, read together on every career export:** `game-state.json` and
   `rules.json` for the game tables (e.g. `moraleLevels`, `reputationLevels` at its root): how the
   game works for this career, which doesn't change between exports. Values in the game state refer
@@ -400,6 +404,9 @@ General rule on managing one doesn't apply.
   `salvage-received.json` once the salvage is final. Writing a mission outcome deletes the salvage
   file, so it always belongs to the outcome next to it; the game has no id that identifies every
   contract to link them by.
+- **The catalog is a file of its own that doesn't depend on the career:** `catalog.json`, with
+  every chassis, mech and component the game has loaded, written on every career load and so, with
+  an unchanged game, once per game start.
 - **Every export file starts with `modVersion`, `exportedAt` and `trigger`** (`ExportFile`, which
   every file's model inherits), describing the export that last wrote it.
 - **Points in time are day numbers** on the game's `DaysPassed` scale (`company.daysPassed`), e.g.
@@ -423,6 +430,10 @@ General rule on managing one doesn't apply.
 - **Chassis:** a mech's frame without its removable components (`ChassisDef`). Storage keeps
   chassis, not mechs.
 - **Mech:** a complete mech (`MechDef`): in the mech bay, or sold whole by a store.
+- **Stock mech:** the mech the game treats as a chassis' stock loadout, the one whose id is the
+  chassis id with `chassisdef` replaced by `mechdef`.
+- **Catalog:** the export of every chassis, mech and component definition the game has loaded
+  (`catalog.json`).
 - **Ship upgrade:** an upgrade of the Argo (`ShipModuleUpgrade`), bought in its engineering
   screen. Never just "upgrade", which components also have.
 

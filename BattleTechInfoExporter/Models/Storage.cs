@@ -21,14 +21,12 @@ internal sealed record StoredComponent(ComponentReference Component, int Count, 
 ///     A stored chassis. Readying it gives a mech with the stock armor and the chassis' fixed components, but no
 ///     weapons or other components.
 /// </summary>
-/// <param name="Role">The chassis' stock role, e.g. "Brawler".</param>
 /// <param name="MaxArmor">The most armor each location can take, from head to legs.</param>
 /// <param name="Hardpoints">The weapon hardpoints of all locations together.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record StoredChassis(
     DefinitionReference Chassis,
     WeightClass WeightClass,
-    string Role,
     float Tonnage,
     IReadOnlyList<LocationMaxArmor> MaxArmor,
     Hardpoints Hardpoints,

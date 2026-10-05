@@ -80,7 +80,6 @@ internal static class StoreReader
         return new MechForSale(
             MechReader.ReferenceTo(mech),
             chassis.weightClass,
-            chassis.StockRole,
             chassis.Tonnage,
             MechReader.ReadMaxArmor(chassis),
             MechReader.ReadHardpoints(chassis),

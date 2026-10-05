@@ -27,6 +27,24 @@ Two more hold the latest mission:
   confirmed. It holds everything the company gets from the salvage of the mission in
   `mission-outcome.json`; a new mission outcome deletes it until its salvage is final.
 
+The last one describes the game rather than the career:
+
+- `catalog.json`: every chassis, mech and component the game has loaded for the career, DLC
+  included, keyed by id, so tools can judge what else exists beyond what the career refers to.
+  - **Chassis:** the frame: weight class, tonnage and bare tonnage, max jump jets, built-in heat
+    dissipation, walk and sprint distance, melee values before upgrades, and per location max
+    armor, structure and hardpoints; plus the stock mech, the mech the game treats as the chassis'
+    stock loadout.
+  - **Mechs:** a loadout on a chassis: value, tonnage, performance summary, whether it can come as
+    salvage (hero variants can't), and per location armor and components, the chassis' fixed ones
+    marked. A mech assembled from parts or bought comes with this loadout; a stored chassis is
+    readied with only its fixed components.
+  - **Components:** every component's stats, like the component definitions of the other files.
+
+  The tutorial's target dummies, the copies of stock mechs the game makes for unlocked skins (e.g.
+  the backers' Shadow Hawk-UMBRA) and the game's internal melee and AI weapons are left out, as are
+  the game's role and other advisory texts, which often don't match the best way to use a mech.
+
 Every file starts with `modVersion`, `exportedAt` and the `trigger` of the export that last wrote
 it. A file is replaced in one step, never half-written, and only when its content apart from
 `exportedAt` changed, plus once after every game start. Points in time are day numbers, comparable
@@ -63,7 +81,7 @@ The game state holds:
   it's proceeded with, with the day of arrival while travelling to it. The game generates a system's contracts only when the contract screen first
   opens; until then `contracts` is `null`.
 - **Component definitions:** the stats of every component the file refers to, keyed by id, so the
-  entries don't repeat them.
+  entries don't repeat them, and whether it can come as salvage.
 
 ## Triggers
 
@@ -82,6 +100,9 @@ The game state is exported when:
 - **Experience is spent:** a pilot's training is confirmed in the barracks.
 - **A new mech needs a place:** the game asks where to put it because every mech bay is full, e.g.
   after salvage completes a mech.
+
+The catalog is exported when the career is loaded, also after a mission, and written once after
+every game start.
 
 The mission files are exported when:
 

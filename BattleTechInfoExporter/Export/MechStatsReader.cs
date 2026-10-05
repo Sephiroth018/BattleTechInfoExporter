@@ -120,6 +120,11 @@ internal static class MechStatsReader
             ? new RangeStats(0, 0)
             : new RangeStats(weapons.Max(weapon => weapon.MaxRange), weapons.Average(weapon => weapon.MediumRange));
 
+    /// <summary>The chassis' melee values, which upgrades add to, as the stat tooltips show them.</summary>
+    // StatTooltipData.SetMeleeData doubles the jump attack's damage.
+    internal static ChassisMelee ReadChassisMelee(ChassisDef chassis) =>
+        new(chassis.MeleeDamage, chassis.MeleeInstability, chassis.DFADamage * 2, chassis.DFASelfDamage);
+
     // Mirrors StatTooltipData.SetDurabilityData, except for its stability defense.
     private static DurabilityStats ReadDurability(MechDef mech, List<UpgradeDef> upgrades) =>
         new(
@@ -135,11 +140,11 @@ internal static class MechStatsReader
     // Mirrors StatTooltipData.SetMeleeData.
     private static MeleeStats ReadMelee(MechDef mech, List<UpgradeDef> upgrades)
     {
-        var chassis = mech.Chassis;
+        var chassisMelee = ReadChassisMelee(mech.Chassis);
         return new MeleeStats(
-            chassis.MeleeDamage + SumWeaponBonuses("DamagePerShot", WeaponSubType.Melee),
-            chassis.MeleeInstability + SumWeaponBonuses("Instability", WeaponSubType.Melee),
-            chassis.DFADamage * 2 + SumWeaponBonuses("DamagePerShot", WeaponSubType.DFA));
+            chassisMelee.Damage + SumWeaponBonuses("DamagePerShot", WeaponSubType.Melee),
+            chassisMelee.StabilityDamage + SumWeaponBonuses("Instability", WeaponSubType.Melee),
+            chassisMelee.DeathFromAboveDamage + SumWeaponBonuses("DamagePerShot", WeaponSubType.DFA));
 
         float SumWeaponBonuses(string statName, WeaponSubType attack) =>
             SumEffects(

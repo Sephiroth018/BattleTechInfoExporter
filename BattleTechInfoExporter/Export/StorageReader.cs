@@ -55,7 +55,6 @@ internal static class StorageReader
                 ? new StoredChassis(
                     MechReader.ReferenceTo(chassis),
                     chassis.weightClass,
-                    chassis.StockRole,
                     chassis.Tonnage,
                     MechReader.ReadMaxArmor(chassis),
                     MechReader.ReadHardpoints(chassis),
