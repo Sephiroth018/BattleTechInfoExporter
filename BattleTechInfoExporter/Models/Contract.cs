@@ -90,8 +90,12 @@ internal sealed record NegotiationOption(
     Salvage Salvage,
     ReputationChange Reputation);
 
-/// <summary>The reputation changes of a successful contract, as the negotiation shows them.</summary>
-/// <param name="Employer">The gain with the employer; <c>null</c> when the employer doesn't gain reputation.</param>
+/// <summary>
+///     The reputation changes of a contract: of its success, as the negotiation shows them, or of a mission's outcome.
+/// </summary>
+/// <param name="Employer">
+///     The change, usually a gain, with the employer; <c>null</c> when the employer doesn't gain reputation.
+/// </param>
 /// <param name="Target">
 ///     The change, usually a loss, with the target; <c>null</c> when the target doesn't gain reputation.
 /// </param>

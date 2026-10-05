@@ -13,5 +13,7 @@ internal enum ExportTrigger
     StoreClosed,
     MechBayChanged,
     ExperienceSpent,
-    MechPlacementShown
+    MechPlacementShown,
+    MissionCompleted,
+    SalvageChosen
 }

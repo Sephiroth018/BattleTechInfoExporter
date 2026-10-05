@@ -14,7 +14,7 @@ namespace BattleTechInfoExporter.Export;
 internal static class MechReader
 {
     // From head to legs, in pairs, as the mech lab lays them out.
-    private static readonly ChassisLocations[] Locations =
+    internal static readonly IReadOnlyList<ChassisLocations> Locations =
     [
         ChassisLocations.Head,
         ChassisLocations.CenterTorso,
@@ -227,19 +227,20 @@ internal static class MechReader
             HasRearArmor(definition)
                 ? new Armor(loadout.CurrentRearArmor, loadout.AssignedRearArmor, definition.MaxRearArmor)
                 : null,
-            new Structure(loadout.CurrentInternalStructure, definition.InternalStructure),
+            ReadStructure(mech, location),
             ReadHardpoints(mech.Chassis, [location]),
             // A component whose definition is missing has no known size.
             new Slots(components.Sum(component => component.Def?.InventorySize ?? 0), definition.InventorySlots),
             components.Select(component => new MountedComponent(
-                    componentReferences.ReferenceTo(
-                        component.ComponentDefType,
-                        component.ComponentDefID,
-                        component.Def),
+                    componentReferences.ReferenceTo(component),
                     component.DamageLevel,
                     component.IsFixed))
                 .ToList());
     }
+
+    internal static Structure ReadStructure(MechDef mech, ChassisLocations location) =>
+        new(mech.GetLocationLoadoutDef(location).CurrentInternalStructure,
+            mech.GetChassisLocationDef(location).InternalStructure);
 
     private static List<RefitChange>? ReadRefit(
         SimGameState simGame,
