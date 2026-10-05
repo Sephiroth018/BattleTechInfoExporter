@@ -25,7 +25,7 @@ internal static class ExportFileWriter
         Converters = { new StringEnumConverter() }
     };
 
-    internal static readonly string ExportDirectory = Path.Combine(ModAssembly.Directory, "exports");
+    private static readonly string ExportDirectory = Path.Combine(ModAssembly.Directory, "exports");
 
     // The JSON last written per file name, without its ExportedAt; empty after every game start, so each file is
     // written once per session.
@@ -36,20 +36,20 @@ internal static class ExportFileWriter
     ///     when its content, apart from <see cref="ExportFile.ExportedAt" />, is the same as the last one written
     ///     this session, so tools watching it only see real changes.
     /// </summary>
-    /// <returns>Whether the file was written.</returns>
-    internal static bool Write(string fileName, ExportFile content)
+    internal static void Write(string fileName, ExportFile content)
     {
         Directory.CreateDirectory(ExportDirectory);
         var path = Path.Combine(ExportDirectory, fileName);
         var comparedContent = JsonConvert.SerializeObject(content with { ExportedAt = null }, SerializerSettings);
-        if (LastWrittenContents.TryGetValue(fileName, out var lastWrittenContent)
-            && lastWrittenContent == comparedContent
-            && File.Exists(path))
+        var fileExists = File.Exists(path);
+        if (fileExists
+            && LastWrittenContents.TryGetValue(fileName, out var lastWrittenContent)
+            && lastWrittenContent == comparedContent)
         {
-            return false;
+            ModLog.Logger.Log($"Left {fileName} unchanged ({content.Trigger})");
+            return;
         }
 
-        var fileExists = File.Exists(path);
         var json = JsonConvert.SerializeObject(content with { ExportedAt = DateTimeOffset.Now }, SerializerSettings);
         var temporaryPath = path + ".tmp";
         File.WriteAllText(temporaryPath, json);
@@ -64,7 +64,7 @@ internal static class ExportFileWriter
 
         // Only once the file is written, so a failed write is retried on the next export.
         LastWrittenContents[fileName] = comparedContent;
-        return true;
+        ModLog.Logger.Log($"Exported {fileName} ({content.Trigger}) to {ExportDirectory}");
     }
 
     /// <summary>
