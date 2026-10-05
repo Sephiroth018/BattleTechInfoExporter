@@ -23,7 +23,7 @@ internal static class ContractReader
     // (SimGameState.FinishCompleteBreadcrumbProcess, FailBreadcrumb).
     internal static ActiveContract? ReadActiveContract(
         SimGameState simGame,
-        (StarSystem Destination, int DaysLeft)? travelInProgress)
+        (StarSystem Destination, int ArrivesOnDay)? travelInProgress)
     {
         if (simGame.ActiveTravelContract is not { } contract)
         {
@@ -320,15 +320,23 @@ internal static class ContractReader
             ? CreateTravel(system, ReadTravelDays(simGame, system))
             : null;
 
-    // While travelling to the contract's system, the days are the trip's as the position has them, also on the last
+    // While travelling to the contract's system, the arrival is the trip's as the position has it, also on the last
     // leg from the jump point to the planet.
-    private static ContractTravel? ReadActiveContractTravel(
+    private static ActiveContractTravel? ReadActiveContractTravel(
         SimGameState simGame,
         BattleTech.Contract contract,
-        (StarSystem Destination, int DaysLeft)? travelInProgress) =>
-        ReadTargetSystem(contract) is { } system && travelInProgress?.Destination.ID == system.ID
-            ? CreateTravel(system, travelInProgress.Value.DaysLeft)
-            : ReadTravel(simGame, contract);
+        (StarSystem Destination, int ArrivesOnDay)? travelInProgress)
+    {
+        if (ReadTargetSystem(contract) is { } system && travelInProgress?.Destination.ID == system.ID)
+        {
+            return ToActiveContractTravel(CreateTravel(system, null), travelInProgress.Value.ArrivesOnDay);
+        }
+
+        return ReadTravel(simGame, contract) is { } travel ? ToActiveContractTravel(travel, null) : null;
+    }
+
+    private static ActiveContractTravel ToActiveContractTravel(ContractTravel travel, int? arrivesOnDay) =>
+        new(travel.System, travel.Tags, travel.Days, arrivesOnDay);
 
     // The contract list marks travel contracts by the target system in the contract's context (SGContractsListItem).
     private static StarSystem? ReadTargetSystem(BattleTech.Contract contract) =>

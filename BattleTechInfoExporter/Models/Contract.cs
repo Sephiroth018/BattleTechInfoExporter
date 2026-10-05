@@ -40,10 +40,7 @@ internal sealed record Contract(
 /// <param name="Difficulty">On the scale of <see cref="ReputationLevel.MaxContractDifficulty" />.</param>
 /// <param name="Terms">The terms the contract was accepted with.</param>
 /// <param name="Biome"><c>null</c> where the game has no biome for the contract.</param>
-/// <param name="Travel">
-///     <c>null</c> once the company has arrived at the contract's planet; while travelling there, its days are
-///     those of <see cref="Models.Travel.DaysLeft" />.
-/// </param>
+/// <param name="Travel"><c>null</c> once the company has arrived at the contract's planet.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ActiveContract(
     string? Id,
@@ -57,7 +54,7 @@ internal sealed record ActiveContract(
     NegotiationOption Terms,
     LanceLimits LanceLimits,
     DefinitionReference? Biome,
-    ContractTravel? Travel);
+    ActiveContractTravel? Travel);
 
 /// <summary>The contract's terms.</summary>
 /// <param name="ValuesByShare">
@@ -125,3 +122,19 @@ internal sealed record MechSlotLimits(float? MinTonnage, float? MaxTonnage);
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ContractTravel(DefinitionReference System, IReadOnlyList<DefinitionReference> Tags, int? Days);
+
+/// <param name="Tags">The planet tags the starmap shows for the system, e.g. its industry.</param>
+/// <param name="Days">
+///     The travel days to the system, as the contract details show them, until the company sets off; <c>null</c>
+///     while travelling there and if the game finds no route.
+/// </param>
+/// <param name="ArrivesOnDay">
+///     While travelling to the system, the day of arrival, as in <see cref="Models.Travel.ArrivesOnDay" />;
+///     <c>null</c> otherwise.
+/// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record ActiveContractTravel(
+    DefinitionReference System,
+    IReadOnlyList<DefinitionReference> Tags,
+    int? Days,
+    int? ArrivesOnDay);

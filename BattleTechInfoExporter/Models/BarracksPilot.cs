@@ -11,14 +11,14 @@ internal sealed record BarracksPilot : Pilot
         Experience experience,
         int injuries,
         PilotStatus status,
-        int daysUntilReady,
+        int? readyOnDay,
         Spirits spirits,
         ServiceRecord serviceRecord) : base(pilot)
     {
         Experience = experience;
         Injuries = injuries;
         Status = status;
-        DaysUntilReady = daysUntilReady;
+        ReadyOnDay = readyOnDay;
         Spirits = spirits;
         ServiceRecord = serviceRecord;
     }
@@ -29,8 +29,11 @@ internal sealed record BarracksPilot : Pilot
 
     public PilotStatus Status { get; }
 
-    /// <summary>Zero when the pilot is <see cref="PilotStatus.Ready" />.</summary>
-    public int DaysUntilReady { get; }
+    /// <summary>
+    ///     The day the pilot is ready again, on the scale of <see cref="Company.DaysPassed" />; <c>null</c> when
+    ///     <see cref="PilotStatus.Ready" />.
+    /// </summary>
+    public int? ReadyOnDay { get; }
 
     public Spirits Spirits { get; }
 
@@ -40,10 +43,14 @@ internal sealed record BarracksPilot : Pilot
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Experience(int Unspent, int Spent);
 
-/// <param name="DaysRemaining">Until high or low spirits end; <c>null</c> for normal spirits, which don't.</param>
+/// <param name="EndsOnDay">
+///     The day high or low spirits end, on the scale of <see cref="Company.DaysPassed" />; <c>null</c> for normal
+///     spirits and when the game sets no end.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record Spirits(SpiritsLevel Level, int? DaysRemaining);
+internal sealed record Spirits(SpiritsLevel Level, int? EndsOnDay);
 
+/// <param name="HiredOnDay">On the scale of <see cref="Company.DaysPassed" />.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ServiceRecord(
     int Missions,
@@ -51,4 +58,4 @@ internal sealed record ServiceRecord(
     int OtherKills,
     int Ejections,
     int LifetimeInjuries,
-    int DaysOnCrew);
+    int HiredOnDay);

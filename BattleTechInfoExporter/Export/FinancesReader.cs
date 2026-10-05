@@ -13,13 +13,17 @@ internal static class FinancesReader
     internal static Finances ReadFinances(SimGameState simGame) =>
         new(
             simGame.Funds,
-            simGame.DayRemainingInQuarter,
+            ReadNextReportOnDay(simGame),
             new Spending(
                 simGame.ExpenditureLevel,
                 simGame.ExpenditureMoraleValue
                     .Select(option => new SpendingOption(option.Key, simGame.GetExpenditures(option.Key), option.Value))
                     .ToList()),
             ReadExpectedExpenses(simGame));
+
+    // The financial report's work order counts down the same days (SimGameState.OnDayPassed).
+    internal static int ReadNextReportOnDay(SimGameState simGame) =>
+        simGame.DaysPassed + simGame.DayRemainingInQuarter;
 
     /// <summary>
     ///     The pilot's line in the expenses of each report, with the spending level's cost modifier

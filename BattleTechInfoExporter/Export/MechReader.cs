@@ -5,7 +5,6 @@ using BattleTech;
 using BattleTech.Data;
 using BattleTech.UI;
 using BattleTechInfoExporter.Models;
-using UnityEngine;
 using Mech = BattleTechInfoExporter.Models.Mech;
 
 namespace BattleTechInfoExporter.Export;
@@ -104,16 +103,20 @@ internal static class MechReader
     }
 
     // Both dictionaries are keyed by the mech bay slot; a slot is in one of them at most.
-    internal static List<Mech> ReadMechs(SimGameState simGame, ComponentReferences componentReferences) =>
+    internal static List<Mech> ReadMechs(
+        SimGameState simGame,
+        ComponentReferences componentReferences,
+        IReadOnlyDictionary<WorkOrderEntry, int> mechLabFinishingDays) =>
         simGame.ActiveMechs
             .Concat(simGame.ReadyingMechs)
             .OrderBy(slot => slot.Key)
-            .Select(slot => ReadMech(simGame, componentReferences, slot.Key, slot.Value))
+            .Select(slot => ReadMech(simGame, componentReferences, mechLabFinishingDays, slot.Key, slot.Value))
             .ToList();
 
     private static Mech ReadMech(
         SimGameState simGame,
         ComponentReferences componentReferences,
+        IReadOnlyDictionary<WorkOrderEntry, int> mechLabFinishingDays,
         int slot,
         MechDef mech)
     {
@@ -137,9 +140,8 @@ internal static class MechReader
                 WorkOrderEntry_ReadyMech => MechStatus.Readying,
                 _ => MechStatus.InMaintenance
             },
-            ReadDaysUntilReady(simGame, workOrder),
             // SimGameState.GetWorkOrderEntryForMech finds the order among the queue's own entries.
-            workOrder is null ? null : simGame.MechLabQueue.IndexOf(workOrder) + 1,
+            workOrder is null ? null : mechLabFinishingDays[workOrder],
             ReadRefit(simGame, componentReferences, mech, refitOrder),
             MechValidationRules.ValidateMechCanBeFielded(simGame, mech),
             // The mech lab validates at this level, against the mech's work order (MechLabPanel).
@@ -185,32 +187,6 @@ internal static class MechReader
             mech.Description.Cost,
             MechStatsReader.Read(mech),
             Locations.Select(location => ReadLocation(componentReferences, mech, location)).ToList());
-    }
-
-    // Mirrors TaskTimelineWidget.RefreshEntries and TaskManagementElement.UpdateItem: the mech techs work on
-    // the first order of the queue only, so each order waits for the ones before it.
-    private static int ReadDaysUntilReady(SimGameState simGame, WorkOrderEntry_MechLab? workOrder)
-    {
-        if (workOrder is null || workOrder.IsCostPaid())
-        {
-            return 0;
-        }
-
-        var days = 0;
-        foreach (var entry in simGame.MechLabQueue.Where(entry => simGame.WorkOrderIsMechTech(entry.Type)))
-        {
-            if (!entry.IsCostPaid())
-            {
-                days += Math.Max(1, Mathf.CeilToInt((float)entry.GetRemainingCost() / simGame.MechTechSkill));
-            }
-
-            if (entry == workOrder)
-            {
-                break;
-            }
-        }
-
-        return days;
     }
 
     private static MechLocation ReadLocation(

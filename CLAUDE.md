@@ -402,6 +402,9 @@ General rule on managing one doesn't apply.
   contract to link them by.
 - **Every export file starts with `modVersion`, `exportedAt` and `trigger`** (`ExportFile`, which
   every file's model inherits), describing the export that last wrote it.
+- **Points in time are day numbers** on the game's `DaysPassed` scale (`company.daysPassed`), e.g.
+  `readyOnDay`, never countdowns, so a passing day changes only the company's day and date. Durations
+  that don't count down (a route's travel days) stay durations.
 - **Game texts are plain text** (`GameText`): descriptions and objective titles lose the
   formatting tags (`<i>`, `<color=…>`) and tooltip links the game's UI renders. Names are left as they are.
 - **Game enums keep the game's values** (e.g. `IN_SYSTEM`, `LIKED`); the UI shows the same. Our own
