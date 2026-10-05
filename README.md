@@ -35,9 +35,9 @@ The **game state**, written to `Mods/BattleTechInfoExporter/exports/game-state.j
       can pilot
 - [x] Component definitions: the tonnage, slots, cost, bonuses and weapon, ammunition box or heat
       sink stats of every component the export refers to, listed once per component type by id
-- [x] Storage: the stored components with their working and damaged counts, the stored mechs with
-      their chassis stats, and the mech parts collected per mech. Stored mechs are bare chassis:
-      readying one gives the stock armor and the chassis' fixed equipment, but no weapons
+- [x] Storage: the stored components with their working and damaged counts, the stored chassis with
+      their stats, and the mech parts collected per mech. Readying a stored chassis gives the stock
+      armor and the chassis' fixed components, but no weapons
 - [x] The current system's stores (system store, faction store, black market) that the company can
       use, with the components and mech parts they sell, their stock and prices
 - [x] The current system's hiring hall: the pilots for hire with their skills, primary abilities,

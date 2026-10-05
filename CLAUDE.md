@@ -398,6 +398,14 @@ repository URL and supported game version; the build stamps the version into the
   changes. `ExportFileWriter` compares with the content it last wrote, kept in memory, so each file
   is also written once after every game start.
 
+## Glossary
+
+- **Component:** anything mounted in a mech's slots (weapon, ammunition box, heat sink, jump jet,
+  upgrade), the game's `MechComponentDef`. Never "equipment".
+- **Chassis:** a mech's frame without its removable components (`ChassisDef`). Storage keeps
+  chassis, not mechs.
+- **Mech:** a complete mech (`MechDef`): in the mech bay, or sold whole by a store.
+
 ## Commands
 
 - **Build:** `dotnet build`.

@@ -10,22 +10,22 @@ internal static class GameStateReader
 {
     internal static GameState Read(SimGameState simGame, ExportTrigger trigger)
     {
-        var componentDefinitions = new ComponentReferences(simGame.DataManager);
+        var componentReferences = new ComponentReferences(simGame.DataManager);
         var travelInProgress = ReadTravelInProgress(simGame);
         return new GameState(
             ModAssembly.Version,
             trigger,
             ReadCompany(simGame),
             PilotReader.ReadPilots(simGame),
-            MechReader.ReadMechs(simGame, componentDefinitions),
+            MechReader.ReadMechs(simGame, componentReferences),
             LanceReader.ReadLastLance(simGame),
-            StorageReader.ReadStorage(simGame, componentDefinitions),
-            StoreReader.ReadStores(simGame, componentDefinitions),
+            StorageReader.ReadStorage(simGame, componentReferences),
+            StoreReader.ReadStores(simGame, componentReferences),
             PilotReader.ReadHiringHall(simGame),
             ContractReader.ReadActiveContract(simGame, travelInProgress),
             ContractReader.ReadContracts(simGame),
             // After every section that references components.
-            componentDefinitions.Definitions,
+            componentReferences.Definitions,
             ReadPosition(simGame, travelInProgress));
     }
 

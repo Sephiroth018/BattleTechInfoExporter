@@ -67,16 +67,16 @@ internal static class MechReader
     }
 
     // Both dictionaries are keyed by the mech bay slot; a slot is in one of them at most.
-    internal static List<Mech> ReadMechs(SimGameState simGame, ComponentReferences componentDefinitions) =>
+    internal static List<Mech> ReadMechs(SimGameState simGame, ComponentReferences componentReferences) =>
         simGame.ActiveMechs
             .Concat(simGame.ReadyingMechs)
             .OrderBy(slot => slot.Key)
-            .Select(slot => ReadMech(simGame, componentDefinitions, slot.Key, slot.Value))
+            .Select(slot => ReadMech(simGame, componentReferences, slot.Key, slot.Value))
             .ToList();
 
     private static Mech ReadMech(
         SimGameState simGame,
-        ComponentReferences componentDefinitions,
+        ComponentReferences componentReferences,
         int slot,
         MechDef mech)
     {
@@ -103,7 +103,7 @@ internal static class MechReader
             ReadDaysUntilReady(simGame, workOrder),
             // SimGameState.GetWorkOrderEntryForMech finds the order among the queue's own entries.
             workOrder is null ? null : simGame.MechLabQueue.IndexOf(workOrder) + 1,
-            ReadRefit(simGame, componentDefinitions, mech, refitOrder),
+            ReadRefit(simGame, componentReferences, mech, refitOrder),
             MechValidationRules.ValidateMechCanBeFielded(simGame, mech),
             // The mech lab validates at this level, against the mech's work order (MechLabPanel).
             MechValidationRules.ValidateMechDef(MechValidationLevel.MechLab, simGame.DataManager, mech, workOrder)
@@ -111,13 +111,13 @@ internal static class MechReader
                 .SelectMany(problems => problems)
                 .Select(problem => problem.ToString())
                 .ToList(),
-            ReadLoadout(componentDefinitions, mech),
+            ReadLoadout(componentReferences, mech),
             refitOrder is null
                 ? null
-                : ReadLoadout(componentDefinitions, MechRefit.CopyWithPendingSteps(simGame, mech, refitOrder)));
+                : ReadLoadout(componentReferences, MechRefit.CopyWithPendingSteps(simGame, mech, refitOrder)));
     }
 
-    private static MechLoadout ReadLoadout(ComponentReferences componentDefinitions, MechDef mech)
+    private static MechLoadout ReadLoadout(ComponentReferences componentReferences, MechDef mech)
     {
         // The maximum it returns is the stat bar's scale, not the chassis tonnage.
         float usedTonnage = 0, ignoredMax = 0;
@@ -127,7 +127,7 @@ internal static class MechReader
             // Recomputed by MechDef.RefreshBattleValue whenever the loadout changes; the mech bay shows it.
             mech.Description.Cost,
             MechStatsReader.Read(mech),
-            Locations.Select(location => ReadLocation(componentDefinitions, mech, location)).ToList());
+            Locations.Select(location => ReadLocation(componentReferences, mech, location)).ToList());
     }
 
     // Mirrors TaskTimelineWidget.RefreshEntries and TaskManagementElement.UpdateItem: the mech techs work on
@@ -157,7 +157,7 @@ internal static class MechReader
     }
 
     private static MechLocation ReadLocation(
-        ComponentReferences componentDefinitions,
+        ComponentReferences componentReferences,
         MechDef mech,
         ChassisLocations location)
     {
@@ -175,7 +175,7 @@ internal static class MechReader
             // A component whose definition is missing has no known size.
             new Slots(components.Sum(component => component.Def?.InventorySize ?? 0), definition.InventorySlots),
             components.Select(component => new MountedComponent(
-                    componentDefinitions.ReferenceTo(
+                    componentReferences.ReferenceTo(
                         component.ComponentDefType,
                         component.ComponentDefID,
                         component.Def),
@@ -186,24 +186,24 @@ internal static class MechReader
 
     private static List<RefitChange>? ReadRefit(
         SimGameState simGame,
-        ComponentReferences componentDefinitions,
+        ComponentReferences componentReferences,
         MechDef mech,
         WorkOrderEntry_MechLab? refitOrder) =>
         refitOrder?.SubEntries
             // SimGameState.UpdateMechLabWorkQueue relies on the same.
             .Cast<WorkOrderEntry_MechLab>()
-            .Select(step => ReadRefitChange(simGame, componentDefinitions, mech, step))
+            .Select(step => ReadRefitChange(simGame, componentReferences, mech, step))
             .ToList();
 
     private static RefitChange ReadRefitChange(
         SimGameState simGame,
-        ComponentReferences componentDefinitions,
+        ComponentReferences componentReferences,
         MechDef mech,
         WorkOrderEntry_MechLab step) =>
         step switch
         {
-            WorkOrderEntry_InstallComponent installation => ReadInstallation(componentDefinitions, installation),
-            WorkOrderEntry_RepairComponent repair => ReadRepair(simGame, componentDefinitions, mech, repair),
+            WorkOrderEntry_InstallComponent installation => ReadInstallation(componentReferences, installation),
+            WorkOrderEntry_RepairComponent repair => ReadRepair(simGame, componentReferences, mech, repair),
             WorkOrderEntry_ModifyMechArmor armor => new RefitChange(
                 RefitChangeType.ModifyArmor,
                 step.IsMechLabComplete,
@@ -222,14 +222,14 @@ internal static class MechReader
     // definition is resolved from the type and id instead. A removal is an install step without a desired location
     // (SimGameState.CreateComponentInstallWorkOrder).
     private static RefitChange ReadInstallation(
-        ComponentReferences componentDefinitions,
+        ComponentReferences componentReferences,
         WorkOrderEntry_InstallComponent installation)
     {
         var isRemoval = installation.DesiredLocation == ChassisLocations.None;
         return new RefitChange(
             isRemoval ? RefitChangeType.RemoveComponent : RefitChangeType.InstallComponent,
             installation.IsMechLabComplete,
-            componentDefinitions.ReferenceTo(installation.ComponentType, installation.MechComponentID),
+            componentReferences.ReferenceTo(installation.ComponentType, installation.MechComponentID),
             installation.DamageLevel,
             isRemoval ? installation.PreviousLocation : installation.DesiredLocation);
     }
@@ -241,7 +241,7 @@ internal static class MechReader
     // order, or in storage, where it isn't mounted.
     private static RefitChange ReadRepair(
         SimGameState simGame,
-        ComponentReferences componentDefinitions,
+        ComponentReferences componentReferences,
         MechDef mech,
         WorkOrderEntry_RepairComponent repair)
     {
@@ -258,7 +258,7 @@ internal static class MechReader
         return new RefitChange(
             RefitChangeType.RepairComponent,
             repair.IsMechLabComplete,
-            componentDefinitions.ReferenceTo(repair.ComponentType, repair.MechComponentID, component?.Def),
+            componentReferences.ReferenceTo(repair.ComponentType, repair.MechComponentID, component?.Def),
             repair.DamageLevel,
             component?.MountedLocation is { } location and not ChassisLocations.None ? location : null);
     }

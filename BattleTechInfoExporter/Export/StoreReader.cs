@@ -9,7 +9,7 @@ internal static class StoreReader
 {
     // A store exists when it has stock (StarSystem.HasFactionStore, HasBlackMarketStore). CanUseSystemStore doesn't
     // check it, the other two do.
-    internal static Stores ReadStores(SimGameState simGame, ComponentReferences componentDefinitions)
+    internal static Stores ReadStores(SimGameState simGame, ComponentReferences componentReferences)
     {
         var system = simGame.CurSystem;
         return new Stores(
@@ -24,13 +24,13 @@ internal static class StoreReader
                 FactionEnumeration.GetAuriganPiratesFactionValue()));
 
         Store? ReadStoreIfUsable(bool isUsable, Shop shop, FactionValue priceFaction) =>
-            isUsable ? ReadStore(simGame, componentDefinitions, shop, priceFaction) : null;
+            isUsable ? ReadStore(simGame, componentReferences, shop, priceFaction) : null;
     }
 
     // The price faction is the one Shop.GetPrice takes the reputation of.
     private static Store ReadStore(
         SimGameState simGame,
-        ComponentReferences componentDefinitions,
+        ComponentReferences componentReferences,
         Shop shop,
         FactionValue priceFaction)
     {
@@ -45,7 +45,7 @@ internal static class StoreReader
             DefinitionReferences.ReferenceTo(priceFaction),
             items
                 .Where(item => item.Type != ShopItemType.MechPart)
-                .Select(item => componentDefinitions.TryReferenceTo(
+                .Select(item => componentReferences.TryReferenceTo(
                     SimGameState.ComponentTypeToBattleTechResourceType(Shop.ShopItemTypeToComponentType(item.Type)),
                     item.ID) is { } component
                     ? new ComponentForSale(component, CountOf(item), PriceOf(shop, item))

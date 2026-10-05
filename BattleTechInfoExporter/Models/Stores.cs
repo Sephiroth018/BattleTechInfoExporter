@@ -18,7 +18,7 @@ internal sealed record Stores(Store? System, Store? Faction, Store? BlackMarket)
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Store(
     DefinitionReference Faction,
-    IReadOnlyList<ComponentForSale> Equipment,
+    IReadOnlyList<ComponentForSale> Components,
     IReadOnlyList<MechPartsForSale> MechParts);
 
 /// <param name="Count">The copies in stock; <c>null</c>: unlimited.</param>
