@@ -354,7 +354,8 @@ name, version and folder, `ModLog` its logger. Folders:
 
 - `Triggers/`: the patches that decide when to export.
 - `Export/`: `GameStateExporter`, the single entry point every trigger calls; `GameStateReader`
-  builds the models of both export files from the game, with `PilotReader` for the barracks and
+  builds the models of both export files from the game, with `FinancesReader` for the finances and
+  expense lines, `PilotReader` for the barracks and
   hiring hall pilots, `MechReader` and `MechStatsReader` for the mechs, with `MechRefit` for a mech's loadout after its
   refit, `LanceReader` for the last
   lance, `StorageReader` for the storage, `StoreReader` for the stores and `ContractReader` for the

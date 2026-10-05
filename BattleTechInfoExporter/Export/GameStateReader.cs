@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using BattleTech;
 using BattleTechInfoExporter.Models;
-using Localize;
 using UnityEngine;
 
 namespace BattleTechInfoExporter.Export;
@@ -51,7 +50,7 @@ internal static class GameStateReader
             simGame.DaysPassed,
             simGame.CurrentDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
             new Morale(simGame.Morale, simGame.GetCurrentMoraleLevelDescriptor()),
-            ReadFinances(simGame),
+            FinancesReader.ReadFinances(simGame),
             new MercenaryReviewBoard(
                 simGame.GetRawReputation(FactionEnumeration.GetMercenaryReviewBoardFactionValue()),
                 simGame.GetCurrentMRBLevel()),
@@ -63,59 +62,6 @@ internal static class GameStateReader
             simGame.MechTechSkill,
             simGame.MedTechSkill,
             simGame.GetMaxMechWarriors());
-
-    private static Finances ReadFinances(SimGameState simGame) =>
-        new(
-            simGame.Funds,
-            simGame.DayRemainingInQuarter,
-            new Spending(
-                simGame.ExpenditureLevel,
-                simGame.ExpenditureMoraleValue
-                    .Select(option => new SpendingOption(option.Key, simGame.GetExpenditures(option.Key), option.Value))
-                    .ToList()),
-            ReadExpectedExpenses(simGame));
-
-    // Mirrors the line items of SGCaptainsQuartersStatusScreen.RefreshData, including its rounding;
-    // the game has no method that returns them.
-    private static ExpectedExpenses ReadExpectedExpenses(SimGameState simGame)
-    {
-        var costModifier = simGame.GetExpenditureCostModifier(simGame.ExpenditureLevel);
-        var shipName = simGame.CurDropship == DropshipType.Leopard
-            ? Strings.T("Bank Loan Interest Payment")
-            : Strings.T("Argo Operating Costs");
-        return new ExpectedExpenses(
-            simGame.GetExpenditures(),
-            new ShipExpense(shipName, Mathf.RoundToInt(costModifier * simGame.GetShipBaseMaintenanceCost())),
-            ReadShipUpgradeExpenses(simGame, costModifier),
-            simGame.ActiveMechs.Values
-                .Select(mech => new MechExpense(
-                    MechReader.ReferenceToBayMech(mech),
-                    Mathf.RoundToInt(costModifier * simGame.Constants.Finances.MechCostPerQuarter)))
-                .ToList(),
-            simGame.PilotRoster
-                .Select(pilot => new PilotExpense(
-                    PilotReader.ReferenceTo(pilot.pilotDef.Description),
-                    PilotReader.ReadSalary(simGame, costModifier, pilot.pilotDef)))
-                .ToList());
-    }
-
-    // Only the Argo charges upkeep for its upgrades.
-    private static List<ShipUpgradeExpense> ReadShipUpgradeExpenses(SimGameState simGame, float costModifier)
-    {
-        if (simGame.CurDropship != DropshipType.Argo)
-        {
-            return [];
-        }
-
-        return simGame.ShipUpgrades
-            .Select(upgrade => (upgrade, upkeep: Mathf.CeilToInt(
-                upgrade.AdditionalCost * simGame.Constants.CareerMode.ArgoMaintenanceMultiplier)))
-            .Where(upgradeUpkeep => upgradeUpkeep.upkeep > 0)
-            .Select(upgradeUpkeep => new ShipUpgradeExpense(
-                DefinitionReferences.ReferenceTo(upgradeUpkeep.upgrade.Description),
-                Mathf.RoundToInt(costModifier * upgradeUpkeep.upkeep)))
-            .ToList();
-    }
 
     // The limits are hardcoded in SimGameState.CanPilotTakeAbility.
     private static SkillRules ReadSkillRules(SimGameState simGame)
