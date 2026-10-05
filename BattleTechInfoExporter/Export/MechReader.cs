@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BattleTech;
+using BattleTech.Data;
 using BattleTechInfoExporter.Models;
 using UnityEngine;
 using Mech = BattleTechInfoExporter.Models.Mech;
@@ -34,6 +35,12 @@ internal static class MechReader
     // A mech's name is its nickname (renameable in the mech lab).
     internal static DefinitionReference ReferenceTo(MechDef mech) =>
         new(mech.Description.Id, NameWithVariant(mech.Name, mech.Chassis));
+
+    /// <summary>
+    ///     The reference to the mech that mech parts assemble into, or <c>null</c> when its definition is missing.
+    /// </summary>
+    internal static DefinitionReference? TryReferenceToMech(DataManager dataManager, string mechId) =>
+        dataManager.MechDefs.TryGet(mechId, out var mech) ? ReferenceTo(mech) : null;
 
     internal static MechReference ReferenceToBayMech(MechDef mech) =>
         new(mech.GUID, NameWithVariant(mech.Name, mech.Chassis));

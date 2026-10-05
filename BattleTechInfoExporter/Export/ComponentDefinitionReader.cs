@@ -28,13 +28,19 @@ internal sealed class ComponentDefinitionReader
 
     internal ComponentDefinitions Definitions => new(_weapons, _ammunitionBoxes, _heatSinks, _jumpJets, _upgrades);
 
-    // DataManager.Get returns null for a missing definition; the type mapping is static, so no SimGameState is needed.
+    // The type mapping is static, so no SimGameState is needed.
     internal ComponentReference ReferenceTo(ComponentType componentType, string componentId) =>
         ReferenceTo(
             componentType,
             componentId,
-            _dataManager.Get(SimGameState.ComponentTypeToBattleTechResourceType(componentType), componentId)
-                as MechComponentDef);
+            FindDefinition(SimGameState.ComponentTypeToBattleTechResourceType(componentType), componentId));
+
+    /// <summary>The reference to a component, or <c>null</c> when its definition is missing.</summary>
+    /// <remarks>For lists that leave out what they can't describe, unlike the other overloads.</remarks>
+    internal ComponentReference? TryReferenceTo(BattleTechResourceType resourceType, string componentId) =>
+        FindDefinition(resourceType, componentId) is { } definition
+            ? ReferenceTo(definition.ComponentType, componentId, definition)
+            : null;
 
     // The id stands in for the name of a missing definition, which gets no entry.
     internal ComponentReference ReferenceTo(
@@ -73,6 +79,10 @@ internal sealed class ComponentDefinitionReader
         // The definition's own type, so the reference names the group that holds it.
         return new ComponentReference(componentId, NameOf(definition), definition.ComponentType);
     }
+
+    // DataManager.Get returns null for a missing definition.
+    private MechComponentDef? FindDefinition(BattleTechResourceType resourceType, string componentId) =>
+        _dataManager.Get(resourceType, componentId) as MechComponentDef;
 
     private static void AddOnce<TDefinition>(
         SortedDictionary<string, TDefinition> definitions,
