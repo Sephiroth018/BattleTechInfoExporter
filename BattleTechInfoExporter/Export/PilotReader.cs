@@ -33,18 +33,8 @@ internal static class PilotReader
     private static HiringHallPilot ReadHiringHallPilot(SimGameState simGame, Pilot pilot)
     {
         var definition = pilot.pilotDef;
-        var description = definition.Description;
         return new HiringHallPilot(
-            description.Id,
-            FullName(description),
-            description.Callsign,
-            ReadPilotType(simGame, pilot),
-            description.Age,
-            description.Gender,
-            simGame.GetPilotFullExpertise(pilot),
-            ReadSkills(pilot),
-            ReadAbilities(definition),
-            pilot.Health,
+            ReadPilotCommon(simGame, pilot),
             // What SG_HiringHall_Screen shows and SimGameState.HirePilot charges.
             simGame.CurSystem.GetPurchaseCostAfterReputationModifier(simGame.GetMechWarriorHiringCost(definition)),
             FinancesReader.ReadSalary(simGame, definition),
@@ -55,18 +45,8 @@ internal static class PilotReader
     private static BarracksPilot ReadPilot(SimGameState simGame, Pilot pilot)
     {
         var definition = pilot.pilotDef;
-        var description = definition.Description;
         return new BarracksPilot(
-            description.Id,
-            FullName(description),
-            description.Callsign,
-            ReadPilotType(simGame, pilot),
-            description.Age,
-            description.Gender,
-            simGame.GetPilotFullExpertise(pilot),
-            ReadSkills(pilot),
-            ReadAbilities(definition),
-            pilot.Health,
+            ReadPilotCommon(simGame, pilot),
             new Experience(pilot.UnspentXP, pilot.SpentXP),
             pilot.Injuries,
             ReadPilotStatus(pilot),
@@ -79,6 +59,22 @@ internal static class PilotReader
                 definition.MissionsEjected,
                 definition.LifetimeInjuries,
                 simGame.DaysPassed - definition.DateOfHire));
+    }
+
+    private static Models.Pilot ReadPilotCommon(SimGameState simGame, Pilot pilot)
+    {
+        var description = pilot.pilotDef.Description;
+        return new Models.Pilot(
+            description.Id,
+            FullName(description),
+            description.Callsign,
+            ReadPilotType(simGame, pilot),
+            description.Age,
+            description.Gender,
+            simGame.GetPilotFullExpertise(pilot),
+            ReadSkills(pilot),
+            ReadAbilities(pilot.pilotDef),
+            pilot.Health);
     }
 
     private static Skills ReadSkills(Pilot pilot) => new(pilot.Gunnery, pilot.Piloting, pilot.Guts, pilot.Tactics);

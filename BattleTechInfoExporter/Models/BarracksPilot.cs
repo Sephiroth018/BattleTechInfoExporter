@@ -1,29 +1,41 @@
-using System.Collections.Generic;
-using BattleTech;
 using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>A pilot in the barracks: the commander or a roster member.</summary>
-/// <param name="DaysUntilReady">Zero when the pilot is <see cref="PilotStatus.Ready" />.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record BarracksPilot(
-    string Id,
-    string Name,
-    string Callsign,
-    PilotType Type,
-    int Age,
-    Gender Gender,
-    string Expertise,
-    Skills Skills,
-    IReadOnlyList<DefinitionReference> Abilities,
-    int Health,
-    Experience Experience,
-    int Injuries,
-    PilotStatus Status,
-    int DaysUntilReady,
-    Spirits Spirits,
-    ServiceRecord ServiceRecord) : Pilot(Id, Name, Callsign, Type, Age, Gender, Expertise, Skills, Abilities, Health);
+internal sealed record BarracksPilot : Pilot
+{
+    internal BarracksPilot(
+        Pilot pilot,
+        Experience experience,
+        int injuries,
+        PilotStatus status,
+        int daysUntilReady,
+        Spirits spirits,
+        ServiceRecord serviceRecord) : base(pilot)
+    {
+        Experience = experience;
+        Injuries = injuries;
+        Status = status;
+        DaysUntilReady = daysUntilReady;
+        Spirits = spirits;
+        ServiceRecord = serviceRecord;
+    }
+
+    public Experience Experience { get; }
+
+    public int Injuries { get; }
+
+    public PilotStatus Status { get; }
+
+    /// <summary>Zero when the pilot is <see cref="PilotStatus.Ready" />.</summary>
+    public int DaysUntilReady { get; }
+
+    public Spirits Spirits { get; }
+
+    public ServiceRecord ServiceRecord { get; }
+}
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Experience(int Unspent, int Spent);

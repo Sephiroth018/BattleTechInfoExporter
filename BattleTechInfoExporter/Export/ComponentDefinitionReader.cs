@@ -110,15 +110,9 @@ internal sealed class ComponentDefinitionReader
             new[] { definition.BonusValueA, definition.BonusValueB }.Where(bonus => !string.IsNullOrEmpty(bonus))
                 .ToList());
 
-    private static WeaponDefinition ReadWeapon(WeaponDef weapon)
-    {
-        var component = ReadComponent(weapon);
-        return new WeaponDefinition(
-            component.Name,
-            component.Tonnage,
-            component.Slots,
-            component.Cost,
-            component.Bonuses,
+    private static WeaponDefinition ReadWeapon(WeaponDef weapon) =>
+        new(
+            ReadComponent(weapon),
             weapon.WeaponCategoryValue.FriendlyName,
             weapon.AmmoCategoryValue.Is_NotSet || weapon.AmmoCategoryValue.UsesInternalAmmo
                 ? null
@@ -139,20 +133,9 @@ internal sealed class ComponentDefinitionReader
             weapon.CriticalChanceMultiplier,
             weapon.RefireModifier,
             weapon.IndirectFireCapable);
-    }
 
-    private AmmunitionBoxDefinition ReadAmmunitionBox(AmmunitionBoxDef ammunitionBox)
-    {
-        var component = ReadComponent(ammunitionBox);
-        return new AmmunitionBoxDefinition(
-            component.Name,
-            component.Tonnage,
-            component.Slots,
-            component.Cost,
-            component.Bonuses,
-            ReadAmmoCategory(ammunitionBox),
-            ammunitionBox.Capacity);
-    }
+    private AmmunitionBoxDefinition ReadAmmunitionBox(AmmunitionBoxDef ammunitionBox) =>
+        new(ReadComponent(ammunitionBox), ReadAmmoCategory(ammunitionBox), ammunitionBox.Capacity);
 
     // The box's own Ammo is only set once the game has needed it (AmmunitionBoxDef.refreshAmmo). The game guards
     // the lookup as well (AmmunitionBoxDef.GatherDependencies); the ammo's id stands in for a missing definition.
@@ -168,15 +151,6 @@ internal sealed class ComponentDefinitionReader
         return ammunitionBox.AmmoID;
     }
 
-    private static HeatSinkDefinition ReadHeatSink(HeatSinkDef heatSink)
-    {
-        var component = ReadComponent(heatSink);
-        return new HeatSinkDefinition(
-            component.Name,
-            component.Tonnage,
-            component.Slots,
-            component.Cost,
-            component.Bonuses,
-            heatSink.DissipationCapacity);
-    }
+    private static HeatSinkDefinition ReadHeatSink(HeatSinkDef heatSink) =>
+        new(ReadComponent(heatSink), heatSink.DissipationCapacity);
 }

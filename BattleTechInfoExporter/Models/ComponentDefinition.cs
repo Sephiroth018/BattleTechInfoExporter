@@ -18,63 +18,109 @@ internal record ComponentDefinition(
     int Cost,
     IReadOnlyList<string> Bonuses);
 
-/// <param name="Category">The hardpoint kind the weapon needs, e.g. "Ballistic" or "Support".</param>
-/// <param name="AmmoCategory">
-///     The ammo the weapon fires, as <see cref="AmmunitionBoxDefinition.AmmoCategory" /> names it; <c>null</c>
-///     when it needs none.
-/// </param>
-/// <param name="Damage">The damage of one shot.</param>
-/// <param name="Instability">The stability damage of one shot.</param>
-/// <param name="ShotsWhenFired">The shots fired per attack.</param>
-/// <param name="HeatDamage">The heat the target takes per shot.</param>
-/// <param name="HeatGenerated">The heat the mech takes per attack.</param>
-/// <param name="AccuracyModifier">The weapon's own to-hit modifier, which the hit chance adds to the others.</param>
-/// <param name="RefireModifier">The accuracy penalty for firing again in the next round.</param>
-/// <param name="IsIndirectFireCapable">Whether the weapon can fire at targets out of line of sight.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record WeaponDefinition(
-    string Name,
-    float Tonnage,
-    int Slots,
-    int Cost,
-    IReadOnlyList<string> Bonuses,
-    string Category,
-    string? AmmoCategory,
-    float Damage,
-    float Instability,
-    int ShotsWhenFired,
-    int ProjectilesPerShot,
-    float HeatDamage,
-    int HeatGenerated,
-    WeaponRanges Ranges,
-    float AccuracyModifier,
-    float CriticalChanceMultiplier,
-    int RefireModifier,
-    bool IsIndirectFireCapable) : ComponentDefinition(Name, Tonnage, Slots, Cost, Bonuses);
+internal sealed record WeaponDefinition : ComponentDefinition
+{
+    internal WeaponDefinition(
+        ComponentDefinition component,
+        string category,
+        string? ammoCategory,
+        float damage,
+        float instability,
+        int shotsWhenFired,
+        int projectilesPerShot,
+        float heatDamage,
+        int heatGenerated,
+        WeaponRanges ranges,
+        float accuracyModifier,
+        float criticalChanceMultiplier,
+        int refireModifier,
+        bool isIndirectFireCapable) : base(component)
+    {
+        Category = category;
+        AmmoCategory = ammoCategory;
+        Damage = damage;
+        Instability = instability;
+        ShotsWhenFired = shotsWhenFired;
+        ProjectilesPerShot = projectilesPerShot;
+        HeatDamage = heatDamage;
+        HeatGenerated = heatGenerated;
+        Ranges = ranges;
+        AccuracyModifier = accuracyModifier;
+        CriticalChanceMultiplier = criticalChanceMultiplier;
+        RefireModifier = refireModifier;
+        IsIndirectFireCapable = isIndirectFireCapable;
+    }
+
+    /// <summary>The hardpoint kind the weapon needs, e.g. "Ballistic" or "Support".</summary>
+    public string Category { get; }
+
+    /// <summary>
+    ///     The ammo the weapon fires, as <see cref="AmmunitionBoxDefinition.AmmoCategory" /> names it; <c>null</c>
+    ///     when it needs none.
+    /// </summary>
+    public string? AmmoCategory { get; }
+
+    /// <summary>The damage of one shot.</summary>
+    public float Damage { get; }
+
+    /// <summary>The stability damage of one shot.</summary>
+    public float Instability { get; }
+
+    /// <summary>The shots fired per attack.</summary>
+    public int ShotsWhenFired { get; }
+
+    public int ProjectilesPerShot { get; }
+
+    /// <summary>The heat the target takes per shot.</summary>
+    public float HeatDamage { get; }
+
+    /// <summary>The heat the mech takes per attack.</summary>
+    public int HeatGenerated { get; }
+
+    public WeaponRanges Ranges { get; }
+
+    /// <summary>The weapon's own to-hit modifier, which the hit chance adds to the others.</summary>
+    public float AccuracyModifier { get; }
+
+    public float CriticalChanceMultiplier { get; }
+
+    /// <summary>The accuracy penalty for firing again in the next round.</summary>
+    public int RefireModifier { get; }
+
+    /// <summary>Whether the weapon can fire at targets out of line of sight.</summary>
+    public bool IsIndirectFireCapable { get; }
+}
 
 /// <summary>The range brackets in meters: the weapon is less accurate below short range and beyond long range.</summary>
 /// <param name="Min">Below it the weapon can't fire.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record WeaponRanges(float Min, float Short, float Medium, float Long, float Max);
 
-/// <param name="AmmoCategory">The weapons the ammo fits, e.g. "AC/5".</param>
-/// <param name="Capacity">The shots in the box; it is full at the start of every mission.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record AmmunitionBoxDefinition(
-    string Name,
-    float Tonnage,
-    int Slots,
-    int Cost,
-    IReadOnlyList<string> Bonuses,
-    string AmmoCategory,
-    int Capacity) : ComponentDefinition(Name, Tonnage, Slots, Cost, Bonuses);
+internal sealed record AmmunitionBoxDefinition : ComponentDefinition
+{
+    internal AmmunitionBoxDefinition(ComponentDefinition component, string ammoCategory, int capacity) : base(component)
+    {
+        AmmoCategory = ammoCategory;
+        Capacity = capacity;
+    }
 
-/// <param name="Dissipation">The heat the heat sink removes per round.</param>
+    /// <summary>The weapons the ammo fits, e.g. "AC/5".</summary>
+    public string AmmoCategory { get; }
+
+    /// <summary>The shots in the box; it is full at the start of every mission.</summary>
+    public int Capacity { get; }
+}
+
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record HeatSinkDefinition(
-    string Name,
-    float Tonnage,
-    int Slots,
-    int Cost,
-    IReadOnlyList<string> Bonuses,
-    float Dissipation) : ComponentDefinition(Name, Tonnage, Slots, Cost, Bonuses);
+internal sealed record HeatSinkDefinition : ComponentDefinition
+{
+    internal HeatSinkDefinition(ComponentDefinition component, float dissipation) : base(component)
+    {
+        Dissipation = dissipation;
+    }
+
+    /// <summary>The heat the heat sink removes per round.</summary>
+    public float Dissipation { get; }
+}
