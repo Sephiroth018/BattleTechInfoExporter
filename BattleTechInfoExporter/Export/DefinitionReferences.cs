@@ -5,9 +5,9 @@ using BattleTechInfoExporter.Models;
 namespace BattleTechInfoExporter.Export;
 
 /// <summary>
-///     Makes the <see cref="DefinitionReference" /> to a game definition that only needs its description, a faction
-///     or a biome; references with their own naming rule are made by the reader that owns it (e.g.
-///     <see cref="MechReader" /> for mechs and chassis, <see cref="PilotReader" /> for pilots).
+///     Makes the <see cref="DefinitionReference" /> to a game definition that only needs its description, a faction,
+///     a biome or a data-driven enum value; references with their own naming rule are made by the reader that owns
+///     it (e.g. <see cref="MechReader" /> for mechs and chassis, <see cref="PilotReader" /> for pilots).
 /// </summary>
 internal static class DefinitionReferences
 {
@@ -16,6 +16,10 @@ internal static class DefinitionReferences
 
     internal static DefinitionReference ReferenceTo(FactionValue faction) =>
         new(faction.FactionDefID, FactionNames.Format(faction));
+
+    // A data-driven enum value, e.g. a contract type or a ship upgrade category, by its name and its UI name.
+    internal static DefinitionReference ReferenceTo(EnumValue value) =>
+        new(value.Name, value.FriendlyName);
 
     // Mirrors LanceHeaderWidget, which names the biome by its description and falls back to the skin's name.
     internal static DefinitionReference ReferenceTo(DataManager dataManager, Biome.BIOMESKIN biome) =>

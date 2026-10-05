@@ -35,7 +35,7 @@ internal static class ContractReader
         return new ActiveContract(
             ReadId(contractOverride),
             contractOverride.contractName,
-            contract.ShortDescription,
+            GameText.ToPlainText(contract.ShortDescription),
             ReadType(simGame, contract),
             contractOverride.contractDisplayStyle,
             DefinitionReferences.ReferenceTo(employer),
@@ -88,11 +88,13 @@ internal static class ContractReader
         var contractTypes = simGame.ContractTypeDescriptions
             .Select(description => new ContractTypeDescription(
                 ReadContractType(description.Key),
-                description.Value.Details))
+                GameText.ToPlainText(description.Value.Details)))
             .ToList();
         if (simGame.PriorityMissionDescription is { } priority)
         {
-            contractTypes.Add(new ContractTypeDescription(PriorityType(simGame), priority.Details));
+            contractTypes.Add(new ContractTypeDescription(
+                PriorityType(simGame),
+                GameText.ToPlainText(priority.Details)));
         }
 
         return contractTypes;
@@ -108,7 +110,7 @@ internal static class ContractReader
             // contracts don't need.
             contractOverride.contractName,
             // The contract details show the interpolated description, unlike the name.
-            contract.ShortDescription,
+            GameText.ToPlainText(contract.ShortDescription),
             ReadType(simGame, contract),
             contractOverride.contractDisplayStyle,
             DefinitionReferences.ReferenceTo(employer),
@@ -143,7 +145,9 @@ internal static class ContractReader
 
     // Mirrors Contract.GetContractTypeString and the type tooltip of SGContractsWidget.PopulateContract.
     private static DefinitionReference ReadType(SimGameState simGame, BattleTech.Contract contract) =>
-        contract.IsPriorityContract ? PriorityType(simGame) : ReferenceTo(contract.Override.ContractTypeValue);
+        contract.IsPriorityContract
+            ? PriorityType(simGame)
+            : DefinitionReferences.ReferenceTo(contract.Override.ContractTypeValue);
 
     // Mirrors SimGameState.ContractUserMeetsReputation_Campaign.
     private static int ReadDifficulty(SimGameState simGame, ContractOverride contractOverride) =>
@@ -168,16 +172,13 @@ internal static class ContractReader
     {
         if (ContractTypeEnumeration.GetContractTypeByInt(contractTypeId) is { } contractType)
         {
-            return ReferenceTo(contractType);
+            return DefinitionReferences.ReferenceTo(contractType);
         }
 
         ModLog.Logger.LogWarning($"Found no contract type {contractTypeId}; its id stands in");
         var id = contractTypeId.ToString(CultureInfo.InvariantCulture);
         return new DefinitionReference(id, id);
     }
-
-    private static DefinitionReference ReferenceTo(ContractTypeValue contractType) =>
-        new(contractType.Name, contractType.FriendlyName);
 
     private static DefinitionReference PriorityType(SimGameState simGame) =>
         new("Priority", simGame.PriorityMissionTitle);

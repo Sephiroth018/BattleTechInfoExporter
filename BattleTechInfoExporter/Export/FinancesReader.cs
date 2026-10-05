@@ -43,7 +43,7 @@ internal static class FinancesReader
         return new ExpectedExpenses(
             simGame.GetExpenditures(),
             new ShipExpense(shipName, Mathf.RoundToInt(costModifier * simGame.GetShipBaseMaintenanceCost())),
-            ReadShipUpgradeExpenses(simGame, costModifier),
+            ReadShipUpgradeExpenses(simGame),
             simGame.ActiveMechs.Values
                 .Select(mech => new MechExpense(
                     MechReader.ReferenceToBayMech(mech),
@@ -57,7 +57,7 @@ internal static class FinancesReader
     }
 
     // Only the Argo charges upkeep for its upgrades.
-    private static List<ShipUpgradeExpense> ReadShipUpgradeExpenses(SimGameState simGame, float costModifier)
+    private static List<ShipUpgradeExpense> ReadShipUpgradeExpenses(SimGameState simGame)
     {
         if (simGame.CurDropship != DropshipType.Argo)
         {
@@ -65,14 +65,22 @@ internal static class FinancesReader
         }
 
         return simGame.ShipUpgrades
-            .Select(upgrade => (upgrade, upkeep: Mathf.CeilToInt(
-                upgrade.AdditionalCost * simGame.Constants.CareerMode.ArgoMaintenanceMultiplier)))
-            .Where(upgradeUpkeep => upgradeUpkeep.upkeep > 0)
-            .Select(upgradeUpkeep => new ShipUpgradeExpense(
-                DefinitionReferences.ReferenceTo(upgradeUpkeep.upgrade.Description),
-                Mathf.RoundToInt(costModifier * upgradeUpkeep.upkeep)))
+            .Where(upgrade => UnmodifiedUpkeepOf(simGame, upgrade) > 0)
+            .Select(upgrade => new ShipUpgradeExpense(
+                DefinitionReferences.ReferenceTo(upgrade.Description),
+                ReadUpkeep(simGame, upgrade)))
             .ToList();
     }
+
+    /// <summary>
+    ///     The ship upgrade's line in the expenses of each report, with the spending level's cost modifier; the
+    ///     Argo's upgrade screen shows the same (SGShipModuleUpgradeViewPopulator.Populate).
+    /// </summary>
+    internal static int ReadUpkeep(SimGameState simGame, ShipModuleUpgrade upgrade) =>
+        Mathf.RoundToInt(CostModifierOf(simGame) * UnmodifiedUpkeepOf(simGame, upgrade));
+
+    private static int UnmodifiedUpkeepOf(SimGameState simGame, ShipModuleUpgrade upgrade) =>
+        Mathf.CeilToInt(upgrade.AdditionalCost * simGame.Constants.CareerMode.ArgoMaintenanceMultiplier);
 
     private static float CostModifierOf(SimGameState simGame) =>
         simGame.GetExpenditureCostModifier(simGame.ExpenditureLevel);

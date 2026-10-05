@@ -358,10 +358,12 @@ name, version and folder, `ModLog` its logger. Folders:
   inside `CampaignExport`. `GameStateReader` builds the game state file's models from the game, one
   reader per section of the file; `RulesReader` builds the rules file's tables; `MissionReader`
   builds the mission files' models from the completed contract. `DefinitionReferences` makes the
-  references that need only a description, a faction or a biome, and `ComponentReferences`, one per
+  references that need only a description, a faction, a biome or a data-driven enum value, and
+  `ComponentReferences`, one per
   export file, every reference to a component, collecting the definitions referenced; a reference
   with a naming rule of its own is made by the reader that owns it. `ReferenceOrder` orders every
-  list of entries that refer to a definition. `ExportFileWriter` writes and deletes the files in
+  list of entries that refer to a definition, and `GameText` makes every exported game text plain.
+  `ExportFileWriter` writes and deletes the files in
   the mod's `exports/` folder.
 - `Models/`: immutable records, one per JSON object, and the mod's own enums. The records are
   marked `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` because only the serializer reads
@@ -400,6 +402,8 @@ General rule on managing one doesn't apply.
   contract to link them by.
 - **Every export file starts with `modVersion`, `exportedAt` and `trigger`** (`ExportFile`, which
   every file's model inherits), describing the export that last wrote it.
+- **Game texts are plain text** (`GameText`): descriptions and objective titles lose the
+  formatting tags (`<i>`, `<color=…>`) and tooltip links the game's UI renders. Names are left as they are.
 - **Game enums keep the game's values** (e.g. `IN_SYSTEM`, `LIKED`); the UI shows the same. Our own
   enums are camelCase.
 - **JSON:** camelCase properties, indented, `null` written explicitly, through the game's
@@ -416,6 +420,8 @@ General rule on managing one doesn't apply.
 - **Chassis:** a mech's frame without its removable components (`ChassisDef`). Storage keeps
   chassis, not mechs.
 - **Mech:** a complete mech (`MechDef`): in the mech bay, or sold whole by a store.
+- **Ship upgrade:** an upgrade of the Argo (`ShipModuleUpgrade`), bought in its engineering
+  screen. Never just "upgrade", which components also have.
 
 ## Commands
 

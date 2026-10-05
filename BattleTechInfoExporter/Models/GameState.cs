@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>The root of <c>game-state.json</c>.</summary>
+/// <param name="Ship">The Argo; <c>null</c> while the company still flies the Leopard.</param>
 /// <param name="ActiveContract">The travel contract the company has accepted; <c>null</c> without one.</param>
 /// <param name="Contracts">
 ///     The contracts the Command Center offers, without the active contract; <c>null</c> until the game has
@@ -15,6 +16,7 @@ internal sealed record GameState(
     string ModVersion,
     ExportTrigger Trigger,
     Company Company,
+    Ship? Ship,
     IReadOnlyList<BarracksPilot> Pilots,
     IReadOnlyList<Mech> Mechs,
     IReadOnlyList<MechAwaitingPlacement> MechsAwaitingPlacement,
