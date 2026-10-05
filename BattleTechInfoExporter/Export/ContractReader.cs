@@ -35,7 +35,7 @@ internal static class ContractReader
         return new ActiveContract(
             ReadId(contractOverride),
             contractOverride.contractName,
-            contract.ShortDescription,
+            GameText.ToPlainText(contract.ShortDescription),
             ReadType(simGame, contract),
             contractOverride.contractDisplayStyle,
             DefinitionReferences.ReferenceTo(employer),
@@ -88,11 +88,13 @@ internal static class ContractReader
         var contractTypes = simGame.ContractTypeDescriptions
             .Select(description => new ContractTypeDescription(
                 ReadContractType(description.Key),
-                description.Value.Details))
+                GameText.ToPlainText(description.Value.Details)))
             .ToList();
         if (simGame.PriorityMissionDescription is { } priority)
         {
-            contractTypes.Add(new ContractTypeDescription(PriorityType(simGame), priority.Details));
+            contractTypes.Add(new ContractTypeDescription(
+                PriorityType(simGame),
+                GameText.ToPlainText(priority.Details)));
         }
 
         return contractTypes;
@@ -108,7 +110,7 @@ internal static class ContractReader
             // contracts don't need.
             contractOverride.contractName,
             // The contract details show the interpolated description, unlike the name.
-            contract.ShortDescription,
+            GameText.ToPlainText(contract.ShortDescription),
             ReadType(simGame, contract),
             contractOverride.contractDisplayStyle,
             DefinitionReferences.ReferenceTo(employer),

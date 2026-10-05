@@ -40,7 +40,7 @@ internal static class RulesReader
     {
         var abilitiesByLevel = simGame.AbilityTree[skill.ToString()];
         return new Skill(
-            description,
+            GameText.ToPlainText(description),
             Enumerable.Range(2, Math.Max(0, abilitiesByLevel.Count - 1))
                 .Select(level => new SkillLevel(
                     level,
@@ -51,7 +51,7 @@ internal static class RulesReader
                         .Select(ability => new SkillLevelAbility(
                             DefinitionReferences.ReferenceTo(ability.Description),
                             ability.IsPrimaryAbility,
-                            ability.Description.Details))
+                            GameText.ToPlainText(ability.Description.Details)))
                         .ToList()))
                 .ToList());
     }

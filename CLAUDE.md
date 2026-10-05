@@ -362,7 +362,8 @@ name, version and folder, `ModLog` its logger. Folders:
   `ComponentReferences`, one per
   export file, every reference to a component, collecting the definitions referenced; a reference
   with a naming rule of its own is made by the reader that owns it. `ReferenceOrder` orders every
-  list of entries that refer to a definition. `ExportFileWriter` writes and deletes the files in
+  list of entries that refer to a definition, and `GameText` makes every exported game text plain.
+  `ExportFileWriter` writes and deletes the files in
   the mod's `exports/` folder.
 - `Models/`: immutable records, one per JSON object, and the mod's own enums. The records are
   marked `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` because only the serializer reads
@@ -401,6 +402,8 @@ General rule on managing one doesn't apply.
   contract to link them by.
 - **Every export file starts with `modVersion`, `exportedAt` and `trigger`** (`ExportFile`, which
   every file's model inherits), describing the export that last wrote it.
+- **Game texts are plain text** (`GameText`): descriptions lose the formatting tags (`<i>`,
+  `<color=…>`) and tooltip links the game's UI renders.
 - **Game enums keep the game's values** (e.g. `IN_SYSTEM`, `LIKED`); the UI shows the same. Our own
   enums are camelCase.
 - **JSON:** camelCase properties, indented, `null` written explicitly, through the game's

@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using BattleTech;
-using BattleTech.UI.Tooltips;
 using BattleTechInfoExporter.Models;
 using UnityEngine;
 
@@ -11,9 +9,6 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>Builds the Argo's upgrades from the game's career state.</summary>
 internal static class ShipReader
 {
-    // TextMeshPro's formatting tags, e.g. <i> or <color=#F04228>, which the game's texts carry for its UI.
-    private static readonly Regex RichTextTag = new("</?[a-zA-Z][^>]*>");
-
     // On the Leopard the starting upgrades are already listed, but the game applies them and shows the engineering
     // screen only on the Argo (SimGameState.AddArgoUpgrade, ApplyArgoUpgrades).
     internal static Ship? ReadShip(SimGameState simGame) =>
@@ -66,7 +61,7 @@ internal static class ShipReader
             status,
             DefinitionReferences.ReferenceTo(upgrade.ShipUpgradeCategoryValue),
             upgrade.Location,
-            WithoutRichTextTags(upgrade.Description.Details),
+            GameText.ToPlainText(upgrade.Description.Details),
             upgrade.RequiredModules
                 .Select(id => DefinitionReferences.ReferenceTo(simGame.DataManager.ShipUpgradeDefs.Get(id).Description))
                 .OrderByDefinition(reference => reference)
@@ -89,17 +84,6 @@ internal static class ShipReader
             .SingleOrDefault();
         return description is null
             ? null
-            : new ShipUpgradeEffect(stat.name, stat.ToSingle(), stat.set, PlainText(description));
+            : new ShipUpgradeEffect(stat.name, stat.ToSingle(), stat.set, GameText.ToPlainText(description));
     }
-
-    // The text without its tooltip links, as LocalizableText shows it with links disabled, and without formatting.
-    private static string PlainText(ResultDescriptionEntry description)
-    {
-        var parser = new TextTooltipParser();
-        parser.Parse(description.Text);
-        parser.SetFormattingEnabled(false);
-        return WithoutRichTextTags(parser.ToTMP(description.Context, null).ToString()).Trim();
-    }
-
-    private static string WithoutRichTextTags(string text) => RichTextTag.Replace(text, string.Empty);
 }
