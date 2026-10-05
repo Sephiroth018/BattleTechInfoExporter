@@ -45,6 +45,15 @@ internal static class MechReader
     internal static MechReference ReferenceToBayMech(MechDef mech) =>
         new(mech.GUID, NameWithVariant(mech.Name, mech.Chassis));
 
+    internal static List<LocationMaxArmor> ReadMaxArmor(ChassisDef chassis) =>
+        Locations
+            .Select(location => (location, definition: chassis.GetLocationDef(location)))
+            .Select(location => new LocationMaxArmor(
+                location.location,
+                location.definition.MaxArmor,
+                HasRearArmor(location.definition) ? location.definition.MaxRearArmor : null))
+            .ToList();
+
     /// <summary>The chassis' weapon hardpoints of all locations together.</summary>
     internal static Hardpoints ReadHardpoints(ChassisDef chassis) => ReadHardpoints(chassis, Locations);
 

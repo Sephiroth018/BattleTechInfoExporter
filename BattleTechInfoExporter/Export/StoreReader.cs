@@ -44,7 +44,7 @@ internal static class StoreReader
         return new Store(
             DefinitionReferences.ReferenceTo(priceFaction),
             items
-                .Where(item => item.Type != ShopItemType.MechPart)
+                .Where(item => IsComponent(item.Type))
                 .Select(item => componentReferences.TryReferenceTo(
                     SimGameState.ComponentTypeToBattleTechResourceType(Shop.ShopItemTypeToComponentType(item.Type)),
                     item.ID) is { } component
@@ -52,6 +52,15 @@ internal static class StoreReader
                     : Skip<ComponentForSale>(shop, item))
                 .OfType<ComponentForSale>()
                 .OrderByComponent(component => component.Component)
+                .ToList(),
+            items
+                .Where(item => item.Type == ShopItemType.Mech)
+                // Bought as SimGameState.AddFromShopDefItem does: the id is the mech's.
+                .Select(item => simGame.DataManager.MechDefs.TryGet(item.ID, out var mech)
+                    ? ReadMechForSale(shop, item, mech)
+                    : Skip<MechForSale>(shop, item))
+                .OfType<MechForSale>()
+                .OrderByDefinition(mech => mech.Mech)
                 .ToList(),
             items
                 .Where(item => item.Type == ShopItemType.MechPart)
@@ -63,11 +72,26 @@ internal static class StoreReader
                 .ToList());
     }
 
-    // Stores sell components and mech parts; other types only appear in the list of things to sell to them.
+    private static MechForSale ReadMechForSale(Shop shop, ShopDefItem item, MechDef mech)
+    {
+        var chassis = mech.Chassis;
+        return new MechForSale(
+            MechReader.ReferenceTo(mech),
+            chassis.weightClass,
+            chassis.StockRole,
+            chassis.Tonnage,
+            MechReader.ReadMaxArmor(chassis),
+            MechReader.ReadHardpoints(chassis),
+            chassis.MaxJumpjets,
+            CountOf(item),
+            PriceOf(shop, item));
+    }
+
+    // Stores sell components, whole mechs and mech parts; other types only appear in the list of things to sell to
+    // them.
     private static bool IsKnownType(Shop shop, ShopDefItem item)
     {
-        if (item.Type is ShopItemType.Weapon or ShopItemType.AmmunitionBox or ShopItemType.HeatSink
-            or ShopItemType.JumpJet or ShopItemType.Upgrade or ShopItemType.MechPart)
+        if (IsComponent(item.Type) || item.Type is ShopItemType.Mech or ShopItemType.MechPart)
         {
             return true;
         }
@@ -75,6 +99,10 @@ internal static class StoreReader
         ModLog.Logger.LogWarning($"Skipped {item.ID} in the {shop.ThisShopType} store: unexpected type {item.Type}");
         return false;
     }
+
+    private static bool IsComponent(ShopItemType type) =>
+        type is ShopItemType.Weapon or ShopItemType.AmmunitionBox or ShopItemType.HeatSink or ShopItemType.JumpJet
+            or ShopItemType.Upgrade;
 
     // Shop.GetPrice can't price an item without a definition, so the item is left out instead of referenced by id.
     private static T? Skip<T>(Shop shop, ShopDefItem item) where T : class

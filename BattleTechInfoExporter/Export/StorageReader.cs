@@ -56,6 +56,7 @@ internal static class StorageReader
                     chassis.weightClass,
                     chassis.StockRole,
                     chassis.Tonnage,
+                    MechReader.ReadMaxArmor(chassis),
                     MechReader.ReadHardpoints(chassis),
                     chassis.MaxJumpjets,
                     item.Count)

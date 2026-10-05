@@ -91,6 +91,11 @@ internal sealed record Armor(float Current, float Assigned, float Max);
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Structure(float Current, float Max);
 
+/// <summary>The most armor a chassis' location can take.</summary>
+/// <param name="Rear"><c>null</c> outside the torso, which alone has rear armor.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record LocationMaxArmor(ChassisLocations Location, float Front, float? Rear);
+
 /// <summary>The number of weapon hardpoints of each kind.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Hardpoints(int Ballistic, int Energy, int Missile, int Support);

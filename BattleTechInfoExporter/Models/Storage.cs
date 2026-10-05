@@ -22,6 +22,7 @@ internal sealed record StoredComponent(ComponentReference Component, int Count, 
 ///     weapons or other components.
 /// </summary>
 /// <param name="Role">The chassis' stock role, e.g. "Brawler".</param>
+/// <param name="MaxArmor">The most armor each location can take, from head to legs.</param>
 /// <param name="Hardpoints">The weapon hardpoints of all locations together.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record StoredChassis(
@@ -29,6 +30,7 @@ internal sealed record StoredChassis(
     WeightClass WeightClass,
     string Role,
     float Tonnage,
+    IReadOnlyList<LocationMaxArmor> MaxArmor,
     Hardpoints Hardpoints,
     int MaxJumpJets,
     int Count);
