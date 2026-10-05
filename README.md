@@ -111,9 +111,9 @@ Requires the .NET SDK version pinned in `global.json` and a local BattleTech ins
    </Project>
    ```
 
-2. Run `dotnet tool restore` once, then `dotnet build`. Every build copies the mod into the game's
-   `Mods/BattleTechInfoExporter/` folder. A Release build (`dotnet build -c Release`) also packages
-   it as `artifacts/BattleTechInfoExporter-<version>.zip`.
+2. Run `dotnet tool restore` once, then `dotnet build`. `dotnet build -p:DeployToGame=true` also
+   copies the mod into the game's `Mods/BattleTechInfoExporter/` folder. A Release build
+   (`dotnet build -c Release`) also packages it as `artifacts/BattleTechInfoExporter-<version>.zip`.
 
 ## AI disclaimer
 
