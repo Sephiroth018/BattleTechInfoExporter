@@ -12,5 +12,6 @@ internal enum ExportTrigger
     ContractsGenerated,
     StoreClosed,
     MechBayChanged,
-    ExperienceSpent
+    ExperienceSpent,
+    MechPlacementShown
 }

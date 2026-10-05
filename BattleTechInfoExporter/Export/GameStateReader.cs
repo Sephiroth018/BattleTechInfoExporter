@@ -18,6 +18,7 @@ internal static class GameStateReader
             ReadCompany(simGame),
             PilotReader.ReadPilots(simGame),
             MechReader.ReadMechs(simGame, componentReferences),
+            MechReader.ReadMechsAwaitingPlacement(simGame, componentReferences),
             LanceReader.ReadLastLance(simGame),
             StorageReader.ReadStorage(simGame, componentReferences),
             StoreReader.ReadStores(simGame, componentReferences),

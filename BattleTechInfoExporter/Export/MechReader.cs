@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BattleTech;
 using BattleTech.Data;
+using BattleTech.UI;
 using BattleTechInfoExporter.Models;
 using UnityEngine;
 using Mech = BattleTechInfoExporter.Models.Mech;
@@ -151,6 +152,26 @@ internal static class MechReader
             refitOrder is null
                 ? null
                 : ReadLoadout(componentReferences, MechRefit.CopyWithPendingSteps(simGame, mech, refitOrder)));
+    }
+
+    // The interrupt queue shows its first entry as curPopup and holds the rest in popups, in display order
+    // (SimGameInterruptManager.DisplayIfAvailable). A ChassisDef entry comes only from a deprecated store item type.
+    internal static List<MechAwaitingPlacement> ReadMechsAwaitingPlacement(
+        SimGameState simGame,
+        ComponentReferences componentReferences)
+    {
+        var interruptQueue = simGame.InterruptQueue;
+        return interruptQueue.popups
+            .Prepend(interruptQueue.curPopup)
+            .OfType<SimGameInterruptManager.MechPlacementPopupEntry>()
+            .Select(entry => entry.parameters[0])
+            .OfType<MechDef>()
+            .Select(mech => new MechAwaitingPlacement(
+                ReferenceTo(mech.Chassis),
+                mech.Chassis.weightClass,
+                mech.Chassis.StockRole,
+                ReadLoadout(componentReferences, mech)))
+            .ToList();
     }
 
     private static MechLoadout ReadLoadout(ComponentReferences componentReferences, MechDef mech)
