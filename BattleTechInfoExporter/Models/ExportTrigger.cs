@@ -15,5 +15,6 @@ internal enum ExportTrigger
     ExperienceSpent,
     MechPlacementShown,
     MissionCompleted,
-    SalvageChosen
+    SalvageChosen,
+    ShipUpgradeStarted
 }

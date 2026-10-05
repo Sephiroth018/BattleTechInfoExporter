@@ -36,6 +36,9 @@ The game state holds:
 - **Company:** name, date, morale, rating, MechTech and MedTech, and the reputation with every
   faction.
 - **Finances:** funds, the spending level and the expected expenses of the next financial report.
+- **Ship:** the Argo's installed upgrades and the ones that can be bought, with their effects in
+  the game's words and as values, and the price, upkeep and installation days of those for sale;
+  `null` while the company still flies the Leopard.
 - **Position:** the current system and, when travelling, the destination and days left.
 - **Pilots:** the commander and the roster with all their relevant stats.
 - **Mechs:** the mech bay's mechs with their status, loadout, armor, performance summary and place
@@ -70,6 +73,7 @@ The game state is exported when:
 - **A store is closed.**
 - **The mech bay changes:** a refit, repair, readying or storing is queued, an order is cancelled,
   the queue is reordered, or a mech, chassis or mech parts are scrapped.
+- **An Argo upgrade is bought.**
 - **Experience is spent:** a pilot's training is confirmed in the barracks.
 - **A new mech needs a place:** the game asks where to put it because every mech bay is full, e.g.
   after salvage completes a mech.
@@ -83,7 +87,6 @@ The mission files are exported when:
 ## Planned
 
 - The active flashpoint.
-- The ship and its upgrades.
 - An export on a key combination.
 
 ## Installing

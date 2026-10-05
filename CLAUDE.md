@@ -416,6 +416,8 @@ General rule on managing one doesn't apply.
 - **Chassis:** a mech's frame without its removable components (`ChassisDef`). Storage keeps
   chassis, not mechs.
 - **Mech:** a complete mech (`MechDef`): in the mech bay, or sold whole by a store.
+- **Ship upgrade:** an upgrade of the Argo (`ShipModuleUpgrade`), bought in its engineering
+  screen. Never just "upgrade", which components also have.
 
 ## Commands
 

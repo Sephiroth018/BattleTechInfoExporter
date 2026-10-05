@@ -16,6 +16,7 @@ internal static class GameStateReader
             ModAssembly.Version,
             trigger,
             ReadCompany(simGame),
+            ShipReader.ReadShip(simGame),
             PilotReader.ReadPilots(simGame),
             MechReader.ReadMechs(simGame, componentReferences),
             MechReader.ReadMechsAwaitingPlacement(simGame, componentReferences),
