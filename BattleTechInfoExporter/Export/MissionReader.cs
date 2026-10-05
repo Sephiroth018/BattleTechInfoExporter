@@ -21,7 +21,10 @@ internal static class MissionReader
             contract.State,
             contract.IsGoodFaithEffort,
             contract.MissionObjectiveResultList
-                .Select(objective => new ObjectiveResult(objective.title, objective.isPrimary, objective.status))
+                .Select(objective => new ObjectiveResult(
+                    GameText.ToPlainText(objective.title),
+                    objective.isPrimary,
+                    objective.status))
                 .ToList(),
             contract.MoneyResults,
             // SimGameState.GetFinalReputationChange gives a faction that doesn't gain reputation no change.

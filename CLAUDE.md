@@ -402,8 +402,8 @@ General rule on managing one doesn't apply.
   contract to link them by.
 - **Every export file starts with `modVersion`, `exportedAt` and `trigger`** (`ExportFile`, which
   every file's model inherits), describing the export that last wrote it.
-- **Game texts are plain text** (`GameText`): descriptions lose the formatting tags (`<i>`,
-  `<color=…>`) and tooltip links the game's UI renders.
+- **Game texts are plain text** (`GameText`): descriptions and objective titles lose the
+  formatting tags (`<i>`, `<color=…>`) and tooltip links the game's UI renders. Names are left as they are.
 - **Game enums keep the game's values** (e.g. `IN_SYSTEM`, `LIKED`); the UI shows the same. Our own
   enums are camelCase.
 - **JSON:** camelCase properties, indented, `null` written explicitly, through the game's
