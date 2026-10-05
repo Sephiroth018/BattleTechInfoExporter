@@ -131,7 +131,6 @@ internal static class MechReader
             mech.Name,
             ReferenceTo(chassis),
             chassis.weightClass,
-            chassis.StockRole,
             slot / slotsPerBay + 1,
             slot % slotsPerBay + 1,
             workOrder switch
@@ -172,7 +171,6 @@ internal static class MechReader
             .Select(mech => new MechAwaitingPlacement(
                 ReferenceTo(mech.Chassis),
                 mech.Chassis.weightClass,
-                mech.Chassis.StockRole,
                 ReadLoadout(componentReferences, mech)))
             .ToList();
     }

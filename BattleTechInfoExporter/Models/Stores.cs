@@ -38,7 +38,6 @@ internal sealed record ComponentForSale(ComponentReference Component, int? Count
 internal sealed record MechForSale(
     DefinitionReference Mech,
     WeightClass WeightClass,
-    string Role,
     float Tonnage,
     IReadOnlyList<LocationMaxArmor> MaxArmor,
     Hardpoints Hardpoints,
