@@ -11,5 +11,6 @@ internal enum ExportTrigger
     WorkOrderCompleted,
     ContractsGenerated,
     StoreClosed,
-    MechBayChanged
+    MechBayChanged,
+    ExperienceSpent
 }
