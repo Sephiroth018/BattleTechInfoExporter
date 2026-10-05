@@ -79,7 +79,11 @@ internal static class WorkQueueReader
     // Mirrors TaskManagementElement.UpdateItem for a single entry: a paid entry is done. The daily progress is the
     // entry type's, e.g. SimGameState.DailyUpgradeValue for a ship upgrade.
     private static int DaysUntilFinished(WorkOrderEntry entry, int dailyProgress) =>
-        entry.IsCostPaid() ? 0 : Mathf.Max(1, Mathf.CeilToInt((float)entry.GetRemainingCost() / dailyProgress));
+        entry.IsCostPaid() ? 0 : DaysFor(entry.GetRemainingCost(), dailyProgress);
+
+    /// <summary>The days work of this cost takes, at least one, as the timeline counts them.</summary>
+    internal static int DaysFor(int cost, int dailyProgress) =>
+        Mathf.Max(1, Mathf.CeilToInt((float)cost / dailyProgress));
 
     // The timeline names the mech by SimGameState.GetMechByID, which also finds readying mechs.
     private static WorkQueueEntry ReadMechLabEntry(

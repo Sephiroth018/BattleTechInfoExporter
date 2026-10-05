@@ -17,6 +17,10 @@ namespace BattleTechInfoExporter.Models;
 ///     The day the mech lab finishes its work order, as in <see cref="GameState.WorkQueue" />; <c>null</c> when
 ///     <see cref="MechStatus.Ready" />.
 /// </param>
+/// <param name="Repair">
+///     What repairing the mech's damage in the mech bay would take; <c>null</c> without damage and unless
+///     <see cref="MechStatus.Ready" />.
+/// </param>
 /// <param name="Refit">
 ///     The steps of the mech's mech lab work order, in order; finished steps are already part of the loadout.
 ///     <c>null</c> without a work order and while readying.
@@ -39,6 +43,7 @@ internal sealed record Mech(
     int Position,
     MechStatus Status,
     int? ReadyOnDay,
+    RepairEstimate? Repair,
     IReadOnlyList<RefitChange>? Refit,
     bool IsFieldable,
     IReadOnlyList<string> Problems,
