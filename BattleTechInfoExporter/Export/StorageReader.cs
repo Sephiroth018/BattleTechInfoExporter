@@ -13,6 +13,9 @@ namespace BattleTechInfoExporter.Export;
 /// </remarks>
 internal static class StorageReader
 {
+    // A stored chassis' stat type; mech parts have their own (SimGameState.MECH_PART_ITEM).
+    private const string MechType = nameof(BattleTechResourceType.MechDef);
+
     internal static Storage ReadStorage(SimGameState simGame, ComponentReferences componentReferences)
     {
         var storedItems = ReadStoredItems(simGame);
@@ -28,19 +31,17 @@ internal static class StorageReader
         ComponentReferences componentReferences,
         IReadOnlyList<StoredItem> storedItems) =>
         storedItems
-            .Where(item => item.Type != SimGameState.MECH_PART_ITEM)
+            .Where(item => item.Type != SimGameState.MECH_PART_ITEM && item.Type != MechType)
             // Working and damaged copies are stats of their own.
             .GroupBy(item => (item.Type, item.Id))
-            .Select(copies => (copies.Key.Id,
-                ResourceType: (BattleTechResourceType)Enum.Parse(typeof(BattleTechResourceType), copies.Key.Type),
-                Copies: copies))
-            .Where(item => item.ResourceType != BattleTechResourceType.MechDef)
-            .Select(item => componentReferences.TryReferenceTo(item.ResourceType, item.Id) is { } component
+            .Select(copies => componentReferences.TryReferenceTo(
+                (BattleTechResourceType)Enum.Parse(typeof(BattleTechResourceType), copies.Key.Type),
+                copies.Key.Id) is { } component
                 ? new StoredComponent(
                     component,
-                    item.Copies.Where(copy => !copy.IsDamaged).Sum(copy => copy.Count),
-                    item.Copies.Where(copy => copy.IsDamaged).Sum(copy => copy.Count))
-                : Skip<StoredComponent>(item.Id))
+                    copies.Where(copy => !copy.IsDamaged).Sum(copy => copy.Count),
+                    copies.Where(copy => copy.IsDamaged).Sum(copy => copy.Count))
+                : null)
             .OfType<StoredComponent>()
             .OrderByComponent(component => component.Component)
             .ToList();
@@ -49,8 +50,8 @@ internal static class StorageReader
     // SimGameState.GetAllInventoryMechDefs does and counted as MechBayMechStorageWidget.InitInventory does.
     private static List<StoredChassis> ReadChassis(SimGameState simGame, IReadOnlyList<StoredItem> storedItems) =>
         storedItems
-            .Where(item => item.Type == nameof(BattleTechResourceType.MechDef) && !item.IsDamaged)
-            .Select(item => simGame.DataManager.ChassisDefs.TryGet(item.Id, out var chassis)
+            .Where(item => item.Type == MechType && !item.IsDamaged)
+            .Select(item => MechReader.TryGetChassis(simGame.DataManager, item.Id) is { } chassis
                 ? new StoredChassis(
                     MechReader.ReferenceTo(chassis),
                     chassis.weightClass,
@@ -60,7 +61,7 @@ internal static class StorageReader
                     MechReader.ReadHardpoints(chassis),
                     chassis.MaxJumpjets,
                     item.Count)
-                : Skip<StoredChassis>(item.Id))
+                : null)
             .OfType<StoredChassis>()
             .OrderByDefinition(chassis => chassis.Chassis)
             .ToList();
@@ -72,32 +73,25 @@ internal static class StorageReader
             .Where(item => item.Type == SimGameState.MECH_PART_ITEM)
             .Select(item => MechReader.TryReferenceToMech(simGame.DataManager, item.Id) is { } mech
                 ? new StoredMechParts(mech, item.Count)
-                : Skip<StoredMechParts>(item.Id))
+                : null)
             .OfType<StoredMechParts>()
             .OrderByDefinition(parts => parts.Mech)
             .ToList();
-
-    private static T? Skip<T>(string id) where T : class
-    {
-        ModLog.Logger.LogWarning($"Skipped {id} in storage: no definition");
-        return null;
-    }
 
     // The stats with a count of at least one, as SimGameState.GetAllInventoryItemDefs and GetAllInventoryMechParts
     // select them.
     private static List<StoredItem> ReadStoredItems(SimGameState simGame) =>
         simGame.GetAllInventoryStrings()
-            .Select(statName => (StatName: statName, Count: simGame.CompanyStats.GetValue<int>(statName)))
-            .Where(stat => stat.Count >= 1)
-            .Select(stat =>
+            .Select(statName =>
             {
-                var parts = stat.StatName.Split('.');
+                var parts = statName.Split('.');
                 return new StoredItem(
                     parts[1],
                     parts[2],
-                    stat.StatName.EndsWith(".DAMAGED", StringComparison.Ordinal),
-                    stat.Count);
+                    statName.EndsWith(".DAMAGED", StringComparison.Ordinal),
+                    simGame.CompanyStats.GetValue<int>(statName));
             })
+            .Where(item => item.Count >= 1)
             .ToList();
 
     private sealed record StoredItem(string Type, string Id, bool IsDamaged, int Count);

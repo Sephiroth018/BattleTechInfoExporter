@@ -40,18 +40,45 @@ internal static class MechReader
     ///     The reference to the mech that mech parts assemble into, or <c>null</c> when its definition is missing.
     /// </summary>
     internal static DefinitionReference? TryReferenceToMech(DataManager dataManager, string mechId) =>
-        dataManager.MechDefs.TryGet(mechId, out var mech) ? ReferenceTo(mech) : null;
+        TryGetMech(dataManager, mechId) is { } mech ? ReferenceTo(mech) : null;
+
+    /// <summary>The mech's definition, or <c>null</c>, with a warning, when it is missing.</summary>
+    internal static MechDef? TryGetMech(DataManager dataManager, string mechId)
+    {
+        if (dataManager.MechDefs.TryGet(mechId, out var mech))
+        {
+            return mech;
+        }
+
+        ModLog.Logger.LogWarning($"Left out {mechId}: no {nameof(BattleTechResourceType.MechDef)} definition");
+        return null;
+    }
+
+    /// <summary>The chassis' definition, or <c>null</c>, with a warning, when it is missing.</summary>
+    internal static ChassisDef? TryGetChassis(DataManager dataManager, string chassisId)
+    {
+        if (dataManager.ChassisDefs.TryGet(chassisId, out var chassis))
+        {
+            return chassis;
+        }
+
+        ModLog.Logger.LogWarning($"Left out {chassisId}: no {nameof(BattleTechResourceType.ChassisDef)} definition");
+        return null;
+    }
 
     internal static MechReference ReferenceToBayMech(MechDef mech) =>
         new(mech.GUID, NameWithVariant(mech.Name, mech.Chassis));
 
     internal static List<LocationMaxArmor> ReadMaxArmor(ChassisDef chassis) =>
         Locations
-            .Select(location => (location, definition: chassis.GetLocationDef(location)))
-            .Select(location => new LocationMaxArmor(
-                location.location,
-                location.definition.MaxArmor,
-                HasRearArmor(location.definition) ? location.definition.MaxRearArmor : null))
+            .Select(location =>
+            {
+                var definition = chassis.GetLocationDef(location);
+                return new LocationMaxArmor(
+                    location,
+                    definition.MaxArmor,
+                    HasRearArmor(definition) ? definition.MaxRearArmor : null);
+            })
             .ToList();
 
     /// <summary>The chassis' weapon hardpoints of all locations together.</summary>

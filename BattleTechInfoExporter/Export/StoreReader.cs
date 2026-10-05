@@ -40,25 +40,27 @@ internal static class StoreReader
                 $"The {shop.ThisShopType} store is still generating its stock; it may be incomplete");
         }
 
+        // Shop.GetPrice can't price an item without a definition, so such an item is left out instead of referenced
+        // by its id.
         var items = shop.ActiveInventory.Where(item => IsKnownType(shop, item)).ToList();
         return new Store(
             DefinitionReferences.ReferenceTo(priceFaction),
             items
                 .Where(item => IsComponent(item.Type))
                 .Select(item => componentReferences.TryReferenceTo(
-                    SimGameState.ComponentTypeToBattleTechResourceType(Shop.ShopItemTypeToComponentType(item.Type)),
+                    Shop.ShopItemTypeToComponentType(item.Type),
                     item.ID) is { } component
                     ? new ComponentForSale(component, CountOf(item), PriceOf(shop, item))
-                    : Skip<ComponentForSale>(shop, item))
+                    : null)
                 .OfType<ComponentForSale>()
                 .OrderByComponent(component => component.Component)
                 .ToList(),
             items
                 .Where(item => item.Type == ShopItemType.Mech)
                 // Bought as SimGameState.AddFromShopDefItem does: the id is the mech's.
-                .Select(item => simGame.DataManager.MechDefs.TryGet(item.ID, out var mech)
+                .Select(item => MechReader.TryGetMech(simGame.DataManager, item.ID) is { } mech
                     ? ReadMechForSale(shop, item, mech)
-                    : Skip<MechForSale>(shop, item))
+                    : null)
                 .OfType<MechForSale>()
                 .OrderByDefinition(mech => mech.Mech)
                 .ToList(),
@@ -66,7 +68,7 @@ internal static class StoreReader
                 .Where(item => item.Type == ShopItemType.MechPart)
                 .Select(item => MechReader.TryReferenceToMech(simGame.DataManager, item.ID) is { } mech
                     ? new MechPartsForSale(mech, CountOf(item), PriceOf(shop, item))
-                    : Skip<MechPartsForSale>(shop, item))
+                    : null)
                 .OfType<MechPartsForSale>()
                 .OrderByDefinition(parts => parts.Mech)
                 .ToList());
@@ -103,13 +105,6 @@ internal static class StoreReader
     private static bool IsComponent(ShopItemType type) =>
         type is ShopItemType.Weapon or ShopItemType.AmmunitionBox or ShopItemType.HeatSink or ShopItemType.JumpJet
             or ShopItemType.Upgrade;
-
-    // Shop.GetPrice can't price an item without a definition, so the item is left out instead of referenced by id.
-    private static T? Skip<T>(Shop shop, ShopDefItem item) where T : class
-    {
-        ModLog.Logger.LogWarning($"Skipped {item.ID} in the {shop.ThisShopType} store: no {item.Type} definition");
-        return null;
-    }
 
     private static int? CountOf(ShopDefItem item) => item.IsInfinite ? null : item.Count;
 

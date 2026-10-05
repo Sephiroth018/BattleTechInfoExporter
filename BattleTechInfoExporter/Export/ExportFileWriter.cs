@@ -68,10 +68,6 @@ internal static class ExportFileWriter
         ModLog.Logger.Log($"Exported {fileName} ({content.Trigger}) to {ExportDirectory}");
     }
 
-    /// <summary>
-    ///     Writes inherited properties before a type's own, base type first, so e.g. every component definition
-    ///     starts with its name; Newtonsoft.Json writes them the other way round.
-    /// </summary>
     // Newtonsoft.Json 10, the game's version, has no naming strategy for enums yet.
     private sealed class OwnEnumConverter : StringEnumConverter
     {
@@ -85,6 +81,10 @@ internal static class ExportFileWriter
             && (Nullable.GetUnderlyingType(objectType) ?? objectType).Assembly == typeof(OwnEnumConverter).Assembly;
     }
 
+    /// <summary>
+    ///     Writes inherited properties before a type's own, base type first, so e.g. every component definition
+    ///     starts with its name; Newtonsoft.Json writes them the other way round.
+    /// </summary>
     private sealed class InheritedFirstContractResolver : DefaultContractResolver
     {
         // OrderBy is stable, so the properties keep their declaration order within each type.

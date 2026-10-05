@@ -35,12 +35,21 @@ internal sealed class ComponentReferences
             componentId,
             FindDefinition(SimGameState.ComponentTypeToBattleTechResourceType(componentType), componentId));
 
+    internal ComponentReference? TryReferenceTo(ComponentType componentType, string componentId) =>
+        TryReferenceTo(SimGameState.ComponentTypeToBattleTechResourceType(componentType), componentId);
+
     /// <summary>The reference to a component, or <c>null</c> when its definition is missing.</summary>
     /// <remarks>For lists that leave out what they can't describe, unlike the other overloads.</remarks>
-    internal ComponentReference? TryReferenceTo(BattleTechResourceType resourceType, string componentId) =>
-        FindDefinition(resourceType, componentId) is { } definition
-            ? ReferenceTo(definition.ComponentType, componentId, definition)
-            : null;
+    internal ComponentReference? TryReferenceTo(BattleTechResourceType resourceType, string componentId)
+    {
+        if (FindDefinition(resourceType, componentId) is { } definition)
+        {
+            return ReferenceTo(definition.ComponentType, componentId, definition);
+        }
+
+        ModLog.Logger.LogWarning($"Left out {componentId}: no {resourceType} definition");
+        return null;
+    }
 
     // The id stands in for the name of a missing definition, which gets no entry.
     internal ComponentReference ReferenceTo(
