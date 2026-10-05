@@ -396,8 +396,9 @@ repository URL and supported game version; the build stamps the version into the
 
 ## Commands
 
-- **Build and deploy:** `dotnet build` copies the DLL and `mod.json` into
-  `<game>/Mods/BattleTechInfoExporter/`.
+- **Build:** `dotnet build`.
+- **Deploy:** `dotnet build -p:DeployToGame=true` also copies the DLL and `mod.json` into
+  `<game>/Mods/BattleTechInfoExporter/`, for testing a branch in the game.
 - **Package:** `dotnet build -c Release` also writes `artifacts/BattleTechInfoExporter-<version>.zip`.
 - **Format:** `dotnet jb cleanupcode BattleTechInfoExporter.slnx --profile="Built-in: Full Cleanup"
   --disable-settings-layers="GlobalAll;GlobalPerProduct;SolutionPersonal;ProjectPersonal"
