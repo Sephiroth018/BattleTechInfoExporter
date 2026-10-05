@@ -27,7 +27,7 @@ internal static class MechReader
 
     /// <summary>A mech or chassis name followed by the variant, e.g. "Atlas (AS7-D)".</summary>
     /// <remarks>The variant identifies the mech, as in the game's lance and store lists.</remarks>
-    internal static string NameWithVariant(string name, ChassisDef chassis) => $"{name} ({chassis.VariantName})";
+    private static string NameWithVariant(string name, ChassisDef chassis) => $"{name} ({chassis.VariantName})";
 
     internal static DefinitionReference ReferenceTo(ChassisDef chassis) =>
         new(chassis.Description.Id, NameWithVariant(chassis.Description.Name, chassis));
@@ -46,11 +46,13 @@ internal static class MechReader
         new(mech.GUID, NameWithVariant(mech.Name, mech.Chassis));
 
     /// <summary>The chassis' weapon hardpoints of all locations together.</summary>
-    /// <remarks>Summed as TooltipPrefab_Chassis.SetHardpointData does.</remarks>
-    internal static Hardpoints ReadHardpoints(ChassisDef chassis)
+    internal static Hardpoints ReadHardpoints(ChassisDef chassis) => ReadHardpoints(chassis, Locations);
+
+    // Summed as TooltipPrefab_Chassis.SetHardpointData does.
+    private static Hardpoints ReadHardpoints(ChassisDef chassis, IEnumerable<ChassisLocations> locations)
     {
         int ballistic = 0, energy = 0, missile = 0, support = 0;
-        foreach (var location in Locations)
+        foreach (var location in locations)
         {
             MechStatisticsRules.GetHardpointCountForLocation(
                 chassis,
@@ -161,24 +163,15 @@ internal static class MechReader
     {
         var loadout = mech.GetLocationLoadoutDef(location);
         var definition = mech.GetChassisLocationDef(location);
-        int ballistic = 0, energy = 0, missile = 0, support = 0;
-        MechStatisticsRules.GetHardpointCountForLocation(
-            mech,
-            location,
-            ref ballistic,
-            ref energy,
-            ref missile,
-            ref support);
         var components = mech.Inventory.Where(component => component.MountedLocation == location).ToList();
         return new MechLocation(
             location,
             new Armor(loadout.CurrentArmor, loadout.AssignedArmor, definition.MaxArmor),
-            // Locations without rear armor have -1 for it.
-            definition.MaxRearArmor < 0
-                ? null
-                : new Armor(loadout.CurrentRearArmor, loadout.AssignedRearArmor, definition.MaxRearArmor),
+            HasRearArmor(definition)
+                ? new Armor(loadout.CurrentRearArmor, loadout.AssignedRearArmor, definition.MaxRearArmor)
+                : null,
             new Structure(loadout.CurrentInternalStructure, definition.InternalStructure),
-            new Hardpoints(ballistic, energy, missile, support),
+            ReadHardpoints(mech.Chassis, [location]),
             // A component whose definition is missing has no known size.
             new Slots(components.Sum(component => component.Def?.InventorySize ?? 0), definition.InventorySlots),
             components.Select(component => new Equipment(
@@ -209,30 +202,14 @@ internal static class MechReader
         WorkOrderEntry_MechLab step) =>
         step switch
         {
-            // An install step's MechComponentRef is restored from the save without a DataManager, so its Def stays
-            // null; the definition is resolved from the type and id instead.
-            // A removal has no desired location (SimGameState.CreateComponentInstallWorkOrder).
-            WorkOrderEntry_InstallComponent { DesiredLocation: ChassisLocations.None } removal => new RefitChange(
-                RefitChangeType.RemoveComponent,
-                step.IsMechLabComplete,
-                componentDefinitions.ReferenceTo(removal.ComponentType, removal.MechComponentID),
-                removal.DamageLevel,
-                removal.PreviousLocation),
-            WorkOrderEntry_InstallComponent installation => new RefitChange(
-                RefitChangeType.InstallComponent,
-                step.IsMechLabComplete,
-                componentDefinitions.ReferenceTo(installation.ComponentType, installation.MechComponentID),
-                installation.DamageLevel,
-                installation.DesiredLocation),
+            WorkOrderEntry_InstallComponent installation => ReadInstallation(componentDefinitions, installation),
             WorkOrderEntry_RepairComponent repair => ReadRepair(simGame, componentDefinitions, mech, repair),
             WorkOrderEntry_ModifyMechArmor armor => new RefitChange(
                 RefitChangeType.ModifyArmor,
                 step.IsMechLabComplete,
                 Location: armor.Location,
                 FrontArmor: armor.DesiredFrontArmor,
-                RearArmor: mech.GetChassisLocationDef(armor.Location).MaxRearArmor < 0
-                    ? null
-                    : armor.DesiredRearArmor),
+                RearArmor: HasRearArmor(mech.GetChassisLocationDef(armor.Location)) ? armor.DesiredRearArmor : null),
             WorkOrderEntry_RepairMechStructure structure => new RefitChange(
                 RefitChangeType.RepairStructure,
                 step.IsMechLabComplete,
@@ -240,6 +217,25 @@ internal static class MechReader
                 Structure: structure.StructureAmount),
             _ => throw new InvalidOperationException($"Unexpected mech lab work order type {step.Type}")
         };
+
+    // An install step's MechComponentRef is restored from the save without a DataManager, so its Def stays null; the
+    // definition is resolved from the type and id instead. A removal is an install step without a desired location
+    // (SimGameState.CreateComponentInstallWorkOrder).
+    private static RefitChange ReadInstallation(
+        ComponentDefinitionReader componentDefinitions,
+        WorkOrderEntry_InstallComponent installation)
+    {
+        var isRemoval = installation.DesiredLocation == ChassisLocations.None;
+        return new RefitChange(
+            isRemoval ? RefitChangeType.RemoveComponent : RefitChangeType.InstallComponent,
+            installation.IsMechLabComplete,
+            componentDefinitions.ReferenceTo(installation.ComponentType, installation.MechComponentID),
+            installation.DamageLevel,
+            isRemoval ? installation.PreviousLocation : installation.DesiredLocation);
+    }
+
+    // Locations without rear armor have -1 for it.
+    private static bool HasRearArmor(LocationDef location) => location.MaxRearArmor >= 0;
 
     // Finds the component as SimGameState.ML_RepairComponent does: on the mech, among the parts held for the work
     // order, or in storage, where it isn't mounted.
