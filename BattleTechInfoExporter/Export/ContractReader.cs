@@ -51,13 +51,20 @@ internal static class ContractReader
     // (SGRoomController_CmdCenter.StartContractScreen). The mod never generates them itself: that would change the
     // career. The active contract is left out: an accepted global contract stays in SimGameState.GlobalContracts
     // until arrival, and once arrived, GetAllCurrentlySelectableContracts adds it.
-    internal static List<Contract>? ReadContracts(SimGameState simGame) =>
-        simGame.CurSystem.InitialContractsFetched
-            ? simGame.GetAllCurrentlySelectableContracts()
-                .Where(contract => contract != simGame.ActiveTravelContract)
-                .Select(contract => ReadContract(simGame, contract))
-                .ToList()
-            : null;
+    internal static List<Contract>? ReadContracts(SimGameState simGame)
+    {
+        if (!simGame.CurSystem.InitialContractsFetched)
+        {
+            return null;
+        }
+
+        // Contracts often share a target system, whose tags and route are costly to read; each is read once.
+        var travelsBySystemId = new Dictionary<string, ContractTravel>();
+        return simGame.GetAllCurrentlySelectableContracts()
+            .Where(contract => contract != simGame.ActiveTravelContract)
+            .Select(contract => ReadContract(simGame, contract, travelsBySystemId))
+            .ToList();
+    }
 
     // SimGameState.ContractTypeDescriptions has the procedural mission types; priority contracts share one entry.
     internal static List<ContractTypeDescription> ReadContractTypes(SimGameState simGame)
@@ -75,7 +82,10 @@ internal static class ContractReader
         return contractTypes;
     }
 
-    private static Contract ReadContract(SimGameState simGame, BattleTech.Contract contract)
+    private static Contract ReadContract(
+        SimGameState simGame,
+        BattleTech.Contract contract,
+        Dictionary<string, ContractTravel> travelsBySystemId)
     {
         var contractOverride = contract.Override;
         var employer = contract.GetTeamFaction(contractOverride.employerTeam.teamGuid);
@@ -94,7 +104,7 @@ internal static class ContractReader
             ReadNegotiation(simGame, contract, employer, target),
             ReadLanceLimits(contractOverride),
             ReadBiome(simGame, contract.ContractBiome),
-            ReadTravel(simGame, contract));
+            ReadTravel(simGame, contract, travelsBySystemId));
     }
 
     // Mirrors Contract.GetContractTypeString and the type tooltip of SGContractsWidget.PopulateContract.
@@ -259,10 +269,24 @@ internal static class ContractReader
     private static DefinitionReference? ReadBiome(SimGameState simGame, Biome.BIOMESKIN biome) =>
         biome <= Biome.BIOMESKIN.generic ? null : DefinitionReferences.ReferenceTo(simGame.DataManager, biome);
 
-    private static ContractTravel? ReadTravel(SimGameState simGame, BattleTech.Contract contract) =>
-        ReadTargetSystem(contract) is { } system && system != simGame.CurSystem
-            ? CreateTravel(system, ReadTravelDays(simGame, system))
-            : null;
+    private static ContractTravel? ReadTravel(
+        SimGameState simGame,
+        BattleTech.Contract contract,
+        Dictionary<string, ContractTravel> travelsBySystemId)
+    {
+        if (ReadTargetSystem(contract) is not { } system || system == simGame.CurSystem)
+        {
+            return null;
+        }
+
+        if (!travelsBySystemId.TryGetValue(system.ID, out var travel))
+        {
+            travel = CreateTravel(system, ReadTravelDays(simGame, system));
+            travelsBySystemId.Add(system.ID, travel);
+        }
+
+        return travel;
+    }
 
     // While travelling to the contract's system, the days are the trip's as the position has them, also on the last
     // leg from the jump point to the planet.
@@ -272,7 +296,7 @@ internal static class ContractReader
         (StarSystem Destination, int DaysLeft)? travelInProgress) =>
         ReadTargetSystem(contract) is { } system && travelInProgress?.Destination.ID == system.ID
             ? CreateTravel(system, travelInProgress.Value.DaysLeft)
-            : ReadTravel(simGame, contract);
+            : ReadTravel(simGame, contract, new Dictionary<string, ContractTravel>());
 
     // The contract list marks travel contracts by the target system in the contract's context (SGContractsListItem).
     private static StarSystem? ReadTargetSystem(BattleTech.Contract contract) =>
