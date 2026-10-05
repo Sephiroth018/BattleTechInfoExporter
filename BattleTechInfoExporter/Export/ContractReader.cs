@@ -36,6 +36,7 @@ internal static class ContractReader
         return new ActiveContract(
             ReadId(contractOverride),
             contractOverride.contractName,
+            contract.ShortDescription,
             ReadType(simGame, contract),
             contractOverride.contractDisplayStyle,
             DefinitionReferences.ReferenceTo(employer),
@@ -108,6 +109,8 @@ internal static class ContractReader
             // The contract list and details show the raw name; Contract.Name interpolates it, which the game's
             // contracts don't need.
             contractOverride.contractName,
+            // The contract details show the interpolated description, unlike the name.
+            contract.ShortDescription,
             ReadType(simGame, contract),
             contractOverride.contractDisplayStyle,
             DefinitionReferences.ReferenceTo(employer),

@@ -35,11 +35,11 @@ The game state holds:
   and prices.
 - **Hiring hall:** the current system's pilots for hire, like the roster's pilots plus hiring cost,
   salary and whether the company can hire them.
-- **Contracts:** the contracts the Command Center offers with their terms, and the negotiation as
-  the values at each slider position (pay and salvage together take at most 100 %, exactly 100 %
-  when the employer gains no reputation); plus the accepted travel contract until it's proceeded
-  with. The game generates a system's contracts only when the contract screen first opens; until
-  then `contracts` is `null`.
+- **Contracts:** the contracts the Command Center offers with their description and terms, and the
+  negotiation as the values at each slider position (pay and salvage together take at most 100 %,
+  exactly 100 % when the employer gains no reputation); plus the accepted travel contract until
+  it's proceeded with. The game generates a system's contracts only when the contract screen first
+  opens; until then `contracts` is `null`.
 - **Component definitions:** the stats of every component the file refers to, keyed by id, so the
   entries don't repeat them.
 

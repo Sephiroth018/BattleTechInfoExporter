@@ -22,6 +22,7 @@ namespace BattleTechInfoExporter.Models;
 internal sealed record Contract(
     string? Id,
     string Name,
+    string Description,
     DefinitionReference Type,
     ContractDisplayStyle DisplayStyle,
     DefinitionReference Employer,
@@ -47,6 +48,7 @@ internal sealed record Contract(
 internal sealed record ActiveContract(
     string? Id,
     string Name,
+    string Description,
     DefinitionReference Type,
     ContractDisplayStyle DisplayStyle,
     DefinitionReference Employer,
