@@ -28,6 +28,8 @@ The game state holds:
 - **Pilots:** the commander and the roster with all their relevant stats.
 - **Mechs:** the mech bay's mechs with their status, loadout, armor, performance summary and place
   in the mech lab queue; a mech in a refit also carries what it will be once the refit is done.
+- **Mechs awaiting placement:** new mechs the game asks to place, store or scrap because every mech
+  bay is full, with the loadout they come with.
 - **Last lance:** the mechs and pilots last sent on a mission, the only assignment of pilots to
   mechs the game keeps.
 - **Storage:** the stored components, chassis and mech parts.
@@ -57,6 +59,8 @@ The game state is exported when:
 - **The mech bay changes:** a refit, repair, readying or storing is queued, an order is cancelled,
   the queue is reordered, or a mech, chassis or mech parts are scrapped.
 - **Experience is spent:** a pilot's training is confirmed in the barracks.
+- **A new mech needs a place:** the game asks where to put it because every mech bay is full, e.g.
+  after salvage completes a mech.
 
 ## Planned
 

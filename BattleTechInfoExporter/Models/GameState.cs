@@ -17,6 +17,7 @@ internal sealed record GameState(
     Company Company,
     IReadOnlyList<BarracksPilot> Pilots,
     IReadOnlyList<Mech> Mechs,
+    IReadOnlyList<MechAwaitingPlacement> MechsAwaitingPlacement,
     IReadOnlyList<LastLanceUnit> LastLance,
     Storage Storage,
     Stores Stores,
