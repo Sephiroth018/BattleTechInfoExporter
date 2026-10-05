@@ -56,6 +56,7 @@ The game state is exported when:
 - **A store is closed.**
 - **The mech bay changes:** a refit, repair, readying or storing is queued, an order is cancelled,
   the queue is reordered, or a mech, chassis or mech parts are scrapped.
+- **Experience is spent:** a pilot's training is confirmed in the barracks.
 
 ## Planned
 
