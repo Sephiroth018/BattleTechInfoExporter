@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using BattleTech;
 using BattleTech.Framework;
@@ -64,7 +65,7 @@ internal static class ContractReader
     {
         var contractTypes = simGame.ContractTypeDescriptions
             .Select(description => new ContractTypeDescription(
-                ReferenceTo(ContractTypeEnumeration.GetContractTypeByInt(description.Key)),
+                ReadContractType(description.Key),
                 description.Value.Details))
             .ToList();
         if (simGame.PriorityMissionDescription is { } priority)
@@ -118,6 +119,19 @@ internal static class ContractReader
                 .FirstOrDefault(action =>
                     action.Type == SimGameResultAction.ActionType.System_StartNonProceduralContract)
                 ?.additionalValues[3];
+
+    // GetContractTypeByInt returns null for an id a mod describes without enumerating it; the id stands in.
+    private static DefinitionReference ReadContractType(long contractTypeId)
+    {
+        if (ContractTypeEnumeration.GetContractTypeByInt(contractTypeId) is { } contractType)
+        {
+            return ReferenceTo(contractType);
+        }
+
+        ModLog.Logger.LogWarning($"Found no contract type {contractTypeId}; its id stands in");
+        var id = contractTypeId.ToString(CultureInfo.InvariantCulture);
+        return new DefinitionReference(id, id);
+    }
 
     private static DefinitionReference ReferenceTo(ContractTypeValue contractType) =>
         new(contractType.Name, contractType.FriendlyName);

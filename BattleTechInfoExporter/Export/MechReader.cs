@@ -172,7 +172,8 @@ internal static class MechReader
                 : new Armor(loadout.CurrentRearArmor, loadout.AssignedRearArmor, definition.MaxRearArmor),
             new Structure(loadout.CurrentInternalStructure, definition.InternalStructure),
             new Hardpoints(ballistic, energy, missile, support),
-            new Slots(components.Sum(component => component.Def.InventorySize), definition.InventorySlots),
+            // A component whose definition is missing has no known size.
+            new Slots(components.Sum(component => component.Def?.InventorySize ?? 0), definition.InventorySlots),
             components.Select(component => new Equipment(
                     componentDefinitions.ReferenceTo(
                         component.ComponentDefType,

@@ -44,6 +44,7 @@ internal sealed class ComponentDefinitionReader
     {
         if (definition is null)
         {
+            ModLog.Logger.LogWarning($"Found no definition of {componentType} {componentId}; its id stands in");
             return new ComponentReference(componentId, componentId, componentType);
         }
 
@@ -139,9 +140,22 @@ internal sealed class ComponentDefinitionReader
             component.Slots,
             component.Cost,
             component.Bonuses,
-            // The box's own Ammo is only set once the game has needed it (AmmunitionBoxDef.refreshAmmo).
-            _dataManager.AmmoDefs.Get(ammunitionBox.AmmoID).AmmoCategoryValue.FriendlyName,
+            ReadAmmoCategory(ammunitionBox),
             ammunitionBox.Capacity);
+    }
+
+    // The box's own Ammo is only set once the game has needed it (AmmunitionBoxDef.refreshAmmo). The game guards
+    // the lookup as well (AmmunitionBoxDef.GatherDependencies); the ammo's id stands in for a missing definition.
+    private string ReadAmmoCategory(AmmunitionBoxDef ammunitionBox)
+    {
+        if (_dataManager.AmmoDefs.TryGet(ammunitionBox.AmmoID, out var ammo))
+        {
+            return ammo.AmmoCategoryValue.FriendlyName;
+        }
+
+        ModLog.Logger.LogWarning(
+            $"Found no ammo {ammunitionBox.AmmoID} of {ammunitionBox.Description.Id}; its id stands in");
+        return ammunitionBox.AmmoID;
     }
 
     private static HeatSinkDefinition ReadHeatSink(HeatSinkDef heatSink)
