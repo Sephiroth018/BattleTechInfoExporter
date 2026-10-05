@@ -10,7 +10,7 @@ internal static class GameStateReader
 {
     internal static GameState Read(SimGameState simGame, ExportTrigger trigger)
     {
-        var componentDefinitions = new ComponentDefinitionReader(simGame.DataManager);
+        var componentDefinitions = new ComponentReferences(simGame.DataManager);
         var travelInProgress = ReadTravelInProgress(simGame);
         return new GameState(
             ModAssembly.Version,

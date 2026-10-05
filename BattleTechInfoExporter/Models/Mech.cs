@@ -76,7 +76,7 @@ internal sealed record MechLocation(
     Structure Structure,
     Hardpoints Hardpoints,
     Slots Slots,
-    IReadOnlyList<Equipment> Equipment);
+    IReadOnlyList<MountedComponent> Equipment);
 
 /// <param name="Current">
 ///     What is left after combat damage; refilled to <see cref="Assigned" /> after a mission unless the

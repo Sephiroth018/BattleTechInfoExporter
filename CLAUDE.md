@@ -361,7 +361,7 @@ name, version and folder, `ModLog` its logger. Folders:
   and `ContractReader` for the active contract and the contracts, with `SystemTags` for a system's
   planet tags; `RulesReader` builds the rules file's tables. `DefinitionReferences` makes the
   references that need only a description, a faction or a biome; references with a naming rule of
-  their own are made by the reader that owns it. `ComponentDefinitionReader`, one per export file,
+  their own are made by the reader that owns it. `ComponentReferences`, one per export file,
   makes every reference to a component and collects the definitions referenced, needing only the
   game's `DataManager`; `ExportFileWriter` writes the files into the mod's `exports/` folder.
 - `Models/`: immutable records, one per JSON object, marked

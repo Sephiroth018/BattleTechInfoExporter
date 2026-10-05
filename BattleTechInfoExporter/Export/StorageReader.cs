@@ -13,7 +13,7 @@ namespace BattleTechInfoExporter.Export;
 /// </remarks>
 internal static class StorageReader
 {
-    internal static Storage ReadStorage(SimGameState simGame, ComponentDefinitionReader componentDefinitions)
+    internal static Storage ReadStorage(SimGameState simGame, ComponentReferences componentDefinitions)
     {
         var storedItems = ReadStoredItems(simGame);
         return new Storage(
@@ -25,7 +25,7 @@ internal static class StorageReader
     // Filtered as SimGameState.GetAllInventoryItemDefs does. That method isn't used: it generates a game UID for
     // every component, which changes the career's state. Counted as MechLabPanel.PopulateInventory does.
     private static List<StoredComponent> ReadEquipment(
-        ComponentDefinitionReader componentDefinitions,
+        ComponentReferences componentDefinitions,
         IReadOnlyList<StoredItem> storedItems) =>
         storedItems
             .Where(item => item.Type != SimGameState.MECH_PART_ITEM)

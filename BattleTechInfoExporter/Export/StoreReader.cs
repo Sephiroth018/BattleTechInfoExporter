@@ -9,7 +9,7 @@ internal static class StoreReader
 {
     // A store exists when it has stock (StarSystem.HasFactionStore, HasBlackMarketStore). CanUseSystemStore doesn't
     // check it, the other two do.
-    internal static Stores ReadStores(SimGameState simGame, ComponentDefinitionReader componentDefinitions)
+    internal static Stores ReadStores(SimGameState simGame, ComponentReferences componentDefinitions)
     {
         var system = simGame.CurSystem;
         return new Stores(
@@ -30,7 +30,7 @@ internal static class StoreReader
     // The price faction is the one Shop.GetPrice takes the reputation of.
     private static Store ReadStore(
         SimGameState simGame,
-        ComponentDefinitionReader componentDefinitions,
+        ComponentReferences componentDefinitions,
         Shop shop,
         FactionValue priceFaction)
     {

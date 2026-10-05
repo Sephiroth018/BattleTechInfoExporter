@@ -67,7 +67,7 @@ internal static class MechReader
     }
 
     // Both dictionaries are keyed by the mech bay slot; a slot is in one of them at most.
-    internal static List<Mech> ReadMechs(SimGameState simGame, ComponentDefinitionReader componentDefinitions) =>
+    internal static List<Mech> ReadMechs(SimGameState simGame, ComponentReferences componentDefinitions) =>
         simGame.ActiveMechs
             .Concat(simGame.ReadyingMechs)
             .OrderBy(slot => slot.Key)
@@ -76,7 +76,7 @@ internal static class MechReader
 
     private static Mech ReadMech(
         SimGameState simGame,
-        ComponentDefinitionReader componentDefinitions,
+        ComponentReferences componentDefinitions,
         int slot,
         MechDef mech)
     {
@@ -117,7 +117,7 @@ internal static class MechReader
                 : ReadLoadout(componentDefinitions, MechRefit.CopyWithPendingSteps(simGame, mech, refitOrder)));
     }
 
-    private static MechLoadout ReadLoadout(ComponentDefinitionReader componentDefinitions, MechDef mech)
+    private static MechLoadout ReadLoadout(ComponentReferences componentDefinitions, MechDef mech)
     {
         // The maximum it returns is the stat bar's scale, not the chassis tonnage.
         float usedTonnage = 0, ignoredMax = 0;
@@ -157,7 +157,7 @@ internal static class MechReader
     }
 
     private static MechLocation ReadLocation(
-        ComponentDefinitionReader componentDefinitions,
+        ComponentReferences componentDefinitions,
         MechDef mech,
         ChassisLocations location)
     {
@@ -174,7 +174,7 @@ internal static class MechReader
             ReadHardpoints(mech.Chassis, [location]),
             // A component whose definition is missing has no known size.
             new Slots(components.Sum(component => component.Def?.InventorySize ?? 0), definition.InventorySlots),
-            components.Select(component => new Equipment(
+            components.Select(component => new MountedComponent(
                     componentDefinitions.ReferenceTo(
                         component.ComponentDefType,
                         component.ComponentDefID,
@@ -186,7 +186,7 @@ internal static class MechReader
 
     private static List<RefitChange>? ReadRefit(
         SimGameState simGame,
-        ComponentDefinitionReader componentDefinitions,
+        ComponentReferences componentDefinitions,
         MechDef mech,
         WorkOrderEntry_MechLab? refitOrder) =>
         refitOrder?.SubEntries
@@ -197,7 +197,7 @@ internal static class MechReader
 
     private static RefitChange ReadRefitChange(
         SimGameState simGame,
-        ComponentDefinitionReader componentDefinitions,
+        ComponentReferences componentDefinitions,
         MechDef mech,
         WorkOrderEntry_MechLab step) =>
         step switch
@@ -222,7 +222,7 @@ internal static class MechReader
     // definition is resolved from the type and id instead. A removal is an install step without a desired location
     // (SimGameState.CreateComponentInstallWorkOrder).
     private static RefitChange ReadInstallation(
-        ComponentDefinitionReader componentDefinitions,
+        ComponentReferences componentDefinitions,
         WorkOrderEntry_InstallComponent installation)
     {
         var isRemoval = installation.DesiredLocation == ChassisLocations.None;
@@ -241,7 +241,7 @@ internal static class MechReader
     // order, or in storage, where it isn't mounted.
     private static RefitChange ReadRepair(
         SimGameState simGame,
-        ComponentDefinitionReader componentDefinitions,
+        ComponentReferences componentDefinitions,
         MechDef mech,
         WorkOrderEntry_RepairComponent repair)
     {

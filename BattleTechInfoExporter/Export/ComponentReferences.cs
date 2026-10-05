@@ -12,7 +12,7 @@ namespace BattleTechInfoExporter.Export;
 ///     so the file's <see cref="ComponentDefinitions" /> hold exactly those. One instance per export file; it needs
 ///     only the game's <see cref="DataManager" />, so it also works in combat.
 /// </summary>
-internal sealed class ComponentDefinitionReader
+internal sealed class ComponentReferences
 {
     private readonly SortedDictionary<string, AmmunitionBoxDefinition> _ammunitionBoxes = new(StringComparer.Ordinal);
     private readonly DataManager _dataManager;
@@ -21,7 +21,7 @@ internal sealed class ComponentDefinitionReader
     private readonly SortedDictionary<string, ComponentDefinition> _upgrades = new(StringComparer.Ordinal);
     private readonly SortedDictionary<string, WeaponDefinition> _weapons = new(StringComparer.Ordinal);
 
-    internal ComponentDefinitionReader(DataManager dataManager)
+    internal ComponentReferences(DataManager dataManager)
     {
         _dataManager = dataManager;
     }
