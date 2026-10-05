@@ -42,15 +42,23 @@ internal static class PilotReader
             && simGame.CanMechWarriorBeHiredAccordingToMorale(pilot));
     }
 
+    /// <summary>
+    ///     The day the pilot is out of the med bay or their event timeout ends, as the barracks counts it; today for a
+    ///     ready pilot.
+    /// </summary>
+    internal static int ReadReadyOnDay(SimGameState simGame, Pilot pilot) =>
+        simGame.DaysPassed + simGame.GetPilotTimeoutTimeRemaining(pilot);
+
     private static BarracksPilot ReadPilot(SimGameState simGame, Pilot pilot)
     {
         var definition = pilot.pilotDef;
+        var status = ReadPilotStatus(pilot);
         return new BarracksPilot(
             ReadPilotCommon(simGame, pilot),
             new Experience(pilot.UnspentXP, pilot.SpentXP),
             pilot.Injuries,
-            ReadPilotStatus(pilot),
-            simGame.GetPilotTimeoutTimeRemaining(pilot),
+            status,
+            status == PilotStatus.Ready ? null : ReadReadyOnDay(simGame, pilot),
             ReadSpirits(simGame, pilot),
             new ServiceRecord(
                 definition.MissionsPiloted,
@@ -58,7 +66,7 @@ internal static class PilotReader
                 definition.OtherKills,
                 definition.MissionsEjected,
                 definition.LifetimeInjuries,
-                simGame.DaysPassed - definition.DateOfHire));
+                definition.DateOfHire));
     }
 
     private static Models.Pilot ReadPilotCommon(SimGameState simGame, Pilot pilot)
@@ -102,12 +110,16 @@ internal static class PilotReader
         {
             { HasHighMorale: true } => new Spirits(
                 SpiritsLevel.High,
-                simGame.GetTemporaryTagLength(pilot, Pilot.PILOTDEFTAG_HIGH_MORALE)),
+                ReadTagEndDay(simGame, pilot, Pilot.PILOTDEFTAG_HIGH_MORALE)),
             { HasLowMorale: true } => new Spirits(
                 SpiritsLevel.Low,
-                simGame.GetTemporaryTagLength(pilot, Pilot.PILOTDEFTAG_LOW_MORALE)),
+                ReadTagEndDay(simGame, pilot, Pilot.PILOTDEFTAG_LOW_MORALE)),
             _ => new Spirits(SpiritsLevel.Normal, null)
         };
+
+    // SimGameState.GetTemporaryTagLength returns zero for a tag no temporary event result added, which has no end.
+    private static int? ReadTagEndDay(SimGameState simGame, Pilot pilot, string tag) =>
+        simGame.GetTemporaryTagLength(pilot, tag) is var days and > 0 ? simGame.DaysPassed + days : null;
 
     private static string FullName(HumanDescriptionDef pilot) =>
         $"{pilot.FirstName} {pilot.LastName}".Trim() is { Length: > 0 } fullName ? fullName : pilot.Name;

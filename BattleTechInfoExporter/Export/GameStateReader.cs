@@ -12,13 +12,15 @@ internal static class GameStateReader
     {
         var componentReferences = new ComponentReferences(simGame.DataManager);
         var travelInProgress = ReadTravelInProgress(simGame);
+        var mechLabFinishingDays = WorkQueueReader.ReadMechLabFinishingDays(simGame);
         return new GameState(
             ModAssembly.Version,
             trigger,
             ReadCompany(simGame),
+            WorkQueueReader.ReadWorkQueue(simGame, mechLabFinishingDays),
             ShipReader.ReadShip(simGame),
             PilotReader.ReadPilots(simGame),
-            MechReader.ReadMechs(simGame, componentReferences),
+            MechReader.ReadMechs(simGame, componentReferences, mechLabFinishingDays),
             MechReader.ReadMechsAwaitingPlacement(simGame, componentReferences),
             LanceReader.ReadLastLance(simGame),
             StorageReader.ReadStorage(simGame, componentReferences),
@@ -62,7 +64,7 @@ internal static class GameStateReader
 
     private static Position ReadPosition(
         SimGameState simGame,
-        (StarSystem Destination, int DaysLeft)? travelInProgress) =>
+        (StarSystem Destination, int ArrivesOnDay)? travelInProgress) =>
         new(
             DefinitionReferences.ReferenceTo(simGame.CurSystem.Def.Description),
             DefinitionReferences.ReferenceTo(simGame.CurSystem.OwnerValue),
@@ -72,21 +74,20 @@ internal static class GameStateReader
                 .Select(biome => DefinitionReferences.ReferenceTo(simGame.DataManager, biome))
                 .ToList(),
             simGame.TravelState,
-            travelInProgress is ({ } destination, var daysLeft)
+            travelInProgress is ({ } destination, var arrivesOnDay)
                 ? new Travel(
                     DefinitionReferences.ReferenceTo(destination.Def.Description),
                     DefinitionReferences.ReferenceTo(destination.OwnerValue),
-                    daysLeft)
+                    arrivesOnDay)
                 : null);
 
-    // TravelTime only counts the current leg (e.g. to the jump point). The travel order keeps the legs as
-    // internal sub-entries, so its remaining cost is the whole trip, the single entry the queue shows.
-    private static (StarSystem Destination, int DaysLeft)? ReadTravelInProgress(SimGameState simGame)
+    // TravelTime only counts the current leg (e.g. to the jump point); the travel order counts the whole trip.
+    private static (StarSystem Destination, int ArrivesOnDay)? ReadTravelInProgress(SimGameState simGame)
     {
         var destination = simGame.Starmap?.Destination?.System;
         var travelOrder = simGame.TravelOrder;
         return simGame.TravelState == SimGameTravelStatus.IN_SYSTEM || destination is null || travelOrder is null
             ? null
-            : (destination, travelOrder.GetRemainingCost());
+            : (destination, WorkQueueReader.ReadArrivalDay(simGame, travelOrder));
     }
 }

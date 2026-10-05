@@ -29,20 +29,24 @@ Two more hold the latest mission:
 
 Every file starts with `modVersion`, `exportedAt` and the `trigger` of the export that last wrote
 it. A file is replaced in one step, never half-written, and only when its content apart from
-`exportedAt` changed, plus once after every game start.
+`exportedAt` changed, plus once after every game start. Points in time are day numbers, comparable
+with the company's `daysPassed`, so a day passing with nothing else happening changes only the company's day and date.
 
 The game state holds:
 
 - **Company:** name, date, morale, rating, MechTech and MedTech, and the reputation with every
   faction.
-- **Finances:** funds, the spending level and the expected expenses of the next financial report.
+- **Finances:** funds, the day of the next financial report, the spending level and its expected
+  expenses.
+- **Work queue:** the timeline's entries in order, each with the day it finishes and the mech,
+  pilot, destination or ship upgrade it applies to.
 - **Ship:** the Argo's upgrades the engineering screen shows, each installed, installing,
   available or locked, with its required upgrades, price, upkeep, installation days and effects in
   the game's words and as values; `null` while the company still flies the Leopard.
-- **Position:** the current system and, when travelling, the destination and days left.
+- **Position:** the current system and, when travelling, the destination and day of arrival.
 - **Pilots:** the commander and the roster with all their relevant stats.
-- **Mechs:** the mech bay's mechs with their status, loadout, armor, performance summary and place
-  in the mech lab queue; a mech in a refit also carries what it will be once the refit is done.
+- **Mechs:** the mech bay's mechs with their status, the day they're ready, loadout, armor and
+  performance summary; a mech in a refit also carries what it will be once the refit is done.
 - **Mechs awaiting placement:** new mechs the game asks to place, store or scrap because every mech
   bay is full, with the loadout they come with.
 - **Last lance:** the mechs and pilots last sent on a mission, the only assignment of pilots to
@@ -55,7 +59,7 @@ The game state holds:
 - **Contracts:** the contracts the Command Center offers with their description and terms, and the
   negotiation as the values at each slider position (pay and salvage together take at most 100 %,
   exactly 100 % when the employer gains no reputation); plus the accepted travel contract until
-  it's proceeded with. The game generates a system's contracts only when the contract screen first
+  it's proceeded with, with the day of arrival while travelling to it. The game generates a system's contracts only when the contract screen first
   opens; until then `contracts` is `null`.
 - **Component definitions:** the stats of every component the file refers to, keyed by id, so the
   entries don't repeat them.

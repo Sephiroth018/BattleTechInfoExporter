@@ -2,9 +2,12 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
+/// <param name="NextReportOnDay">
+///     The day of the next financial report, on the scale of <see cref="Company.DaysPassed" />.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Finances(
     int Funds,
-    int DaysUntilReport,
+    int NextReportOnDay,
     Spending Spending,
     ExpectedExpenses ExpectedExpenses);

@@ -13,13 +13,9 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Bay">The mech bay row, counted from 1, as the mech bay shows it.</param>
 /// <param name="Position">The position in the bay row, counted from 1.</param>
 /// <param name="Role">The chassis' stock role, e.g. "Brawler".</param>
-/// <param name="DaysUntilReady">
-///     The days until the mech lab finishes its work order; zero when
+/// <param name="ReadyOnDay">
+///     The day the mech lab finishes its work order, as in <see cref="GameState.WorkQueue" />; <c>null</c> when
 ///     <see cref="MechStatus.Ready" />.
-/// </param>
-/// <param name="WorkQueuePosition">
-///     The position of the mech's work order in the mech lab queue, counted from 1; the mech techs work on the
-///     first one only. <c>null</c> without a work order.
 /// </param>
 /// <param name="Refit">
 ///     The steps of the mech's mech lab work order, in order; finished steps are already part of the loadout.
@@ -42,8 +38,7 @@ internal sealed record Mech(
     int Bay,
     int Position,
     MechStatus Status,
-    int DaysUntilReady,
-    int? WorkQueuePosition,
+    int? ReadyOnDay,
     IReadOnlyList<RefitChange>? Refit,
     bool IsFieldable,
     IReadOnlyList<string> Problems,

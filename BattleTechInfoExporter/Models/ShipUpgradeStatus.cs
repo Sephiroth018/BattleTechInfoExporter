@@ -5,7 +5,7 @@ internal enum ShipUpgradeStatus
 {
     Installed,
 
-    /// <summary>Bought and being installed; it finishes as the work queue shows.</summary>
+    /// <summary>Bought and being installed; it finishes as <see cref="GameState.WorkQueue" /> shows.</summary>
     Installing,
 
     /// <summary>
