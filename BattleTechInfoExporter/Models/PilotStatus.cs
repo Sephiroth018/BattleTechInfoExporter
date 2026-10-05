@@ -1,10 +1,6 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
 namespace BattleTechInfoExporter.Models;
 
-/// <summary>Whether a pilot can be deployed, as the barracks shows it; written in camelCase.</summary>
-[JsonConverter(typeof(StringEnumConverter), true)]
+/// <summary>Whether a pilot can be deployed, as the barracks shows it.</summary>
 internal enum PilotStatus
 {
     Ready,
