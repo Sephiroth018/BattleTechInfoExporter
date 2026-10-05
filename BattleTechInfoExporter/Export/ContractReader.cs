@@ -159,25 +159,32 @@ internal static class ContractReader
         {
             return new Negotiation(
                 false,
-                [Option(null, null, contract.Override.negotiatedSalary, contract.Override.negotiatedSalvage)]);
+                null,
+                ReadNegotiationOption(
+                    simGame,
+                    contract,
+                    employer,
+                    target,
+                    null,
+                    null,
+                    contract.Override.negotiatedSalary,
+                    contract.Override.negotiatedSalvage));
         }
 
-        // The sliders' shares can't exceed 100 together; without employer reputation they are coupled and leave
-        // nothing for it (SGContractsWidget.OnNegPaymentChange, ShouldAdjustReputation). Accepting sets the
-        // reputation share to the rest (Contract.SetNegotiatedValues).
+        // Pay, salvage and reputation each depend only on their own share. The sliders' shares can't exceed 100
+        // together; without employer reputation they are coupled and leave nothing for it
+        // (SGContractsWidget.OnNegPaymentChange, ShouldAdjustReputation). Accepting sets the reputation share to the
+        // rest (Contract.SetNegotiatedValues).
         return new Negotiation(
             true,
             NegotiationShares
-                .SelectMany(pay => NegotiationShares.Select(salvage => (pay, salvage)))
-                .Where(shares => employer.DoesGainReputation
-                    ? shares.pay + shares.salvage <= 100
-                    : shares.pay + shares.salvage == 100)
-                .Select(shares => Option(shares.pay, shares.salvage, shares.pay / 100f, shares.salvage / 100f))
-                .ToList());
-
-        NegotiationOption Option(int? payPercent, int? salvagePercent, float payShare, float salvageShare) =>
-            ReadNegotiationOption(simGame, contract, employer, target, payPercent, salvagePercent, payShare,
-                salvageShare);
+                .Select(share => new ValuesAtShare(
+                    share,
+                    ReadPay(simGame, contract, share / 100f),
+                    ReadSalvage(simGame, contract, share / 100f),
+                    ReadReputation(simGame, contract, employer, target, share / 100f)))
+                .ToList(),
+            null);
     }
 
     // Accepting a contract stores the shares it was accepted with (SGContractsWidget.OnContractAccepted).

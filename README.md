@@ -45,9 +45,14 @@ The **game state**, written to `Mods/BattleTechInfoExporter/exports/game-state.j
 - [x] The current system's hiring hall: the pilots for hire with their skills, primary abilities,
       health, hiring cost, salary, and whether the company's rating and morale allow hiring them
 - [x] Contracts: the contracts the Command Center offers, with their mission type, employer and
-      target, difficulty and whether the reputation allows them, the pay, salvage and reputation
-      changes of every combination the negotiation allows, the lance limits, the biome, and for contracts in another
-      system its planet tags and travel days. The mission types' descriptions are in the rules file.
+      target, difficulty and whether the reputation allows them, the negotiation, the lance limits,
+      the biome, and for contracts in another system its planet tags and travel days. The mission
+      types' descriptions are in the rules file. The negotiation lists the values at each slider
+      position (0, 25, 50, 75 and 100 %): the pay comes from the row at the pay share, the salvage
+      from the row at the salvage share, and the reputation changes from the row at the share left
+      over. Pay and salvage together can take at most 100 %; when the employer gains no reputation
+      (its reputation change is `null`), they must take exactly 100 %. A contract that can't be
+      negotiated has its fixed terms instead.
       **The game only generates a system's contracts when its Command Center's contract screen first
       opens, or after a contract; the mod never generates them itself, so it doesn't change the
       game. Until then, `contracts` is `null`; once the game has generated them, they're exported.**
