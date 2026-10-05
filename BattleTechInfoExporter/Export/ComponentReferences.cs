@@ -9,7 +9,8 @@ namespace BattleTechInfoExporter.Export;
 
 /// <summary>
 ///     Makes an export file's references to components and collects the definitions of the components referenced,
-///     so the file's <see cref="ComponentDefinitions" /> hold exactly those. One instance per export file; it needs
+///     so the file's <see cref="ComponentDefinitions" /> hold exactly those, apart from definitions added on their
+///     own (<see cref="AddDefinition" />). One instance per export file; it needs
 ///     only the game's <see cref="DataManager" />, so it also works in combat.
 /// </summary>
 internal sealed class ComponentReferences
@@ -66,6 +67,14 @@ internal sealed class ComponentReferences
             return new ComponentReference(componentId, componentId, componentType);
         }
 
+        AddDefinition(componentId, definition);
+        // The definition's own type, so the reference names the group that holds it.
+        return new ComponentReference(componentId, NameOf(definition), definition.ComponentType);
+    }
+
+    /// <summary>Collects a definition whether or not anything in the file refers to it.</summary>
+    internal void AddDefinition(string componentId, MechComponentDef definition)
+    {
         switch (definition)
         {
             case WeaponDef weapon:
@@ -87,9 +96,6 @@ internal sealed class ComponentReferences
                 throw new InvalidOperationException(
                     $"Unexpected component definition type {definition.GetType().Name} for {componentId}");
         }
-
-        // The definition's own type, so the reference names the group that holds it.
-        return new ComponentReference(componentId, NameOf(definition), definition.ComponentType);
     }
 
     // DataManager.Get returns null for a missing definition.
@@ -120,7 +126,9 @@ internal sealed class ComponentReferences
             definition.InventorySize,
             definition.Description.Cost,
             new[] { definition.BonusValueA, definition.BonusValueB }.Where(bonus => !string.IsNullOrEmpty(bonus))
-                .ToList());
+                .ToList(),
+            // Contract.AddMechComponentToSalvage skips blacklisted components.
+            !definition.ComponentTags.Contains(MechValidationRules.Tag_Blacklisted));
 
     private static WeaponDefinition ReadWeapon(WeaponDef weapon) =>
         new(

@@ -20,6 +20,8 @@ internal static class CareerLoadedTrigger
     {
         try
         {
+            // The catalog doesn't depend on the career; ExportFileWriter writes it once per game start.
+            CatalogExporter.Export(simGame, ExportTrigger.CareerLoaded);
             // After a mission, the results are only applied a few frames later; ContractCompletedTrigger and
             // SaveTrigger export them.
             if (simGame.CompletedContract == null)
