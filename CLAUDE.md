@@ -41,8 +41,7 @@ Once per repository, before the rest of the workflow applies:
 1. **First commit, directly on `main` and without an issue** (`chore: set up repository`): this
    file, the stack's standard `.gitignore`, a `.gitattributes` fixing line endings to LF on every
    machine (`* text=auto eol=lf`, CRLF only for `.cmd`/`.bat`), a README with the project goal and
-   the AI disclaimer, the LICENSE (MIT unless
-   the project says otherwise) and the initial solution.
+   the AI disclaimer, the LICENSE (MIT unless the project says otherwise) and the initial solution.
 2. **Create the GitHub repository** (name and visibility decided with the user) and push.
 3. **Repository settings:** merge commits only (no squash or rebase merging), default merge message
    from the PR title and description, head branches deleted automatically after merging.
@@ -230,7 +229,8 @@ deliberate workaround, or an external fact with its source (e.g. the game method
 ### Documentation
 
 - **The README** says what the project is, how to install and use it, and how to build it, and
-  carries an AI disclaimer stating how extensively AI is used in the project.
+  carries an AI disclaimer stating how extensively AI is used in the project. It never refers to
+  issues: it describes the project as it is, not how it got there.
 - **Decisions live in their GitHub issue**, not in separate decision records (see "Issues and
   projects").
 
@@ -276,8 +276,9 @@ this file.
   `latest-recommended` and `EnforceCodeStyleInBuild`. Suppress a diagnostic only at the narrowest
   scope, with a justification.
 - **`.editorconfig` is the single source of style, formatting and naming rules**, ReSharper's
-  included (`resharper_*` keys). Inspection severities it can't express live in the team-shared
-  ReSharper settings file `<solution name>.sln.DotSettings` (named so even for `.slnx`). Never
+  included (`resharper_*` keys). Inspection severities it can't express go in the team-shared
+  ReSharper settings file `<solution name>.sln.DotSettings` (named so even for `.slnx`), created
+  when the first one is needed. Never
   loosen either to make a change pass. Its `end_of_line = lf` matches `.gitattributes`, so
   formatting checks see the same line endings on every machine.
 - **ReSharper Command Line Tools** (`JetBrains.ReSharper.GlobalTools`, a local tool) apply the
@@ -295,19 +296,16 @@ Everything enforceable lives in `.editorconfig` and the analyzer settings (style
 namespaces, namespaces matching folders, `var` everywhere, culture-safe formatting and parsing).
 This section holds what needs judgment.
 
-- **`internal` by default**; a type is `public` only when another assembly needs it. Internal
-  classes are `sealed` unless designed for inheritance (CA1852 enforces it); public ones stay open.
-- **Expression bodies (`=>`) for properties and for value-returning methods that are a single
-  expression**, even when it wraps. Constructors and `void` methods use a block body. ReSharper's
-  cleanup enforces this (`resharper_use_heuristics_for_body_style`).
+- **`internal` by default**; a type is `public` only when another assembly needs it. Public classes
+  stay open; internal ones are sealed unless designed for inheritance.
 - **Immutable by default:** records for data, `init`/`readonly` where possible, and read-only
   collection interfaces (`IReadOnlyList<T>`, `IReadOnlyDictionary<TKey, TValue>`) in signatures.
-- **Classic constructors with explicit fields**, no primary constructors on classes.
 - **No escape hatches** (null-forgiving `!`, `#nullable disable`, `dynamic`, reflection) without a
   narrow, stated reason. Where a project needs one (e.g. reflection for a game's private members),
   its "Project" part says where.
 - **No mutable static state** unless a host framework requires it, documented under "Project".
-- **Persisted enums have explicit values**, so reordering members can't change stored data.
+- **Enums stored by number have explicit values**, so reordering members can't change stored data.
+  Enums stored by name don't need them.
 - **`string.Empty`, not `""`**, except where C# requires a constant (patterns, `const`, attribute
   arguments). No analyzer enforces it.
 - **Async all the way:** no `.Result` or `.Wait()`, no `async void` outside event handlers.
@@ -336,13 +334,15 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
   one allowed escape hatch, and only for game types.
 - **Hook into the game with Harmony patches**, as ModTek's guide does; the game's `MessageCenter`
   doesn't exist yet when `Init` runs. A patch class is `internal static` and marked
-  `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]`: ReSharper doesn't recognize Harmony's
-  attributes and would otherwise report the patch as unused. It takes the patched object as
-  `[HarmonyArgument("__instance")]` with a name that follows our naming rules. A trigger patch only
-  calls `GameStateExporter.Export`, which catches and logs every exception: one escaping a patch
-  breaks the game's own code. A patch doing anything else catches its own. Being static by nature, patches are the allowed exception to "No mutable static state", limited
-  to what a patch needs. The other exception is `ExportFileWriter`'s cache of the content it last
-  wrote per file, which lives as long as the game runs.
+  `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]`, because ReSharper doesn't recognize
+  Harmony's attributes. Harmony's injected arguments (`__instance`, `__state`) are taken through
+  `[HarmonyArgument]` under a name that follows our naming rules.
+- **An exception escaping a patch breaks the game's own code.** `GameStateExporter.Export` catches
+  and logs every exception, so a patch that only calls it needs no handling of its own; a patch
+  doing anything else catches its own.
+- **Mutable static state** is allowed in patches, limited to what a patch needs, and in
+  `ExportFileWriter`'s cache of the content it last wrote per file, which lives as long as the game
+  runs.
 - **Logging** goes through `ModLog.Logger`, the game's `HBS.Logging` logger under the name
   `BattleTechInfoExporter`, and ends up in ModTek's log.
 
@@ -352,23 +352,24 @@ One project, `BattleTechInfoExporter/`, in `BattleTechInfoExporter.slnx`. `ModEn
 only public type; it applies all Harmony patches in the assembly. `ModAssembly` holds the mod's
 name, version and folder, `ModLog` its logger. Folders:
 
-- `Triggers/`: the patches that decide when to export.
-- `Export/`: `GameStateExporter`, the single entry point every trigger calls; `GameStateReader`
-  builds the game state file's models from the game, with `FinancesReader` for the finances and
-  expense lines, `PilotReader` for the barracks and hiring hall pilots, `MechReader` and
-  `MechStatsReader` for the mechs, with `MechRefit` for a mech's loadout after its refit,
-  `LanceReader` for the last lance, `StorageReader` for the storage, `StoreReader` for the stores
-  and `ContractReader` for the active contract and the contracts, with `SystemTags` for a system's
-  planet tags; `RulesReader` builds the rules file's tables. `DefinitionReferences` makes the
-  references that need only a description, a faction or a biome; references with a naming rule of
-  their own are made by the reader that owns it. `ComponentReferences`, one per export file,
-  makes every reference to a component and collects the definitions referenced, needing only the
-  game's `DataManager`; `ExportFileWriter` writes the files into the mod's `exports/` folder.
-- `Models/`: immutable records, one per JSON object, marked
-  `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` because only the serializer reads them.
+- `Triggers/`: the patches that decide when to export, and the recorder patches they share.
+- `Export/`: `GameStateExporter`, the single entry point every trigger calls. `GameStateReader`
+  builds the game state file's models from the game, one reader per section of the file;
+  `RulesReader` builds the rules file's tables. `DefinitionReferences` makes the references that
+  need only a description, a faction or a biome, and `ComponentReferences`, one per export file,
+  every reference to a component, collecting the definitions referenced; a reference with a naming
+  rule of its own is made by the reader that owns it. `ReferenceOrder` orders every list of entries
+  that refer to a definition. `ExportFileWriter` writes the files into the mod's `exports/` folder.
+- `Models/`: immutable records, one per JSON object, and the mod's own enums. The records are
+  marked `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` because only the serializer reads
+  them.
 
 The version lives only in `<Version>` in `Directory.Build.props`, next to the description, author,
-repository URL and supported game version; the build stamps the version into the DLL and generates `mod.json` from them.
+repository URL and supported game version; the build stamps the version into the DLL and generates
+`mod.json` from them.
+
+There is no GitHub Project for this repository: planned features are issues with labels, so the
+General rule on managing one doesn't apply.
 
 ## Export format
 
@@ -383,6 +384,8 @@ repository URL and supported game version; the build stamps the version into the
   sections), holding only the definitions the file refers to, so each file stands on its own. The
   entries carry the reference and their own state, instead of repeating the definition's stats; a
   reference whose definition is missing has no entry. Keys keep the game's ids as they are.
+- **Lists of entries that refer to a definition are ordered the same way everywhere**
+  (`ReferenceOrder`): by component type for components, then by name, with the id breaking ties.
 - **Two files, read together on every export:** `game-state.json` for the career state and
   `rules.json` for the game tables (e.g. `moraleLevels`, `reputationLevels` at its root): how the
   game works for this career, which doesn't change between exports. Values in the game state refer
@@ -422,8 +425,8 @@ repository URL and supported game version; the build stamps the version into the
 
 ## Releases
 
-From the first PR that exports something on, every merged PR that changes the mod gets a GitHub
-release, after the merge, from the merged `main`: a Release build, then
+Every merged PR that changes the mod gets a GitHub release, after the merge, from the merged
+`main`: a Release build, then
 `gh release create v<version>` with the zip attached and release notes summarizing the PR (marked as
 generated with Claude Code).
 
@@ -447,7 +450,8 @@ The game is BattleTech 1.9.1 (Unity 2018.4, Mono, .NET Framework 4.7.2). In orde
    ask the user; regenerating it needs a decompiler run on a thread with a large stack, because
    `ilspycmd -p` overflows its stack on `Assembly-CSharp`.
 2. **The game's data files** (`BattleTech_Data/StreamingAssets/data` in the install) for
-   definitions and ids.
+   definitions and ids. The DLC's definitions aren't there but in asset bundles, so a search over
+   the loose files isn't complete: say so, or check in the game.
 3. **ModTek's documentation** (github.com/BattletechModders/ModTek, `doc/`) for mod loader
    behavior: `mod.json`, DLL entry points, HarmonyX, logging.
 4. **Other mods' source and community answers** are hints only, confirmed in the game code before
