@@ -16,6 +16,9 @@
 # Machine-specific build settings (the game install path)
 Directory.Build.user.props
 
+# Worktrees the Claude desktop app creates for its sessions
+.claude/worktrees/
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

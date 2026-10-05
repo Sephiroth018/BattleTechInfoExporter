@@ -12,7 +12,7 @@ namespace BattleTechInfoExporter.Export;
 ///     so the file's <see cref="ComponentDefinitions" /> hold exactly those. One instance per export file; it needs
 ///     only the game's <see cref="DataManager" />, so it also works in combat.
 /// </summary>
-internal sealed class ComponentDefinitionReader
+internal sealed class ComponentReferences
 {
     private readonly SortedDictionary<string, AmmunitionBoxDefinition> _ammunitionBoxes = new(StringComparer.Ordinal);
     private readonly DataManager _dataManager;
@@ -21,20 +21,35 @@ internal sealed class ComponentDefinitionReader
     private readonly SortedDictionary<string, ComponentDefinition> _upgrades = new(StringComparer.Ordinal);
     private readonly SortedDictionary<string, WeaponDefinition> _weapons = new(StringComparer.Ordinal);
 
-    internal ComponentDefinitionReader(DataManager dataManager)
+    internal ComponentReferences(DataManager dataManager)
     {
         _dataManager = dataManager;
     }
 
     internal ComponentDefinitions Definitions => new(_weapons, _ammunitionBoxes, _heatSinks, _jumpJets, _upgrades);
 
-    // DataManager.Get returns null for a missing definition; the type mapping is static, so no SimGameState is needed.
+    // The type mapping is static, so no SimGameState is needed.
     internal ComponentReference ReferenceTo(ComponentType componentType, string componentId) =>
         ReferenceTo(
             componentType,
             componentId,
-            _dataManager.Get(SimGameState.ComponentTypeToBattleTechResourceType(componentType), componentId)
-                as MechComponentDef);
+            FindDefinition(SimGameState.ComponentTypeToBattleTechResourceType(componentType), componentId));
+
+    internal ComponentReference? TryReferenceTo(ComponentType componentType, string componentId) =>
+        TryReferenceTo(SimGameState.ComponentTypeToBattleTechResourceType(componentType), componentId);
+
+    /// <summary>The reference to a component, or <c>null</c> when its definition is missing.</summary>
+    /// <remarks>For lists that leave out what they can't describe, unlike the other overloads.</remarks>
+    internal ComponentReference? TryReferenceTo(BattleTechResourceType resourceType, string componentId)
+    {
+        if (FindDefinition(resourceType, componentId) is { } definition)
+        {
+            return ReferenceTo(definition.ComponentType, componentId, definition);
+        }
+
+        ModLog.Logger.LogWarning($"Left out {componentId}: no {resourceType} definition");
+        return null;
+    }
 
     // The id stands in for the name of a missing definition, which gets no entry.
     internal ComponentReference ReferenceTo(
@@ -44,6 +59,7 @@ internal sealed class ComponentDefinitionReader
     {
         if (definition is null)
         {
+            ModLog.Logger.LogWarning($"Found no definition of {componentType} {componentId}; its id stands in");
             return new ComponentReference(componentId, componentId, componentType);
         }
 
@@ -73,6 +89,10 @@ internal sealed class ComponentDefinitionReader
         return new ComponentReference(componentId, NameOf(definition), definition.ComponentType);
     }
 
+    // DataManager.Get returns null for a missing definition.
+    private MechComponentDef? FindDefinition(BattleTechResourceType resourceType, string componentId) =>
+        _dataManager.Get(resourceType, componentId) as MechComponentDef;
+
     private static void AddOnce<TDefinition>(
         SortedDictionary<string, TDefinition> definitions,
         string componentId,
@@ -99,15 +119,9 @@ internal sealed class ComponentDefinitionReader
             new[] { definition.BonusValueA, definition.BonusValueB }.Where(bonus => !string.IsNullOrEmpty(bonus))
                 .ToList());
 
-    private static WeaponDefinition ReadWeapon(WeaponDef weapon)
-    {
-        var component = ReadComponent(weapon);
-        return new WeaponDefinition(
-            component.Name,
-            component.Tonnage,
-            component.Slots,
-            component.Cost,
-            component.Bonuses,
+    private static WeaponDefinition ReadWeapon(WeaponDef weapon) =>
+        new(
+            ReadComponent(weapon),
             weapon.WeaponCategoryValue.FriendlyName,
             weapon.AmmoCategoryValue.Is_NotSet || weapon.AmmoCategoryValue.UsesInternalAmmo
                 ? null
@@ -128,31 +142,24 @@ internal sealed class ComponentDefinitionReader
             weapon.CriticalChanceMultiplier,
             weapon.RefireModifier,
             weapon.IndirectFireCapable);
+
+    private AmmunitionBoxDefinition ReadAmmunitionBox(AmmunitionBoxDef ammunitionBox) =>
+        new(ReadComponent(ammunitionBox), ReadAmmoCategory(ammunitionBox), ammunitionBox.Capacity);
+
+    // The box's own Ammo is only set once the game has needed it (AmmunitionBoxDef.refreshAmmo). The game guards
+    // the lookup as well (AmmunitionBoxDef.GatherDependencies); the ammo's id stands in for a missing definition.
+    private string ReadAmmoCategory(AmmunitionBoxDef ammunitionBox)
+    {
+        if (_dataManager.AmmoDefs.TryGet(ammunitionBox.AmmoID, out var ammo))
+        {
+            return ammo.AmmoCategoryValue.FriendlyName;
+        }
+
+        ModLog.Logger.LogWarning(
+            $"Found no ammo {ammunitionBox.AmmoID} of {ammunitionBox.Description.Id}; its id stands in");
+        return ammunitionBox.AmmoID;
     }
 
-    private AmmunitionBoxDefinition ReadAmmunitionBox(AmmunitionBoxDef ammunitionBox)
-    {
-        var component = ReadComponent(ammunitionBox);
-        return new AmmunitionBoxDefinition(
-            component.Name,
-            component.Tonnage,
-            component.Slots,
-            component.Cost,
-            component.Bonuses,
-            // The box's own Ammo is only set once the game has needed it (AmmunitionBoxDef.refreshAmmo).
-            _dataManager.AmmoDefs.Get(ammunitionBox.AmmoID).AmmoCategoryValue.FriendlyName,
-            ammunitionBox.Capacity);
-    }
-
-    private static HeatSinkDefinition ReadHeatSink(HeatSinkDef heatSink)
-    {
-        var component = ReadComponent(heatSink);
-        return new HeatSinkDefinition(
-            component.Name,
-            component.Tonnage,
-            component.Slots,
-            component.Cost,
-            component.Bonuses,
-            heatSink.DissipationCapacity);
-    }
+    private static HeatSinkDefinition ReadHeatSink(HeatSinkDef heatSink) =>
+        new(ReadComponent(heatSink), heatSink.DissipationCapacity);
 }

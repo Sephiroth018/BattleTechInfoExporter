@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using BattleTech;
 using BattleTech.Framework;
@@ -51,20 +51,43 @@ internal static class ContractReader
     // (SGRoomController_CmdCenter.StartContractScreen). The mod never generates them itself: that would change the
     // career. The active contract is left out: an accepted global contract stays in SimGameState.GlobalContracts
     // until arrival, and once arrived, GetAllCurrentlySelectableContracts adds it.
-    internal static List<Contract>? ReadContracts(SimGameState simGame) =>
-        simGame.CurSystem.InitialContractsFetched
-            ? simGame.GetAllCurrentlySelectableContracts()
-                .Where(contract => contract != simGame.ActiveTravelContract)
-                .Select(contract => ReadContract(simGame, contract))
-                .ToList()
-            : null;
+    internal static List<Contract>? ReadContracts(SimGameState simGame)
+    {
+        if (!simGame.CurSystem.InitialContractsFetched)
+        {
+            return null;
+        }
+
+        // Contracts often share a target system, whose tags and route are costly to read; each is read once.
+        var travelsBySystemId = new Dictionary<string, ContractTravel?>();
+        return simGame.GetAllCurrentlySelectableContracts()
+            .Where(contract => contract != simGame.ActiveTravelContract)
+            .Select(contract => ReadContract(simGame, contract, ReadTravelOnce(contract)))
+            .ToList();
+
+        ContractTravel? ReadTravelOnce(BattleTech.Contract contract)
+        {
+            if (ReadTargetSystem(contract) is not { } system)
+            {
+                return null;
+            }
+
+            if (!travelsBySystemId.TryGetValue(system.ID, out var travel))
+            {
+                travel = ReadTravel(simGame, contract);
+                travelsBySystemId.Add(system.ID, travel);
+            }
+
+            return travel;
+        }
+    }
 
     // SimGameState.ContractTypeDescriptions has the procedural mission types; priority contracts share one entry.
     internal static List<ContractTypeDescription> ReadContractTypes(SimGameState simGame)
     {
         var contractTypes = simGame.ContractTypeDescriptions
             .Select(description => new ContractTypeDescription(
-                ReferenceTo(ContractTypeEnumeration.GetContractTypeByInt(description.Key)),
+                ReadContractType(description.Key),
                 description.Value.Details))
             .ToList();
         if (simGame.PriorityMissionDescription is { } priority)
@@ -75,7 +98,7 @@ internal static class ContractReader
         return contractTypes;
     }
 
-    private static Contract ReadContract(SimGameState simGame, BattleTech.Contract contract)
+    private static Contract ReadContract(SimGameState simGame, BattleTech.Contract contract, ContractTravel? travel)
     {
         var contractOverride = contract.Override;
         var employer = contract.GetTeamFaction(contractOverride.employerTeam.teamGuid);
@@ -94,7 +117,7 @@ internal static class ContractReader
             ReadNegotiation(simGame, contract, employer, target),
             ReadLanceLimits(contractOverride),
             ReadBiome(simGame, contract.ContractBiome),
-            ReadTravel(simGame, contract));
+            travel);
     }
 
     // Mirrors Contract.GetContractTypeString and the type tooltip of SGContractsWidget.PopulateContract.
@@ -119,6 +142,19 @@ internal static class ContractReader
                     action.Type == SimGameResultAction.ActionType.System_StartNonProceduralContract)
                 ?.additionalValues[3];
 
+    // GetContractTypeByInt returns null for an id a mod describes without enumerating it; the id stands in.
+    private static DefinitionReference ReadContractType(long contractTypeId)
+    {
+        if (ContractTypeEnumeration.GetContractTypeByInt(contractTypeId) is { } contractType)
+        {
+            return ReferenceTo(contractType);
+        }
+
+        ModLog.Logger.LogWarning($"Found no contract type {contractTypeId}; its id stands in");
+        var id = contractTypeId.ToString(CultureInfo.InvariantCulture);
+        return new DefinitionReference(id, id);
+    }
+
     private static DefinitionReference ReferenceTo(ContractTypeValue contractType) =>
         new(contractType.Name, contractType.FriendlyName);
 
@@ -136,25 +172,36 @@ internal static class ContractReader
         {
             return new Negotiation(
                 false,
-                [Option(null, null, contract.Override.negotiatedSalary, contract.Override.negotiatedSalvage)]);
+                null,
+                ReadNegotiationOption(
+                    simGame,
+                    contract,
+                    employer,
+                    target,
+                    null,
+                    null,
+                    contract.Override.negotiatedSalary,
+                    contract.Override.negotiatedSalvage));
         }
 
-        // The sliders' shares can't exceed 100 together; without employer reputation they are coupled and leave
-        // nothing for it (SGContractsWidget.OnNegPaymentChange, ShouldAdjustReputation). Accepting sets the
-        // reputation share to the rest (Contract.SetNegotiatedValues).
+        // Pay, salvage and reputation each depend only on their own share. The sliders' shares can't exceed 100
+        // together; without employer reputation they are coupled and leave nothing for it
+        // (SGContractsWidget.OnNegPaymentChange, ShouldAdjustReputation). Accepting sets the reputation share to the
+        // rest (Contract.SetNegotiatedValues).
         return new Negotiation(
             true,
             NegotiationShares
-                .SelectMany(pay => NegotiationShares.Select(salvage => (pay, salvage)))
-                .Where(shares => employer.DoesGainReputation
-                    ? shares.pay + shares.salvage <= 100
-                    : shares.pay + shares.salvage == 100)
-                .Select(shares => Option(shares.pay, shares.salvage, shares.pay / 100f, shares.salvage / 100f))
-                .ToList());
-
-        NegotiationOption Option(int? payPercent, int? salvagePercent, float payShare, float salvageShare) =>
-            ReadNegotiationOption(simGame, contract, employer, target, payPercent, salvagePercent, payShare,
-                salvageShare);
+                .Select(share =>
+                {
+                    var fraction = share / 100f;
+                    return new ValuesAtShare(
+                        share,
+                        ReadPay(simGame, contract, fraction),
+                        ReadSalvage(simGame, contract, fraction),
+                        ReadReputation(simGame, contract, employer, target, fraction));
+                })
+                .ToList(),
+            null);
     }
 
     // Accepting a contract stores the shares it was accepted with (SGContractsWidget.OnContractAccepted).
@@ -228,11 +275,9 @@ internal static class ContractReader
     // As SGContractsWidget.PopulateContract passes them to the lance tonnage icons; -1 means no limit.
     private static LanceLimits ReadLanceLimits(ContractOverride contractOverride)
     {
-        var mechs = Enumerable.Range(0,
-                Math.Min(contractOverride.maxNumberOfPlayerUnits, contractOverride.mechMinTonnages.Length))
-            .Select(slot => new MechSlotLimits(
-                LimitOf(contractOverride.mechMinTonnages[slot]),
-                LimitOf(contractOverride.mechMaxTonnages[slot])))
+        var mechs = contractOverride.mechMinTonnages
+            .Zip(contractOverride.mechMaxTonnages, (min, max) => new MechSlotLimits(LimitOf(min), LimitOf(max)))
+            .Take(contractOverride.maxNumberOfPlayerUnits)
             .ToList();
         return new LanceLimits(
             contractOverride.maxNumberOfPlayerUnits,
@@ -243,8 +288,10 @@ internal static class ContractReader
 
     private static float? LimitOf(float tonnage) => tonnage < 0 ? null : tonnage;
 
+    // The contract screens show only biomes above generic (SGContractsWidget.PopulateContract,
+    // LanceContractDetailsWidget).
     private static DefinitionReference? ReadBiome(SimGameState simGame, Biome.BIOMESKIN biome) =>
-        biome == Biome.BIOMESKIN.generic ? null : DefinitionReferences.ReferenceTo(simGame.DataManager, biome);
+        biome <= Biome.BIOMESKIN.generic ? null : DefinitionReferences.ReferenceTo(simGame.DataManager, biome);
 
     private static ContractTravel? ReadTravel(SimGameState simGame, BattleTech.Contract contract) =>
         ReadTargetSystem(contract) is { } system && system != simGame.CurSystem

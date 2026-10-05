@@ -1,10 +1,6 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
 namespace BattleTechInfoExporter.Models;
 
-/// <summary>The game's pilot types (as SimGameState.GetPilotTypeColor tells them apart); written in camelCase.</summary>
-[JsonConverter(typeof(StringEnumConverter), true)]
+/// <summary>The game's pilot types, as SimGameState.GetPilotTypeColor tells them apart.</summary>
 internal enum PilotType
 {
     Commander,

@@ -58,13 +58,25 @@ internal sealed record ActiveContract(
     ContractTravel? Travel);
 
 /// <summary>The contract's terms.</summary>
-/// <param name="Options">
-///     Every combination of the pay and salvage sliders the negotiation allows: their shares add up to at most 100,
-///     reputation gets the rest. When the employer doesn't gain reputation, they always add up to 100. A single
-///     option with the fixed terms when the contract can't be negotiated.
+/// <param name="ValuesByShare">
+///     The values at each slider position; <c>null</c> when the contract can't be negotiated. A row is not a deal:
+///     the pay comes from the row at the pay share, the salvage from the row at the salvage share and the reputation
+///     from the row at the share left over.
 /// </param>
+/// <param name="FixedTerms">The terms of a contract that can't be negotiated; <c>null</c> otherwise.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record Negotiation(bool CanNegotiate, IReadOnlyList<NegotiationOption> Options);
+internal sealed record Negotiation(
+    bool CanNegotiate,
+    IReadOnlyList<ValuesAtShare>? ValuesByShare,
+    NegotiationOption? FixedTerms);
+
+/// <summary>What one slider position gives, each value for its own slider.</summary>
+/// <param name="Share">The slider's position in percent.</param>
+/// <param name="Pay">The pay when the pay slider is at this share.</param>
+/// <param name="Salvage">The salvage when the salvage slider is at this share.</param>
+/// <param name="Reputation">The reputation changes when this share is left over for reputation.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record ValuesAtShare(int Share, int Pay, Salvage Salvage, ReputationChange Reputation);
 
 /// <param name="PayShare">The pay slider's position in percent; <c>null</c> for fixed terms.</param>
 /// <param name="SalvageShare">The salvage slider's position in percent; <c>null</c> for fixed terms.</param>

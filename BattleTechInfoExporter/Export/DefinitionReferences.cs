@@ -5,8 +5,9 @@ using BattleTechInfoExporter.Models;
 namespace BattleTechInfoExporter.Export;
 
 /// <summary>
-///     Makes the <see cref="DefinitionReference" /> to a game definition that several readers share; references only
-///     one section needs are made by the reader of that section.
+///     Makes the <see cref="DefinitionReference" /> to a game definition that only needs its description, a faction
+///     or a biome; references with their own naming rule are made by the reader that owns it (e.g.
+///     <see cref="MechReader" /> for mechs and chassis, <see cref="PilotReader" /> for pilots).
 /// </summary>
 internal static class DefinitionReferences
 {

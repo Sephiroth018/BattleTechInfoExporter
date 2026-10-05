@@ -51,8 +51,8 @@ internal sealed record Mech(
     MechLoadout? AfterRefit);
 
 /// <summary>A mech's loadout with the tonnage, value and stats that follow from it.</summary>
-/// <param name="Value">The C-Bill value the game computes from the chassis, armor and equipment.</param>
-/// <param name="Locations">The body locations with their armor, structure and equipment, from head to legs.</param>
+/// <param name="Value">The C-Bill value the game computes from the chassis, armor and components.</param>
+/// <param name="Locations">The body locations with their armor, structure and components, from head to legs.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechLoadout(
     Tonnage Tonnage,
@@ -60,14 +60,14 @@ internal sealed record MechLoadout(
     MechStats Stats,
     IReadOnlyList<MechLocation> Locations);
 
-/// <param name="Used">The tonnage of the chassis, armor and equipment.</param>
+/// <param name="Used">The tonnage of the chassis, armor and components.</param>
 /// <param name="Max">The chassis' tonnage.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Tonnage(float Used, float Max);
 
 /// <param name="RearArmor"><c>null</c> outside the torso, which alone has rear armor.</param>
-/// <param name="Slots">The equipment slots, used by <see cref="Equipment" /> and available.</param>
-/// <param name="Equipment">The equipment mounted in the location, including the chassis' fixed equipment.</param>
+/// <param name="Slots">The component slots, used by <see cref="Components" /> and available.</param>
+/// <param name="Components">The components mounted in the location, including the chassis' fixed ones.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechLocation(
     ChassisLocations Location,
@@ -76,7 +76,7 @@ internal sealed record MechLocation(
     Structure Structure,
     Hardpoints Hardpoints,
     Slots Slots,
-    IReadOnlyList<Equipment> Equipment);
+    IReadOnlyList<MountedComponent> Components);
 
 /// <param name="Current">
 ///     What is left after combat damage; refilled to <see cref="Assigned" /> after a mission unless the
@@ -90,6 +90,11 @@ internal sealed record Armor(float Current, float Assigned, float Max);
 /// <param name="Current">Below <see cref="Max" /> when damaged, zero when the location is destroyed.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Structure(float Current, float Max);
+
+/// <summary>The most armor a chassis' location can take.</summary>
+/// <param name="Rear"><c>null</c> outside the torso, which alone has rear armor.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record LocationMaxArmor(ChassisLocations Location, float Front, float? Rear);
 
 /// <summary>The number of weapon hardpoints of each kind.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

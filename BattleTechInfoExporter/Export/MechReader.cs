@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BattleTech;
+using BattleTech.Data;
 using BattleTechInfoExporter.Models;
 using UnityEngine;
 using Mech = BattleTechInfoExporter.Models.Mech;
@@ -26,7 +27,7 @@ internal static class MechReader
 
     /// <summary>A mech or chassis name followed by the variant, e.g. "Atlas (AS7-D)".</summary>
     /// <remarks>The variant identifies the mech, as in the game's lance and store lists.</remarks>
-    internal static string NameWithVariant(string name, ChassisDef chassis) => $"{name} ({chassis.VariantName})";
+    private static string NameWithVariant(string name, ChassisDef chassis) => $"{name} ({chassis.VariantName})";
 
     internal static DefinitionReference ReferenceTo(ChassisDef chassis) =>
         new(chassis.Description.Id, NameWithVariant(chassis.Description.Name, chassis));
@@ -35,15 +36,59 @@ internal static class MechReader
     internal static DefinitionReference ReferenceTo(MechDef mech) =>
         new(mech.Description.Id, NameWithVariant(mech.Name, mech.Chassis));
 
+    /// <summary>
+    ///     The reference to the mech that mech parts assemble into, or <c>null</c> when its definition is missing.
+    /// </summary>
+    internal static DefinitionReference? TryReferenceToMech(DataManager dataManager, string mechId) =>
+        TryGetMech(dataManager, mechId) is { } mech ? ReferenceTo(mech) : null;
+
+    /// <summary>The mech's definition, or <c>null</c>, with a warning, when it is missing.</summary>
+    internal static MechDef? TryGetMech(DataManager dataManager, string mechId)
+    {
+        if (dataManager.MechDefs.TryGet(mechId, out var mech))
+        {
+            return mech;
+        }
+
+        ModLog.Logger.LogWarning($"Left out {mechId}: no {nameof(BattleTechResourceType.MechDef)} definition");
+        return null;
+    }
+
+    /// <summary>The chassis' definition, or <c>null</c>, with a warning, when it is missing.</summary>
+    internal static ChassisDef? TryGetChassis(DataManager dataManager, string chassisId)
+    {
+        if (dataManager.ChassisDefs.TryGet(chassisId, out var chassis))
+        {
+            return chassis;
+        }
+
+        ModLog.Logger.LogWarning($"Left out {chassisId}: no {nameof(BattleTechResourceType.ChassisDef)} definition");
+        return null;
+    }
+
     internal static MechReference ReferenceToBayMech(MechDef mech) =>
         new(mech.GUID, NameWithVariant(mech.Name, mech.Chassis));
 
+    internal static List<LocationMaxArmor> ReadMaxArmor(ChassisDef chassis) =>
+        Locations
+            .Select(location =>
+            {
+                var definition = chassis.GetLocationDef(location);
+                return new LocationMaxArmor(
+                    location,
+                    definition.MaxArmor,
+                    HasRearArmor(definition) ? definition.MaxRearArmor : null);
+            })
+            .ToList();
+
     /// <summary>The chassis' weapon hardpoints of all locations together.</summary>
-    /// <remarks>Summed as TooltipPrefab_Chassis.SetHardpointData does.</remarks>
-    internal static Hardpoints ReadHardpoints(ChassisDef chassis)
+    internal static Hardpoints ReadHardpoints(ChassisDef chassis) => ReadHardpoints(chassis, Locations);
+
+    // Summed as TooltipPrefab_Chassis.SetHardpointData does.
+    private static Hardpoints ReadHardpoints(ChassisDef chassis, IEnumerable<ChassisLocations> locations)
     {
         int ballistic = 0, energy = 0, missile = 0, support = 0;
-        foreach (var location in Locations)
+        foreach (var location in locations)
         {
             MechStatisticsRules.GetHardpointCountForLocation(
                 chassis,
@@ -58,16 +103,16 @@ internal static class MechReader
     }
 
     // Both dictionaries are keyed by the mech bay slot; a slot is in one of them at most.
-    internal static List<Mech> ReadMechs(SimGameState simGame, ComponentDefinitionReader componentDefinitions) =>
+    internal static List<Mech> ReadMechs(SimGameState simGame, ComponentReferences componentReferences) =>
         simGame.ActiveMechs
             .Concat(simGame.ReadyingMechs)
             .OrderBy(slot => slot.Key)
-            .Select(slot => ReadMech(simGame, componentDefinitions, slot.Key, slot.Value))
+            .Select(slot => ReadMech(simGame, componentReferences, slot.Key, slot.Value))
             .ToList();
 
     private static Mech ReadMech(
         SimGameState simGame,
-        ComponentDefinitionReader componentDefinitions,
+        ComponentReferences componentReferences,
         int slot,
         MechDef mech)
     {
@@ -94,7 +139,7 @@ internal static class MechReader
             ReadDaysUntilReady(simGame, workOrder),
             // SimGameState.GetWorkOrderEntryForMech finds the order among the queue's own entries.
             workOrder is null ? null : simGame.MechLabQueue.IndexOf(workOrder) + 1,
-            ReadRefit(simGame, componentDefinitions, mech, refitOrder),
+            ReadRefit(simGame, componentReferences, mech, refitOrder),
             MechValidationRules.ValidateMechCanBeFielded(simGame, mech),
             // The mech lab validates at this level, against the mech's work order (MechLabPanel).
             MechValidationRules.ValidateMechDef(MechValidationLevel.MechLab, simGame.DataManager, mech, workOrder)
@@ -102,13 +147,13 @@ internal static class MechReader
                 .SelectMany(problems => problems)
                 .Select(problem => problem.ToString())
                 .ToList(),
-            ReadLoadout(componentDefinitions, mech),
+            ReadLoadout(componentReferences, mech),
             refitOrder is null
                 ? null
-                : ReadLoadout(componentDefinitions, MechRefit.CopyWithPendingSteps(simGame, mech, refitOrder)));
+                : ReadLoadout(componentReferences, MechRefit.CopyWithPendingSteps(simGame, mech, refitOrder)));
     }
 
-    private static MechLoadout ReadLoadout(ComponentDefinitionReader componentDefinitions, MechDef mech)
+    private static MechLoadout ReadLoadout(ComponentReferences componentReferences, MechDef mech)
     {
         // The maximum it returns is the stat bar's scale, not the chassis tonnage.
         float usedTonnage = 0, ignoredMax = 0;
@@ -118,7 +163,7 @@ internal static class MechReader
             // Recomputed by MechDef.RefreshBattleValue whenever the loadout changes; the mech bay shows it.
             mech.Description.Cost,
             MechStatsReader.Read(mech),
-            Locations.Select(location => ReadLocation(componentDefinitions, mech, location)).ToList());
+            Locations.Select(location => ReadLocation(componentReferences, mech, location)).ToList());
     }
 
     // Mirrors TaskTimelineWidget.RefreshEntries and TaskManagementElement.UpdateItem: the mech techs work on
@@ -148,33 +193,25 @@ internal static class MechReader
     }
 
     private static MechLocation ReadLocation(
-        ComponentDefinitionReader componentDefinitions,
+        ComponentReferences componentReferences,
         MechDef mech,
         ChassisLocations location)
     {
         var loadout = mech.GetLocationLoadoutDef(location);
         var definition = mech.GetChassisLocationDef(location);
-        int ballistic = 0, energy = 0, missile = 0, support = 0;
-        MechStatisticsRules.GetHardpointCountForLocation(
-            mech,
-            location,
-            ref ballistic,
-            ref energy,
-            ref missile,
-            ref support);
         var components = mech.Inventory.Where(component => component.MountedLocation == location).ToList();
         return new MechLocation(
             location,
             new Armor(loadout.CurrentArmor, loadout.AssignedArmor, definition.MaxArmor),
-            // Locations without rear armor have -1 for it.
-            definition.MaxRearArmor < 0
-                ? null
-                : new Armor(loadout.CurrentRearArmor, loadout.AssignedRearArmor, definition.MaxRearArmor),
+            HasRearArmor(definition)
+                ? new Armor(loadout.CurrentRearArmor, loadout.AssignedRearArmor, definition.MaxRearArmor)
+                : null,
             new Structure(loadout.CurrentInternalStructure, definition.InternalStructure),
-            new Hardpoints(ballistic, energy, missile, support),
-            new Slots(components.Sum(component => component.Def.InventorySize), definition.InventorySlots),
-            components.Select(component => new Equipment(
-                    componentDefinitions.ReferenceTo(
+            ReadHardpoints(mech.Chassis, [location]),
+            // A component whose definition is missing has no known size.
+            new Slots(components.Sum(component => component.Def?.InventorySize ?? 0), definition.InventorySlots),
+            components.Select(component => new MountedComponent(
+                    componentReferences.ReferenceTo(
                         component.ComponentDefType,
                         component.ComponentDefID,
                         component.Def),
@@ -185,46 +222,30 @@ internal static class MechReader
 
     private static List<RefitChange>? ReadRefit(
         SimGameState simGame,
-        ComponentDefinitionReader componentDefinitions,
+        ComponentReferences componentReferences,
         MechDef mech,
         WorkOrderEntry_MechLab? refitOrder) =>
         refitOrder?.SubEntries
             // SimGameState.UpdateMechLabWorkQueue relies on the same.
             .Cast<WorkOrderEntry_MechLab>()
-            .Select(step => ReadRefitChange(simGame, componentDefinitions, mech, step))
+            .Select(step => ReadRefitChange(simGame, componentReferences, mech, step))
             .ToList();
 
     private static RefitChange ReadRefitChange(
         SimGameState simGame,
-        ComponentDefinitionReader componentDefinitions,
+        ComponentReferences componentReferences,
         MechDef mech,
         WorkOrderEntry_MechLab step) =>
         step switch
         {
-            // An install step's MechComponentRef is restored from the save without a DataManager, so its Def stays
-            // null; the definition is resolved from the type and id instead.
-            // A removal has no desired location (SimGameState.CreateComponentInstallWorkOrder).
-            WorkOrderEntry_InstallComponent { DesiredLocation: ChassisLocations.None } removal => new RefitChange(
-                RefitChangeType.RemoveComponent,
-                step.IsMechLabComplete,
-                componentDefinitions.ReferenceTo(removal.ComponentType, removal.MechComponentID),
-                removal.DamageLevel,
-                removal.PreviousLocation),
-            WorkOrderEntry_InstallComponent installation => new RefitChange(
-                RefitChangeType.InstallComponent,
-                step.IsMechLabComplete,
-                componentDefinitions.ReferenceTo(installation.ComponentType, installation.MechComponentID),
-                installation.DamageLevel,
-                installation.DesiredLocation),
-            WorkOrderEntry_RepairComponent repair => ReadRepair(simGame, componentDefinitions, mech, repair),
+            WorkOrderEntry_InstallComponent installation => ReadInstallation(componentReferences, installation),
+            WorkOrderEntry_RepairComponent repair => ReadRepair(simGame, componentReferences, mech, repair),
             WorkOrderEntry_ModifyMechArmor armor => new RefitChange(
                 RefitChangeType.ModifyArmor,
                 step.IsMechLabComplete,
                 Location: armor.Location,
                 FrontArmor: armor.DesiredFrontArmor,
-                RearArmor: mech.GetChassisLocationDef(armor.Location).MaxRearArmor < 0
-                    ? null
-                    : armor.DesiredRearArmor),
+                RearArmor: HasRearArmor(mech.GetChassisLocationDef(armor.Location)) ? armor.DesiredRearArmor : null),
             WorkOrderEntry_RepairMechStructure structure => new RefitChange(
                 RefitChangeType.RepairStructure,
                 step.IsMechLabComplete,
@@ -233,11 +254,30 @@ internal static class MechReader
             _ => throw new InvalidOperationException($"Unexpected mech lab work order type {step.Type}")
         };
 
+    // An install step's MechComponentRef is restored from the save without a DataManager, so its Def stays null; the
+    // definition is resolved from the type and id instead. A removal is an install step without a desired location
+    // (SimGameState.CreateComponentInstallWorkOrder).
+    private static RefitChange ReadInstallation(
+        ComponentReferences componentReferences,
+        WorkOrderEntry_InstallComponent installation)
+    {
+        var isRemoval = installation.DesiredLocation == ChassisLocations.None;
+        return new RefitChange(
+            isRemoval ? RefitChangeType.RemoveComponent : RefitChangeType.InstallComponent,
+            installation.IsMechLabComplete,
+            componentReferences.ReferenceTo(installation.ComponentType, installation.MechComponentID),
+            installation.DamageLevel,
+            isRemoval ? installation.PreviousLocation : installation.DesiredLocation);
+    }
+
+    // Locations without rear armor have -1 for it.
+    private static bool HasRearArmor(LocationDef location) => location.MaxRearArmor >= 0;
+
     // Finds the component as SimGameState.ML_RepairComponent does: on the mech, among the parts held for the work
     // order, or in storage, where it isn't mounted.
     private static RefitChange ReadRepair(
         SimGameState simGame,
-        ComponentDefinitionReader componentDefinitions,
+        ComponentReferences componentReferences,
         MechDef mech,
         WorkOrderEntry_RepairComponent repair)
     {
@@ -254,7 +294,7 @@ internal static class MechReader
         return new RefitChange(
             RefitChangeType.RepairComponent,
             repair.IsMechLabComplete,
-            componentDefinitions.ReferenceTo(repair.ComponentType, repair.MechComponentID, component?.Def),
+            componentReferences.ReferenceTo(repair.ComponentType, repair.MechComponentID, component?.Def),
             repair.DamageLevel,
             component?.MountedLocation is { } location and not ChassisLocations.None ? location : null);
     }

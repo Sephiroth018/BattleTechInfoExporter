@@ -9,7 +9,7 @@ internal static class StoreReader
 {
     // A store exists when it has stock (StarSystem.HasFactionStore, HasBlackMarketStore). CanUseSystemStore doesn't
     // check it, the other two do.
-    internal static Stores ReadStores(SimGameState simGame, ComponentDefinitionReader componentDefinitions)
+    internal static Stores ReadStores(SimGameState simGame, ComponentReferences componentReferences)
     {
         var system = simGame.CurSystem;
         return new Stores(
@@ -24,13 +24,13 @@ internal static class StoreReader
                 FactionEnumeration.GetAuriganPiratesFactionValue()));
 
         Store? ReadStoreIfUsable(bool isUsable, Shop shop, FactionValue priceFaction) =>
-            isUsable ? ReadStore(simGame, componentDefinitions, shop, priceFaction) : null;
+            isUsable ? ReadStore(simGame, componentReferences, shop, priceFaction) : null;
     }
 
     // The price faction is the one Shop.GetPrice takes the reputation of.
     private static Store ReadStore(
         SimGameState simGame,
-        ComponentDefinitionReader componentDefinitions,
+        ComponentReferences componentReferences,
         Shop shop,
         FactionValue priceFaction)
     {
@@ -40,54 +40,71 @@ internal static class StoreReader
                 $"The {shop.ThisShopType} store is still generating its stock; it may be incomplete");
         }
 
-        var items = shop.ActiveInventory.Where(item => IsReadable(simGame, shop, item)).ToList();
+        // Shop.GetPrice can't price an item without a definition, so such an item is left out instead of referenced
+        // by its id.
+        var items = shop.ActiveInventory.Where(item => IsKnownType(shop, item)).ToList();
         return new Store(
             DefinitionReferences.ReferenceTo(priceFaction),
             items
-                .Where(item => item.Type != ShopItemType.MechPart)
-                .Select(item => new ComponentForSale(
-                    componentDefinitions.ReferenceTo(Shop.ShopItemTypeToComponentType(item.Type), item.ID),
-                    CountOf(item),
-                    PriceOf(shop, item)))
+                .Where(item => IsComponent(item.Type))
+                .Select(item => componentReferences.TryReferenceTo(
+                    Shop.ShopItemTypeToComponentType(item.Type),
+                    item.ID) is { } component
+                    ? new ComponentForSale(component, CountOf(item), PriceOf(shop, item))
+                    : null)
+                .OfType<ComponentForSale>()
                 .OrderByComponent(component => component.Component)
                 .ToList(),
             items
+                .Where(item => item.Type == ShopItemType.Mech)
+                // Bought as SimGameState.AddFromShopDefItem does: the id is the mech's.
+                .Select(item => MechReader.TryGetMech(simGame.DataManager, item.ID) is { } mech
+                    ? ReadMechForSale(shop, item, mech)
+                    : null)
+                .OfType<MechForSale>()
+                .OrderByDefinition(mech => mech.Mech)
+                .ToList(),
+            items
                 .Where(item => item.Type == ShopItemType.MechPart)
-                .Select(item => new MechPartsForSale(
-                    MechReader.ReferenceTo(simGame.DataManager.MechDefs.Get(item.ID)),
-                    CountOf(item),
-                    PriceOf(shop, item)))
+                .Select(item => MechReader.TryReferenceToMech(simGame.DataManager, item.ID) is { } mech
+                    ? new MechPartsForSale(mech, CountOf(item), PriceOf(shop, item))
+                    : null)
+                .OfType<MechPartsForSale>()
                 .OrderByDefinition(parts => parts.Mech)
                 .ToList());
     }
 
-    // Stores sell components and mech parts; other types only appear in the list of things to sell to them.
-    // Shop.GetPrice can't price an item without a definition.
-    private static bool IsReadable(SimGameState simGame, Shop shop, ShopDefItem item)
+    private static MechForSale ReadMechForSale(Shop shop, ShopDefItem item, MechDef mech)
     {
-        var resourceType = item.Type switch
-        {
-            ShopItemType.Weapon or ShopItemType.AmmunitionBox or ShopItemType.HeatSink or ShopItemType.JumpJet
-                or ShopItemType.Upgrade => SimGameState.ComponentTypeToBattleTechResourceType(
-                    Shop.ShopItemTypeToComponentType(item.Type)),
-            ShopItemType.MechPart => BattleTechResourceType.MechDef,
-            _ => (BattleTechResourceType?)null
-        };
-        if (resourceType is null)
-        {
-            ModLog.Logger.LogWarning(
-                $"Skipped {item.ID} in the {shop.ThisShopType} store: unexpected type {item.Type}");
-            return false;
-        }
-
-        if (!simGame.DataManager.Exists(resourceType.Value, item.ID))
-        {
-            ModLog.Logger.LogWarning($"Skipped {item.ID} in the {shop.ThisShopType} store: no {item.Type} definition");
-            return false;
-        }
-
-        return true;
+        var chassis = mech.Chassis;
+        return new MechForSale(
+            MechReader.ReferenceTo(mech),
+            chassis.weightClass,
+            chassis.StockRole,
+            chassis.Tonnage,
+            MechReader.ReadMaxArmor(chassis),
+            MechReader.ReadHardpoints(chassis),
+            chassis.MaxJumpjets,
+            CountOf(item),
+            PriceOf(shop, item));
     }
+
+    // Stores sell components, whole mechs and mech parts; other types only appear in the list of things to sell to
+    // them.
+    private static bool IsKnownType(Shop shop, ShopDefItem item)
+    {
+        if (IsComponent(item.Type) || item.Type is ShopItemType.Mech or ShopItemType.MechPart)
+        {
+            return true;
+        }
+
+        ModLog.Logger.LogWarning($"Skipped {item.ID} in the {shop.ThisShopType} store: unexpected type {item.Type}");
+        return false;
+    }
+
+    private static bool IsComponent(ShopItemType type) =>
+        type is ShopItemType.Weapon or ShopItemType.AmmunitionBox or ShopItemType.HeatSink or ShopItemType.JumpJet
+            or ShopItemType.Upgrade;
 
     private static int? CountOf(ShopDefItem item) => item.IsInfinite ? null : item.Count;
 

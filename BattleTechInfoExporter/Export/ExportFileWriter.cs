@@ -12,8 +12,9 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>Writes export files into the mod's <c>exports</c> folder.</summary>
 internal static class ExportFileWriter
 {
-    // Game enums keep the game's own values (e.g. IN_SYSTEM), which is what the UI shows. Dictionary keys are
-    // game ids, kept as they are; CamelCasePropertyNamesContractResolver would camel-case them too.
+    // Game enums keep the game's own values (e.g. IN_SYSTEM), which is what the UI shows; the mod's own enums are
+    // camelCase. The first converter that can convert a type wins. Dictionary keys are game ids, kept as they are;
+    // CamelCasePropertyNamesContractResolver would camel-case them too.
     private static readonly JsonSerializerSettings SerializerSettings = new()
     {
         Formatting = Formatting.Indented,
@@ -22,7 +23,7 @@ internal static class ExportFileWriter
             NamingStrategy = new CamelCaseNamingStrategy { ProcessDictionaryKeys = false }
         },
         NullValueHandling = NullValueHandling.Include,
-        Converters = { new StringEnumConverter() }
+        Converters = { new OwnEnumConverter(), new StringEnumConverter() }
     };
 
     private static readonly string ExportDirectory = Path.Combine(ModAssembly.Directory, "exports");
@@ -65,6 +66,19 @@ internal static class ExportFileWriter
         // Only once the file is written, so a failed write is retried on the next export.
         LastWrittenContents[fileName] = comparedContent;
         ModLog.Logger.Log($"Exported {fileName} ({content.Trigger}) to {ExportDirectory}");
+    }
+
+    // Newtonsoft.Json 10, the game's version, has no naming strategy for enums yet.
+    private sealed class OwnEnumConverter : StringEnumConverter
+    {
+        internal OwnEnumConverter()
+        {
+            CamelCaseText = true;
+        }
+
+        public override bool CanConvert(Type objectType) =>
+            base.CanConvert(objectType)
+            && (Nullable.GetUnderlyingType(objectType) ?? objectType).Assembly == typeof(OwnEnumConverter).Assembly;
     }
 
     /// <summary>

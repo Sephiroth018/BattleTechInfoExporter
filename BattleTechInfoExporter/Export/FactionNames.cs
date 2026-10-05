@@ -32,11 +32,13 @@ internal static class FactionNames
         }
 
         var name = ToTitleCase(Strings.T(definition.Name));
-        var shortName = string.IsNullOrEmpty(definition.ShortName)
-            ? string.Empty
-            : ToTitleCase(WithoutLeadingArticle(Strings.T(definition.ShortName)));
-        return shortName.Length == 0 ||
-               WithoutLeadingArticle(name).Equals(shortName, StringComparison.OrdinalIgnoreCase)
+        if (string.IsNullOrEmpty(definition.ShortName))
+        {
+            return name;
+        }
+
+        var shortName = ToTitleCase(WithoutLeadingArticle(Strings.T(definition.ShortName)));
+        return WithoutLeadingArticle(name).Equals(shortName, StringComparison.OrdinalIgnoreCase)
             ? name
             : $"{name} ({shortName})";
     }

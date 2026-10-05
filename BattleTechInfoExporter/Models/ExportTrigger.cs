@@ -1,10 +1,6 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
 namespace BattleTechInfoExporter.Models;
 
-/// <summary>What caused an export; its names are written to the file in camelCase.</summary>
-[JsonConverter(typeof(StringEnumConverter), true)]
+/// <summary>What caused an export.</summary>
 internal enum ExportTrigger
 {
     CareerLoaded,
