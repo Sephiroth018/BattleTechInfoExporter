@@ -341,7 +341,8 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
   `[HarmonyArgument("__instance")]` with a name that follows our naming rules. A trigger patch only
   calls `GameStateExporter.Export`, which catches and logs every exception: one escaping a patch
   breaks the game's own code. A patch doing anything else catches its own. Being static by nature, patches are the allowed exception to "No mutable static state", limited
-  to what a patch needs.
+  to what a patch needs. The other exception is `ExportFileWriter`'s cache of the content it last
+  wrote per file, which lives as long as the game runs.
 - **Logging** goes through `ModLog.Logger`, the game's `HBS.Logging` logger under the name
   `BattleTechInfoExporter`, and ends up in ModTek's log.
 
@@ -384,15 +385,17 @@ repository URL and supported game version; the build stamps the version into the
 - **Two files, read together on every export:** `game-state.json` for the career state and
   `rules.json` for the game tables (e.g. `moraleLevels`, `reputationLevels` at its root): how the
   game works for this career, which doesn't change between exports. Values in the game state refer
-  to them by name, instead of repeating thresholds and effects per entry. Both start with
-  `modVersion`; only the game state has an `exportedAt`, since the rules file has no moment of its
-  own.
+  to them by name, instead of repeating thresholds and effects per entry.
+- **Every export file starts with `modVersion`, `exportedAt` and `trigger`** (`ExportFile`, which
+  every file's model inherits), describing the export that last wrote it.
 - **Game enums keep the game's values** (e.g. `IN_SYSTEM`, `LIKED`); the UI shows the same. Our own
   enums are camelCase.
 - **JSON:** camelCase properties, indented, `null` written explicitly, through the game's
   Newtonsoft.Json.
 - **Files are replaced atomically**, so a tool reading them never sees a half-written file, and
-  only when their content changed, so a tool watching them sees only real changes.
+  only when their content apart from `exportedAt` changed, so a tool watching them sees only real
+  changes. `ExportFileWriter` compares with the content it last wrote, kept in memory, so each file
+  is also written once after every game start.
 
 ## Commands
 

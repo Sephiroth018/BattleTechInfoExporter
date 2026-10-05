@@ -16,9 +16,10 @@ namespace BattleTechInfoExporter.Models;
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Rules(
     string ModVersion,
+    ExportTrigger Trigger,
     IReadOnlyList<MoraleLevel> MoraleLevels,
     IReadOnlyList<ReputationLevel> ReputationLevels,
     SkillRules Skills,
     IReadOnlyList<SpiritsLevelCosts> SpiritsLevels,
     int MechPartsPerMech,
-    IReadOnlyList<ContractTypeDescription> ContractTypes);
+    IReadOnlyList<ContractTypeDescription> ContractTypes) : ExportFile(ModVersion, null, Trigger);
