@@ -11,92 +11,51 @@ The mod is a work in progress; see [Planned](#planned) for what's still missing.
 Two files in `Mods/BattleTechInfoExporter/exports/`, written together on every export:
 
 - `game-state.json`: the career state.
-- `rules.json`: the game's rules for this career, which the game state refers to by name instead of
-  repeating thresholds and effects per entry.
+- `rules.json`: the game's rules for this career (morale and reputation levels, skill training
+  tables, spirits levels, mech parts per mech, mission types), which the game state refers to by
+  name instead of repeating thresholds and effects per entry.
 
 Every file starts with `modVersion`, `exportedAt` and the `trigger` of the export that last wrote
 it. A file is replaced in one step, never half-written, and only when its content apart from
-`exportedAt` changed, plus once after every game start; a tool watching the files sees only real
-changes.
+`exportedAt` changed, plus once after every game start.
 
-### Game state
+The game state holds:
 
-- **Company:** name, dropship, date, morale, Mercenary Review Board rating, MechTech and MedTech,
-  reputation with every faction, and how many pilots the barracks hold.
-- **Finances:** funds, days until the next report, the spending level and its options, and the
-  expected expenses of the next report with their breakdown.
-- **Position:** the system with its owner, planet tags and biomes, the travel status, and when
-  travelling the destination and days left.
-- **Pilots:** the commander and the roster with their skills, experience, primary abilities, health
-  and injuries, status, spirits and service record.
-- **Mechs:** the active and readying mechs of the mech bay with their status, position in the mech
-  lab queue, the steps of a queued refit, loadout problems, armor, structure and hardpoints per
-  location, every mounted component with its damage, and the performance summary with its ratings
-  and the numbers behind them.
-  - A mech in a refit also carries the loadout, tonnage, value and performance summary it will have
-    once the refit is done.
+- **Company:** name, date, morale, rating, MechTech and MedTech, and the reputation with every
+  faction.
+- **Finances:** funds, the spending level and the expected expenses of the next financial report.
+- **Position:** the current system and, when travelling, the destination and days left.
+- **Pilots:** the commander and the roster with all their relevant stats.
+- **Mechs:** the mech bay's mechs with their status, loadout, armor, performance summary and place
+  in the mech lab queue; a mech in a refit also carries what it will be once the refit is done.
 - **Last lance:** the mechs and pilots last sent on a mission, the only assignment of pilots to
-  mechs the game keeps; a mech or pilot that has left the company since is `null`. The lance
-  configuration pre-fills from it only the mechs that can be fielded and the pilots who can pilot.
-- **Storage:** the stored components with their working and damaged counts, the stored chassis
-  with their stats (weight class, role, tonnage, maximum armor per location, hardpoints, jump jets)
-  and the mech parts collected per mech. Readying a stored chassis gives the stock armor and the
-  chassis' fixed components, but no weapons.
-- **Stores:** the current system's system store, faction store and black market, where the company
-  can use them, with the components, mech parts and (rarely) whole mechs they sell, their stock and
-  prices. A whole mech carries the same chassis stats as a stored chassis.
-- **Hiring hall:** the current system's pilots for hire with their skills, primary abilities,
-  health, hiring cost, salary, and whether the company's rating and morale allow hiring them.
-- **Contracts:** the contracts the Command Center offers, with their mission type, employer and
-  target, difficulty and whether the reputation allows them, the negotiation, the lance limits, the
-  biome, and for contracts in another system its planet tags and travel days. The mission types'
-  descriptions are in the rules file.
-  - The negotiation lists the values at each slider position (0, 25, 50, 75 and 100 %): the pay
-    comes from the row at the pay share, the salvage from the row at the salvage share, and the
-    reputation changes from the row at the share left over. Pay and salvage together can take at
-    most 100 %; when the employer gains no reputation (its reputation change is `null`), they must
-    take exactly 100 %. A contract that can't be negotiated has its fixed terms instead.
-  - The game only generates a system's contracts when its Command Center's contract screen first
-    opens, or after a contract; the mod never generates them itself, so it doesn't change the game.
-    Until then, `contracts` is `null`.
-- **Active contract:** the accepted travel contract, from accepting it until proceeding with it on
-  arrival, with the same details, the terms it was accepted with, and the trip's remaining days as
-  its travel days. It isn't repeated in the contracts.
-- **Component definitions:** every component the file refers to, once per component type by id,
-  with its tonnage, slots, cost and bonuses, and the stats of weapons, ammunition boxes and heat
-  sinks.
-
-### Rules
-
-- **Morale levels.**
-- **Reputation levels**, each with its contract difficulty limit, system store access and store
-  price change.
-- **Skills:** the training table of each skill with the experience cost of each level and the
-  abilities and traits it unlocks, and the limits on choosing primary abilities.
-- **Spirits levels:** the resolve cost of Precision Strike and Vigilance in normal, high and low
-  spirits.
-- **Mech parts per mech:** how many parts make a mech.
-- **Mission types** with their descriptions.
+  mechs the game keeps.
+- **Storage:** the stored components, chassis and mech parts.
+- **Stores:** the current system's system store, faction store and black market with their stock
+  and prices.
+- **Hiring hall:** the current system's pilots for hire, like the roster's pilots plus hiring cost,
+  salary and whether the company can hire them.
+- **Contracts:** the contracts the Command Center offers with their terms, and the negotiation as
+  the values at each slider position (pay and salvage together take at most 100 %, exactly 100 %
+  when the employer gains no reputation); plus the accepted travel contract until it's proceeded
+  with. The game generates a system's contracts only when the contract screen first opens; until
+  then `contracts` is `null`.
+- **Component definitions:** the stats of every component the file refers to, keyed by id, so the
+  entries don't repeat them.
 
 ## Triggers
 
 The game state is exported when:
 
 - **The career is loaded**, new or from a save.
-- **The game saves the career**, manually or automatically, outside combat. Among others, it
-  autosaves after arriving in a system, after a contract, after closing the financial report and
-  after events.
-- **A contract's results are applied**, salvage included, back on the career screens. Most
-  contracts export through the autosave that follows; flashpoint contracts and contracts followed by
-  a story contract, which the game doesn't autosave after, export directly.
-- **The monthly financial report is shown**, with the expenses paid, to help choose next month's
-  spending level. The autosave after closing it exports the chosen level.
-- **A work order finishes:** a mech lab order (once the whole order is done), a medbay heal or an
-  Argo upgrade. Orders finishing on the same day export together.
-- **The game finishes generating the contracts** of the current system.
-- **A store is closed**, from the main screen or the mech lab.
-- **The mech bay changes:** a refit or repair is queued, a mech is readied or stored, an order is
-  cancelled, the queue is reordered, or a mech, a stored chassis or mech parts are scrapped.
+- **The game saves the career** outside combat, manually or automatically.
+- **A contract's results are applied**, salvage included.
+- **The monthly financial report is shown**, with the expenses paid.
+- **A work order finishes:** a mech lab order, a medbay heal or an Argo upgrade.
+- **The contracts of the current system are generated.**
+- **A store is closed.**
+- **The mech bay changes:** a refit, repair, readying or storing is queued, an order is cancelled,
+  the queue is reordered, or a mech, chassis or mech parts are scrapped.
 
 ## Planned
 
