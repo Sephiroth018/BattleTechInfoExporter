@@ -29,8 +29,9 @@ Two more hold the latest mission:
 
 The last one describes the game rather than the career:
 
-- `catalog.json`: every chassis, mech and component the game has loaded for the career, DLC
-  included, keyed by id, so tools can judge what else exists beyond what the career refers to.
+- `catalog.json`: every chassis, mech, vehicle, turret and component the game has loaded for the
+  career, DLC included, keyed by id, so tools can judge what else exists beyond what the career
+  refers to, and what a mission's enemies can do.
   - **Chassis:** the frame: weight class, tonnage and bare tonnage, max jump jets, built-in heat
     dissipation, walk and sprint distance, melee values before upgrades, and per location max
     armor, structure and hardpoints; plus the stock mech, the mech the game treats as the chassis'
@@ -39,9 +40,14 @@ The last one describes the game rather than the career:
     salvage (hero variants can't), and per location armor and components, the chassis' fixed ones
     marked. A mech assembled from parts or bought comes with this loadout; a stored chassis is
     readied with only its fixed components.
+  - **Vehicles:** weight class, tonnage, movement type, walk and sprint distance, and per location
+    armor, structure and components. Armor and structure are as in combat, where the game cuts the
+    values in a vehicle's definition to three quarters.
+  - **Turrets:** weight class, tonnage, firing arc, and armor, structure and components as in
+    combat.
   - **Components:** every component's stats, like the component definitions of the other files.
 
-  The tutorial's target dummies, the copies of stock mechs the game makes for unlocked skins (e.g.
+  The tutorial's target dummies and target vehicles, the copies of stock mechs the game makes for unlocked skins (e.g.
   the backers' Shadow Hawk-UMBRA) and the game's internal melee and AI weapons are left out, as are
   the game's role and other advisory texts, which often don't match the best way to use a mech.
 
@@ -102,7 +108,7 @@ The game state is exported when:
   after salvage completes a mech.
 
 The catalog is exported when the career is loaded, also after a mission, and written once after
-every game start.
+every game start. The first time, it waits a moment for the game to load every vehicle and turret.
 
 The mission files are exported when:
 

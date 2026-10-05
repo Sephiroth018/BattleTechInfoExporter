@@ -36,7 +36,7 @@ internal sealed class ComponentReferences
             componentId,
             FindDefinition(SimGameState.ComponentTypeToBattleTechResourceType(componentType), componentId));
 
-    internal ComponentReference ReferenceTo(MechComponentRef component) =>
+    internal ComponentReference ReferenceTo(BaseComponentRef component) =>
         ReferenceTo(component.ComponentDefType, component.ComponentDefID, component.Def);
 
     internal ComponentReference? TryReferenceTo(ComponentType componentType, string componentId) =>

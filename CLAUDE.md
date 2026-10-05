@@ -355,7 +355,8 @@ name, version and folder, `ModLog` its logger. Folders:
 - `Triggers/`: the patches that decide when to export, and the recorder patches they share.
 - `Export/`: the exporters, the single entry points the triggers call: `GameStateExporter` for the
   career state, `MissionExporter` for the mission files, one method per file, and `CatalogExporter`
-  for the catalog. All run their export inside `CampaignExport`. `GameStateReader` builds the game
+  for the catalog, which first loads the vehicles and turrets the career doesn't and exports once
+  they are loaded. All run their export inside `CampaignExport`. `GameStateReader` builds the game
   state file's models from the game, one reader per section of the file; `RulesReader` builds the
   rules file's tables; `MissionReader` builds the mission files' models from the completed
   contract; `CatalogReader` builds the catalog from the definitions the game has loaded. `DefinitionReferences` makes the
@@ -405,8 +406,9 @@ General rule on managing one doesn't apply.
   file, so it always belongs to the outcome next to it; the game has no id that identifies every
   contract to link them by.
 - **The catalog is a file of its own that doesn't depend on the career:** `catalog.json`, with
-  every chassis, mech and component the game has loaded, written on every career load and so, with
-  an unchanged game, once per game start.
+  every chassis, mech, vehicle, turret and component the game has loaded, written on every career
+  load and so, with an unchanged game, once per game start. Vehicles' and turrets' armor and
+  structure are their combat values, after the game's vehicle multipliers.
 - **Every export file starts with `modVersion`, `exportedAt` and `trigger`** (`ExportFile`, which
   every file's model inherits), describing the export that last wrote it.
 - **Points in time are day numbers** on the game's `DaysPassed` scale (`company.daysPassed`), e.g.
@@ -432,8 +434,11 @@ General rule on managing one doesn't apply.
 - **Mech:** a complete mech (`MechDef`): in the mech bay, or sold whole by a store.
 - **Stock mech:** the mech the game treats as a chassis' stock loadout, the one whose id is the
   chassis id with `chassisdef` replaced by `mechdef`.
-- **Catalog:** the export of every chassis, mech and component definition the game has loaded
-  (`catalog.json`).
+- **Vehicle:** a ground unit with fixed armor and loadout (`VehicleDef`), only met as an enemy or
+  ally in combat.
+- **Turret:** a fixed emplacement with a single location (`TurretDef`).
+- **Catalog:** the export of every chassis, mech, vehicle, turret and component definition the
+  game has loaded (`catalog.json`).
 - **Ship upgrade:** an upgrade of the Argo (`ShipModuleUpgrade`), bought in its engineering
   screen. Never just "upgrade", which components also have.
 
