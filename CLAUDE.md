@@ -358,7 +358,8 @@ name, version and folder, `ModLog` its logger. Folders:
   inside `CampaignExport`. `GameStateReader` builds the game state file's models from the game, one
   reader per section of the file; `RulesReader` builds the rules file's tables; `MissionReader`
   builds the mission files' models from the completed contract. `DefinitionReferences` makes the
-  references that need only a description, a faction or a biome, and `ComponentReferences`, one per
+  references that need only a description, a faction, a biome or a data-driven enum value, and
+  `ComponentReferences`, one per
   export file, every reference to a component, collecting the definitions referenced; a reference
   with a naming rule of its own is made by the reader that owns it. `ReferenceOrder` orders every
   list of entries that refer to a definition. `ExportFileWriter` writes and deletes the files in

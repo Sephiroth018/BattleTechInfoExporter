@@ -44,19 +44,15 @@ internal static class ShipReader
             FinancesReader.ReadUpkeep(simGame, upgrade),
             upgrade.TechCost / simGame.DailyUpgradeValue);
 
-    private static ShipUpgrade ReadUpgrade(SimGameState simGame, ShipModuleUpgrade upgrade)
-    {
-        var category = upgrade.ShipUpgradeCategoryValue;
-        return new ShipUpgrade(
-            DefinitionReferences.ReferenceTo(upgrade.Description),
-            new DefinitionReference(category.Name, category.FriendlyName),
+    private static ShipUpgrade ReadUpgrade(SimGameState simGame, ShipModuleUpgrade upgrade) =>
+        new(DefinitionReferences.ReferenceTo(upgrade.Description),
+            DefinitionReferences.ReferenceTo(upgrade.ShipUpgradeCategoryValue),
             upgrade.Location,
             upgrade.Description.Details,
             upgrade.Stats
                 .Select(stat => ReadEffect(simGame, stat))
                 .OfType<ShipUpgradeEffect>()
                 .ToList());
-    }
 
     // The effect text of SGShipModuleUpgradeViewPopulator.BuildEffectsString, one stat at a time; a stat without
     // one, e.g. because its description is hidden, is left out as on the screen.
