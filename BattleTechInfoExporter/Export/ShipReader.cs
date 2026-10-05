@@ -12,23 +12,18 @@ namespace BattleTechInfoExporter.Export;
 internal static class ShipReader
 {
     // TextMeshPro's formatting tags, e.g. <i> or <color=#F04228>, which the game's texts carry for its UI.
-    private static readonly Regex RichTextTag = new("</?[a-zA-Z][^>]*>", RegexOptions.Compiled);
+    private static readonly Regex RichTextTag = new("</?[a-zA-Z][^>]*>");
 
     // On the Leopard the starting upgrades are already listed, but the game applies them and shows the engineering
     // screen only on the Argo (SimGameState.AddArgoUpgrade, ApplyArgoUpgrades).
     internal static Ship? ReadShip(SimGameState simGame) =>
         simGame.CurDropship == DropshipType.Argo
-            ? new Ship(
-                ReadShownUpgrades(simGame)
-                    .Select(shown => ReadUpgrade(simGame, shown.Upgrade, shown.Status))
-                    .OrderByDefinition(upgrade => upgrade.Upgrade)
-                    .ToList())
+            ? new Ship(ReadShownUpgrades(simGame).OrderByDefinition(upgrade => upgrade.Upgrade).ToList())
             : null;
 
     // Mirrors SGEngineeringScreen.PopulateUpgradeDictionary: the installed, installing and available upgrades,
     // then the locked ones whose required upgrades are all among them; the screen shows no others.
-    private static List<(ShipModuleUpgrade Upgrade, ShipUpgradeStatus Status)> ReadShownUpgrades(
-        SimGameState simGame)
+    private static IEnumerable<ShipUpgrade> ReadShownUpgrades(SimGameState simGame)
     {
         var definitions = simGame.DataManager.ShipUpgradeDefs;
         var upgrades = definitions.Keys.Select(definitions.Get).ToList();
@@ -45,8 +40,8 @@ internal static class ShipReader
         var locked = upgrades
             .Where(upgrade => !unlockedIds.Contains(upgrade.Description.Id)
                               && simGame.HasShipUpgrade(upgrade.RequiredModules, unlockedIds))
-            .Select(upgrade => (upgrade, ShipUpgradeStatus.Locked));
-        return unlocked.Concat(locked).ToList();
+            .Select(upgrade => ReadUpgrade(simGame, upgrade, ShipUpgradeStatus.Locked));
+        return unlocked.Select(entry => ReadUpgrade(simGame, entry.Upgrade, entry.Status)).Concat(locked);
     }
 
     private static ShipUpgradeStatus? UnlockedStatusOf(SimGameState simGame, ShipModuleUpgrade upgrade)
