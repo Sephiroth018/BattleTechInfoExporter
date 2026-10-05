@@ -8,8 +8,9 @@ using BattleTechInfoExporter.Models;
 namespace BattleTechInfoExporter.Export;
 
 /// <summary>
-///     Builds the catalog from the definitions the game has loaded for the career: every mech with its chassis and
-///     components (SimGameState.RequestDataManagerResources), and every other component.
+///     Builds the catalog from the definitions the game has loaded: every mech with its chassis and components
+///     (SimGameState.RequestDataManagerResources), every other component, and every vehicle and turret, which
+///     <see cref="CatalogExporter" /> loads itself.
 /// </summary>
 internal static class CatalogReader
 {
@@ -17,9 +18,23 @@ internal static class CatalogReader
     // mechdef_urbanmech_TESTDUMMY on a real chassis, and their TargetDummyMod upgrade.
     private const string DummyIdPart = "DUMMY";
 
+    // The tutorial's target vehicles, vehicledef_TARGETVEHICLE1 and 2, named "Target Dummy".
+    private const string TargetVehicleIdPart = "TARGETVEHICLE";
+
+    // The order of VehicleDef's locations, with the turret last because not every vehicle has one.
+    private static readonly IReadOnlyList<VehicleChassisLocations> VehicleLocations =
+    [
+        VehicleChassisLocations.Front,
+        VehicleChassisLocations.Left,
+        VehicleChassisLocations.Right,
+        VehicleChassisLocations.Rear,
+        VehicleChassisLocations.Turret
+    ];
+
     internal static Catalog Read(SimGameState simGame, ExportTrigger trigger)
     {
         var dataManager = simGame.DataManager;
+        var combatMultipliers = simGame.CombatConstants.CombatValueMultipliers;
         var componentReferences = new ComponentReferences(dataManager);
         var mechDefinitions = ToSortedDictionary(
             dataManager.MechDefs,
@@ -27,6 +42,12 @@ internal static class CatalogReader
         var chassisDefinitions = ToSortedDictionary(
             dataManager.ChassisDefs,
             chassis => ReadChassis(dataManager, chassis));
+        var vehicleDefinitions = ToSortedDictionary(
+            dataManager.VehicleDefs,
+            vehicle => ReadVehicle(componentReferences, combatMultipliers, vehicle));
+        var turretDefinitions = ToSortedDictionary(
+            dataManager.TurretDefs,
+            turret => ReadTurret(componentReferences, combatMultipliers, turret));
         foreach (var component in ReadComponents(dataManager))
         {
             componentReferences.AddDefinition(component.Key, component.Value);
@@ -37,6 +58,8 @@ internal static class CatalogReader
             trigger,
             chassisDefinitions,
             mechDefinitions,
+            vehicleDefinitions,
+            turretDefinitions,
             componentReferences.Definitions);
     }
 
@@ -61,6 +84,7 @@ internal static class CatalogReader
     // UNLOCKED_chrPrfMech_shadowhawkBacker-UMBRA-SHD-2D: only their look differs.
     private static bool IsLeftOut(string id) =>
         id.IndexOf(DummyIdPart, StringComparison.Ordinal) >= 0
+        || id.IndexOf(TargetVehicleIdPart, StringComparison.Ordinal) >= 0
         || id.StartsWith(AssetUnlocks.UnlockedIdPrefix, StringComparison.Ordinal);
 
     private static ChassisDefinition ReadChassis(DataManager dataManager, ChassisDef chassis) =>
@@ -71,7 +95,7 @@ internal static class CatalogReader
             chassis.InitialTonnage,
             chassis.MaxJumpjets,
             chassis.Heatsinks,
-            new ChassisMovement(chassis.MovementCapDef.MaxWalkDistance, chassis.MovementCapDef.MaxSprintDistance),
+            ReadMovement(chassis.MovementCapDef),
             MechStatsReader.ReadChassisMelee(chassis),
             // The mech lab's stock popup, the store and mech assembly find the stock mech by this id
             // (MechLabStockInfoPopup, SG_Shop_Screen, SimGameState).
@@ -126,6 +150,65 @@ internal static class CatalogReader
                 })
                 .ToList());
     }
+
+    // A vehicle's chassis and components are set once its dependencies are loaded (VehicleDef.Refresh). Armor and
+    // structure are multiplied as when it spawns (Vehicle.InitStats); its name is the HUD's (Vehicle.Nickname).
+    private static VehicleDefinition? ReadVehicle(
+        ComponentReferences componentReferences,
+        CombatValueMultipliersDef combatMultipliers,
+        VehicleDef vehicle)
+    {
+        if (vehicle.Chassis is not { } chassis)
+        {
+            ModLog.Logger.LogWarning(
+                $"Left out {vehicle.Description.Id}: its chassis {vehicle.ChassisID} isn't loaded");
+            return null;
+        }
+
+        return new VehicleDefinition(
+            vehicle.Description.Name,
+            chassis.weightClass,
+            chassis.Tonnage,
+            chassis.movementType,
+            ReadMovement(chassis.MovementCapDef),
+            VehicleLocations
+                .Where(location => location != VehicleChassisLocations.Turret || chassis.HasTurret)
+                .Select(location => new VehicleLocationDefinition(
+                    location,
+                    vehicle.GetLocationLoadoutDef(location).AssignedArmor * combatMultipliers.ArmorMultiplierVehicle,
+                    vehicle.GetChassisLocationDef(location).InternalStructure
+                    * combatMultipliers.StructureMultiplierVehicle,
+                    vehicle.Inventory
+                        .Where(component => component.MountedLocation == location)
+                        .Select(componentReferences.ReferenceTo)
+                        .ToList()))
+                .ToList());
+    }
+
+    // Like a vehicle's (TurretDef.Refresh, Turret.InitStats, Turret.Nickname).
+    private static TurretDefinition? ReadTurret(
+        ComponentReferences componentReferences,
+        CombatValueMultipliersDef combatMultipliers,
+        TurretDef turret)
+    {
+        if (turret.Chassis is not { } chassis)
+        {
+            ModLog.Logger.LogWarning($"Left out {turret.Description.Id}: its chassis {turret.ChassisID} isn't loaded");
+            return null;
+        }
+
+        return new TurretDefinition(
+            turret.Description.Name,
+            chassis.weightClass,
+            chassis.Tonnage,
+            chassis.FiringArcDegrees,
+            turret.AssignedArmor * combatMultipliers.ArmorMultiplierVehicle,
+            chassis.MaxInternalStructure * combatMultipliers.StructureMultiplierVehicle,
+            turret.Inventory.Select(componentReferences.ReferenceTo).ToList());
+    }
+
+    private static ChassisMovement ReadMovement(MovementCapabilitiesDef movement) =>
+        new(movement.MaxWalkDistance, movement.MaxSprintDistance);
 
     // Every component type, keyed by id, without the dummies' and the game's internal weapons: the melee and jump
     // attacks and the AI's imaginary laser, which aren't mounted (MechDef.CreateMeleeWeaponRefs).
