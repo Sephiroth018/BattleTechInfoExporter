@@ -257,8 +257,10 @@ internal static class ContractReader
 
     private static float? LimitOf(float tonnage) => tonnage < 0 ? null : tonnage;
 
+    // The contract screens show only biomes above generic (SGContractsWidget.PopulateContract,
+    // LanceContractDetailsWidget).
     private static DefinitionReference? ReadBiome(SimGameState simGame, Biome.BIOMESKIN biome) =>
-        biome == Biome.BIOMESKIN.generic ? null : DefinitionReferences.ReferenceTo(simGame.DataManager, biome);
+        biome <= Biome.BIOMESKIN.generic ? null : DefinitionReferences.ReferenceTo(simGame.DataManager, biome);
 
     private static ContractTravel? ReadTravel(SimGameState simGame, BattleTech.Contract contract) =>
         ReadTargetSystem(contract) is { } system && system != simGame.CurSystem
