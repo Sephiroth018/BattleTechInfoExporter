@@ -320,7 +320,7 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
 
 - **BattleTech 1.9.1 on Mono with the .NET Framework 4.7.2 profile**, so the project targets
   `net472`. It is loaded by ModTek v4.5.1 or later, which calls every public static `Init` method.
-- **Only the story campaign is supported** (`SimGameState.IsCampaign`); `GameStateExporter` skips
+- **Only the story campaign is supported** (`SimGameState.IsCampaign`); `CampaignExport` skips
   career mode with a log line.
 - **Game assemblies come from the install** (`BattleTechGameDir` in the git-ignored
   `Directory.Build.user.props`) and are never copied into the build output or the repository.
@@ -337,9 +337,9 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
   `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]`, because ReSharper doesn't recognize
   Harmony's attributes. Harmony's injected arguments (`__instance`, `__state`) are taken through
   `[HarmonyArgument]` under a name that follows our naming rules.
-- **An exception escaping a patch breaks the game's own code.** `GameStateExporter.Export` catches
-  and logs every exception, so a patch that only calls it needs no handling of its own; a patch
-  doing anything else catches its own.
+- **An exception escaping a patch breaks the game's own code.** Every exporter catches and logs
+  every exception (`CampaignExport`), so a patch that only calls one needs no handling of its own;
+  a patch doing anything else catches its own.
 - **Mutable static state** is allowed in patches, limited to what a patch needs, and in
   `ExportFileWriter`'s cache of the content it last wrote per file, which lives as long as the game
   runs.
@@ -353,13 +353,16 @@ only public type; it applies all Harmony patches in the assembly. `ModAssembly` 
 name, version and folder, `ModLog` its logger. Folders:
 
 - `Triggers/`: the patches that decide when to export, and the recorder patches they share.
-- `Export/`: `GameStateExporter`, the single entry point every trigger calls. `GameStateReader`
-  builds the game state file's models from the game, one reader per section of the file;
-  `RulesReader` builds the rules file's tables. `DefinitionReferences` makes the references that
-  need only a description, a faction or a biome, and `ComponentReferences`, one per export file,
-  every reference to a component, collecting the definitions referenced; a reference with a naming
-  rule of its own is made by the reader that owns it. `ReferenceOrder` orders every list of entries
-  that refer to a definition. `ExportFileWriter` writes the files into the mod's `exports/` folder.
+- `Export/`: the exporters, the single entry points the triggers call: `GameStateExporter` for the
+  career state, `MissionExporter` for the mission files, one method per file. Both run their export
+  inside `CampaignExport`. `GameStateReader` builds the game state file's models from the game, one
+  reader per section of the file; `RulesReader` builds the rules file's tables; `MissionReader`
+  builds the mission files' models from the completed contract. `DefinitionReferences` makes the
+  references that need only a description, a faction or a biome, and `ComponentReferences`, one per
+  export file, every reference to a component, collecting the definitions referenced; a reference
+  with a naming rule of its own is made by the reader that owns it. `ReferenceOrder` orders every
+  list of entries that refer to a definition. `ExportFileWriter` writes and deletes the files in
+  the mod's `exports/` folder.
 - `Models/`: immutable records, one per JSON object, and the mod's own enums. The records are
   marked `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` because only the serializer reads
   them.
@@ -386,10 +389,15 @@ General rule on managing one doesn't apply.
   reference whose definition is missing has no entry. Keys keep the game's ids as they are.
 - **Lists of entries that refer to a definition are ordered the same way everywhere**
   (`ReferenceOrder`): by component type for components, then by name, with the id breaking ties.
-- **Two files, read together on every export:** `game-state.json` for the career state and
+- **The career state is two files, read together on every career export:** `game-state.json` and
   `rules.json` for the game tables (e.g. `moraleLevels`, `reputationLevels` at its root): how the
   game works for this career, which doesn't change between exports. Values in the game state refer
   to them by name, instead of repeating thresholds and effects per entry.
+- **The latest mission is two files of its own,** written in combat and the after-action report:
+  `mission-outcome.json` when the mission ends, before the salvage is chosen, and
+  `salvage-received.json` once the salvage is final. Writing a mission outcome deletes the salvage
+  file, so it always belongs to the outcome next to it; the game has no id that identifies every
+  contract to link them by.
 - **Every export file starts with `modVersion`, `exportedAt` and `trigger`** (`ExportFile`, which
   every file's model inherits), describing the export that last wrote it.
 - **Game enums keep the game's values** (e.g. `IN_SYSTEM`, `LIKED`); the UI shows the same. Our own

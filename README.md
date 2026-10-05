@@ -8,12 +8,24 @@ The mod is a work in progress; see [Planned](#planned) for what's still missing.
 
 ## Export files
 
-Two files in `Mods/BattleTechInfoExporter/exports/`, written together on every export:
+The files are in `Mods/BattleTechInfoExporter/exports/`. Two of them hold the career and are
+written together on every career export:
 
 - `game-state.json`: the career state.
 - `rules.json`: the game's rules for this career (morale and reputation levels, skill training
-  tables, spirits levels, mech parts per mech, mission types), which the game state refers to by
-  name instead of repeating thresholds and effects per entry.
+  tables, spirits levels, mech parts per mech, mission types), which the game state and the mission
+  outcome refer to by name instead of repeating thresholds and effects per entry.
+
+Two more hold the latest mission:
+
+- `mission-outcome.json`: written when a mission ends, before the salvage is chosen. It holds the
+  contract, the outcome and objectives, the payment, reputation and experience, the lance with
+  each pilot's injuries and kills and each mech's structure and component damage, and the salvage
+  on offer: the pool to choose from, how many items the company gets and picks, and the components
+  it recovers from its own lost mechs.
+- `salvage-received.json`: written once the salvage is final, after the priority salvage is
+  confirmed. It holds everything the company gets from the salvage of the mission in
+  `mission-outcome.json`; a new mission outcome deletes it until its salvage is final.
 
 Every file starts with `modVersion`, `exportedAt` and the `trigger` of the export that last wrote
 it. A file is replaced in one step, never half-written, and only when its content apart from
@@ -62,12 +74,16 @@ The game state is exported when:
 - **A new mech needs a place:** the game asks where to put it because every mech bay is full, e.g.
   after salvage completes a mech.
 
+The mission files are exported when:
+
+- **A mission ends**, still in combat: the mission outcome.
+- **The salvage is final**, after the priority salvage is confirmed or right away when there is
+  nothing to choose: the salvage received.
+
 ## Planned
 
 - The active flashpoint.
 - The ship and its upgrades.
-- The mission outcome after a mission and the salvage result after priority salvage is chosen, each
-  in its own file, if the game makes them accessible.
 - An export on a key combination.
 
 ## Installing

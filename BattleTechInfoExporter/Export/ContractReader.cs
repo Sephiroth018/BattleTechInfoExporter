@@ -11,8 +11,8 @@ using Contract = BattleTechInfoExporter.Models.Contract;
 namespace BattleTechInfoExporter.Export;
 
 /// <summary>
-///     Builds the active contract, the Command Center's contracts and the mission type table from the game's career
-///     state.
+///     Builds the active contract, the Command Center's contracts, the mission type table and a mission's contract
+///     from the game's career state.
 /// </summary>
 internal static class ContractReader
 {
@@ -31,8 +31,7 @@ internal static class ContractReader
         }
 
         var contractOverride = contract.Override;
-        var employer = contract.GetTeamFaction(contractOverride.employerTeam.teamGuid);
-        var target = contract.GetTeamFaction(contractOverride.targetTeam.teamGuid);
+        var (employer, target) = ReadFactions(contract);
         return new ActiveContract(
             ReadId(contractOverride),
             contractOverride.contractName,
@@ -102,8 +101,7 @@ internal static class ContractReader
     private static Contract ReadContract(SimGameState simGame, BattleTech.Contract contract, ContractTravel? travel)
     {
         var contractOverride = contract.Override;
-        var employer = contract.GetTeamFaction(contractOverride.employerTeam.teamGuid);
-        var target = contract.GetTeamFaction(contractOverride.targetTeam.teamGuid);
+        var (employer, target) = ReadFactions(contract);
         return new Contract(
             ReadId(contractOverride),
             // The contract list and details show the raw name; Contract.Name interpolates it, which the game's
@@ -122,6 +120,26 @@ internal static class ContractReader
             ReadBiome(simGame, contract.ContractBiome),
             travel);
     }
+
+    // The mission is fought in the current system: a contract elsewhere needs travelling there first.
+    internal static MissionContract ReadMissionContract(SimGameState simGame, BattleTech.Contract contract)
+    {
+        var contractOverride = contract.Override;
+        var (employer, target) = ReadFactions(contract);
+        return new MissionContract(
+            ReadId(contractOverride),
+            contractOverride.contractName,
+            ReadType(simGame, contract),
+            contractOverride.contractDisplayStyle,
+            DefinitionReferences.ReferenceTo(employer),
+            DefinitionReferences.ReferenceTo(target),
+            ReadDifficulty(simGame, contractOverride),
+            DefinitionReferences.ReferenceTo(simGame.CurSystem.Def.Description));
+    }
+
+    internal static (FactionValue Employer, FactionValue Target) ReadFactions(BattleTech.Contract contract) =>
+        (contract.GetTeamFaction(contract.Override.employerTeam.teamGuid),
+            contract.GetTeamFaction(contract.Override.targetTeam.teamGuid));
 
     // Mirrors Contract.GetContractTypeString and the type tooltip of SGContractsWidget.PopulateContract.
     private static DefinitionReference ReadType(SimGameState simGame, BattleTech.Contract contract) =>

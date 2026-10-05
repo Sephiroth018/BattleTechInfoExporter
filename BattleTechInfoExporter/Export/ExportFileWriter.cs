@@ -9,7 +9,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Writes export files into the mod's <c>exports</c> folder.</summary>
+/// <summary>Writes and deletes the export files in the mod's <c>exports</c> folder.</summary>
 internal static class ExportFileWriter
 {
     // Game enums keep the game's own values (e.g. IN_SYSTEM), which is what the UI shows; the mod's own enums are
@@ -66,6 +66,21 @@ internal static class ExportFileWriter
         // Only once the file is written, so a failed write is retried on the next export.
         LastWrittenContents[fileName] = comparedContent;
         ModLog.Logger.Log($"Exported {fileName} ({content.Trigger}) to {ExportDirectory}");
+    }
+
+    /// <summary>Deletes the file, if there is one, for content that no longer applies.</summary>
+    internal static void Delete(string fileName)
+    {
+        var path = Path.Combine(ExportDirectory, fileName);
+        // Forgotten even without a file, so the next write of it always happens.
+        LastWrittenContents.Remove(fileName);
+        if (!File.Exists(path))
+        {
+            return;
+        }
+
+        File.Delete(path);
+        ModLog.Logger.Log($"Deleted {fileName} from {ExportDirectory}");
     }
 
     // Newtonsoft.Json 10, the game's version, has no naming strategy for enums yet.
