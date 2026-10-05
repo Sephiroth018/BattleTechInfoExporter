@@ -466,4 +466,6 @@ Semantic versioning, bumped in every PR as part of its changes: major for breaki
 exported JSON (its consumers must adapt), minor for new data, files or triggers, patch for fixes.
 While the export format is still being worked out, versions stay at 0.x and a breaking format change
 bumps only the minor version; 1.0.0 marks the format as settled. The version is defined once (see
-"Structure") and flows into both the DLL and `mod.json`.
+"Structure") and flows into both the DLL and `mod.json`. Issues name the part their change bumps
+(major, minor or patch), never the resulting version, which goes stale when another PR merges
+first; the PR applies the bump to the version on `main`.
