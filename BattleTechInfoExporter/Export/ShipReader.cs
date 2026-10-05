@@ -19,40 +19,66 @@ internal static class ShipReader
     internal static Ship? ReadShip(SimGameState simGame) =>
         simGame.CurDropship == DropshipType.Argo
             ? new Ship(
-                simGame.ShipUpgrades
-                    .Select(upgrade => ReadUpgrade(simGame, upgrade))
+                ReadShownUpgrades(simGame)
+                    .Select(shown => ReadUpgrade(simGame, shown.Upgrade, shown.Status))
                     .OrderByDefinition(upgrade => upgrade.Upgrade)
-                    .ToList(),
-                ReadAvailableUpgrades(simGame))
+                    .ToList())
             : null;
 
-    // Mirrors the available upgrades of SGEngineeringScreen.PopulateUpgradeDictionary.
-    private static List<AvailableShipUpgrade> ReadAvailableUpgrades(SimGameState simGame) =>
-        simGame.DataManager.ResourceLocator.AllEntriesOfResource(BattleTechResourceType.ShipModuleUpgrade)
-            .Select(entry => simGame.DataManager.ShipUpgradeDefs.Get(entry.Id))
-            .Where(upgrade => !simGame.HasShipUpgrade(upgrade.Description.Id)
-                              && !simGame.UpgradeInProgress(upgrade.Description.Id)
-                              && simGame.HasShipUpgrade(upgrade.RequiredModules))
-            .Select(upgrade => ReadAvailableUpgrade(simGame, upgrade))
-            .OrderByDefinition(upgrade => upgrade.Upgrade)
-            .ToList();
+    // Mirrors SGEngineeringScreen.PopulateUpgradeDictionary: the installed, installing and available upgrades,
+    // then the locked ones whose required upgrades are all among them; the screen shows no others.
+    private static List<(ShipModuleUpgrade Upgrade, ShipUpgradeStatus Status)> ReadShownUpgrades(
+        SimGameState simGame)
+    {
+        var definitions = simGame.DataManager.ShipUpgradeDefs;
+        var upgrades = definitions.Keys.Select(definitions.Get).ToList();
+        var unlocked = new List<(ShipModuleUpgrade Upgrade, ShipUpgradeStatus Status)>();
+        foreach (var upgrade in upgrades)
+        {
+            if (UnlockedStatusOf(simGame, upgrade) is { } status)
+            {
+                unlocked.Add((upgrade, status));
+            }
+        }
 
-    // The values SGShipModuleUpgradeViewPopulator.Populate shows, which QueueArgoUpgrade charges.
-    private static AvailableShipUpgrade ReadAvailableUpgrade(SimGameState simGame, ShipModuleUpgrade upgrade) =>
-        new(ReadUpgrade(simGame, upgrade),
+        var unlockedIds = unlocked.Select(entry => entry.Upgrade.Description.Id).ToList();
+        var locked = upgrades
+            .Where(upgrade => !unlockedIds.Contains(upgrade.Description.Id)
+                              && simGame.HasShipUpgrade(upgrade.RequiredModules, unlockedIds))
+            .Select(upgrade => (upgrade, ShipUpgradeStatus.Locked));
+        return unlocked.Concat(locked).ToList();
+    }
+
+    private static ShipUpgradeStatus? UnlockedStatusOf(SimGameState simGame, ShipModuleUpgrade upgrade)
+    {
+        var id = upgrade.Description.Id;
+        if (simGame.HasShipUpgrade(id))
+        {
+            return ShipUpgradeStatus.Installed;
+        }
+
+        if (simGame.UpgradeInProgress(id))
+        {
+            return ShipUpgradeStatus.Installing;
+        }
+
+        return simGame.HasShipUpgrade(upgrade.RequiredModules) ? ShipUpgradeStatus.Available : null;
+    }
+
+    // The values SGShipModuleUpgradeViewPopulator.Populate shows; QueueArgoUpgrade charges the same.
+    private static ShipUpgrade ReadUpgrade(SimGameState simGame, ShipModuleUpgrade upgrade, ShipUpgradeStatus status) =>
+        new(DefinitionReferences.ReferenceTo(upgrade.Description),
+            status,
+            DefinitionReferences.ReferenceTo(upgrade.ShipUpgradeCategoryValue),
+            upgrade.Location,
+            WithoutRichTextTags(upgrade.Description.Details),
             upgrade.RequiredModules
                 .Select(id => DefinitionReferences.ReferenceTo(simGame.DataManager.ShipUpgradeDefs.Get(id).Description))
                 .OrderByDefinition(reference => reference)
                 .ToList(),
             Mathf.CeilToInt(upgrade.PurchaseCost * simGame.Constants.CareerMode.ArgoUpgradeCostMultiplier),
             FinancesReader.ReadUpkeep(simGame, upgrade),
-            upgrade.TechCost / simGame.DailyUpgradeValue);
-
-    private static ShipUpgrade ReadUpgrade(SimGameState simGame, ShipModuleUpgrade upgrade) =>
-        new(DefinitionReferences.ReferenceTo(upgrade.Description),
-            DefinitionReferences.ReferenceTo(upgrade.ShipUpgradeCategoryValue),
-            upgrade.Location,
-            WithoutRichTextTags(upgrade.Description.Details),
+            upgrade.TechCost / simGame.DailyUpgradeValue,
             upgrade.Stats
                 .Select(stat => ReadEffect(simGame, stat))
                 .OfType<ShipUpgradeEffect>()

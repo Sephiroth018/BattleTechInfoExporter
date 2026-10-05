@@ -36,9 +36,9 @@ The game state holds:
 - **Company:** name, date, morale, rating, MechTech and MedTech, and the reputation with every
   faction.
 - **Finances:** funds, the spending level and the expected expenses of the next financial report.
-- **Ship:** the Argo's installed upgrades and the ones that can be bought, with their effects in
-  the game's words and as values, and the price, upkeep and installation days of those for sale;
-  `null` while the company still flies the Leopard.
+- **Ship:** the Argo's upgrades the engineering screen shows, each installed, installing,
+  available or locked, with its required upgrades, price, upkeep, installation days and effects in
+  the game's words and as values; `null` while the company still flies the Leopard.
 - **Position:** the current system and, when travelling, the destination and days left.
 - **Pilots:** the commander and the roster with all their relevant stats.
 - **Mechs:** the mech bay's mechs with their status, loadout, armor, performance summary and place
