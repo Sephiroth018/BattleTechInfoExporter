@@ -142,6 +142,7 @@ internal static class MechReader
             },
             // SimGameState.GetWorkOrderEntryForMech finds the order among the queue's own entries.
             workOrder is null ? null : mechLabFinishingDays[workOrder],
+            workOrder is null ? MechRepair.Estimate(simGame, mech) : null,
             ReadRefit(simGame, componentReferences, mech, refitOrder),
             MechValidationRules.ValidateMechCanBeFielded(simGame, mech),
             // The mech lab validates at this level, against the mech's work order (MechLabPanel).

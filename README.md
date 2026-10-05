@@ -46,7 +46,8 @@ The game state holds:
 - **Position:** the current system and, when travelling, the destination and day of arrival.
 - **Pilots:** the commander and the roster with all their relevant stats.
 - **Mechs:** the mech bay's mechs with their status, the day they're ready, loadout, armor and
-  performance summary; a mech in a refit also carries what it will be once the refit is done.
+  performance summary; a mech in a refit also carries what it will be once the refit is done, and
+  a damaged mech the mech lab isn't working on the days and C-Bills its repair would take.
 - **Mechs awaiting placement:** new mechs the game asks to place, store or scrap because every mech
   bay is full, with the loadout they come with.
 - **Last lance:** the mechs and pilots last sent on a mission, the only assignment of pilots to
