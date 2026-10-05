@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using BattleTechInfoExporter.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -26,22 +27,30 @@ internal static class ExportFileWriter
 
     internal static readonly string ExportDirectory = Path.Combine(ModAssembly.Directory, "exports");
 
+    // The JSON last written per file name, without its ExportedAt; empty after every game start, so each file is
+    // written once per session.
+    private static readonly Dictionary<string, string> LastWrittenContents = new();
+
     /// <summary>
     ///     Replaces the file in one step, so a tool reading it never sees a half-written file. Leaves it untouched
-    ///     when its content is the same, so tools watching it only see real changes.
+    ///     when its content, apart from <see cref="ExportFile.ExportedAt" />, is the same as the last one written
+    ///     this session, so tools watching it only see real changes.
     /// </summary>
     /// <returns>Whether the file was written.</returns>
-    internal static bool Write(string fileName, object content)
+    internal static bool Write(string fileName, ExportFile content)
     {
         Directory.CreateDirectory(ExportDirectory);
         var path = Path.Combine(ExportDirectory, fileName);
-        var json = JsonConvert.SerializeObject(content, SerializerSettings);
-        var fileExists = File.Exists(path);
-        if (fileExists && File.ReadAllText(path) == json)
+        var comparedContent = JsonConvert.SerializeObject(content with { ExportedAt = null }, SerializerSettings);
+        if (LastWrittenContents.TryGetValue(fileName, out var lastWrittenContent)
+            && lastWrittenContent == comparedContent
+            && File.Exists(path))
         {
             return false;
         }
 
+        var fileExists = File.Exists(path);
+        var json = JsonConvert.SerializeObject(content with { ExportedAt = DateTimeOffset.Now }, SerializerSettings);
         var temporaryPath = path + ".tmp";
         File.WriteAllText(temporaryPath, json);
         if (fileExists)
@@ -53,6 +62,8 @@ internal static class ExportFileWriter
             File.Move(temporaryPath, path);
         }
 
+        // Only once the file is written, so a failed write is retried on the next export.
+        LastWrittenContents[fileName] = comparedContent;
         return true;
     }
 

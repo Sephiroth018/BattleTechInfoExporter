@@ -10,8 +10,11 @@ Only the story campaign is supported; in career mode the mod exports nothing.
 
 ## Exports
 
-The **game state**, written to `Mods/BattleTechInfoExporter/exports/game-state.json` and
-overwritten on every export:
+Every export file starts with the mod version, `exportedAt` and the `trigger` of the export that
+last wrote it. A file is only rewritten when its content changed, or a different trigger exported
+it, and once after every game start.
+
+The **game state**, written to `Mods/BattleTechInfoExporter/exports/game-state.json`:
 
 - [x] The company: dropship, date, morale, MechTech and MedTech, reputation with every faction,
       and how many pilots the barracks hold
@@ -53,8 +56,7 @@ overwritten on every export:
 - [ ] The ship and its upgrades; the mech lab queue is part of each mech
 
 The game's **rules** for this career, written to `Mods/BattleTechInfoExporter/exports/rules.json`
-alongside the game state, which refers to them by name. The file is only rewritten when the rules
-change, e.g. after loading another career:
+alongside the game state, which refers to them by name:
 
 - [x] Morale levels, reputation levels with their contract difficulty limits, system store access
       and store price changes, and the skill training table with the experience cost of each level,

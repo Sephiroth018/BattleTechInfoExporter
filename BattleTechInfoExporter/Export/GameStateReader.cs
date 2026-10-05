@@ -18,7 +18,6 @@ internal static class GameStateReader
         var travelInProgress = ReadTravelInProgress(simGame);
         return new GameState(
             ModAssembly.Version,
-            DateTimeOffset.Now,
             trigger,
             ReadCompany(simGame),
             PilotReader.ReadPilots(simGame),
@@ -34,9 +33,10 @@ internal static class GameStateReader
             ReadPosition(simGame, travelInProgress));
     }
 
-    internal static Rules ReadRules(SimGameState simGame) =>
+    internal static Rules ReadRules(SimGameState simGame, ExportTrigger trigger) =>
         new(
             ModAssembly.Version,
+            trigger,
             ReadMoraleLevels(simGame),
             ReadReputationLevels(simGame),
             ReadSkillRules(simGame),

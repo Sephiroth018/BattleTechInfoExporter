@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 
@@ -14,7 +13,6 @@ namespace BattleTechInfoExporter.Models;
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record GameState(
     string ModVersion,
-    DateTimeOffset ExportedAt,
     ExportTrigger Trigger,
     Company Company,
     IReadOnlyList<BarracksPilot> Pilots,
@@ -26,4 +24,4 @@ internal sealed record GameState(
     ActiveContract? ActiveContract,
     IReadOnlyList<Contract>? Contracts,
     ComponentDefinitions ComponentDefinitions,
-    Position Position);
+    Position Position) : ExportFile(ModVersion, null, Trigger);
