@@ -41,7 +41,8 @@ The last one describes the game rather than the career:
     readied with only its fixed components.
   - **Components:** every component's stats, like the component definitions of the other files.
 
-  The tutorial's target dummies and the game's internal melee and AI weapons are left out, as are
+  The tutorial's target dummies, the copies of stock mechs the game makes for unlocked skins (e.g.
+  the backers' Shadow Hawk-UMBRA) and the game's internal melee and AI weapons are left out, as are
   the game's role and other advisory texts, which often don't match the best way to use a mech.
 
 Every file starts with `modVersion`, `exportedAt` and the `trigger` of the export that last wrote

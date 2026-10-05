@@ -48,7 +48,7 @@ internal static class CatalogReader
         var entries = new SortedDictionary<string, TEntry>(StringComparer.Ordinal);
         foreach (var definition in definitions)
         {
-            if (!IsDummy(definition.Key) && readEntry(definition.Value) is { } entry)
+            if (!IsLeftOut(definition.Key) && readEntry(definition.Value) is { } entry)
             {
                 entries.Add(definition.Key, entry);
             }
@@ -57,7 +57,11 @@ internal static class CatalogReader
         return entries;
     }
 
-    private static bool IsDummy(string id) => id.IndexOf(DummyIdPart, StringComparison.Ordinal) >= 0;
+    // Also the copies of stock mechs AssetUnlocks.CreateCustomMechsForBase makes for unlocked skins, e.g.
+    // UNLOCKED_chrPrfMech_shadowhawkBacker-UMBRA-SHD-2D: only their look differs.
+    private static bool IsLeftOut(string id) =>
+        id.IndexOf(DummyIdPart, StringComparison.Ordinal) >= 0
+        || id.StartsWith(AssetUnlocks.UnlockedIdPrefix, StringComparison.Ordinal);
 
     private static ChassisDefinition ReadChassis(DataManager dataManager, ChassisDef chassis) =>
         new(
@@ -134,7 +138,7 @@ internal static class CatalogReader
             .Concat(dataManager.HeatSinkDefs.Select(AsComponent))
             .Concat(dataManager.JumpJetDefs.Select(AsComponent))
             .Concat(dataManager.UpgradeDefs.Select(AsComponent))
-            .Where(component => !IsDummy(component.Key));
+            .Where(component => !IsLeftOut(component.Key));
 
     private static KeyValuePair<string, MechComponentDef> AsComponent<TDefinition>(
         KeyValuePair<string, TDefinition> definition)
