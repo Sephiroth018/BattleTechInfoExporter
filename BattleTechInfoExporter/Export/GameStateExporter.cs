@@ -24,7 +24,7 @@ internal static class GameStateExporter
 
             // Both are read before either is written, so a failing read leaves both files from the same export.
             var gameState = GameStateReader.Read(simGame, trigger);
-            var rules = GameStateReader.ReadRules(simGame, trigger);
+            var rules = RulesReader.Read(simGame, trigger);
             ExportFileWriter.Write(GameStateFileName, gameState);
             ExportFileWriter.Write(RulesFileName, rules);
         }

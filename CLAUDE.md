@@ -354,16 +354,16 @@ name, version and folder, `ModLog` its logger. Folders:
 
 - `Triggers/`: the patches that decide when to export.
 - `Export/`: `GameStateExporter`, the single entry point every trigger calls; `GameStateReader`
-  builds the models of both export files from the game, with `FinancesReader` for the finances and
-  expense lines, `PilotReader` for the barracks and
-  hiring hall pilots, `MechReader` and `MechStatsReader` for the mechs, with `MechRefit` for a mech's loadout after its
-  refit, `LanceReader` for the last
-  lance, `StorageReader` for the storage, `StoreReader` for the stores and `ContractReader` for the
-  active contract and the contracts, with `SystemTags` for a
-  system's planet tags; `DefinitionReferences` makes the references to definitions all of
-  them share; `ComponentDefinitionReader`, one per export file, makes every reference to a component and
-  collects the definitions referenced, needing only the game's `DataManager`; `ExportFileWriter`
-  writes them into the mod's `exports/` folder.
+  builds the game state file's models from the game, with `FinancesReader` for the finances and
+  expense lines, `PilotReader` for the barracks and hiring hall pilots, `MechReader` and
+  `MechStatsReader` for the mechs, with `MechRefit` for a mech's loadout after its refit,
+  `LanceReader` for the last lance, `StorageReader` for the storage, `StoreReader` for the stores
+  and `ContractReader` for the active contract and the contracts, with `SystemTags` for a system's
+  planet tags; `RulesReader` builds the rules file's tables. `DefinitionReferences` makes the
+  references that need only a description, a faction or a biome; references with a naming rule of
+  their own are made by the reader that owns it. `ComponentDefinitionReader`, one per export file,
+  makes every reference to a component and collects the definitions referenced, needing only the
+  game's `DataManager`; `ExportFileWriter` writes the files into the mod's `exports/` folder.
 - `Models/`: immutable records, one per JSON object, marked
   `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` because only the serializer reads them.
 
