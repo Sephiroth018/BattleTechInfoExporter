@@ -39,22 +39,34 @@ internal static class RulesReader
     private static Skill ReadSkill(SimGameState simGame, SkillType skill, string description)
     {
         var abilitiesByLevel = simGame.AbilityTree[skill.ToString()];
+        var toHit = simGame.CombatConstants.ToHit;
+        var piloting = simGame.CombatConstants.PilotingConstants;
         return new Skill(
             GameText.ToPlainText(description),
             Enumerable.Range(2, Math.Max(0, abilitiesByLevel.Count - 1))
                 .Select(level => new SkillLevel(
                     level,
                     simGame.GetLevelCost(level - 1),
+                    // Mirrors ToHit.GetBaseToHitChance.
+                    skill == SkillType.Gunnery
+                        ? HitChancePercent(toHit.ToHitBaseFloor, level, toHit.ToHitGunneryDivisor)
+                        : null,
+                    // Mirrors ToHit.GetBaseMeleeToHitChance.
+                    skill == SkillType.Piloting
+                        ? HitChancePercent(piloting.PilotingBaseFloor, level, piloting.PilotingDivisor)
+                        : null,
                     abilitiesByLevel[level - 1]
-                        // The per-level accuracy traits have no name or description and aren't shown anywhere.
+                        // The per-level accuracy traits have no name and no effects, only a label for the
+                        // level's hit chance.
                         .Where(ability => !string.IsNullOrEmpty(ability.Description.Name))
-                        .Select(ability => new SkillLevelAbility(
-                            DefinitionReferences.ReferenceTo(ability.Description),
-                            ability.IsPrimaryAbility,
-                            GameText.ToPlainText(ability.Description.Details)))
+                        .Select(ability => AbilityReader.Read(simGame, ability))
                         .ToList()))
                 .ToList());
     }
+
+    // Rounded to a tenth, so float noise doesn't show.
+    private static float HitChancePercent(float floor, int level, float divisor) =>
+        Mathf.Round((floor + level / divisor) * 1000f) / 10f;
 
     // Names, thresholds and resolve come from two constant files that mods can change separately;
     // only levels present in all three are complete.
