@@ -77,8 +77,10 @@ internal static class MissionReader
             unit.mechLost,
             unit.mechLost ? null : MechRepair.Estimate(simGame, RestoreAfterCombat(simGame, mech)),
             MechReader.Locations
-                .Select(location => new DamagedLocation(location, MechReader.ReadStructure(mech, location)))
-                .Where(location => location.Structure.Current < location.Structure.Max)
+                .Select(location => new DamagedLocation(
+                    location,
+                    mech.GetLocationLoadoutDef(location).CurrentInternalStructure))
+                .Where(damaged => damaged.Structure < mech.GetChassisLocationDef(damaged.Location).InternalStructure)
                 .ToList(),
             mech.Inventory
                 .Where(component => component.DamageLevel != ComponentDamageLevel.Functional)

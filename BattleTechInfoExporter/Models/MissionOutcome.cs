@@ -86,8 +86,9 @@ internal sealed record LanceUnitOutcome(
     IReadOnlyList<DamagedLocation> DamagedLocations,
     IReadOnlyList<DamagedComponent> DamagedComponents);
 
+/// <param name="Structure">The structure left, below the chassis'; zero when the location is destroyed.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record DamagedLocation(ChassisLocations Location, Structure Structure);
+internal sealed record DamagedLocation(ChassisLocations Location, float Structure);
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record DamagedComponent(

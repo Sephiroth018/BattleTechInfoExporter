@@ -153,7 +153,7 @@ internal static class MechReader
 
     private static MechLoadout ReadLoadout(MechDef mech) =>
         new(
-            new Tonnage(ReadUsedTonnage(mech), mech.Chassis.Tonnage),
+            ReadUsedTonnage(mech),
             // Recomputed by MechDef.RefreshBattleValue whenever the loadout changes; the mech bay shows it.
             mech.Description.Cost,
             MechStatsReader.Read(mech),
@@ -174,28 +174,20 @@ internal static class MechReader
     private static MechLocation ReadLocation(MechDef mech, ChassisLocations location)
     {
         var loadout = mech.GetLocationLoadoutDef(location);
-        var definition = mech.GetChassisLocationDef(location);
-        var components = ComponentsMountedIn(mech, location).ToList();
         return new MechLocation(
             location,
-            new Armor(loadout.CurrentArmor, loadout.AssignedArmor, definition.MaxArmor),
-            HasRearArmor(definition)
-                ? new Armor(loadout.CurrentRearArmor, loadout.AssignedRearArmor, definition.MaxRearArmor)
+            new Armor(loadout.CurrentArmor, loadout.AssignedArmor),
+            HasRearArmor(mech.GetChassisLocationDef(location))
+                ? new Armor(loadout.CurrentRearArmor, loadout.AssignedRearArmor)
                 : null,
-            ReadStructure(mech, location),
-            ReadHardpoints(mech.Chassis, location),
-            // A component whose definition is missing has no known size.
-            new Slots(components.Sum(component => component.Def?.InventorySize ?? 0), definition.InventorySlots),
-            components.Select(component => new MountedComponent(
+            loadout.CurrentInternalStructure,
+            ComponentsMountedIn(mech, location)
+                .Select(component => new MountedComponent(
                     ComponentReferences.ReferenceTo(component),
                     component.DamageLevel,
                     component.IsFixed))
                 .ToList());
     }
-
-    internal static Structure ReadStructure(MechDef mech, ChassisLocations location) =>
-        new(mech.GetLocationLoadoutDef(location).CurrentInternalStructure,
-            mech.GetChassisLocationDef(location).InternalStructure);
 
     private static List<RefitChange>? ReadRefit(
         SimGameState simGame,

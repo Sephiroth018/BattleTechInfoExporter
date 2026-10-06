@@ -35,7 +35,7 @@ The last one describes the game rather than the career:
   refers to, and what a mission's enemies can do.
   - **Chassis:** the frame: weight class, tonnage and bare tonnage, max jump jets, built-in heat
     dissipation, walk and sprint distance, melee values before upgrades, and per location max
-    armor, structure and hardpoints; plus the stock mech, the mech the game treats as the chassis'
+    armor, structure, hardpoints and component slots; plus the stock mech, the mech the game treats as the chassis'
     stock loadout.
   - **Mechs:** a loadout on a chassis: value, tonnage, performance summary, whether it can come as
     salvage (hero variants can't), and per location armor and components, the chassis' fixed ones
@@ -49,7 +49,8 @@ The last one describes the game rather than the career:
   - **Components:** every component's stats and whether it can come as salvage.
 
   The other files refer to the catalog's chassis, mechs and components by id instead of repeating
-  their stats; a file and the catalog belong together when their `modVersion` matches.
+  their stats or limits, e.g. a location's max armor; a file and the catalog belong together when
+  their `modVersion` matches.
 
   The tutorial's target dummies and target vehicles, the copies of stock mechs the game makes for unlocked skins (e.g.
   the backers' Shadow Hawk-UMBRA) and the game's internal melee and AI weapons are left out, as are
