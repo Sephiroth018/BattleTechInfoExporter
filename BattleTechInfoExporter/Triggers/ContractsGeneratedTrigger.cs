@@ -1,8 +1,8 @@
-using BattleTech;
 using BattleTechInfoExporter.Export;
 using BattleTechInfoExporter.Models;
 using HarmonyLib;
 using JetBrains.Annotations;
+using StarSystem = BattleTech.StarSystem;
 
 namespace BattleTechInfoExporter.Triggers;
 
