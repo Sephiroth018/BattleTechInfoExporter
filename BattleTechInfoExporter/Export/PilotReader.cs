@@ -49,6 +49,17 @@ internal static class PilotReader
     internal static int ReadReadyOnDay(SimGameState simGame, Pilot pilot) =>
         simGame.DaysPassed + simGame.GetPilotTimeoutTimeRemaining(pilot);
 
+    /// <summary>
+    ///     The day a pilot coming back from a mission is out of the med bay, as <see cref="ReadReadyOnDay" /> counts it
+    ///     once the contract is resolved; <c>null</c> for an uninjured pilot.
+    /// </summary>
+    /// <remarks>
+    ///     Injured pilots can't be deployed, so the pilot has no heal order yet, and the time counts from the injuries
+    ///     alone, as SimGameState.RefreshInjuries prices the order ResolveCompleteContract creates for them.
+    /// </remarks>
+    internal static int? ReadReadyOnDayAfterMission(SimGameState simGame, Pilot pilot) =>
+        pilot.Injuries == 0 ? null : ReadReadyOnDay(simGame, pilot);
+
     private static BarracksPilot ReadPilot(SimGameState simGame, Pilot pilot)
     {
         var definition = pilot.pilotDef;

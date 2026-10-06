@@ -34,7 +34,7 @@ internal static class MissionReader
             contract.MercenaryReviewboardReputationResults,
             contract.ExperienceEarned,
             contract.PlayerUnitResults
-                .Select(unit => ReadLanceUnit(componentReferences, contract, unit))
+                .Select(unit => ReadLanceUnit(simGame, componentReferences, contract, unit))
                 .ToList(),
             // Before the choice, SalvageResults holds only the components recovered from the company's lost mechs.
             new SalvageOffer(
@@ -61,23 +61,27 @@ internal static class MissionReader
     // The unit's mech and pilot are copies taken from combat (Mech.ToMechDef keeps the mech bay's GUID); the pilot's
     // kills count this mission only, as Pilot.InitStats resets them when combat starts.
     private static LanceUnitOutcome ReadLanceUnit(
+        SimGameState simGame,
         ComponentReferences componentReferences,
         Contract contract,
         UnitResult unit)
     {
         var pilot = unit.pilot;
         var mech = unit.mech;
+        // Contract.FinalizeKilledMechWarriors has rolled who of the incapacitated dies.
+        var isKilled = contract.KilledPilots.Contains(pilot);
         return new LanceUnitOutcome(
             PilotReader.ReferenceTo(pilot),
             pilot.Injuries,
             pilot.Health,
             pilot.IsIncapacitated,
-            // Contract.FinalizeKilledMechWarriors has rolled who of the incapacitated dies.
-            contract.KilledPilots.Contains(pilot),
+            isKilled,
+            isKilled ? null : PilotReader.ReadReadyOnDayAfterMission(simGame, pilot),
             pilot.MechsKilled,
             pilot.OthersKilled,
             MechReader.ReferenceToBayMech(mech),
             unit.mechLost,
+            unit.mechLost ? null : MechRepair.Estimate(simGame, RestoreAfterCombat(simGame, mech)),
             MechReader.Locations
                 .Select(location => new DamagedLocation(location, MechReader.ReadStructure(mech, location)))
                 .Where(location => location.Structure.Current < location.Structure.Max)
@@ -90,6 +94,15 @@ internal static class MissionReader
                     component.DamageLevel))
                 .OrderByComponent(component => component.Component)
                 .ToList());
+    }
+
+    // The mech as the mech bay gets it back, with its non-functional components working again
+    // (SimGameState.ResolveCompleteContract); restored on a copy, as the contract's results stay as they are.
+    private static MechDef RestoreAfterCombat(SimGameState simGame, MechDef mech)
+    {
+        var restored = new MechDef(mech);
+        simGame.RestoreMechPostCombat(restored);
+        return restored;
     }
 
     // A component's salvage id is the component's, a mech part's the mech's it assembles into

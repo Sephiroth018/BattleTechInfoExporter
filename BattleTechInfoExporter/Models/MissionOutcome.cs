@@ -54,12 +54,20 @@ internal sealed record ObjectiveResult(string Title, bool IsPrimary, ObjectiveSt
 /// <param name="Injuries">The pilot's injuries, including those from before the mission.</param>
 /// <param name="Health">The injuries the pilot can take before being incapacitated.</param>
 /// <param name="IsKilled">Whether the pilot died; an incapacitated pilot may survive.</param>
+/// <param name="PilotReadyOnDay">
+///     The day the pilot is out of the med bay, as the barracks counts it once the contract is resolved; <c>null</c>
+///     for an uninjured or killed pilot.
+/// </param>
 /// <param name="MechKills">The enemy mechs the pilot destroyed in this mission.</param>
 /// <param name="OtherKills">The other enemy units the pilot destroyed in this mission.</param>
 /// <param name="Mech">The mech, as in the mech bay.</param>
 /// <param name="IsMechLost">
 ///     Whether the mech was destroyed and not recovered; its surviving components are in
 ///     <see cref="SalvageOffer.Automatic" />.
+/// </param>
+/// <param name="Repair">
+///     What repairing the mech's damage in the mech bay would take, as for a mech bay mech's
+///     <see cref="Mech.Repair" />; <c>null</c> without damage and for a lost mech.
 /// </param>
 /// <param name="DamagedLocations">The locations with structure damage, from head to legs; armor is repaired for free.</param>
 /// <param name="DamagedComponents">The components damaged or destroyed.</param>
@@ -70,10 +78,12 @@ internal sealed record LanceUnitOutcome(
     int Health,
     bool IsIncapacitated,
     bool IsKilled,
+    int? PilotReadyOnDay,
     int MechKills,
     int OtherKills,
     MechReference Mech,
     bool IsMechLost,
+    RepairEstimate? Repair,
     IReadOnlyList<DamagedLocation> DamagedLocations,
     IReadOnlyList<DamagedComponent> DamagedComponents);
 
