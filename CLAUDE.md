@@ -400,7 +400,10 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   `rules.json` for the game tables (e.g. `moraleLevels`, `reputationLevels` at its root): how the
   game works for this career, which doesn't change between exports, and `star-systems.json` with
   every star system keyed by id. Values in the game state refer to the rules by name, instead of
-  repeating thresholds and effects per entry.
+  repeating thresholds and effects per entry. A star system's data lives only in
+  `star-systems.json`, as definitions do in the catalog: its entries have the name, with the id as
+  their key, and the other files refer to a star system by its reference alone (`starSystem`,
+  `destination`), next to their own state such as the day of arrival.
 - **Travel days and cost are the starmap's route** (`RouteReader`) from the current system: `null`
   where the game finds no route, always for a system whose travel requirements aren't met. In
   `star-systems.json` the current system has 0 for both.
@@ -508,9 +511,9 @@ before the go-ahead. Every checklist starts with the standard checks:
 
 followed by the PR's own feature checks.
 
-Check 2 is Claude's, not the user's: when the user says to merge or that they've verified the other
-checks, the game has run with the PR's build, so Claude reads the log then, ticks the check, and
-stops and reports instead of merging if it fails.
+Checks 1 and 2 are Claude's, not the user's: when the user says to merge or that they've verified
+the other checks, the game has run with the PR's build, so Claude reads the log then and ticks
+both checks, check 1 because the mod ran, or stops and reports instead of merging if it fails.
 
 ## Versioning
 

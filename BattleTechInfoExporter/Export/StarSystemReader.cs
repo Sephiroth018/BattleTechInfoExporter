@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BattleTech;
+using BattleTech.Data;
 using BattleTechInfoExporter.Models;
 using Starmap = BattleTechInfoExporter.Models.Starmap;
 using StarSystem = BattleTech.StarSystem;
@@ -22,8 +23,18 @@ internal static class StarSystemReader
         return new Starmap(ModAssembly.Version, trigger, starSystems);
     }
 
-    // StarSystemDef.SupportedBiomes limits the maps of the system's contracts (SimGameState.GetSinglePlayerProceduralPlayableMaps).
-    internal static List<DefinitionReference> ReadBiomes(SimGameState simGame, StarSystem system) =>
+    // Mirrors the starmap's system panel (SGSystemViewPopulator, HBSTagView), which shows only the tags the
+    // metadata database marks as player-visible, by their friendly name (TagDataStructFetcher.GetItem).
+    private static List<DefinitionReference> ReadVisibleTags(StarSystem system) =>
+        system.Tags
+            .Select(tag => MetadataDatabase.Instance.GetTagIfExists(tag))
+            .Where(tag => tag is { PlayerVisible: true })
+            .Select(tag => new DefinitionReference(tag.Name, tag.FriendlyName))
+            .ToList();
+
+    // StarSystemDef.SupportedBiomes limits the maps of the star system's contracts
+    // (SimGameState.GetSinglePlayerProceduralPlayableMaps).
+    private static List<DefinitionReference> ReadBiomes(SimGameState simGame, StarSystem system) =>
         system.Def.SupportedBiomes
             .Select(biome => DefinitionReferences.ReferenceTo(simGame.DataManager, biome))
             .ToList();
@@ -36,9 +47,9 @@ internal static class StarSystemReader
             : canTravelTo ? RouteReader.ReadRoute(simGame, system)
             : null;
         return new Models.StarSystem(
-            DefinitionReferences.ReferenceTo(system.Def.Description),
+            system.Def.Description.Name,
             DefinitionReferences.ReferenceTo(system.OwnerValue),
-            SystemTags.ReadVisibleTags(system),
+            ReadVisibleTags(system),
             ReadBiomes(simGame, system),
             // As the starmap's system panel shows it (SGSystemViewPopulator).
             simGame.GetNormalizedDifficulty(system.Def),
