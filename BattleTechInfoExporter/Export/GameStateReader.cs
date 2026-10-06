@@ -10,7 +10,6 @@ internal static class GameStateReader
 {
     internal static GameState Read(SimGameState simGame, ExportTrigger trigger)
     {
-        var componentReferences = new ComponentReferences(simGame.DataManager);
         var travelInProgress = ReadTravelInProgress(simGame);
         var mechLabFinishingDays = WorkQueueReader.ReadMechLabFinishingDays(simGame);
         return new GameState(
@@ -20,16 +19,14 @@ internal static class GameStateReader
             WorkQueueReader.ReadWorkQueue(simGame, mechLabFinishingDays),
             ShipReader.ReadShip(simGame),
             PilotReader.ReadPilots(simGame),
-            MechReader.ReadMechs(simGame, componentReferences, mechLabFinishingDays),
-            MechReader.ReadMechsAwaitingPlacement(simGame, componentReferences),
+            MechReader.ReadMechs(simGame, mechLabFinishingDays),
+            MechReader.ReadMechsAwaitingPlacement(simGame),
             LanceReader.ReadLastLance(simGame),
-            StorageReader.ReadStorage(simGame, componentReferences),
-            StoreReader.ReadStores(simGame, componentReferences),
+            StorageReader.ReadStorage(simGame),
+            StoreReader.ReadStores(simGame),
             PilotReader.ReadHiringHall(simGame),
             ContractReader.ReadActiveContract(simGame, travelInProgress),
             ContractReader.ReadContracts(simGame),
-            // After every section that references components.
-            componentReferences.Definitions,
             ReadPosition(simGame, travelInProgress));
     }
 

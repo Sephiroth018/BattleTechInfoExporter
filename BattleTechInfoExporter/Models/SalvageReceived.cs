@@ -16,8 +16,7 @@ internal sealed record SalvageReceived(
     string ModVersion,
     ExportTrigger Trigger,
     MissionContract Contract,
-    SalvageItems Received,
-    ComponentDefinitions ComponentDefinitions) : ExportFile(ModVersion, null, Trigger);
+    SalvageItems Received) : ExportFile(ModVersion, null, Trigger);
 
 /// <summary>Salvage items, counted like <see cref="Storage" />.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

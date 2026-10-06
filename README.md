@@ -46,7 +46,10 @@ The last one describes the game rather than the career:
     values in a vehicle's definition to three quarters.
   - **Turrets:** weight class, tonnage, firing arc, and armor, structure and components as in
     combat.
-  - **Components:** every component's stats, like the component definitions of the other files.
+  - **Components:** every component's stats and whether it can come as salvage.
+
+  The other files refer to the catalog's chassis, mechs and components by id instead of repeating
+  their stats; a file and the catalog belong together when their `modVersion` matches.
 
   The tutorial's target dummies and target vehicles, the copies of stock mechs the game makes for unlocked skins (e.g.
   the backers' Shadow Hawk-UMBRA) and the game's internal melee and AI weapons are left out, as are
@@ -87,8 +90,6 @@ The game state holds:
   exactly 100 % when the employer gains no reputation); plus the accepted travel contract until
   it's proceeded with, with the day of arrival while travelling to it. The game generates a system's contracts only when the contract screen first
   opens; until then `contracts` is `null`.
-- **Component definitions:** the stats of every component the file refers to, keyed by id, so the
-  entries don't repeat them, and whether it can come as salvage.
 
 ## Triggers
 
