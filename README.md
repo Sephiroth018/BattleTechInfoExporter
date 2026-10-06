@@ -97,6 +97,14 @@ The game state holds:
   it's proceeded with, with the day of arrival while travelling to it. The game generates a system's contracts only when the contract screen first
   opens; until then `contracts` is `null`.
 
+The rules' skill training tables hold, per level, the experience it costs, the base hit chance it
+gives (Gunnery for ranged attacks, Piloting for melee, before an attack's modifiers) and the
+abilities it unlocks. Each ability has its activation, targeting, cooldown and uses, and the
+statistics it changes: statistic, operation and value, the pilot or weapons it applies to, how long
+the change lasts and what triggers it. Multi-Target and Sensor Lock change no statistics in the
+game's data, because the game hardcodes them. Initiative is on the game's scale, where units act
+from the lowest value up, so an ability that lets a unit act earlier lowers it.
+
 ## Triggers
 
 The game state is exported when:

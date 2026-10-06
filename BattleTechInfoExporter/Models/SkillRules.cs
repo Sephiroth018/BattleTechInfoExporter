@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using BattleTech;
 using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
@@ -21,10 +22,36 @@ internal sealed record SkillRules(
 internal sealed record Skill(string Description, IReadOnlyList<SkillLevel> Levels);
 
 /// <param name="ExperienceCost">The experience spent to reach the level from the one below.</param>
+/// <param name="BaseHitChancePercent">
+///     Gunnery only: the hit chance of ranged attacks at this level, before the attack's modifiers.
+/// </param>
+/// <param name="BaseMeleeHitChancePercent">
+///     Piloting only: the hit chance of melee attacks at this level, before the attack's modifiers.
+/// </param>
 /// <param name="Abilities">The primary abilities and passive traits unlocked at the level.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record SkillLevel(int Level, int ExperienceCost, IReadOnlyList<SkillLevelAbility> Abilities);
+internal sealed record SkillLevel(
+    int Level,
+    int ExperienceCost,
+    float? BaseHitChancePercent,
+    float? BaseMeleeHitChancePercent,
+    IReadOnlyList<SkillLevelAbility> Abilities);
 
 /// <param name="IsPrimary">A primary ability is chosen, a passive trait comes with the level.</param>
+/// <param name="Targeting">How the ability is aimed; <c>null</c> for one that isn't.</param>
+/// <param name="Cooldown">The rounds before the ability can be used again; <c>null</c> without a cooldown.</param>
+/// <param name="Uses">How often the ability can be used per mission; <c>null</c> without a limit.</param>
+/// <param name="Effects">
+///     The statistics the ability changes; empty for an ability whose effect the game hardcodes, e.g.
+///     Multi-Target or Sensor Lock.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record SkillLevelAbility(DefinitionReference Ability, bool IsPrimary, string Description);
+internal sealed record SkillLevelAbility(
+    DefinitionReference Ability,
+    bool IsPrimary,
+    string Description,
+    AbilityDef.ActivationTiming ActivationTiming,
+    AbilityDef.TargetingType? Targeting,
+    int? Cooldown,
+    int? Uses,
+    IReadOnlyList<AbilityEffect> Effects);
