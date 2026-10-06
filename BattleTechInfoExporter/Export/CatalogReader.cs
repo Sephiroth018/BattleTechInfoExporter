@@ -260,7 +260,7 @@ internal static class CatalogReader
         var weapons = new SortedDictionary<string, WeaponDefinition>(StringComparer.Ordinal);
         var ammunitionBoxes = new SortedDictionary<string, AmmunitionBoxDefinition>(StringComparer.Ordinal);
         var heatSinks = new SortedDictionary<string, HeatSinkDefinition>(StringComparer.Ordinal);
-        var jumpJets = new SortedDictionary<string, ComponentDefinition>(StringComparer.Ordinal);
+        var jumpJets = new SortedDictionary<string, JumpJetDefinition>(StringComparer.Ordinal);
         var upgrades = new SortedDictionary<string, ComponentDefinition>(StringComparer.Ordinal);
         var readIds = new HashSet<string>(StringComparer.Ordinal);
         foreach (var component in components.Where(component => readIds.Add(component.Key)))
@@ -277,7 +277,7 @@ internal static class CatalogReader
                     heatSinks.Add(component.Key, ReadHeatSink(heatSink));
                     break;
                 case JumpJetDef jumpJet:
-                    jumpJets.Add(component.Key, ReadComponent(jumpJet));
+                    jumpJets.Add(component.Key, ReadJumpJet(jumpJet));
                     break;
                 case UpgradeDef upgrade:
                     upgrades.Add(component.Key, ReadComponent(upgrade));
@@ -345,4 +345,8 @@ internal static class CatalogReader
 
     private static HeatSinkDefinition ReadHeatSink(HeatSinkDef heatSink) =>
         new(ReadComponent(heatSink), heatSink.DissipationCapacity);
+
+    // JumpCapacity is left out: no game code reads it.
+    private static JumpJetDefinition ReadJumpJet(JumpJetDef jumpJet) =>
+        new(ReadComponent(jumpJet), jumpJet.MinTonnage, jumpJet.MaxTonnage);
 }

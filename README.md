@@ -13,8 +13,9 @@ written together on every career export:
 
 - `game-state.json`: the career state.
 - `rules.json`: the game's rules for this career (morale and reputation levels, skill training
-  tables, spirits levels, mech parts per mech, mission types), which the game state and the mission
-  outcome refer to by name instead of repeating thresholds and effects per entry.
+  tables, spirits levels, mech parts per mech, mission types, jump distance per number of jump
+  jets), which the game state and the mission outcome refer to by name instead of repeating
+  thresholds and effects per entry.
 - `star-systems.json`: every star system on the starmap, locked story systems included, keyed by
   id, with its name, owner, tags, biomes, difficulty, whether its travel requirements are met, and
   the days and C-Bills the trip from the current system takes as the starmap shows them (0 for the
@@ -51,7 +52,8 @@ The last one describes the game rather than the career:
     values in a vehicle's definition to three quarters.
   - **Turrets:** weight class, tonnage, firing arc, and armor, structure and components as in
     combat.
-  - **Components:** every component's stats and whether it can come as salvage.
+  - **Components:** every component's stats and whether it can come as salvage; for jump jets,
+    the chassis tonnage range that can mount them.
 
   The other files refer to the catalog's chassis, mechs and components by id instead of repeating
   their stats or limits, e.g. a location's max armor; a file and the catalog belong together when

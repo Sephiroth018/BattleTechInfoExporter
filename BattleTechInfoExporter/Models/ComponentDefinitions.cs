@@ -13,5 +13,5 @@ internal sealed record ComponentDefinitions(
     IReadOnlyDictionary<string, WeaponDefinition> Weapons,
     IReadOnlyDictionary<string, AmmunitionBoxDefinition> AmmunitionBoxes,
     IReadOnlyDictionary<string, HeatSinkDefinition> HeatSinks,
-    IReadOnlyDictionary<string, ComponentDefinition> JumpJets,
+    IReadOnlyDictionary<string, JumpJetDefinition> JumpJets,
     IReadOnlyDictionary<string, ComponentDefinition> Upgrades);
