@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BattleTech;
+using BattleTech.Data;
 using BattleTechInfoExporter.Models;
 
 namespace BattleTechInfoExporter.Export;
@@ -16,11 +17,11 @@ internal static class StorageReader
     // A stored chassis' stat type; mech parts have their own (SimGameState.MECH_PART_ITEM).
     private const string MechType = nameof(BattleTechResourceType.MechDef);
 
-    internal static Storage ReadStorage(SimGameState simGame, ComponentReferences componentReferences)
+    internal static Storage ReadStorage(SimGameState simGame)
     {
         var storedItems = ReadStoredItems(simGame);
         return new Storage(
-            ReadComponents(componentReferences, storedItems),
+            ReadComponents(simGame.DataManager, storedItems),
             ReadChassis(simGame, storedItems),
             ReadMechParts(simGame, storedItems));
     }
@@ -28,13 +29,14 @@ internal static class StorageReader
     // Filtered as SimGameState.GetAllInventoryItemDefs does. That method isn't used: it generates a game UID for
     // every component, which changes the career's state. Counted as MechLabPanel.PopulateInventory does.
     private static List<StoredComponent> ReadComponents(
-        ComponentReferences componentReferences,
+        DataManager dataManager,
         IReadOnlyList<StoredItem> storedItems) =>
         storedItems
             .Where(item => item.Type != SimGameState.MECH_PART_ITEM && item.Type != MechType)
             // Working and damaged copies are stats of their own.
             .GroupBy(item => (item.Type, item.Id))
-            .Select(copies => componentReferences.TryReferenceTo(
+            .Select(copies => ComponentReferences.TryReferenceTo(
+                dataManager,
                 (BattleTechResourceType)Enum.Parse(typeof(BattleTechResourceType), copies.Key.Type),
                 copies.Key.Id) is { } component
                 ? new StoredComponent(
@@ -52,14 +54,7 @@ internal static class StorageReader
         storedItems
             .Where(item => item.Type == MechType && !item.IsDamaged)
             .Select(item => MechReader.TryGetChassis(simGame.DataManager, item.Id) is { } chassis
-                ? new StoredChassis(
-                    MechReader.ReferenceTo(chassis),
-                    chassis.weightClass,
-                    chassis.Tonnage,
-                    MechReader.ReadMaxArmor(chassis),
-                    MechReader.ReadHardpoints(chassis),
-                    chassis.MaxJumpjets,
-                    item.Count)
+                ? new StoredChassis(MechReader.ReferenceTo(chassis), item.Count)
                 : null)
             .OfType<StoredChassis>()
             .OrderByDefinition(chassis => chassis.Chassis)

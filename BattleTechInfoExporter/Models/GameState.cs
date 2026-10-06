@@ -31,5 +31,4 @@ internal sealed record GameState(
     IReadOnlyList<HiringHallPilot> HiringHall,
     ActiveContract? ActiveContract,
     IReadOnlyList<Contract>? Contracts,
-    ComponentDefinitions ComponentDefinitions,
     Position Position) : ExportFile(ModVersion, null, Trigger);

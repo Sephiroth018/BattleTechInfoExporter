@@ -28,8 +28,7 @@ internal sealed record MissionOutcome(
     int MercenaryReviewBoardReputation,
     int ExperiencePerPilot,
     IReadOnlyList<LanceUnitOutcome> Lance,
-    SalvageOffer Salvage,
-    ComponentDefinitions ComponentDefinitions) : ExportFile(ModVersion, null, Trigger);
+    SalvageOffer Salvage) : ExportFile(ModVersion, null, Trigger);
 
 /// <summary>The contract a mission was for, as in <see cref="Models.Contract" />.</summary>
 /// <param name="Id">The contract's data file; <c>null</c> where the game keeps no reference to it.</param>
@@ -87,8 +86,9 @@ internal sealed record LanceUnitOutcome(
     IReadOnlyList<DamagedLocation> DamagedLocations,
     IReadOnlyList<DamagedComponent> DamagedComponents);
 
+/// <param name="Structure">The structure left: below the chassis', zero when destroyed.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record DamagedLocation(ChassisLocations Location, Structure Structure);
+internal sealed record DamagedLocation(ChassisLocations Location, float Structure);
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record DamagedComponent(

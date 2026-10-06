@@ -12,7 +12,6 @@ internal static class MissionReader
     // Contract.CompleteContract has filled in every value read here; GenerateSalvage, at its end, the salvage.
     internal static MissionOutcome ReadOutcome(SimGameState simGame, Contract contract, ExportTrigger trigger)
     {
-        var componentReferences = new ComponentReferences(simGame.DataManager);
         var (employer, target) = ContractReader.ReadFactions(contract);
         return new MissionOutcome(
             ModAssembly.Version,
@@ -34,35 +33,30 @@ internal static class MissionReader
             contract.MercenaryReviewboardReputationResults,
             contract.ExperienceEarned,
             contract.PlayerUnitResults
-                .Select(unit => ReadLanceUnit(simGame, componentReferences, contract, unit))
+                .Select(unit => ReadLanceUnit(simGame, contract, unit))
                 .ToList(),
             // Before the choice, SalvageResults holds only the components recovered from the company's lost mechs.
             new SalvageOffer(
                 contract.FinalSalvageCount,
                 contract.FinalPrioritySalvageCount,
-                ReadSalvageItems(simGame, componentReferences, contract.GetPotentialSalvage()),
-                ReadSalvageItems(simGame, componentReferences, contract.SalvageResults)),
-            // After every section that references components.
-            componentReferences.Definitions);
+                ReadSalvageItems(simGame, contract.GetPotentialSalvage()),
+                ReadSalvageItems(simGame, contract.SalvageResults)));
     }
 
     // Contract.FinalizeSalvage adds the priority and the random salvage to SalvageResults, one entry per item.
     internal static SalvageReceived ReadSalvageReceived(SimGameState simGame, Contract contract, ExportTrigger trigger)
     {
-        var componentReferences = new ComponentReferences(simGame.DataManager);
         return new SalvageReceived(
             ModAssembly.Version,
             trigger,
             ContractReader.ReadMissionContract(simGame, contract),
-            ReadSalvageItems(simGame, componentReferences, contract.SalvageResults),
-            componentReferences.Definitions);
+            ReadSalvageItems(simGame, contract.SalvageResults));
     }
 
     // The unit's mech and pilot are copies taken from combat (Mech.ToMechDef keeps the mech bay's GUID); the pilot's
     // kills count this mission only, as Pilot.InitStats resets them when combat starts.
     private static LanceUnitOutcome ReadLanceUnit(
         SimGameState simGame,
-        ComponentReferences componentReferences,
         Contract contract,
         UnitResult unit)
     {
@@ -83,13 +77,15 @@ internal static class MissionReader
             unit.mechLost,
             unit.mechLost ? null : MechRepair.Estimate(simGame, RestoreAfterCombat(simGame, mech)),
             MechReader.Locations
-                .Select(location => new DamagedLocation(location, MechReader.ReadStructure(mech, location)))
-                .Where(location => location.Structure.Current < location.Structure.Max)
+                .Select(location => new DamagedLocation(
+                    location,
+                    mech.GetLocationLoadoutDef(location).CurrentInternalStructure))
+                .Where(damaged => damaged.Structure < mech.GetChassisLocationDef(damaged.Location).InternalStructure)
                 .ToList(),
             mech.Inventory
                 .Where(component => component.DamageLevel != ComponentDamageLevel.Functional)
                 .Select(component => new DamagedComponent(
-                    componentReferences.ReferenceTo(component),
+                    ComponentReferences.ReferenceTo(component),
                     component.MountedLocation,
                     component.DamageLevel))
                 .OrderByComponent(component => component.Component)
@@ -107,16 +103,13 @@ internal static class MissionReader
 
     // A component's salvage id is the component's, a mech part's the mech's it assembles into
     // (SimGameState.ResolveCompleteContract). Chassis salvage is never generated (Contract.GenerateSalvage).
-    private static SalvageItems ReadSalvageItems(
-        SimGameState simGame,
-        ComponentReferences componentReferences,
-        IReadOnlyList<SalvageDef> salvage) =>
+    private static SalvageItems ReadSalvageItems(SimGameState simGame, IReadOnlyList<SalvageDef> salvage) =>
         new(
             salvage
                 .Where(item => item.Type == SalvageDef.SalvageType.COMPONENT)
                 .GroupBy(item => item.Description.Id)
                 .Select(copies => new SalvagedComponent(
-                    componentReferences.ReferenceTo(
+                    ComponentReferences.ReferenceTo(
                         copies.First().ComponentType,
                         copies.Key,
                         copies.First().MechComponentDef),

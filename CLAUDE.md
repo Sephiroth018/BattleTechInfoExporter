@@ -363,8 +363,7 @@ name, version and folder, `ModLog` its logger. Folders:
   mission files' models from the completed contract; `CatalogReader` builds the catalog from the
   definitions the game has loaded. `DefinitionReferences` makes the
   references that need only a description, a faction, a biome or a data-driven enum value, and
-  `ComponentReferences`, one per
-  export file, every reference to a component, collecting the definitions referenced; a reference
+  `ComponentReferences` every reference to a component; a reference
   with a naming rule of its own is made by the reader that owns it. `ReferenceOrder` orders the
   lists of entries that refer to a definition, and `GameText` makes every exported game text plain.
   `ExportFileWriter` writes and deletes the files in
@@ -377,8 +376,8 @@ The version lives only in `<Version>` in `Directory.Build.props`, next to the de
 repository URL and supported game version; the build stamps the version into the DLL and generates
 `mod.json` from them.
 
-There is no GitHub Project for this repository: planned features are issues with labels, so the
-General rule on managing one doesn't apply.
+Planned features are issues on the GitHub Project "Road to 1.0", whose status follows the work (see
+"Issues and projects").
 
 ## Export format
 
@@ -387,13 +386,12 @@ General rule on managing one doesn't apply.
   game's enumeration stands in. Faction names get title case with the short name in brackets
   (`FactionNames`), e.g. "The Local Pirate Organization (Pirates)", because the game's are written
   for use mid-sentence. Component references also carry the game's component `type`, which names
-  their group in `componentDefinitions`.
-- **Definitions many entries share sit in a root object keyed by id** (e.g.
-  `componentDefinitions`, grouped by component type with one entry shape per group and no null
-  sections), holding only the definitions the file refers to, so each file stands on its own; the
-  catalog holds every definition instead. The
-  entries carry the reference and their own state, instead of repeating the definition's stats; a
-  reference whose definition is missing has no entry. Keys keep the game's ids as they are.
+  their group in the catalog's `componentDefinitions`.
+- **Definitions live only in the catalog,** in root objects keyed by id (e.g. `componentDefinitions`,
+  grouped by component type with one entry shape per group and no null sections). The other files
+  refer to them by id and match the catalog through `modVersion`; their entries carry the reference
+  and their own state, instead of repeating the definition's stats or limits (e.g. a location's max
+  armor or slots). A reference whose definition is missing has no entry. Keys keep the game's ids as they are.
 - **Lists of entries that refer to a definition, which the game keeps in no meaningful order**
   (storage, stores, salvage), are ordered the same way everywhere (`ReferenceOrder`): by component
   type for components, then by name, with the id breaking ties. A mech's components keep the game's

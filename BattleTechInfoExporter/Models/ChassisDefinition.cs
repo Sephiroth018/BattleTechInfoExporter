@@ -40,13 +40,19 @@ internal sealed record ChassisMelee(
     float DeathFromAboveSelfDamage);
 
 /// <param name="MaxArmor">The most armor the location can take.</param>
+/// <param name="Slots">The component slots, which a loadout's components fill by their own slots.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ChassisLocationDefinition(
     ChassisLocations Location,
     LocationArmor MaxArmor,
     float Structure,
-    Hardpoints Hardpoints);
+    Hardpoints Hardpoints,
+    int Slots);
 
 /// <param name="Rear"><c>null</c> outside the torso, which alone has rear armor.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record LocationArmor(float Front, float? Rear);
+
+/// <summary>The number of weapon hardpoints of each kind.</summary>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record Hardpoints(int Ballistic, int Energy, int Missile, int Support);

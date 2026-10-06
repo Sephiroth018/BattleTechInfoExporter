@@ -35,23 +35,21 @@ internal static class CatalogReader
     {
         var dataManager = simGame.DataManager;
         var combatMultipliers = simGame.CombatConstants.CombatValueMultipliers;
-        var componentReferences = new ComponentReferences(dataManager);
-        var mechDefinitions = ToSortedDictionary(
-            dataManager.MechDefs,
-            mech => ReadMech(componentReferences, mech));
+        var mechDefinitions = ToSortedDictionary(dataManager.MechDefs, ReadMech);
         var chassisDefinitions = ToSortedDictionary(
             dataManager.ChassisDefs,
             chassis => ReadChassis(dataManager, chassis));
         var vehicleDefinitions = ToSortedDictionary(
             dataManager.VehicleDefs,
-            vehicle => ReadVehicle(componentReferences, combatMultipliers, vehicle));
+            vehicle => ReadVehicle(combatMultipliers, vehicle));
         var turretDefinitions = ToSortedDictionary(
             dataManager.TurretDefs,
-            turret => ReadTurret(componentReferences, combatMultipliers, turret));
-        foreach (var component in ReadComponents(dataManager))
-        {
-            componentReferences.AddDefinition(component.Key, component.Value);
-        }
+            turret => ReadTurret(combatMultipliers, turret));
+        // Also what the catalog's units mount, so every reference in the catalog has its definition.
+        var components = ReadComponents(dataManager)
+            .Concat(MountedComponents(dataManager.MechDefs, mechDefinitions, mech => mech.Inventory))
+            .Concat(MountedComponents(dataManager.VehicleDefs, vehicleDefinitions, vehicle => vehicle.Inventory))
+            .Concat(MountedComponents(dataManager.TurretDefs, turretDefinitions, turret => turret.Inventory));
 
         return new Catalog(
             ModAssembly.Version,
@@ -60,7 +58,7 @@ internal static class CatalogReader
             mechDefinitions,
             vehicleDefinitions,
             turretDefinitions,
-            componentReferences.Definitions);
+            ReadComponentDefinitions(dataManager, components));
     }
 
     private static SortedDictionary<string, TEntry> ToSortedDictionary<TDefinition, TEntry>(
@@ -108,14 +106,32 @@ internal static class CatalogReader
                     var definition = chassis.GetLocationDef(location);
                     return new ChassisLocationDefinition(
                         location,
-                        MechReader.ReadMaxArmor(definition),
+                        ReadMaxArmor(definition),
                         definition.InternalStructure,
-                        MechReader.ReadHardpoints(chassis, [location]));
+                        ReadHardpoints(chassis, location),
+                        definition.InventorySlots);
                 })
                 .ToList());
 
+    private static LocationArmor ReadMaxArmor(LocationDef location) =>
+        new(location.MaxArmor, MechReader.HasRearArmor(location) ? location.MaxRearArmor : null);
+
+    // Counted as TooltipPrefab_Chassis.SetHardpointData does.
+    private static Hardpoints ReadHardpoints(ChassisDef chassis, ChassisLocations location)
+    {
+        int ballistic = 0, energy = 0, missile = 0, support = 0;
+        MechStatisticsRules.GetHardpointCountForLocation(
+            chassis,
+            location,
+            ref ballistic,
+            ref energy,
+            ref missile,
+            ref support);
+        return new Hardpoints(ballistic, energy, missile, support);
+    }
+
     // A mech's chassis and fixed components are set once its dependencies are loaded (MechDef.Refresh).
-    private static MechDefinition? ReadMech(ComponentReferences componentReferences, MechDef mech)
+    private static MechDefinition? ReadMech(MechDef mech)
     {
         if (mech.Chassis is null)
         {
@@ -144,7 +160,7 @@ internal static class CatalogReader
                                 : null),
                         MechReader.ComponentsMountedIn(mech, location)
                             .Select(component => new LoadoutComponent(
-                                componentReferences.ReferenceTo(component),
+                                ComponentReferences.ReferenceTo(component),
                                 component.IsFixed))
                             .ToList());
                 })
@@ -154,7 +170,6 @@ internal static class CatalogReader
     // A vehicle's chassis and components are set once its dependencies are loaded (VehicleDef.Refresh). Armor and
     // structure are multiplied as when it spawns (Vehicle.InitStats); its name is the HUD's (Vehicle.Nickname).
     private static VehicleDefinition? ReadVehicle(
-        ComponentReferences componentReferences,
         CombatValueMultipliersDef combatMultipliers,
         VehicleDef vehicle)
     {
@@ -180,14 +195,13 @@ internal static class CatalogReader
                     * combatMultipliers.StructureMultiplierVehicle,
                     vehicle.Inventory
                         .Where(component => component.MountedLocation == location)
-                        .Select(componentReferences.ReferenceTo)
+                        .Select(ComponentReferences.ReferenceTo)
                         .ToList()))
                 .ToList());
     }
 
     // Like a vehicle's (TurretDef.Refresh, Turret.InitStats, Turret.Nickname).
     private static TurretDefinition? ReadTurret(
-        ComponentReferences componentReferences,
         CombatValueMultipliersDef combatMultipliers,
         TurretDef turret)
     {
@@ -204,7 +218,7 @@ internal static class CatalogReader
             chassis.FiringArcDegrees,
             turret.AssignedArmor * combatMultipliers.ArmorMultiplierVehicle,
             chassis.MaxInternalStructure * combatMultipliers.StructureMultiplierVehicle,
-            turret.Inventory.Select(componentReferences.ReferenceTo).ToList());
+            turret.Inventory.Select(ComponentReferences.ReferenceTo).ToList());
     }
 
     private static ChassisMovement ReadMovement(MovementCapabilitiesDef movement) =>
@@ -227,4 +241,108 @@ internal static class CatalogReader
         KeyValuePair<string, TDefinition> definition)
         where TDefinition : MechComponentDef =>
         new(definition.Key, definition.Value);
+
+    // The components mounted on the units in the catalog, by id; one whose definition is missing has none.
+    private static IEnumerable<KeyValuePair<string, MechComponentDef>> MountedComponents<TUnit, TEntry>(
+        IEnumerable<KeyValuePair<string, TUnit>> units,
+        IReadOnlyDictionary<string, TEntry> entries,
+        Func<TUnit, IEnumerable<BaseComponentRef>> readInventory) =>
+        units
+            .Where(unit => entries.ContainsKey(unit.Key))
+            .SelectMany(unit => readInventory(unit.Value))
+            .Where(component => component.Def is not null)
+            .Select(component => new KeyValuePair<string, MechComponentDef>(component.ComponentDefID, component.Def));
+
+    private static ComponentDefinitions ReadComponentDefinitions(
+        DataManager dataManager,
+        IEnumerable<KeyValuePair<string, MechComponentDef>> components)
+    {
+        var weapons = new SortedDictionary<string, WeaponDefinition>(StringComparer.Ordinal);
+        var ammunitionBoxes = new SortedDictionary<string, AmmunitionBoxDefinition>(StringComparer.Ordinal);
+        var heatSinks = new SortedDictionary<string, HeatSinkDefinition>(StringComparer.Ordinal);
+        var jumpJets = new SortedDictionary<string, ComponentDefinition>(StringComparer.Ordinal);
+        var upgrades = new SortedDictionary<string, ComponentDefinition>(StringComparer.Ordinal);
+        var readIds = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var component in components.Where(component => readIds.Add(component.Key)))
+        {
+            switch (component.Value)
+            {
+                case WeaponDef weapon:
+                    weapons.Add(component.Key, ReadWeapon(weapon));
+                    break;
+                case AmmunitionBoxDef ammunitionBox:
+                    ammunitionBoxes.Add(component.Key, ReadAmmunitionBox(dataManager, ammunitionBox));
+                    break;
+                case HeatSinkDef heatSink:
+                    heatSinks.Add(component.Key, ReadHeatSink(heatSink));
+                    break;
+                case JumpJetDef jumpJet:
+                    jumpJets.Add(component.Key, ReadComponent(jumpJet));
+                    break;
+                case UpgradeDef upgrade:
+                    upgrades.Add(component.Key, ReadComponent(upgrade));
+                    break;
+                default:
+                    throw new InvalidOperationException(
+                        $"Unexpected component definition type {component.Value.GetType().Name} for {component.Key}");
+            }
+        }
+
+        return new ComponentDefinitions(weapons, ammunitionBoxes, heatSinks, jumpJets, upgrades);
+    }
+
+    private static ComponentDefinition ReadComponent(MechComponentDef definition) =>
+        new(
+            ComponentReferences.NameOf(definition),
+            definition.Tonnage,
+            definition.InventorySize,
+            definition.Description.Cost,
+            new[] { definition.BonusValueA, definition.BonusValueB }.Where(bonus => !string.IsNullOrEmpty(bonus))
+                .ToList(),
+            // Contract.AddMechComponentToSalvage skips blacklisted components.
+            !definition.ComponentTags.Contains(MechValidationRules.Tag_Blacklisted));
+
+    private static WeaponDefinition ReadWeapon(WeaponDef weapon) =>
+        new(
+            ReadComponent(weapon),
+            weapon.WeaponCategoryValue.FriendlyName,
+            weapon.AmmoCategoryValue.Is_NotSet || weapon.AmmoCategoryValue.UsesInternalAmmo
+                ? null
+                : weapon.AmmoCategoryValue.FriendlyName,
+            weapon.Damage,
+            weapon.Instability,
+            weapon.ShotsWhenFired,
+            weapon.ProjectilesPerShot,
+            weapon.HeatDamage,
+            weapon.HeatGenerated,
+            new WeaponRanges(
+                weapon.MinRange,
+                weapon.ShortRange,
+                weapon.MediumRange,
+                weapon.LongRange,
+                weapon.MaxRange),
+            weapon.AccuracyModifier,
+            weapon.CriticalChanceMultiplier,
+            weapon.RefireModifier,
+            weapon.IndirectFireCapable);
+
+    private static AmmunitionBoxDefinition ReadAmmunitionBox(DataManager dataManager, AmmunitionBoxDef ammunitionBox) =>
+        new(ReadComponent(ammunitionBox), ReadAmmoCategory(dataManager, ammunitionBox), ammunitionBox.Capacity);
+
+    // The box's own Ammo is only set once the game has needed it (AmmunitionBoxDef.refreshAmmo). The game guards
+    // the lookup as well (AmmunitionBoxDef.GatherDependencies); the ammo's id stands in for a missing definition.
+    private static string ReadAmmoCategory(DataManager dataManager, AmmunitionBoxDef ammunitionBox)
+    {
+        if (dataManager.AmmoDefs.TryGet(ammunitionBox.AmmoID, out var ammo))
+        {
+            return ammo.AmmoCategoryValue.FriendlyName;
+        }
+
+        ModLog.Logger.LogWarning(
+            $"Found no ammo {ammunitionBox.AmmoID} of {ammunitionBox.Description.Id}; its id stands in");
+        return ammunitionBox.AmmoID;
+    }
+
+    private static HeatSinkDefinition ReadHeatSink(HeatSinkDef heatSink) =>
+        new(ReadComponent(heatSink), heatSink.DissipationCapacity);
 }
