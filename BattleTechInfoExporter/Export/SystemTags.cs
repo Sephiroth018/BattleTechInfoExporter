@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using BattleTech;
 using BattleTech.Data;
 using BattleTechInfoExporter.Models;
+using StarSystem = BattleTech.StarSystem;
 
 namespace BattleTechInfoExporter.Export;
 
