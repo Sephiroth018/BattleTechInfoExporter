@@ -6,7 +6,7 @@ using StarSystem = BattleTech.StarSystem;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Reads a star system's planet tags.</summary>
+/// <summary>Reads a star system's tags.</summary>
 internal static class SystemTags
 {
     // Mirrors the starmap's system panel (SGSystemViewPopulator, HBSTagView), which shows only the tags the

@@ -32,6 +32,7 @@ internal static class ContractReader
 
         var contractOverride = contract.Override;
         var (employer, target) = ReadFactions(contract);
+        var starSystem = ReadStarSystem(simGame, contract);
         return new ActiveContract(
             ReadId(contractOverride),
             contractOverride.contractName,
@@ -44,7 +45,11 @@ internal static class ContractReader
             ReadTerms(simGame, contract, employer, target),
             ReadLanceLimits(contractOverride),
             ReadBiome(simGame, contract.ContractBiome),
-            ReadActiveContractTravel(simGame, contract, travelInProgress));
+            DefinitionReferences.ReferenceTo(starSystem.Def.Description),
+            // The arrival is the trip's as the position has it, also on the last leg from the jump point.
+            travelInProgress is ({ } destination, var arrivesOnDay) && destination.ID == starSystem.ID
+                ? arrivesOnDay
+                : null);
     }
 
     // The game generates a system's contracts when the contract screen first opens there
@@ -58,28 +63,10 @@ internal static class ContractReader
             return null;
         }
 
-        // Contracts often share a target system, whose tags and route are costly to read; each is read once.
-        var travelsBySystemId = new Dictionary<string, ContractTravel?>();
         return simGame.GetAllCurrentlySelectableContracts()
             .Where(contract => contract != simGame.ActiveTravelContract)
-            .Select(contract => ReadContract(simGame, contract, ReadTravelOnce(contract)))
+            .Select(contract => ReadContract(simGame, contract))
             .ToList();
-
-        ContractTravel? ReadTravelOnce(BattleTech.Contract contract)
-        {
-            if (ReadTargetSystem(contract) is not { } system)
-            {
-                return null;
-            }
-
-            if (!travelsBySystemId.TryGetValue(system.ID, out var travel))
-            {
-                travel = ReadTravel(simGame, contract);
-                travelsBySystemId.Add(system.ID, travel);
-            }
-
-            return travel;
-        }
     }
 
     // SimGameState.ContractTypeDescriptions has the procedural mission types; priority contracts share one entry.
@@ -100,7 +87,7 @@ internal static class ContractReader
         return contractTypes;
     }
 
-    private static Contract ReadContract(SimGameState simGame, BattleTech.Contract contract, ContractTravel? travel)
+    private static Contract ReadContract(SimGameState simGame, BattleTech.Contract contract)
     {
         var contractOverride = contract.Override;
         var (employer, target) = ReadFactions(contract);
@@ -120,10 +107,10 @@ internal static class ContractReader
             ReadNegotiation(simGame, contract, employer, target),
             ReadLanceLimits(contractOverride),
             ReadBiome(simGame, contract.ContractBiome),
-            travel);
+            DefinitionReferences.ReferenceTo(ReadStarSystem(simGame, contract).Def.Description));
     }
 
-    // The mission is fought in the current system: a contract elsewhere needs travelling there first.
+    // The mission is fought in the current star system: a contract elsewhere needs travelling there first.
     internal static MissionContract ReadMissionContract(SimGameState simGame, BattleTech.Contract contract)
     {
         var contractOverride = contract.Override;
@@ -315,34 +302,8 @@ internal static class ContractReader
     private static DefinitionReference? ReadBiome(SimGameState simGame, Biome.BIOMESKIN biome) =>
         biome <= Biome.BIOMESKIN.generic ? null : DefinitionReferences.ReferenceTo(simGame.DataManager, biome);
 
-    // The contract details show the route's days (SGContractsWidget.PopulateContract).
-    private static ContractTravel? ReadTravel(SimGameState simGame, BattleTech.Contract contract) =>
-        ReadTargetSystem(contract) is { } system && system != simGame.CurSystem
-            ? CreateTravel(system, RouteReader.ReadRoute(simGame, system)?.Days)
-            : null;
-
-    // While travelling to the contract's system, the arrival is the trip's as the position has it, also on the last
-    // leg from the jump point to the planet.
-    private static ActiveContractTravel? ReadActiveContractTravel(
-        SimGameState simGame,
-        BattleTech.Contract contract,
-        (StarSystem Destination, int ArrivesOnDay)? travelInProgress)
-    {
-        if (ReadTargetSystem(contract) is { } system && travelInProgress?.Destination.ID == system.ID)
-        {
-            return ToActiveContractTravel(CreateTravel(system, null), travelInProgress.Value.ArrivesOnDay);
-        }
-
-        return ReadTravel(simGame, contract) is { } travel ? ToActiveContractTravel(travel, null) : null;
-    }
-
-    private static ActiveContractTravel ToActiveContractTravel(ContractTravel travel, int? arrivesOnDay) =>
-        new(travel.System, travel.Tags, travel.Days, arrivesOnDay);
-
-    // The contract list marks travel contracts by the target system in the contract's context (SGContractsListItem).
-    private static StarSystem? ReadTargetSystem(BattleTech.Contract contract) =>
-        contract.GameContext.GetObject(GameContextObjectTagEnum.TargetStarSystem) as StarSystem;
-
-    private static ContractTravel CreateTravel(StarSystem system, int? days) =>
-        new(DefinitionReferences.ReferenceTo(system.Def.Description), SystemTags.ReadVisibleTags(system), days);
+    // The contract list marks travel contracts by the target star system in the contract's context
+    // (SGContractsListItem); without one, the contract is in the current star system.
+    private static StarSystem ReadStarSystem(SimGameState simGame, BattleTech.Contract contract) =>
+        contract.GameContext.GetObject(GameContextObjectTagEnum.TargetStarSystem) as StarSystem ?? simGame.CurSystem;
 }

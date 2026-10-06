@@ -400,7 +400,10 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   `rules.json` for the game tables (e.g. `moraleLevels`, `reputationLevels` at its root): how the
   game works for this career, which doesn't change between exports, and `star-systems.json` with
   every star system keyed by id. Values in the game state refer to the rules by name, instead of
-  repeating thresholds and effects per entry.
+  repeating thresholds and effects per entry. A star system's data lives only in
+  `star-systems.json`, as definitions do in the catalog: its entries have the name, with the id as
+  their key, and the other files refer to a star system by its reference alone (`starSystem`,
+  `destination`), next to their own state such as the day of arrival.
 - **Travel days and cost are the starmap's route** (`RouteReader`) from the current system: `null`
   where the game finds no route, always for a system whose travel requirements aren't met. In
   `star-systems.json` the current system has 0 for both.

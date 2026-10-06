@@ -22,8 +22,9 @@ internal static class StarSystemReader
         return new Starmap(ModAssembly.Version, trigger, starSystems);
     }
 
-    // StarSystemDef.SupportedBiomes limits the maps of the system's contracts (SimGameState.GetSinglePlayerProceduralPlayableMaps).
-    internal static List<DefinitionReference> ReadBiomes(SimGameState simGame, StarSystem system) =>
+    // StarSystemDef.SupportedBiomes limits the maps of the star system's contracts
+    // (SimGameState.GetSinglePlayerProceduralPlayableMaps).
+    private static List<DefinitionReference> ReadBiomes(SimGameState simGame, StarSystem system) =>
         system.Def.SupportedBiomes
             .Select(biome => DefinitionReferences.ReferenceTo(simGame.DataManager, biome))
             .ToList();
@@ -36,7 +37,7 @@ internal static class StarSystemReader
             : canTravelTo ? RouteReader.ReadRoute(simGame, system)
             : null;
         return new Models.StarSystem(
-            DefinitionReferences.ReferenceTo(system.Def.Description),
+            system.Def.Description.Name,
             DefinitionReferences.ReferenceTo(system.OwnerValue),
             SystemTags.ReadVisibleTags(system),
             ReadBiomes(simGame, system),

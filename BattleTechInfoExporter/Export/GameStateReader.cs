@@ -65,15 +65,9 @@ internal static class GameStateReader
         (StarSystem Destination, int ArrivesOnDay)? travelInProgress) =>
         new(
             DefinitionReferences.ReferenceTo(simGame.CurSystem.Def.Description),
-            DefinitionReferences.ReferenceTo(simGame.CurSystem.OwnerValue),
-            SystemTags.ReadVisibleTags(simGame.CurSystem),
-            StarSystemReader.ReadBiomes(simGame, simGame.CurSystem),
             simGame.TravelState,
             travelInProgress is ({ } destination, var arrivesOnDay)
-                ? new Travel(
-                    DefinitionReferences.ReferenceTo(destination.Def.Description),
-                    DefinitionReferences.ReferenceTo(destination.OwnerValue),
-                    arrivesOnDay)
+                ? new Travel(DefinitionReferences.ReferenceTo(destination.Def.Description), arrivesOnDay)
                 : null);
 
     // TravelTime only counts the current leg (e.g. to the jump point); the travel order counts the whole trip.

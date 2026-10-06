@@ -43,7 +43,7 @@ internal sealed record MissionContract(
     DefinitionReference Employer,
     DefinitionReference Target,
     int Difficulty,
-    DefinitionReference System);
+    DefinitionReference StarSystem);
 
 /// <summary>An objective as the after-action report lists it.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

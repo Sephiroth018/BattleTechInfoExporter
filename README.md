@@ -16,9 +16,10 @@ written together on every career export:
   tables, spirits levels, mech parts per mech, mission types), which the game state and the mission
   outcome refer to by name instead of repeating thresholds and effects per entry.
 - `star-systems.json`: every star system on the starmap, locked story systems included, keyed by
-  id, with its owner, planet tags, biomes, difficulty, whether its travel requirements are met, and
+  id, with its name, owner, tags, biomes, difficulty, whether its travel requirements are met, and
   the days and C-Bills the trip from the current system takes as the starmap shows them (0 for the
-  current system, `null` where there is no route).
+  current system, `null` where there is no route). The game state and the mission outcome refer to
+  a star system only by its id and name.
 
 Two more hold the latest mission:
 
@@ -90,8 +91,8 @@ The game state holds:
   and prices.
 - **Hiring hall:** the current system's pilots for hire, like the roster's pilots plus hiring cost,
   salary and whether the company can hire them.
-- **Contracts:** the contracts the Command Center offers with their description and terms, and the
-  negotiation as the values at each slider position (pay and salvage together take at most 100 %,
+- **Contracts:** the contracts the Command Center offers with their star system, description and
+  terms, and the negotiation as the values at each slider position (pay and salvage together take at most 100 %,
   exactly 100 % when the employer gains no reputation); plus the accepted travel contract until
   it's proceeded with, with the day of arrival while travelling to it. The game generates a system's contracts only when the contract screen first
   opens; until then `contracts` is `null`.
