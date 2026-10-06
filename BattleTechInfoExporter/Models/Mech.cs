@@ -36,7 +36,6 @@ internal sealed record Mech(
     string Id,
     string Name,
     DefinitionReference Chassis,
-    WeightClass WeightClass,
     int Bay,
     int Position,
     MechStatus Status,
@@ -88,11 +87,6 @@ internal sealed record Armor(float Current, float Assigned, float Max);
 /// <param name="Current">Below <see cref="Max" /> when damaged, zero when the location is destroyed.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Structure(float Current, float Max);
-
-/// <summary>The most armor a chassis' location can take.</summary>
-/// <param name="Rear"><c>null</c> outside the torso, which alone has rear armor.</param>
-[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record LocationMaxArmor(ChassisLocations Location, float Front, float? Rear);
 
 /// <summary>The number of weapon hardpoints of each kind.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

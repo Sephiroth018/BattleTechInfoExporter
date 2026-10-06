@@ -43,7 +43,7 @@ internal static class MechReader
         TryGetMech(dataManager, mechId) is { } mech ? ReferenceTo(mech) : null;
 
     /// <summary>The mech's definition, or <c>null</c>, with a warning, when it is missing.</summary>
-    internal static MechDef? TryGetMech(DataManager dataManager, string mechId)
+    private static MechDef? TryGetMech(DataManager dataManager, string mechId)
     {
         if (dataManager.MechDefs.TryGet(mechId, out var mech))
         {
@@ -69,36 +69,20 @@ internal static class MechReader
     internal static MechReference ReferenceToBayMech(MechDef mech) =>
         new(mech.GUID, NameWithVariant(mech.Name, mech.Chassis));
 
-    internal static List<LocationMaxArmor> ReadMaxArmor(ChassisDef chassis) =>
-        Locations
-            .Select(location =>
-            {
-                var maxArmor = ReadMaxArmor(chassis.GetLocationDef(location));
-                return new LocationMaxArmor(location, maxArmor.Front, maxArmor.Rear);
-            })
-            .ToList();
-
     internal static LocationArmor ReadMaxArmor(LocationDef location) =>
         new(location.MaxArmor, HasRearArmor(location) ? location.MaxRearArmor : null);
 
-    /// <summary>The chassis' weapon hardpoints of all locations together.</summary>
-    internal static Hardpoints ReadHardpoints(ChassisDef chassis) => ReadHardpoints(chassis, Locations);
-
-    // Summed as TooltipPrefab_Chassis.SetHardpointData does.
-    internal static Hardpoints ReadHardpoints(ChassisDef chassis, IEnumerable<ChassisLocations> locations)
+    // Counted as TooltipPrefab_Chassis.SetHardpointData does.
+    internal static Hardpoints ReadHardpoints(ChassisDef chassis, ChassisLocations location)
     {
         int ballistic = 0, energy = 0, missile = 0, support = 0;
-        foreach (var location in locations)
-        {
-            MechStatisticsRules.GetHardpointCountForLocation(
-                chassis,
-                location,
-                ref ballistic,
-                ref energy,
-                ref missile,
-                ref support);
-        }
-
+        MechStatisticsRules.GetHardpointCountForLocation(
+            chassis,
+            location,
+            ref ballistic,
+            ref energy,
+            ref missile,
+            ref support);
         return new Hardpoints(ballistic, energy, missile, support);
     }
 
@@ -128,7 +112,6 @@ internal static class MechReader
             mech.GUID,
             mech.Name,
             ReferenceTo(chassis),
-            chassis.weightClass,
             slot / slotsPerBay + 1,
             slot % slotsPerBay + 1,
             workOrder switch
@@ -164,10 +147,7 @@ internal static class MechReader
             .OfType<SimGameInterruptManager.MechPlacementPopupEntry>()
             .Select(entry => entry.parameters[0])
             .OfType<MechDef>()
-            .Select(mech => new MechAwaitingPlacement(
-                ReferenceTo(mech.Chassis),
-                mech.Chassis.weightClass,
-                ReadLoadout(mech)))
+            .Select(mech => new MechAwaitingPlacement(ReferenceTo(mech.Chassis), ReadLoadout(mech)))
             .ToList();
     }
 
@@ -203,7 +183,7 @@ internal static class MechReader
                 ? new Armor(loadout.CurrentRearArmor, loadout.AssignedRearArmor, definition.MaxRearArmor)
                 : null,
             ReadStructure(mech, location),
-            ReadHardpoints(mech.Chassis, [location]),
+            ReadHardpoints(mech.Chassis, location),
             // A component whose definition is missing has no known size.
             new Slots(components.Sum(component => component.Def?.InventorySize ?? 0), definition.InventorySlots),
             components.Select(component => new MountedComponent(

@@ -1,4 +1,3 @@
-using BattleTech;
 using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
@@ -12,7 +11,4 @@ namespace BattleTechInfoExporter.Models;
 ///     components for a salvaged chassis.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record MechAwaitingPlacement(
-    DefinitionReference Chassis,
-    WeightClass WeightClass,
-    MechLoadout Loadout);
+internal sealed record MechAwaitingPlacement(DefinitionReference Chassis, MechLoadout Loadout);

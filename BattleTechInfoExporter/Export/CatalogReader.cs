@@ -108,7 +108,7 @@ internal static class CatalogReader
                         location,
                         MechReader.ReadMaxArmor(definition),
                         definition.InternalStructure,
-                        MechReader.ReadHardpoints(chassis, [location]));
+                        MechReader.ReadHardpoints(chassis, location));
                 })
                 .ToList());
 

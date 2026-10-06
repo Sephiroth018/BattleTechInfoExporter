@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using BattleTech;
 using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
@@ -18,20 +17,11 @@ internal sealed record Storage(
 internal sealed record StoredComponent(ComponentReference Component, int Count, int DamagedCount);
 
 /// <summary>
-///     A stored chassis. Readying it gives a mech with the stock armor and the chassis' fixed components, but no
-///     weapons or other components.
+///     A stored chassis, described in the catalog. Readying it gives a mech with the stock armor and the chassis'
+///     fixed components, but no weapons or other components.
 /// </summary>
-/// <param name="MaxArmor">The most armor each location can take, from head to legs.</param>
-/// <param name="Hardpoints">The weapon hardpoints of all locations together.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record StoredChassis(
-    DefinitionReference Chassis,
-    WeightClass WeightClass,
-    float Tonnage,
-    IReadOnlyList<LocationMaxArmor> MaxArmor,
-    Hardpoints Hardpoints,
-    int MaxJumpJets,
-    int Count);
+internal sealed record StoredChassis(DefinitionReference Chassis, int Count);
 
 /// <summary>
 ///     Salvaged parts of a mech; with <see cref="Rules.MechPartsPerMech" /> of them they become that mech.

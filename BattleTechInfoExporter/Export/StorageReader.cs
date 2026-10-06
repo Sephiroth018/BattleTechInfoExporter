@@ -54,14 +54,7 @@ internal static class StorageReader
         storedItems
             .Where(item => item.Type == MechType && !item.IsDamaged)
             .Select(item => MechReader.TryGetChassis(simGame.DataManager, item.Id) is { } chassis
-                ? new StoredChassis(
-                    MechReader.ReferenceTo(chassis),
-                    chassis.weightClass,
-                    chassis.Tonnage,
-                    MechReader.ReadMaxArmor(chassis),
-                    MechReader.ReadHardpoints(chassis),
-                    chassis.MaxJumpjets,
-                    item.Count)
+                ? new StoredChassis(MechReader.ReferenceTo(chassis), item.Count)
                 : null)
             .OfType<StoredChassis>()
             .OrderByDefinition(chassis => chassis.Chassis)

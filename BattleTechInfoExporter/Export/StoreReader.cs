@@ -55,8 +55,8 @@ internal static class StoreReader
             items
                 .Where(item => item.Type == ShopItemType.Mech)
                 // Bought as SimGameState.AddFromShopDefItem does: the id is the mech's.
-                .Select(item => MechReader.TryGetMech(simGame.DataManager, item.ID) is { } mech
-                    ? ReadMechForSale(shop, item, mech)
+                .Select(item => MechReader.TryReferenceToMech(simGame.DataManager, item.ID) is { } mech
+                    ? new MechForSale(mech, CountOf(item), PriceOf(shop, item))
                     : null)
                 .OfType<MechForSale>()
                 .OrderByDefinition(mech => mech.Mech)
@@ -69,20 +69,6 @@ internal static class StoreReader
                 .OfType<MechPartsForSale>()
                 .OrderByDefinition(parts => parts.Mech)
                 .ToList());
-    }
-
-    private static MechForSale ReadMechForSale(Shop shop, ShopDefItem item, MechDef mech)
-    {
-        var chassis = mech.Chassis;
-        return new MechForSale(
-            MechReader.ReferenceTo(mech),
-            chassis.weightClass,
-            chassis.Tonnage,
-            MechReader.ReadMaxArmor(chassis),
-            MechReader.ReadHardpoints(chassis),
-            chassis.MaxJumpjets,
-            CountOf(item),
-            PriceOf(shop, item));
     }
 
     // Stores sell components, whole mechs and mech parts; other types only appear in the list of things to sell to
