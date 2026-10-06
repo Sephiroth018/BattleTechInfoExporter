@@ -52,3 +52,7 @@ internal sealed record ChassisLocationDefinition(
 /// <param name="Rear"><c>null</c> outside the torso, which alone has rear armor.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record LocationArmor(float Front, float? Rear);
+
+/// <summary>The number of weapon hardpoints of each kind.</summary>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record Hardpoints(int Ballistic, int Energy, int Missile, int Support);

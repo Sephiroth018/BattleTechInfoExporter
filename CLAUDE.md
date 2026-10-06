@@ -388,8 +388,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **Definitions live only in the catalog,** in root objects keyed by id (e.g. `componentDefinitions`,
   grouped by component type with one entry shape per group and no null sections). The other files
   refer to them by id and match the catalog through `modVersion`; their entries carry the reference
-  and their own state, instead of repeating the definition's stats. A reference whose definition is
-  missing has no entry. Keys keep the game's ids as they are.
+  and their own state, instead of repeating the definition's stats or limits (e.g. a location's max
+  armor or slots). A reference whose definition is missing has no entry. Keys keep the game's ids as they are.
 - **Lists of entries that refer to a definition, which the game keeps in no meaningful order**
   (storage, stores, salvage), are ordered the same way everywhere (`ReferenceOrder`): by component
   type for components, then by name, with the id breaking ties. A mech's components keep the game's

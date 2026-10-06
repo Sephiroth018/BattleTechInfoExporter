@@ -106,12 +106,29 @@ internal static class CatalogReader
                     var definition = chassis.GetLocationDef(location);
                     return new ChassisLocationDefinition(
                         location,
-                        MechReader.ReadMaxArmor(definition),
+                        ReadMaxArmor(definition),
                         definition.InternalStructure,
-                        MechReader.ReadHardpoints(chassis, location),
+                        ReadHardpoints(chassis, location),
                         definition.InventorySlots);
                 })
                 .ToList());
+
+    private static LocationArmor ReadMaxArmor(LocationDef location) =>
+        new(location.MaxArmor, MechReader.HasRearArmor(location) ? location.MaxRearArmor : null);
+
+    // Counted as TooltipPrefab_Chassis.SetHardpointData does.
+    private static Hardpoints ReadHardpoints(ChassisDef chassis, ChassisLocations location)
+    {
+        int ballistic = 0, energy = 0, missile = 0, support = 0;
+        MechStatisticsRules.GetHardpointCountForLocation(
+            chassis,
+            location,
+            ref ballistic,
+            ref energy,
+            ref missile,
+            ref support);
+        return new Hardpoints(ballistic, energy, missile, support);
+    }
 
     // A mech's chassis and fixed components are set once its dependencies are loaded (MechDef.Refresh).
     private static MechDefinition? ReadMech(MechDef mech)

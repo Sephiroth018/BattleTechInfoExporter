@@ -62,9 +62,7 @@ internal sealed record MechLoadout(
     IReadOnlyList<MechLocation> Locations);
 
 /// <param name="RearArmor"><c>null</c> outside the torso, which alone has rear armor.</param>
-/// <param name="Structure">
-///     The structure left: below the chassis' when damaged, zero when the location is destroyed.
-/// </param>
+/// <param name="Structure">The structure left: below the chassis' when damaged, zero when destroyed.</param>
 /// <param name="Components">The components mounted in the location, including the chassis' fixed ones.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechLocation(
@@ -81,7 +79,3 @@ internal sealed record MechLocation(
 /// <param name="Assigned">The armor fitted in the mech lab.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Armor(float Current, float Assigned);
-
-/// <summary>The number of weapon hardpoints of each kind.</summary>
-[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record Hardpoints(int Ballistic, int Energy, int Missile, int Support);

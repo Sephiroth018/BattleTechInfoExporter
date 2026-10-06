@@ -69,23 +69,6 @@ internal static class MechReader
     internal static MechReference ReferenceToBayMech(MechDef mech) =>
         new(mech.GUID, NameWithVariant(mech.Name, mech.Chassis));
 
-    internal static LocationArmor ReadMaxArmor(LocationDef location) =>
-        new(location.MaxArmor, HasRearArmor(location) ? location.MaxRearArmor : null);
-
-    // Counted as TooltipPrefab_Chassis.SetHardpointData does.
-    internal static Hardpoints ReadHardpoints(ChassisDef chassis, ChassisLocations location)
-    {
-        int ballistic = 0, energy = 0, missile = 0, support = 0;
-        MechStatisticsRules.GetHardpointCountForLocation(
-            chassis,
-            location,
-            ref ballistic,
-            ref energy,
-            ref missile,
-            ref support);
-        return new Hardpoints(ballistic, energy, missile, support);
-    }
-
     // Both dictionaries are keyed by the mech bay slot; a slot is in one of them at most.
     internal static List<Mech> ReadMechs(
         SimGameState simGame,
