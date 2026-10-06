@@ -4,9 +4,9 @@ using System.Linq;
 using BattleTech;
 using BattleTech.Framework;
 using BattleTechInfoExporter.Models;
-using HBS.Nav;
 using UnityEngine;
 using Contract = BattleTechInfoExporter.Models.Contract;
+using StarSystem = BattleTech.StarSystem;
 
 namespace BattleTechInfoExporter.Export;
 
@@ -315,9 +315,10 @@ internal static class ContractReader
     private static DefinitionReference? ReadBiome(SimGameState simGame, Biome.BIOMESKIN biome) =>
         biome <= Biome.BIOMESKIN.generic ? null : DefinitionReferences.ReferenceTo(simGame.DataManager, biome);
 
+    // The contract details show the route's days (SGContractsWidget.PopulateContract).
     private static ContractTravel? ReadTravel(SimGameState simGame, BattleTech.Contract contract) =>
         ReadTargetSystem(contract) is { } system && system != simGame.CurSystem
-            ? CreateTravel(system, ReadTravelDays(simGame, system))
+            ? CreateTravel(system, RouteReader.ReadRoute(simGame, system)?.Days)
             : null;
 
     // While travelling to the contract's system, the arrival is the trip's as the position has it, also on the last
@@ -344,33 +345,4 @@ internal static class ContractReader
 
     private static ContractTravel CreateTravel(StarSystem system, int? days) =>
         new(DefinitionReferences.ReferenceTo(system.Def.Description), SystemTags.ReadVisibleTags(system), days);
-
-    // Mirrors the route days of SGContractsWidget.PopulateContract. The game's Starmap.FindRouteTo steps the path
-    // finder over several frames; this steps an own one to the end, which only computes.
-    private static int? ReadTravelDays(SimGameState simGame, StarSystem system)
-    {
-        var starmap = simGame.Starmap;
-        AStar.AStarResult? route = null;
-        var pathFinder = new AStar.PathFinder();
-        pathFinder.InitFindPath(
-            starmap.GetSystemByID(simGame.CurSystem.ID),
-            starmap.GetSystemByID(system.ID),
-            1,
-            1E-06f,
-            result => route = result);
-        while (pathFinder.Step())
-        {
-        }
-
-        if (route is not { status: PathStatus.Complete })
-        {
-            ModLog.Logger.LogWarning($"Found no route to {system.ID}; its travel days are left out");
-            return null;
-        }
-
-        var nodes = route.path.Cast<StarSystemNode>().ToList();
-        return starmap.DistanceToJumpship()
-               + nodes.Take(nodes.Count - 1).Sum(node => node.Cost)
-               + nodes[nodes.Count - 1].System.JumpDistance;
-    }
 }

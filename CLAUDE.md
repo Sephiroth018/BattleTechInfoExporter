@@ -354,12 +354,14 @@ name, version and folder, `ModLog` its logger. Folders:
 
 - `Triggers/`: the patches that decide when to export, and the recorder patches they share.
 - `Export/`: the exporters, the single entry points the triggers call: `GameStateExporter` for the
-  career state, `MissionExporter` for the mission files, one method per file, and `CatalogExporter`
+  career state and the star systems, `MissionExporter` for the mission files, one method per file, and `CatalogExporter`
   for the catalog, which first loads the vehicles and turrets the career doesn't and exports once
   they are loaded. All run their export inside `CampaignExport`. `GameStateReader` builds the game
   state file's models from the game, one reader per section of the file; `RulesReader` builds the
-  rules file's tables; `MissionReader` builds the mission files' models from the completed
-  contract; `CatalogReader` builds the catalog from the definitions the game has loaded. `DefinitionReferences` makes the
+  rules file's tables; `StarSystemReader` builds the star systems file from the starmap, with
+  `RouteReader` reading the route to a system as the starmap plans it; `MissionReader` builds the
+  mission files' models from the completed contract; `CatalogReader` builds the catalog from the
+  definitions the game has loaded. `DefinitionReferences` makes the
   references that need only a description, a faction, a biome or a data-driven enum value, and
   `ComponentReferences` every reference to a component; a reference
   with a naming rule of its own is made by the reader that owns it. `ReferenceOrder` orders the
@@ -394,10 +396,14 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   (storage, stores, salvage), are ordered the same way everywhere (`ReferenceOrder`): by component
   type for components, then by name, with the id breaking ties. A mech's components keep the game's
   order.
-- **The career state is two files, read together on every career export:** `game-state.json` and
+- **The career state is three files, read together on every career export:** `game-state.json`,
   `rules.json` for the game tables (e.g. `moraleLevels`, `reputationLevels` at its root): how the
-  game works for this career, which doesn't change between exports. Values in the game state refer
-  to them by name, instead of repeating thresholds and effects per entry.
+  game works for this career, which doesn't change between exports, and `star-systems.json` with
+  every star system keyed by id. Values in the game state refer to the rules by name, instead of
+  repeating thresholds and effects per entry.
+- **Travel days and cost are the starmap's route** (`RouteReader`) from the current system: `null`
+  where the game finds no route, always for a system whose travel requirements aren't met. In
+  `star-systems.json` the current system has 0 for both.
 - **The latest mission is two files of its own,** written in combat and the after-action report:
   `mission-outcome.json` when the mission ends, before the salvage is chosen, and
   `salvage-received.json` once the salvage is final. Writing a mission outcome deletes the salvage
@@ -437,6 +443,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **Turret:** a fixed emplacement with a single location (`TurretDef`).
 - **Catalog:** the export of every chassis, mech, vehicle, turret and component definition the
   game has loaded (`catalog.json`).
+- **Star system:** a system on the starmap (`StarSystem`). Never "location" (a mech's body
+  location) or "planet".
 - **Ship upgrade:** an upgrade of the Argo (`ShipModuleUpgrade`), bought in its engineering
   screen. Never just "upgrade", which components also have.
 

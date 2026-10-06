@@ -8,13 +8,17 @@ The mod is a work in progress; see [Planned](#planned) for what's still missing.
 
 ## Export files
 
-The files are in `Mods/BattleTechInfoExporter/exports/`. Two of them hold the career and are
+The files are in `Mods/BattleTechInfoExporter/exports/`. Three of them hold the career and are
 written together on every career export:
 
 - `game-state.json`: the career state.
 - `rules.json`: the game's rules for this career (morale and reputation levels, skill training
   tables, spirits levels, mech parts per mech, mission types), which the game state and the mission
   outcome refer to by name instead of repeating thresholds and effects per entry.
+- `star-systems.json`: every star system on the starmap, locked story systems included, keyed by
+  id, with its owner, planet tags, biomes, difficulty, whether its travel requirements are met, and
+  the days and C-Bills the trip from the current system takes as the starmap shows them (0 for the
+  current system, `null` where there is no route).
 
 Two more hold the latest mission:
 

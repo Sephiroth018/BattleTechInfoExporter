@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Linq;
 using BattleTech;
 using BattleTechInfoExporter.Models;
+using StarSystem = BattleTech.StarSystem;
 
 namespace BattleTechInfoExporter.Export;
 
@@ -66,10 +67,7 @@ internal static class GameStateReader
             DefinitionReferences.ReferenceTo(simGame.CurSystem.Def.Description),
             DefinitionReferences.ReferenceTo(simGame.CurSystem.OwnerValue),
             SystemTags.ReadVisibleTags(simGame.CurSystem),
-            // StarSystemDef.SupportedBiomes limits the maps of the system's contracts (SimGameState.GetSinglePlayerProceduralPlayableMaps).
-            simGame.CurSystem.Def.SupportedBiomes
-                .Select(biome => DefinitionReferences.ReferenceTo(simGame.DataManager, biome))
-                .ToList(),
+            StarSystemReader.ReadBiomes(simGame, simGame.CurSystem),
             simGame.TravelState,
             travelInProgress is ({ } destination, var arrivesOnDay)
                 ? new Travel(
