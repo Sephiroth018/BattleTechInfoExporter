@@ -374,8 +374,8 @@ The version lives only in `<Version>` in `Directory.Build.props`, next to the de
 repository URL and supported game version; the build stamps the version into the DLL and generates
 `mod.json` from them.
 
-There is no GitHub Project for this repository: planned features are issues with labels, so the
-General rule on managing one doesn't apply.
+Planned features are issues on the GitHub Project "Road to 1.0", whose status follows the work (see
+"Issues and projects").
 
 ## Export format
 
