@@ -28,20 +28,22 @@ internal static class ExportFileWriter
 
     private static readonly string ExportDirectory = Path.Combine(ModAssembly.Directory, "exports");
 
-    // The JSON last written per file name, without its ExportedAt; empty after every game start, so each file is
-    // written once per session.
+    // The JSON last written per file name, without its ExportedAt and Trigger; empty after every game start, so
+    // each file is written once per session.
     private static readonly Dictionary<string, string> LastWrittenContents = new();
 
     /// <summary>
     ///     Replaces the file in one step, so a tool reading it never sees a half-written file. Leaves it untouched
-    ///     when its content, apart from <see cref="ExportFile.ExportedAt" />, is the same as the last one written
-    ///     this session, so tools watching it only see real changes.
+    ///     when its content, apart from <see cref="ExportFile.ExportedAt" /> and <see cref="ExportFile.Trigger" />,
+    ///     is the same as the last one written this session, so tools watching it only see real changes.
     /// </summary>
     internal static void Write(string fileName, ExportFile content)
     {
         Directory.CreateDirectory(ExportDirectory);
         var path = Path.Combine(ExportDirectory, fileName);
-        var comparedContent = JsonConvert.SerializeObject(content with { ExportedAt = null }, SerializerSettings);
+        var comparedContent = JsonConvert.SerializeObject(
+            content with { ExportedAt = null, Trigger = default },
+            SerializerSettings);
         var fileExists = File.Exists(path);
         if (fileExists
             && LastWrittenContents.TryGetValue(fileName, out var lastWrittenContent)
