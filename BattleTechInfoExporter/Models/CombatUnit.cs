@@ -29,9 +29,7 @@ namespace BattleTechInfoExporter.Models;
 ///     <c>null</c> on open ground and when last seen.
 /// </param>
 /// <param name="Pilot">The pilot, which the HUD names only at <see cref="UnitVisibility.Full" />.</param>
-/// <param name="State">
-///     The unit's condition, shown at <see cref="UnitVisibility.Full" /> and <see cref="UnitVisibility.Ghost" />.
-/// </param>
+/// <param name="State">The unit's condition, shown at <see cref="UnitVisibility.Full" />.</param>
 /// <param name="LinesOfFire">
 ///     The lines of fire to the units it could attack: from the player's units to every enemy at
 ///     <see cref="UnitVisibility.Full" />, and from those enemies to the player's units. <c>null</c> for the others.
@@ -53,10 +51,6 @@ internal sealed record CombatUnit(
     CombatUnitState? State,
     IReadOnlyList<LineOfFire>? LinesOfFire);
 
-/// <summary>
-///     A unit's condition. At <see cref="UnitVisibility.Ghost" /> the HUD hides <see cref="Heat" />,
-///     <see cref="Stability" /> and <see cref="Initiative" />, which are <c>null</c> then.
-/// </summary>
 /// <param name="Locations">
 ///     The armor and structure left per location, in the game's order: a mech's from head to legs, a vehicle's from
 ///     front to rear and turret, a turret's single one. The limits are in <see cref="CombatUnit.Definition" /> or
@@ -82,7 +76,7 @@ internal sealed record CombatUnitState(
     int? Heat,
     float? Stability,
     bool HasActivated,
-    int? Initiative,
+    int Initiative,
     IReadOnlyList<CombatComponent> Components,
     IReadOnlyList<CombatAbility> Abilities,
     int PrecisionStrikeCost,

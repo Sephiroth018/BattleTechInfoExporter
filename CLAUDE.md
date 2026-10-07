@@ -494,7 +494,7 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   round. Reserving a unit postpones its activation to a later phase.
 - **Blip:** an enemy known only from sensors (the game's `VisibilityLevel` from `Blip0Minimum` to
   `Blip4Maximum`), shown with as much detail as the player's side's sensors reveal. An enemy in
-  sight but hidden by ECM (`BlipGhost`) is a ghost, not a blip.
+  sight but hidden by ECM (`BlipGhost`) isn't a blip: the export treats it as in full view.
 - **Statistic change:** a change an ability or component makes to a statistic (the game's
   `EffectData` of type `StatisticEffect`).
 

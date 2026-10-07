@@ -176,9 +176,9 @@ it stands in by its catalog id (`null` on open ground). What else it carries fol
   initiative, every component's damage level with the rounds left in each ammo box and in weapons
   that carry their own, the abilities that can be activated with their cooldowns and uses left,
   and what Precision Strike and Vigilance cost it now. A Sensor Lock brings an enemy into full view
-  for the player's whole side, and allied units' sensors count for the player.
-- **Enemies hidden by ECM:** the same, without pilot, heat, stability and initiative, which the HUD
-  hides.
+  for the player's whole side, and allied units' sensors count for the player. An enemy in sight
+  but hidden by ECM counts as in full view, although the HUD hides its pilot, heat, stability and
+  initiative and it can't be targeted until spotted well enough or sensor locked.
 - **Sensor blips:** the position and as much as the HUD shows: nothing more at the lowest level,
   the kind of unit at the next, and its tonnage, or a turret's weight class, at the highest.
 - **Enemies out of sensor range:** where the player's side last detected them, without facing or

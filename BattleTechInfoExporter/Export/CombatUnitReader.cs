@@ -79,8 +79,8 @@ internal static class CombatUnitReader
         var playerTeam = combat.LocalPlayerTeam;
         return playerTeam.VisibilityToTarget(actor) switch
         {
-            VisibilityLevel.LOSFull => UnitVisibility.Full,
-            VisibilityLevel.BlipGhost => UnitVisibility.Ghost,
+            // In sight but hidden by ECM (BlipGhost), which hides only its pilot, heat, stability and initiative.
+            VisibilityLevel.LOSFull or VisibilityLevel.BlipGhost => UnitVisibility.Full,
             VisibilityLevel.Blip4Maximum => UnitVisibility.BlipMaximum,
             VisibilityLevel.Blip1Type => UnitVisibility.BlipType,
             VisibilityLevel.None => playerTeam.VisibilityCache.previouslyDetectedEnemyLocations.ContainsKey(actor)
@@ -98,7 +98,7 @@ internal static class CombatUnitReader
         UnitVisibility visibility,
         IReadOnlyList<AbstractActor>? targets)
     {
-        var isSighted = visibility is UnitVisibility.Full or UnitVisibility.Ghost;
+        var isSighted = visibility == UnitVisibility.Full;
         var isLastSeen = visibility == UnitVisibility.LastSeen;
         var bayMech = allegiance == UnitAllegiance.Player && actor is Mech mech
             ? MechReader.ReferenceToBayMech(mech.MechDef)
@@ -121,8 +121,8 @@ internal static class CombatUnitReader
                     : actor.CurrentPosition),
             isLastSeen ? null : actor.CurrentRotation.eulerAngles.y,
             isLastSeen ? null : actor.occupiedDesignMask?.Id,
-            visibility == UnitVisibility.Full && actor.GetPilot() is { } pilot ? PilotReader.ReferenceTo(pilot) : null,
-            isSighted ? ReadState(actor, visibility == UnitVisibility.Ghost) : null,
+            isSighted && actor.GetPilot() is { } pilot ? PilotReader.ReferenceTo(pilot) : null,
+            isSighted ? ReadState(actor) : null,
             targets is null ? null : ReadLinesOfFire(actor, targets));
     }
 
@@ -158,9 +158,7 @@ internal static class CombatUnitReader
 
     internal static MapPosition ReadPosition(Vector3 position) => new(position.x, position.y, position.z);
 
-    // The HUD hides a ghost's heat, stability and initiative (CombatHUDHeatDisplay, CombatHUDStabilityDisplay,
-    // CombatHUDPhaseDisplay).
-    private static CombatUnitState ReadState(AbstractActor actor, bool isGhost)
+    private static CombatUnitState ReadState(AbstractActor actor)
     {
         var mech = actor as Mech;
         return new CombatUnitState(
@@ -172,10 +170,10 @@ internal static class CombatUnitReader
             actor.IsProne,
             actor.IsShutDown,
             actor.IsUnsteady,
-            isGhost ? null : mech?.CurrentHeat,
-            isGhost ? null : mech?.CurrentStability,
+            mech?.CurrentHeat,
+            mech?.CurrentStability,
             actor.HasActivatedThisRound,
-            isGhost ? null : actor.Initiative,
+            actor.Initiative,
             actor.allComponents.Select(component => ReadComponent(actor, component)).ToList(),
             ReadAbilities(actor),
             actor.OffensivePushCost,
