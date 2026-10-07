@@ -78,10 +78,11 @@ internal static class MapReader
         IReadOnlyDictionary<string, TerrainDefinition> terrains)
     {
         var terrainDataId = map.MapName + TerrainDataIdSuffix;
-        if (dataManager.ResourceLocator.EntryByID(terrainDataId, BattleTechResourceType.TerrainData) is not { } entry)
+        var entry = dataManager.ResourceLocator.EntryByID(terrainDataId, BattleTechResourceType.TerrainData);
+        if (entry is null || !File.Exists(entry.FilePath))
         {
             ModLog.Logger.LogWarning(
-                $"Left out map {map.MapID}: its terrain data {terrainDataId} isn't in the manifest");
+                $"Left out map {map.MapID}: its terrain data {terrainDataId} isn't in the manifest or on disk");
             return null;
         }
 
