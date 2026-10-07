@@ -175,7 +175,7 @@ internal static class CombatUnitReader
             mech?.CurrentHeat,
             mech?.CurrentStability,
             actor.HasActivatedThisRound,
-            actor.Initiative,
+            HudInitiative.FromGamePhase(actor.Initiative),
             actor.allComponents.Select(component => ReadComponent(actor, component)).ToList(),
             pilot?.Injuries,
             pilot?.Health,

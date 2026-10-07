@@ -138,8 +138,9 @@ gives (Gunnery for ranged attacks, Piloting for melee, before an attack's modifi
 abilities it unlocks. Each ability has its activation, targeting, cooldown and uses, and the
 statistics it changes: statistic, operation and value, the pilot or weapons it applies to, how long
 the change lasts and what triggers it. Multi-Target and Sensor Lock change no statistics in the
-game's data, because the game hardcodes them. Initiative is on the game's scale, where units act
-from the lowest value up, so an ability that lets a unit act earlier lowers it.
+game's data, because the game hardcodes them. Changes to initiative follow the HUD, where units act
+from phase 5 down to 1, so a change that lets a unit act earlier is positive, unlike in the game's
+data.
 
 The rules' `combat` object holds the combat constants the game's code reads, named by what they
 are: to-hit modifiers (positive makes an attack harder, negative is a bonus), evasion, guard levels
@@ -190,8 +191,8 @@ to the player's units, as hovering over a target shows them from where the unit 
 of fire (`clear`, `partiallyBlocked`, the game's obstructed, which still allows direct fire with
 the penalties of the rules' `lineOfFire`, or `blocked`), whether a weapon could fire at the target directly, only
 indirectly or not at all, or it is out of range, and whether it is in the firing arc without
-turning. Phase and initiative are on the game's scale, as in the rules: units act from 1 up, which
-the HUD shows counting down from 5. A zone's radius is that of the hexagon the HUD draws; whether a
+turning. Phase and initiative are numbered as on the HUD, as in the rules: units act from 5 down
+to 1. A zone's radius is that of the hexagon the HUD draws; whether a
 unit is inside is decided per map cell. The hit chance isn't exported: it follows from the combat
 rules and changes as soon as a unit moves.
 
