@@ -62,9 +62,9 @@ The last one describes the game rather than the career:
   the backers' Shadow Hawk-UMBRA) and the game's internal melee and AI weapons are left out, as are
   the game's role and other advisory texts, which often don't match the best way to use a mech.
 
-Every file starts with `modVersion`, `exportedAt` and the `trigger` of the export that last wrote
+Every file starts with `modVersion`, `exportedAt` and the `trigger` of the export that last changed
 it. A file is replaced in one step, never half-written, and only when its content apart from
-`exportedAt` changed, plus once after every game start. Points in time are day numbers, comparable
+`exportedAt` and `trigger` changed, plus once after every game start. Points in time are day numbers, comparable
 with the company's `daysPassed`, so a day passing with nothing else happening changes only the company's day and date.
 
 The game state holds:
@@ -114,7 +114,8 @@ The game state is exported when:
 - **The game saves the career** outside combat, manually or automatically.
 - **A contract's results are applied**, salvage included.
 - **The monthly financial report is shown**, with the expenses paid.
-- **A work order finishes:** a mech lab order, a medbay heal or an Argo upgrade.
+- **A mech lab order finishes**, **a pilot is healed** in the med bay, or **an Argo upgrade finishes**,
+  once per day; when several finish on the same day, the `trigger` names the last of them.
 - **The contracts of the current system are generated.**
 - **A store is closed.**
 - **The mech bay changes:** a refit, repair, readying or storing is queued, an order is cancelled,
