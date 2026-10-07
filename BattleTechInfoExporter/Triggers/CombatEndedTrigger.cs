@@ -6,8 +6,8 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Triggers;
 
 /// <summary>
-///     Fires when the game tears a battle down (GameInstance.ClearCombat): once its salvage is final, or when it is
-///     quit, restarted or left by loading a save.
+///     Fires when the game tears a battle down (GameInstance.ClearCombat): when the after-action report is left after
+///     the salvage, or when the battle is quit, restarted or left by loading a save.
 /// </summary>
 [HarmonyPatch(typeof(CombatGameState), nameof(CombatGameState.OnCombatGameDestroyed))]
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
