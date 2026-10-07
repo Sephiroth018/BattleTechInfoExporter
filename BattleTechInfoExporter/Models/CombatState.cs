@@ -11,8 +11,8 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="MapId">The map, keyed as in the catalog's <see cref="Catalog.MapDefinitions" />.</param>
 /// <param name="Round">The combat round, counted from 1.</param>
 /// <param name="Phase">
-///     The current phase on the game's initiative scale, as <see cref="CombatUnitState.Initiative" />: units act
-///     from 1 up, which the HUD shows counting down from 5.
+///     The current phase as the HUD numbers it, as <see cref="CombatUnitState.Initiative" />: units act from 5
+///     down to 1.
 /// </param>
 /// <param name="Resolve">The lance's resolve now; its limits are in <c>rules.json</c>'s <see cref="ResolveRules" />.</param>
 /// <param name="Units">

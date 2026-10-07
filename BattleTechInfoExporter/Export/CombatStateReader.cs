@@ -19,7 +19,7 @@ internal static class CombatStateReader
             // The catalog keys maps by their MapID, which the contract knows only by its path.
             MetadataDatabase.Instance.GetMapByPath(contract.mapPath)?.MapID,
             turnDirector.CurrentRound,
-            turnDirector.CurrentPhase,
+            HudInitiative.FromGamePhase(turnDirector.CurrentPhase),
             combat.LocalPlayerTeam.Morale,
             units,
             ObjectiveReader.ReadObjectives(combat, units),

@@ -375,7 +375,8 @@ name, version and folder, `ModLog` its logger. Folders:
   references that need only a description, a faction, a biome or a data-driven enum value, and
   `ComponentReferences` every reference to a component; a reference
   with a naming rule of its own is made by the reader that owns it. `ReferenceOrder` orders the
-  lists of entries that refer to a definition, and `GameText` makes every exported game text plain.
+  lists of entries that refer to a definition, `GameText` makes every exported game text plain,
+  and `HudInitiative` numbers phases and initiative as the HUD does.
   `ExportFileWriter` writes the files in the mod's `exports/` folder and reads an existing file's header.
 - `Models/`: immutable records, one per JSON object, and the mod's own enums. The records are
   marked `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` because only the serializer reads
@@ -455,6 +456,9 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **Points in time are day numbers** on the game's `DaysPassed` scale (`company.daysPassed`), e.g.
   `readyOnDay`, never countdowns, so a passing day changes only the company's day and date. Durations
   that don't count down (a route's travel days) stay durations.
+- **Phases and initiative are numbered as on the HUD** (`HudInitiative`), from 5 down to 1, never on
+  the game's internal scale, where units act from 1 up: in the combat state, and in the rules'
+  statistic changes to the initiative statistics, whose sign flips so a positive change acts earlier.
 - **Game texts are plain text** (`GameText`): descriptions and objective titles lose the
   formatting tags (`<i>`, `<color=…>`) and tooltip links the game's UI renders. Names are left as they are.
 - **Game enums keep the game's values** (e.g. `IN_SYSTEM`, `LIKED`); the UI shows the same. Our own
