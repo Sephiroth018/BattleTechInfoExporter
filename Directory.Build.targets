@@ -6,10 +6,14 @@
     three-part version instead of running git.
   -->
   <Target Name="ComputeBuildVersion" BeforeTargets="GetAssemblyVersion" Condition="'$(DesignTimeBuild)' != 'true'">
-    <Exec Command="git log --first-parent -S&quot;&lt;VersionPrefix&gt;$(VersionPrefix)&lt;/VersionPrefix&gt;&quot; --format=%25%25H --max-count=1 -- Directory.Build.props"
+    <!-- "hash subject" rather than a format with %H, which a Windows batch file mangles. -->
+    <Exec Command="git log --first-parent -S&quot;&lt;VersionPrefix&gt;$(VersionPrefix)&lt;/VersionPrefix&gt;&quot; --oneline --no-abbrev-commit --max-count=1 -- Directory.Build.props"
           WorkingDirectory="$(MSBuildThisFileDirectory)" ConsoleToMsBuild="true" StandardOutputImportance="low">
-      <Output TaskParameter="ConsoleOutput" PropertyName="VersionPrefixCommit" />
+      <Output TaskParameter="ConsoleOutput" PropertyName="VersionPrefixCommitLine" />
     </Exec>
+    <PropertyGroup>
+      <VersionPrefixCommit>$(VersionPrefixCommitLine.Split(' ')[0])</VersionPrefixCommit>
+    </PropertyGroup>
     <Exec Command="git rev-list --count $(VersionPrefixCommit)..HEAD" Condition="'$(VersionPrefixCommit)' != ''"
           WorkingDirectory="$(MSBuildThisFileDirectory)" ConsoleToMsBuild="true" StandardOutputImportance="low">
       <Output TaskParameter="ConsoleOutput" PropertyName="BuildNumber" />
