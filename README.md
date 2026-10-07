@@ -52,8 +52,9 @@ The last one describes the game rather than the career:
     values in a vehicle's definition to three quarters.
   - **Turrets:** weight class, tonnage, firing arc, and armor, structure and components as in
     combat.
-  - **Components:** every component's stats and whether it can come as salvage; for jump jets,
-    the chassis tonnage range that can mount them.
+  - **Components:** every component's stats, the statistics it changes while mounted (e.g. a
+    jump jet's jump distance, an upgrade's melee damage), and whether it can come as salvage; for
+    jump jets, the chassis tonnage range that can mount them.
 
   The other files refer to the catalog's chassis, mechs and components by id instead of repeating
   their stats or limits, e.g. a location's max armor; a file and the catalog belong together when

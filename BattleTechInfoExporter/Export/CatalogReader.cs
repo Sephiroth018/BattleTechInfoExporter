@@ -299,6 +299,7 @@ internal static class CatalogReader
             definition.Description.Cost,
             new[] { definition.BonusValueA, definition.BonusValueB }.Where(bonus => !string.IsNullOrEmpty(bonus))
                 .ToList(),
+            EffectReader.ReadStatisticChanges(definition.statusEffects),
             // Contract.AddMechComponentToSalvage skips blacklisted components.
             !definition.ComponentTags.Contains(MechValidationRules.Tag_Blacklisted));
 

@@ -451,6 +451,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   location) or "planet".
 - **Ship upgrade:** an upgrade of the Argo (`ShipModuleUpgrade`), bought in its engineering
   screen. Never just "upgrade", which components also have.
+- **Statistic change:** a change an ability or component makes to a statistic (the game's
+  `EffectData` of type `StatisticEffect`).
 
 ## Commands
 

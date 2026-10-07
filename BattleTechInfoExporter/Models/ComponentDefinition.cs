@@ -10,6 +10,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Name">The name the mech lab shows, as in the references to the component.</param>
 /// <param name="Cost">The C-Bill value of the component.</param>
 /// <param name="Bonuses">The short bonus texts shown on the component, e.g. "+ 5 Dmg.".</param>
+/// <param name="Effects">The statistics the component changes while mounted.</param>
 /// <param name="IsSalvageable">
 ///     Whether the component can come as salvage; the game's <c>BLACKLISTED</c> tag rules it out. Nothing else
 ///     follows from it, e.g. about stores.
@@ -21,6 +22,7 @@ internal record ComponentDefinition(
     int Slots,
     int Cost,
     IReadOnlyList<string> Bonuses,
+    IReadOnlyList<StatisticChange> Effects,
     bool IsSalvageable);
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
