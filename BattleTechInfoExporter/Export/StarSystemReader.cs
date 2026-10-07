@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using BattleTech;
-using BattleTech.Data;
 using BattleTechInfoExporter.Models;
 using Starmap = BattleTechInfoExporter.Models.Starmap;
 using StarSystem = BattleTech.StarSystem;
@@ -23,22 +21,6 @@ internal static class StarSystemReader
         return new Starmap(ModAssembly.Version, trigger, starSystems);
     }
 
-    // Mirrors the starmap's system panel (SGSystemViewPopulator, HBSTagView), which shows only the tags the
-    // metadata database marks as player-visible, by their friendly name (TagDataStructFetcher.GetItem).
-    private static List<DefinitionReference> ReadVisibleTags(StarSystem system) =>
-        system.Tags
-            .Select(tag => MetadataDatabase.Instance.GetTagIfExists(tag))
-            .Where(tag => tag is { PlayerVisible: true })
-            .Select(tag => new DefinitionReference(tag.Name, tag.FriendlyName))
-            .ToList();
-
-    // StarSystemDef.SupportedBiomes limits the maps of the star system's contracts
-    // (SimGameState.GetSinglePlayerProceduralPlayableMaps).
-    private static List<DefinitionReference> ReadBiomes(SimGameState simGame, StarSystem system) =>
-        system.Def.SupportedBiomes
-            .Select(biome => DefinitionReferences.ReferenceTo(simGame.DataManager, biome))
-            .ToList();
-
     private static Models.StarSystem ReadStarSystem(SimGameState simGame, StarSystem system)
     {
         var canTravelTo = simGame.Starmap.CanTravelToNode(system.ID);
@@ -48,9 +30,6 @@ internal static class StarSystemReader
             : null;
         return new Models.StarSystem(
             system.Def.Description.Name,
-            DefinitionReferences.ReferenceTo(system.OwnerValue),
-            ReadVisibleTags(system),
-            ReadBiomes(simGame, system),
             // As the starmap's system panel shows it (SGSystemViewPopulator).
             simGame.GetNormalizedDifficulty(system.Def),
             canTravelTo,

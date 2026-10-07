@@ -1,11 +1,8 @@
-using System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
 /// <param name="Name">The name, as in the references to the star system.</param>
-/// <param name="Tags">The star system's tags, as its starmap panel shows them.</param>
-/// <param name="Biomes">The biomes the star system's missions can be on.</param>
 /// <param name="Difficulty">The star system's difficulty, as the starmap shows it.</param>
 /// <param name="CanTravelTo">
 ///     Whether the star system's travel requirements are met; story systems stay locked until then.
@@ -18,9 +15,6 @@ namespace BattleTechInfoExporter.Models;
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record StarSystem(
     string Name,
-    DefinitionReference Owner,
-    IReadOnlyList<DefinitionReference> Tags,
-    IReadOnlyList<DefinitionReference> Biomes,
     int Difficulty,
     bool CanTravelTo,
     int? TravelDays,
