@@ -8,10 +8,15 @@ namespace BattleTechInfoExporter.Models;
 ///     has loaded for the career, keyed by id. It describes the game, not the career, so it only changes with the
 ///     game's data.
 /// </summary>
+/// <param name="SourceFingerprint">
+///     A hash of the game's data the catalog was built from (<see cref="Export.CatalogSourceFingerprint" />); the
+///     catalog is rebuilt when it differs from the game's current data.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Catalog(
     string ModVersion,
     ExportTrigger Trigger,
+    string SourceFingerprint,
     IReadOnlyDictionary<string, ChassisDefinition> ChassisDefinitions,
     IReadOnlyDictionary<string, MechDefinition> MechDefinitions,
     IReadOnlyDictionary<string, VehicleDefinition> VehicleDefinitions,
