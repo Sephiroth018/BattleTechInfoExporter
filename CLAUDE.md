@@ -356,15 +356,17 @@ name, version and folder, `ModLog` its logger. Folders:
 - `Export/`: the exporters, the single entry points the triggers call: `GameStateExporter` for the
   career state, the star systems and the financial report, `MissionExporter` for the mission files,
   one method per file, and `CatalogExporter`
-  for the catalog, which first loads the vehicles and turrets the career doesn't and exports once
-  they are loaded. All run their export inside `CampaignExport`. `GameStateReader` builds the game
+  for the catalog, which first loads the vehicles, turrets and design masks the career doesn't and
+  exports once they are loaded. All run their export inside `CampaignExport`. `GameStateReader` builds the game
   state file's models from the game, one reader per section of the file; `RulesReader` builds the
-  rules file's tables, with `AbilityReader` reading each ability; `EffectReader` reads the statistic
-  changes of abilities and components; `StarSystemReader` builds the star systems file from the starmap, with
+  rules file's tables, with `AbilityReader` reading each ability, `CombatRulesReader` the combat
+  constants and `CampaignRulesReader` the campaign constants; `EffectReader` reads the statistic
+  changes of abilities, components, terrains and rules; `StarSystemReader` builds the star systems file from the starmap, with
   `RouteReader` reading the route to a system as the starmap plans it; `FinancialReportReader` builds
   the financial report file; `MissionReader` builds the
   mission files' models from the completed contract; `CatalogReader` builds the catalog from the
-  definitions the game has loaded. `DefinitionReferences` makes the
+  definitions the game has loaded, with `TerrainReader` reading the terrains and biomes from the
+  design masks. `DefinitionReferences` makes the
   references that need only a description, a faction, a biome or a data-driven enum value, and
   `ComponentReferences` every reference to a component; a reference
   with a naming rule of its own is made by the reader that owns it. `ReferenceOrder` orders the
@@ -418,9 +420,14 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   file, so it always belongs to the outcome next to it; the game has no id that identifies every
   contract to link them by.
 - **The catalog is a file of its own that doesn't depend on the career:** `catalog.json`, with
-  every chassis, mech, vehicle, turret and component the game has loaded, written on every career
-  load and so, with an unchanged game, once per game start. Vehicles' and turrets' armor and
-  structure are their combat values, after the game's vehicle multipliers.
+  every chassis, mech, vehicle, turret, component, terrain and biome the game has loaded, written
+  on every career load and so, with an unchanged game, once per game start. Vehicles' and turrets'
+  armor and structure are their combat values, after the game's vehicle multipliers. Terrains are
+  keyed by design mask id, biomes by the biome id the star systems refer to.
+- **The rules export only constants the game's code reads** (`combat` and `campaign` in
+  `rules.json`): a constant the game never reads, reads only in code nothing calls, or reads only
+  for presentation or the AI is left out, so a consumer never plans around a number that does
+  nothing. Rules the game hardcodes next to a constant are stated in the README.
 - **Every export file starts with `modVersion`, `exportedAt` and `trigger`** (`ExportFile`, which
   every file's model inherits), describing the export that last changed it.
 - **Points in time are day numbers** on the game's `DaysPassed` scale (`company.daysPassed`), e.g.
@@ -449,8 +456,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **Vehicle:** a ground unit with fixed armor and loadout (`VehicleDef`), only met as an enemy or
   ally in combat.
 - **Turret:** a fixed emplacement with a single location (`TurretDef`).
-- **Catalog:** the export of every chassis, mech, vehicle, turret and component definition the
-  game has loaded (`catalog.json`).
+- **Catalog:** the export of every chassis, mech, vehicle, turret, component, terrain and biome
+  definition the game has loaded (`catalog.json`).
 - **Star system:** a system on the starmap (`StarSystem`). Never "location" (a mech's body
   location) or "planet".
 - **Ship upgrade:** an upgrade of the Argo (`ShipModuleUpgrade`), bought in its engineering
