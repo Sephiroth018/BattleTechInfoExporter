@@ -84,7 +84,7 @@ internal static class MissionReader
                     mech.GetLocationLoadoutDef(location).CurrentInternalStructure))
                 .Where(damaged => damaged.Armor.Current < damaged.Armor.Assigned
                                   || damaged.RearArmor?.Current < damaged.RearArmor?.Assigned
-                                  || damaged.Structure < mech.GetChassisLocationDef(damaged.Location).InternalStructure)
+                                  || mech.IsLocationDamaged(damaged.Location))
                 .ToList(),
             mech.Inventory
                 .Where(component => component.DamageLevel != ComponentDamageLevel.Functional)
