@@ -171,7 +171,7 @@ it stands in by its catalog id (`null` on open ground). What else it carries fol
 - **The player's and allied units, and enemies in full view:** the mech, vehicle or turret, by its
   catalog id, or, for the player's own mechs, by their mech bay id in the game state, which holds
   their assigned armor; the pilot; and the state: armor front and rear and structure left per
-  location, evasion pips, the guard level with its sources (braced, cover, Bulwark), entrenched,
+  location in whole points as the paper doll shows them (cut off, a remainder below 1 shown as 1), evasion pips, the guard level with its sources (braced, cover, Bulwark), entrenched,
   prone, shut down, unsteady, heat and stability, whether the unit has activated this round, its
   initiative, every component's damage level with the rounds left in each ammo box and in weapons
   that carry their own, the abilities that can be activated with their cooldowns and uses left,

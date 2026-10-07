@@ -82,10 +82,11 @@ internal sealed record CombatUnitState(
     int PrecisionStrikeCost,
     int VigilanceCost);
 
+/// <summary>A location's armor and structure left, in whole points as the paper doll shows them.</summary>
 /// <param name="Location">The game's name of the location (a mech's, vehicle's or turret's).</param>
 /// <param name="RearArmor"><c>null</c> outside a mech's torso, which alone has rear armor.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record UnitLocation(string Location, float Armor, float? RearArmor, float Structure);
+internal sealed record UnitLocation(string Location, int Armor, int? RearArmor, int Structure);
 
 /// <summary>The unit's guard, which the HUD shows as guarded at <see cref="Level" /> 1 or more.</summary>
 /// <param name="Level">

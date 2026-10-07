@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BattleTech;
+using BattleTech.UI;
 using BattleTechInfoExporter.Models;
 using UnityEngine;
 using Mech = BattleTech.Mech;
@@ -180,11 +181,20 @@ internal static class CombatUnitReader
             actor.DefensivePushCost);
     }
 
+    // Whole points, as the paper doll shows them (HUDMechArmorReadout.FormatForSummary, which the vehicle and turret
+    // readouts share): cut off, except that a remainder below 1 shows as 1.
+    private static UnitLocation ReadLocation(string location, float armor, float? rearArmor, float structure) =>
+        new(
+            location,
+            HUDMechArmorReadout.FormatForSummary(armor),
+            rearArmor is { } rear ? HUDMechArmorReadout.FormatForSummary(rear) : null,
+            HUDMechArmorReadout.FormatForSummary(structure));
+
     private static List<UnitLocation> ReadLocations(AbstractActor actor) =>
         actor switch
         {
             Mech mech => MechReader.Locations
-                .Select(location => new UnitLocation(
+                .Select(location => ReadLocation(
                     location.ToString(),
                     // A location's front armor has the location's value (MechStructureRules.GetArmorFromChassisLocation).
                     mech.GetCurrentArmor((ArmorLocation)location),
@@ -192,7 +202,7 @@ internal static class CombatUnitReader
                     mech.GetCurrentStructure(location)))
                 .ToList(),
             Vehicle vehicle => CatalogReader.VehicleLocationsOf(vehicle.VehicleDef.Chassis)
-                .Select(location => new UnitLocation(
+                .Select(location => ReadLocation(
                     location.ToString(),
                     vehicle.GetCurrentArmor(location),
                     null,
@@ -200,7 +210,7 @@ internal static class CombatUnitReader
                 .ToList(),
             Turret turret =>
             [
-                new UnitLocation(
+                ReadLocation(
                     nameof(BuildingLocation.Structure),
                     turret.GetCurrentArmor(BuildingLocation.Structure),
                     null,
