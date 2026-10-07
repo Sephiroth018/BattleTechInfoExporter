@@ -427,7 +427,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **The rules export only constants the game's code reads** (`combat` and `campaign` in
   `rules.json`): a constant the game never reads, reads only in code nothing calls, or reads only
   for presentation or the AI is left out, so a consumer never plans around a number that does
-  nothing. Rules the game hardcodes next to a constant are stated in the README.
+  nothing. A value the game hardcodes but a tool computes with (a rounding, a limit) is exported
+  next to the constants; a rule it hardcodes with conditions is stated in the README.
 - **Every export file starts with `modVersion`, `exportedAt` and `trigger`** (`ExportFile`, which
   every file's model inherits), describing the export that last changed it.
 - **Points in time are day numbers** on the game's `DaysPassed` scale (`company.daysPassed`), e.g.

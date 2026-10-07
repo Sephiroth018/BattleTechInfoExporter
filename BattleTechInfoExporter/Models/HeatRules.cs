@@ -1,9 +1,11 @@
-using System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
-/// <summary>The heat rules of mechs; vehicles and turrets have no heat.</summary>
+/// <summary>
+///     The heat rules of mechs; vehicles and turrets have no heat. What Coolant Vent does is with the ability in
+///     <see cref="SkillRules" />.
+/// </summary>
 /// <param name="MaxHeat">The heat at which a mech shuts down.</param>
 /// <param name="OverheatsAbove">
 ///     Above this heat the mech is overheated: it takes <see cref="OverheatStructureDamageByWeightClass" /> in every
@@ -13,8 +15,6 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="MaxHeatAfterRestart">A mech restarting from shutdown is cooled to at most this heat.</param>
 /// <param name="HeatGeneratedMultiplier">Multiplies all heat a mech generates itself.</param>
 /// <param name="HeatSinkMultiplier">Multiplies a mech's heat sink capacity, together with the terrain's and biome's.</param>
-/// <param name="CoolantVentEffects">What the Coolant Vent ability does when used.</param>
-/// <param name="CoolantVentCooldownEffects">What follows it once the venting ends.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record HeatRules(
     int MaxHeat,
@@ -28,10 +28,7 @@ internal sealed record HeatRules(
     int MaxHeatAfterRestart,
     float HeatGeneratedMultiplier,
     float HeatSinkMultiplier,
-    ByWeightClass<float> OverheatStructureDamageByWeightClass,
-    bool ShutdownCausesInjury,
-    IReadOnlyList<StatisticChange> CoolantVentEffects,
-    IReadOnlyList<StatisticChange> CoolantVentCooldownEffects);
+    ByWeightClass<float> OverheatStructureDamageByWeightClass);
 
 /// <summary>
 ///     A jump's heat: <see cref="PerUnit" /> for each started <see cref="UnitSize" /> meters of the distance, at

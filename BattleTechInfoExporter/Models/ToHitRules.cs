@@ -21,9 +21,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="AttackerStoodUp">When the attacker stood up this round.</param>
 /// <param name="AttackerOverheated">When the attacking mech is overheated.</param>
 /// <param name="ArmMountedWeapon">For a mech's ranged weapon mounted in an arm.</param>
-/// <param name="DamagedWeapon">For a damaged weapon.</param>
 /// <param name="WeaponInDamagedLocation">For a weapon in a damaged location of a mech.</param>
-/// <param name="PrecisionStrike">For a Precision Strike.</param>
 /// <param name="MechFiringArcDegrees">
 ///     How far to either side of its facing a mech can fire without turning; a turret's arc is in the catalog.
 /// </param>

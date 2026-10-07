@@ -110,8 +110,7 @@ internal static class CombatRulesReader
     }
 
     // Pips from Mech.GetEvasivePipsResult and Vehicle.GetEvasivePipsResult; their modifier from
-    // ToHit.GetEvasivePipsModifier, which weapons the pips apply to from ToHit.WeaponIsAffectedByEvasive, the
-    // stripping from SensorLockSequence.
+    // ToHit.GetEvasivePipsModifier, which weapons the pips apply to from ToHit.WeaponIsAffectedByEvasive.
     private static EvasionRules ReadEvasion(CombatGameConstants constants)
     {
         var toHit = constants.ToHit;
@@ -121,8 +120,6 @@ internal static class CombatRulesReader
                 .Select((distance, index) => new EvasivePips(distance, toHit.EvasivePipsMovingTarget[index]))
                 .ToList(),
             toHit.ToHitMovingPipUMs,
-            true,
-            toHit.SensorLockStripsEvasivePips ? toHit.SensorLockPipsStripped : 0,
             toHit.WeaponsAffectedByEvasive.Select(weaponType => (WeaponType)weaponType).ToList(),
             resolution.VehicleEvasiveResultMultiplier,
             resolution.VehiclesGetEvasive);
@@ -158,7 +155,6 @@ internal static class CombatRulesReader
     private static HeatRules ReadHeat(CombatGameConstants constants)
     {
         var heat = constants.Heat;
-        var resolution = constants.ResolutionConstants;
         return new HeatRules(
             heat.MaxHeat,
             // As Mech.InitStats sets the OverheatLevel statistic.
@@ -180,10 +176,7 @@ internal static class CombatRulesReader
                 heat.CriticalHeatPerLocationLight,
                 heat.CriticalHeatPerLocationMedium,
                 heat.CriticalHeatPerLocationHeavy,
-                heat.CriticalHeatPerLocationAssault),
-            heat.ShutdownCausesInjury,
-            EffectReader.ReadStatisticChanges([resolution.CoolantVentEffect]),
-            EffectReader.ReadStatisticChanges([resolution.CoolantVentCooldownEffect]));
+                heat.CriticalHeatPerLocationAssault));
     }
 
     // The recovery is Mech.GetMinStability's: the level the mech is in always empties, then the action's
@@ -253,6 +246,7 @@ internal static class CombatRulesReader
     private static VisibilityRules ReadVisibility(CombatGameConstants constants)
     {
         var visibility = constants.Visibility;
+        var toHit = constants.ToHit;
         return new VisibilityRules(
             visibility.BaseSpotterDistance,
             visibility.SpotterTacticsMultiplier,
@@ -264,7 +258,7 @@ internal static class CombatRulesReader
             visibility.ShutDownVisibilityModifier,
             visibility.GhostStateHidesBlips,
             new SensorLockRules(
-                constants.ToHit.SensorLockStripsEvasivePips ? constants.ToHit.SensorLockPipsStripped : 0,
+                toHit.SensorLockStripsEvasivePips ? toHit.SensorLockPipsStripped : 0,
                 EffectReader.ReadStatisticChanges(
                     Enumerable.Repeat(visibility.SensorsImpairedEffect, visibility.NumSensorLockImpairedEffects)
                         .Append(visibility.SensorLockAntiStealthEffect))),
@@ -284,7 +278,7 @@ internal static class CombatRulesReader
             morale.CanUseInspireLevel,
             morale.InspireCost,
             morale.AutoInspire,
-            EffectReader.ReadStatisticChanges([morale.InspiredEffect]),
+            EffectReader.ReadStatisticChanges(morale.InspiredEffect),
             morale.MoraleBaselineGainPerRound,
             // Team.CollectUnitBaseline.
             morale switch
@@ -320,7 +314,7 @@ internal static class CombatRulesReader
                 morale.ChangeMajorityAttackingShotsMiss,
                 morale.ChangeObjectiveCompleted,
                 morale.ChangeObjectiveFailed),
-            EffectReader.ReadStatisticChanges([morale.InitiativeDelayEffect]),
+            EffectReader.ReadStatisticChanges(morale.InitiativeDelayEffect),
             morale.CanAIBeInspired);
 
     // Mech.MoveMultiplier; the pivot is PathNodeGrid.BuildPathFromEnd's, the hex width HexGrid's.

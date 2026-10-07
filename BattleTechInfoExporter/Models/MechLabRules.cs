@@ -20,7 +20,7 @@ namespace BattleTechInfoExporter.Models;
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechLabRules(
     MechLabCost StructureRepair,
-    MechLabCost DestroyedLocationRepairMultipliers,
+    MechLabCostMultipliers DestroyedLocationRepairMultipliers,
     MechLabCost ComponentRepair,
     InstallCosts Install,
     MechLabCost ArmorChange,
@@ -28,9 +28,11 @@ internal sealed record MechLabRules(
     int ReadyMechTechPoints,
     float CancelRefundShare);
 
-/// <summary>Tech points and C-Bills.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechLabCost(float TechPoints, float CBills);
+
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record MechLabCostMultipliers(float TechPoints, float CBills);
 
 /// <summary>
 ///     By the component's category: weapons by their type, where ballistic covers autocannons, Gauss rifles and

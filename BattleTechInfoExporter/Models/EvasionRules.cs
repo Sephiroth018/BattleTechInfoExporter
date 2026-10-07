@@ -4,9 +4,12 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
-/// <summary>How a unit earns evasive pips by moving and what each pip does to ranged attacks against it.</summary>
+/// <summary>
+///     How a unit earns evasive pips by moving and what each pip does to ranged attacks against it. A sensor lock
+///     strips pips (see <see cref="SensorLockRules.EvasivePipsStripped" />).
+/// </summary>
 /// <param name="PipsByDistanceMoved">
-///     The pips for moving more than a distance, before a jump's extra pip and the unit's own maximum.
+///     The pips for moving more than a distance; a jump adds one, and the unit's own maximum caps them.
 /// </param>
 /// <param name="ModifierByPips">
 ///     The to-hit modifier by the number of pips, from one pip up; each pip beyond the last entry adds the
@@ -18,8 +21,6 @@ namespace BattleTechInfoExporter.Models;
 internal sealed record EvasionRules(
     IReadOnlyList<EvasivePips> PipsByDistanceMoved,
     IReadOnlyList<float> ModifierByPips,
-    bool JumpAddsPip,
-    int SensorLockStripsPips,
     IReadOnlyList<WeaponType> WeaponTypesAffected,
     float VehiclePipMultiplier,
     bool CanVehiclesBeEvasive);

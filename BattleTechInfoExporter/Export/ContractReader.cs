@@ -142,7 +142,11 @@ internal static class ContractReader
     private static int ReadDifficulty(SimGameState simGame, ContractOverride contractOverride) =>
         Mathf.Min(
             contractOverride.finalDifficulty + contractOverride.difficultyUIModifier,
-            (int)simGame.Constants.Story.GlobalContractDifficultyMax);
+            MaxGlobalDifficulty(simGame));
+
+    /// <summary>The cap on the career's global difficulty, as SimGameState.ContractUserMeetsReputation_Campaign rounds it.</summary>
+    internal static int MaxGlobalDifficulty(SimGameState simGame) =>
+        (int)simGame.Constants.Story.GlobalContractDifficultyMax;
 
     // A travel contract gets a new override without an id (SimGameState.CreateTravelContract); the original's id
     // is only kept in the success action that starts the contract on arrival.

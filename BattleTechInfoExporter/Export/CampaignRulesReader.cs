@@ -18,11 +18,11 @@ internal static class CampaignRulesReader
         var constants = simGame.Constants;
         return new CampaignRules(
             ReadMechLab(constants),
-            ReadMedBay(simGame),
+            ReadMedBay(constants),
             ReadHiring(simGame),
             ReadSalvage(constants),
             ReadFinances(simGame),
-            ReadContracts(constants),
+            ReadContracts(simGame),
             new AllianceRules(
                 Mathf.RoundToInt(constants.Story.AllyReputationThreshold),
                 constants.Story.BreakAllianceReputationChange,
@@ -42,7 +42,7 @@ internal static class CampaignRulesReader
         var mechLab = constants.MechLab;
         return new MechLabRules(
             new MechLabCost(mechLab.StructureRepairTechPoints, mechLab.StructureRepairCost),
-            new MechLabCost(mechLab.ZeroStructureTechPointModifier, mechLab.ZeroStructureCBillModifier),
+            new MechLabCostMultipliers(mechLab.ZeroStructureTechPointModifier, mechLab.ZeroStructureCBillModifier),
             new MechLabCost(mechLab.ComponentRepairTechPoints, mechLab.ComponentRepairCost),
             new InstallCosts(
                 new MechLabCost(mechLab.BallisticInstallTechPoints, mechLab.BallisticInstallCost),
@@ -60,10 +60,10 @@ internal static class CampaignRulesReader
     }
 
     // SimGameState.GetDailyHealValue and GetInjuryCost; the death roll is Contract.FinalizeKilledMechWarriors'.
-    private static MedBayRules ReadMedBay(SimGameState simGame)
+    private static MedBayRules ReadMedBay(SimGameConstants constants)
     {
-        var story = simGame.Constants.Story;
-        var pilot = simGame.Constants.Pilot;
+        var story = constants.Story;
+        var pilot = constants.Pilot;
         return new MedBayRules(
             story.DailyHealValue,
             story.MedTechSkillMod,
@@ -172,8 +172,9 @@ internal static class CampaignRulesReader
     // The pay is SimGameState.CalculateContractValueByContractType's, the payout Contract.CompleteContract's with
     // GetScaledCBillValue, the reputation Contract.GetBaseReputationValue's and GetNegotiableReputationBaseValue's,
     // the difficulty SimGameState.GetDifficultyRangeForContract's, the slots StarSystem.UpdateSystemDay's.
-    private static ContractRules ReadContracts(SimGameConstants constants)
+    private static ContractRules ReadContracts(SimGameState simGame)
     {
+        var constants = simGame.Constants;
         var finances = constants.Finances;
         var story = constants.Story;
         return new ContractRules(
@@ -199,7 +200,7 @@ internal static class CampaignRulesReader
                 story.XPFailureMod,
                 story.XPGoodFaithMod,
                 story.XPBadFaithMod),
-            Mathf.RoundToInt(story.GlobalContractDifficultyMax),
+            ContractReader.MaxGlobalDifficulty(simGame),
             story.ContractDifficultyVariance,
             story.MaxContractsPerSystem,
             story.ContractRenewalPerWeek,

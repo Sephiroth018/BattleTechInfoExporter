@@ -17,31 +17,23 @@ internal static class TerrainReader
     // DesignMaskDef's default move cost, which no unit's movement reaches a single meter of.
     private const float ImpassableMoveCost = 9999.9f;
 
-    // Painted onto cells at runtime, but never applied as a cell's terrain (MapMetaData.GetPriorityTerrainMaskFlags),
-    // so their definitions' values never take effect.
-    private static readonly IReadOnlyList<string> NeverAppliedMaskIds =
-    [
-        "DesignMaskDropshipLandingZone",
-        "DesignMaskDropPodLandingZone",
-        "DesignMaskDangerousLocation"
-    ];
-
     private static readonly IReadOnlyList<Biome.BIOMESKIN> Biomes = Enum.GetValues(typeof(Biome.BIOMESKIN))
         .Cast<Biome.BIOMESKIN>()
         .Where(biome => biome != Biome.BIOMESKIN.UNDEFINED)
         .ToList();
 
-    // Each biome's mask (MapMetaData.biomeDesignMask), which the maps name as Biome.GetDesignMaskNameFromBiomeSkin
-    // does.
-    private static readonly HashSet<string> BiomeMaskIds = new(
-        Biomes.Select(Biome.GetDesignMaskNameFromBiomeSkin),
+    // The masks that aren't terrains: each biome's mask (MapMetaData.biomeDesignMask), which the maps name as
+    // Biome.GetDesignMaskNameFromBiomeSkin does, and the masks painted onto cells at runtime but never applied as
+    // a cell's terrain (MapMetaData.GetPriorityTerrainMaskFlags), whose values never take effect.
+    private static readonly HashSet<string> NonTerrainMaskIds = new(
+        Biomes.Select(Biome.GetDesignMaskNameFromBiomeSkin)
+            .Concat(["DesignMaskDropshipLandingZone", "DesignMaskDropPodLandingZone", "DesignMaskDangerousLocation"]),
         StringComparer.Ordinal);
 
     internal static SortedDictionary<string, TerrainDefinition> ReadTerrainDefinitions(DataManager dataManager)
     {
         var terrains = new SortedDictionary<string, TerrainDefinition>(StringComparer.Ordinal);
-        foreach (var mask in dataManager.DesignMaskDefs
-                     .Where(mask => !BiomeMaskIds.Contains(mask.Key) && !NeverAppliedMaskIds.Contains(mask.Key)))
+        foreach (var mask in dataManager.DesignMaskDefs.Where(mask => !NonTerrainMaskIds.Contains(mask.Key)))
         {
             terrains.Add(mask.Key, ReadTerrain(mask.Value));
         }
@@ -78,21 +70,18 @@ internal static class TerrainReader
         new(
             mask.Description.Name,
             new TerrainMoveCosts(
-                new ByWeightClass<float?>(
-                    MoveCost(mask.moveCostMechLight),
-                    MoveCost(mask.moveCostMechMedium),
-                    MoveCost(mask.moveCostMechHeavy),
-                    MoveCost(mask.moveCostMechAssault)),
-                new ByWeightClass<float?>(
-                    MoveCost(mask.moveCostTrackedLight),
-                    MoveCost(mask.moveCostTrackedMedium),
-                    MoveCost(mask.moveCostTrackedHeavy),
-                    MoveCost(mask.moveCostTrackedAssault)),
-                new ByWeightClass<float?>(
-                    MoveCost(mask.moveCostWheeledLight),
-                    MoveCost(mask.moveCostWheeledMedium),
-                    MoveCost(mask.moveCostWheeledHeavy),
-                    MoveCost(mask.moveCostWheeledAssault))),
+                MoveCosts(mask.moveCostMechLight, mask.moveCostMechMedium, mask.moveCostMechHeavy,
+                    mask.moveCostMechAssault),
+                MoveCosts(
+                    mask.moveCostTrackedLight,
+                    mask.moveCostTrackedMedium,
+                    mask.moveCostTrackedHeavy,
+                    mask.moveCostTrackedAssault),
+                MoveCosts(
+                    mask.moveCostWheeledLight,
+                    mask.moveCostWheeledMedium,
+                    mask.moveCostWheeledHeavy,
+                    mask.moveCostWheeledAssault)),
             mask.moveCostSprintMultiplier,
             mask.visibilityMultiplier,
             mask.visibilityHeight,
@@ -111,7 +100,10 @@ internal static class TerrainReader
                 mask.energyDamageTakenMultiplier,
                 mask.ballisticDamageTakenMultiplier,
                 mask.missileDamageTakenMultiplier),
-            mask.stickyEffect is { } stickyEffect ? EffectReader.ReadStatisticChanges([stickyEffect]) : []);
+            mask.stickyEffect is { } stickyEffect ? EffectReader.ReadStatisticChanges(stickyEffect) : []);
+
+    private static ByWeightClass<float?> MoveCosts(float light, float medium, float heavy, float assault) =>
+        new(MoveCost(light), MoveCost(medium), MoveCost(heavy), MoveCost(assault));
 
     private static float? MoveCost(float cost) => cost >= ImpassableMoveCost ? null : cost;
 

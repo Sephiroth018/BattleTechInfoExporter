@@ -16,6 +16,9 @@ internal static class EffectReader
             .Select(ReadStatisticChange)
             .ToList();
 
+    /// <summary>The changes of a single effect the game applies on its own, outside any ability or component.</summary>
+    internal static List<StatisticChange> ReadStatisticChanges(EffectData effect) => ReadStatisticChanges([effect]);
+
     private static StatisticChange ReadStatisticChange(EffectData effect)
     {
         var statistic = effect.statisticData;
