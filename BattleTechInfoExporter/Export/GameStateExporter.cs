@@ -9,6 +9,7 @@ internal static class GameStateExporter
     private const string GameStateFileName = "game-state.json";
     private const string RulesFileName = "rules.json";
     private const string StarSystemsFileName = "star-systems.json";
+    private const string FinancialReportFileName = "financial-report.json";
 
     internal static void Export(SimGameState simGame, ExportTrigger trigger) =>
         CampaignExport.Run(
@@ -20,8 +21,10 @@ internal static class GameStateExporter
                 var gameState = GameStateReader.Read(simGame, trigger);
                 var rules = RulesReader.Read(simGame, trigger);
                 var starmap = StarSystemReader.Read(simGame, trigger);
+                var financialReport = FinancialReportReader.Read(simGame, trigger);
                 ExportFileWriter.Write(GameStateFileName, gameState);
                 ExportFileWriter.Write(RulesFileName, rules);
                 ExportFileWriter.Write(StarSystemsFileName, starmap);
+                ExportFileWriter.Write(FinancialReportFileName, financialReport);
             });
 }

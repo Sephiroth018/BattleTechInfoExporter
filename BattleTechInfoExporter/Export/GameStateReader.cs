@@ -39,7 +39,7 @@ internal static class GameStateReader
             simGame.DaysPassed,
             simGame.CurrentDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
             new Morale(simGame.Morale, simGame.GetCurrentMoraleLevelDescriptor()),
-            FinancialReportReader.ReadFinancialReport(simGame),
+            simGame.Funds,
             new MercenaryReviewBoard(
                 simGame.GetRawReputation(FactionEnumeration.GetMercenaryReviewBoardFactionValue()),
                 simGame.GetCurrentMRBLevel()),

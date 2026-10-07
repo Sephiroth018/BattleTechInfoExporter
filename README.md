@@ -8,7 +8,7 @@ The mod is a work in progress; see [Planned](#planned) for what's still missing.
 
 ## Export files
 
-The files are in `Mods/BattleTechInfoExporter/exports/`. Three of them hold the career and are
+The files are in `Mods/BattleTechInfoExporter/exports/`. Four of them hold the career and are
 written together on every career export:
 
 - `game-state.json`: the career state.
@@ -21,6 +21,9 @@ written together on every career export:
   the days and C-Bills the trip from the current system takes as the starmap shows them (0 for the
   current system, `null` where there is no route). The game state and the mission outcome refer to
   a star system only by its id and name.
+- `financial-report.json`: the next monthly financial report, as on the finance screen: the day it
+  is due, the spending level and its options with their expected expenses and morale change, and
+  the expected expense lines for the ship, its upgrades, each mech and each pilot.
 
 Two more hold the latest mission:
 
@@ -71,10 +74,8 @@ with the company's `daysPassed`, so a day passing with nothing else happening ch
 
 The game state holds:
 
-- **Company:** name, date, morale, rating, MechTech and MedTech with the changes events made to
-  them for a time and the day each ends, and the reputation with every faction.
-- **Finances:** funds, the day of the next financial report, the spending level and its expected
-  expenses.
+- **Company:** name, date, funds, morale, rating, MechTech and MedTech with the changes events made
+  to them for a time and the day each ends, and the reputation with every faction.
 - **Work queue:** the timeline's entries in order, each with the day it finishes and the mech,
   pilot, destination or ship upgrade it applies to.
 - **Ship:** the Argo's upgrades the engineering screen shows, each installed, installing,
