@@ -17,11 +17,10 @@ written together on every career export:
   jets, and the combat and campaign rules), which the game state and the mission outcome refer to
   by name instead of repeating thresholds and effects per entry.
 - `star-systems.json`: every star system on the starmap, locked story systems included, keyed by
-  id, with its name, owner, tags, biomes, the maps its contracts can be fought on (as the game
-  selects them from the system's biomes and map tags; the catalog has their terrain), difficulty,
-  whether its travel requirements are met, and the days and C-Bills the trip from the current
-  system takes as the starmap shows them (0 for the current system, `null` where there is no
-  route). The game state and the mission outcome refer to a star system only by its id and name.
+  id, with its name, owner, tags, biomes, difficulty, whether its travel requirements are met, and
+  the days and C-Bills the trip from the current system takes as the starmap shows them (0 for the
+  current system, `null` where there is no route). The game state and the mission outcome refer to
+  a star system only by its id and name.
 - `financial-report.json`: the next monthly financial report, as on the finance screen: the day it
   is due, the spending level and its options with their expected expenses (their cost multiplier
   and morale change are in the rules), and the expected expense lines for the ship, its upgrades,
@@ -70,16 +69,17 @@ The last one describes the game rather than the career:
     unit on it on top of the terrain: heat sinking, heat per turn and damage dealt, the only
     values the game reads from a biome.
   - **Maps:** every map some star system's contracts can be fought on: name, biome, map tags, the
-    contract generator's draw weight and the terrain coverage: each terrain's share of the map's
-    playable cells by terrain id, plus `none` for the cells with no terrain, the bare biome. Cells
-    are all the same size, so a share is an area share; the shares sum to 1. The same kind of cell
-    is a different terrain per map, e.g. water is ice on a frozen map, so the shares name the
-    terrain directly. Buildings aren't terrain: a cell under a building counts as the terrain below
-    it.
+    star systems whose contracts the game can put on it (selected as the contract generator does,
+    from the system's biomes and map tags), the contract generator's draw weight and the terrain
+    coverage: each terrain's share of the map's playable cells by terrain id, plus `none` for the
+    cells with no terrain, the bare biome. Cells are all the same size, so a share is an area
+    share; the shares sum to 1. The same kind of cell is a different terrain per map, e.g. water is
+    ice on a polar map, so the shares name the terrain directly. Buildings aren't terrain: a cell
+    under a building counts as the terrain below it.
 
-    The terrain a star system's contracts are likely fought on follows from the system's maps,
-    drawn by weight. The contract type and the maps the game recently offered filter further and
-    aren't exported.
+    The terrain a star system's contracts are likely fought on follows from the maps that list the
+    system, drawn by weight. The contract type and the maps the game recently offered filter
+    further and aren't exported.
 
   The other files refer to the catalog's chassis, mechs and components by id instead of repeating
   their stats or limits, e.g. a location's max armor; a file and the catalog belong together when

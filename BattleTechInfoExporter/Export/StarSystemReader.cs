@@ -51,10 +51,6 @@ internal static class StarSystemReader
             DefinitionReferences.ReferenceTo(system.OwnerValue),
             ReadVisibleTags(system),
             ReadBiomes(simGame, system),
-            MapReader.ReadPlayableMaps(system)
-                .Select(MapReader.ReferenceTo)
-                .OrderByDefinition(map => map)
-                .ToList(),
             // As the starmap's system panel shows it (SGSystemViewPopulator).
             simGame.GetNormalizedDifficulty(system.Def),
             canTravelTo,
