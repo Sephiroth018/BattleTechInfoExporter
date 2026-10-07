@@ -287,7 +287,12 @@ internal static class CombatUnitReader
                         : FireAvailability.None;
                 return new LineOfFire(
                     target.GUID,
-                    level,
+                    level switch
+                    {
+                        LineOfFireLevel.LOFClear => LineOfFireBlocking.Clear,
+                        LineOfFireLevel.LOFObstructed => LineOfFireBlocking.PartiallyBlocked,
+                        _ => LineOfFireBlocking.Blocked
+                    },
                     fire,
                     attacker.IsInFiringArc(target, attacker.CurrentPosition, attacker.CurrentRotation));
             })

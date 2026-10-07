@@ -186,7 +186,8 @@ it stands in by its catalog id (`null` on open ground). What else it carries fol
 
 The player's units carry their lines of fire to every enemy in full view, and those enemies theirs
 to the player's units, as hovering over a target shows them from where the unit stands: the line
-of fire (clear, obstructed or blocked), whether a weapon could fire at the target directly, only
+of fire (`clear`, `partiallyBlocked`, the game's obstructed, which still allows direct fire with
+the penalties of the rules' `lineOfFire`, or `blocked`), whether a weapon could fire at the target directly, only
 indirectly or not at all, or it is out of range, and whether it is in the firing arc without
 turning. Phase and initiative are on the game's scale, as in the rules: units act from 1 up, which
 the HUD shows counting down from 5. A zone's radius is that of the hexagon the HUD draws; whether a

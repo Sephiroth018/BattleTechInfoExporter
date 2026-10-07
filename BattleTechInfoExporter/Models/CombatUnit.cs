@@ -122,13 +122,13 @@ internal sealed record CombatAbility(DefinitionReference Ability, int Cooldown, 
 /// </summary>
 /// <param name="Target">The target's unit id, a key of <see cref="CombatState.Units" />.</param>
 /// <param name="Level">
-///     The line of fire itself: clear, obstructed (the target has cover) or blocked. A target beyond every weapon's
-///     range and the unit's sensors is blocked too.
+///     How much of the line of fire itself is blocked. A target beyond every weapon's range and the unit's sensors is
+///     blocked too.
 /// </param>
 /// <param name="IsInFiringArc">Whether the target is in the unit's firing arc without turning.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record LineOfFire(
     string Target,
-    LineOfFireLevel Level,
+    LineOfFireBlocking Level,
     FireAvailability Fire,
     bool IsInFiringArc);
