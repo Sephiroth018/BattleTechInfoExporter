@@ -3,6 +3,7 @@ using System.Linq;
 using BattleTech;
 using BattleTechInfoExporter.Models;
 using Contract = BattleTech.Contract;
+using Mech = BattleTech.Mech;
 
 namespace BattleTechInfoExporter.Export;
 
@@ -26,6 +27,7 @@ internal static class MissionReader
             ContractReader.ReadMissionContract(simGame, contract),
             contract.State,
             contract.IsGoodFaithEffort,
+            contract.TotalCombatRounds,
             contract.MissionObjectiveResultList
                 .Select(objective => new ObjectiveResult(
                     GameText.ToPlainText(objective.title),
@@ -90,8 +92,39 @@ internal static class MissionReader
                     component.MountedLocation,
                     component.DamageLevel))
                 .OrderByComponent(component => component.Component)
-                .ToList());
+                .ToList(),
+            ReadAmmunitionUse(FindCombatMech(contract, mech)));
     }
+
+    // The unit's mech as it fought, which alone knows its ammo: Mech.ToMechDef copies no ammo but keeps the GUID.
+    // The combat outlives the after-action report (MissionResults.ConfirmResults clears it after FinalizeSalvage),
+    // so both writes of the outcome find it.
+    private static Mech FindCombatMech(Contract contract, MechDef mech) =>
+        contract.BattleTechGame.Combat.AllMechs.Single(combatMech => combatMech.MechDef.GUID == mech.GUID);
+
+    private static List<AmmunitionUse> ReadAmmunitionUse(Mech combatMech) =>
+        combatMech.allComponents
+            .Select(component => ReadShotsFired(component) is { } shotsFired
+                ? new AmmunitionUse(
+                    ComponentReferences.ReferenceTo(component.mechComponentRef),
+                    component.mechComponentRef.MountedLocation,
+                    shotsFired)
+                : null)
+            .OfType<AmmunitionUse>()
+            .ToList();
+
+    // AmmunitionBox.CurrentAmmo reports 0 for a destroyed box; its statistic keeps the rounds left when it was
+    // destroyed, so the shots fired are what the capacity lost. A weapon that carries its own ammo
+    // (AmmoCategoryValue.UsesInternalAmmo) starts a mission with WeaponDef.StartingAmmoCapacity. Null for a
+    // component without ammo.
+    private static int? ReadShotsFired(MechComponent component) =>
+        component switch
+        {
+            AmmunitionBox box => box.AmmoCapacity - box.StatCollection.GetValue<int>("CurrentAmmo"),
+            Weapon { AmmoCategoryValue.UsesInternalAmmo: true } weapon =>
+                weapon.weaponDef.StartingAmmoCapacity - weapon.InternalAmmo,
+            _ => null
+        };
 
     // The mech as the mech bay gets it back, with its non-functional components working again
     // (SimGameState.ResolveCompleteContract); restored on a copy, as the contract's results stay as they are.

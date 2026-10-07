@@ -13,6 +13,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="IsGoodFaithEffort">
 ///     Whether a retreated or failed contract still counts as a good faith effort, which softens its penalties.
 /// </param>
+/// <param name="Rounds">The combat rounds the mission took, counted from 1.</param>
 /// <param name="Payment">The C-Bills paid, with the good faith modifier and the bonuses applied.</param>
 /// <param name="Reputation">The final reputation changes with the employer and the target.</param>
 /// <param name="MercenaryReviewBoardReputation">The change of the Mercenary Review Board rating.</param>
@@ -25,6 +26,7 @@ internal sealed record MissionOutcome(
     MissionContract Contract,
     BattleTech.Contract.ContractState State,
     bool IsGoodFaithEffort,
+    int Rounds,
     IReadOnlyList<ObjectiveResult> Objectives,
     int Payment,
     ReputationChange Reputation,
@@ -73,6 +75,9 @@ internal sealed record ObjectiveResult(string Title, bool IsPrimary, ObjectiveSt
 /// </param>
 /// <param name="DamagedLocations">The locations that lost armor or structure, from head to legs.</param>
 /// <param name="DamagedComponents">The components damaged or destroyed.</param>
+/// <param name="Ammunition">
+///     The shots fired from every ammo box and every weapon that carries its own ammo, in the mech's component order.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record LanceUnitOutcome(
     PilotReference Pilot,
@@ -87,7 +92,8 @@ internal sealed record LanceUnitOutcome(
     bool IsMechLost,
     RepairEstimate? Repair,
     IReadOnlyList<DamagedLocation> DamagedLocations,
-    IReadOnlyList<DamagedComponent> DamagedComponents);
+    IReadOnlyList<DamagedComponent> DamagedComponents,
+    IReadOnlyList<AmmunitionUse> Ammunition);
 
 /// <param name="RearArmor"><c>null</c> outside the torso, which alone has rear armor.</param>
 /// <param name="Structure">The structure left: zero when destroyed.</param>
@@ -99,6 +105,14 @@ internal sealed record DamagedComponent(
     ComponentReference Component,
     ChassisLocations Location,
     ComponentDamageLevel DamageLevel);
+
+/// <summary>The shots a mech fired from an ammo box, or from a weapon that carries its own ammo.</summary>
+/// <param name="Used">
+///     The shots fired, also from a box destroyed since; the capacity is the catalog's
+///     <see cref="AmmunitionBoxDefinition.Capacity" /> or <see cref="WeaponDefinition.InternalAmmoCapacity" />.
+/// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record AmmunitionUse(ComponentReference Component, ChassisLocations Location, int Used);
 
 /// <summary>The salvage of the mission: the offer as the mission ended, and what the company got once it is final.</summary>
 /// <param name="Total">How many items of <see cref="Pool" /> the company gets.</param>

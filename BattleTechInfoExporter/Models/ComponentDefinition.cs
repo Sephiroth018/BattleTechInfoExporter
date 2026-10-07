@@ -32,6 +32,7 @@ internal sealed record WeaponDefinition : ComponentDefinition
         ComponentDefinition component,
         string category,
         string? ammoCategory,
+        int? internalAmmoCapacity,
         float damage,
         float instability,
         int shotsWhenFired,
@@ -46,6 +47,7 @@ internal sealed record WeaponDefinition : ComponentDefinition
     {
         Category = category;
         AmmoCategory = ammoCategory;
+        InternalAmmoCapacity = internalAmmoCapacity;
         Damage = damage;
         Instability = instability;
         ShotsWhenFired = shotsWhenFired;
@@ -67,6 +69,12 @@ internal sealed record WeaponDefinition : ComponentDefinition
     ///     when it needs none.
     /// </summary>
     public string? AmmoCategory { get; }
+
+    /// <summary>
+    ///     The shots a weapon that carries its own ammo instead of using ammo boxes, like a flamer, has per mission;
+    ///     <c>null</c> for every other weapon.
+    /// </summary>
+    public int? InternalAmmoCapacity { get; }
 
     /// <summary>The damage of one shot.</summary>
     public float Damage { get; }

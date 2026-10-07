@@ -414,7 +414,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **The latest mission is a file of its own,** `mission-outcome.json`, written in combat when the
   mission ends, before the salvage is chosen, and again in the after-action report once the
   salvage is final, with `salvage.received` filled in; the offer stays as it was. One file, because
-  the game has no id that identifies every contract to link two by.
+  the game has no id that identifies every contract to link two by. Each mech's ammo use is read
+  from its combat mech, which outlives the after-action report; the contract's copy has no ammo.
 - **The catalog is a file of its own that doesn't depend on the career:** `catalog.json`, with
   every chassis, mech, vehicle, turret and component the game has loaded, written on every career
   load and so, with an unchanged game, once per game start. Vehicles' and turrets' armor and
