@@ -31,26 +31,18 @@ internal static class MapReader
         SimGameState simGame,
         IReadOnlyDictionary<string, TerrainDefinition> terrains)
     {
-        var mapRows = new Dictionary<string, Map_MDD>(StringComparer.Ordinal);
-        var starSystemsPerMap = new Dictionary<string, List<DefinitionReference>>(StringComparer.Ordinal);
-        foreach (var system in simGame.StarSystems)
-        {
-            foreach (var map in ReadPlayableMaps(system))
+        var starSystemsPerMap = simGame.StarSystems
+            .SelectMany(system =>
             {
-                mapRows[map.MapID] = map;
-                if (!starSystemsPerMap.TryGetValue(map.MapID, out var starSystems))
-                {
-                    starSystems = [];
-                    starSystemsPerMap.Add(map.MapID, starSystems);
-                }
-
-                starSystems.Add(DefinitionReferences.ReferenceTo(system.Def.Description));
-            }
-        }
+                var starSystem = DefinitionReferences.ReferenceTo(system.Def.Description);
+                return ReadPlayableMaps(system).Select(map => (Map: map, StarSystem: starSystem));
+            })
+            .GroupBy(playable => playable.Map.MapID, StringComparer.Ordinal);
 
         var maps = new SortedDictionary<string, MapDefinition>(StringComparer.Ordinal);
-        foreach (var map in mapRows.Values)
+        foreach (var starSystems in starSystemsPerMap)
         {
+            var map = starSystems.First().Map;
             if (ReadTerrainCoverage(simGame.DataManager, map, terrains) is not { } terrainCoverage)
             {
                 continue;
@@ -65,7 +57,9 @@ internal static class MapReader
                     map.FriendlyName,
                     DefinitionReferences.ReferenceTo(simGame.DataManager, (Biome.BIOMESKIN)map.BiomeSkinID),
                     tags,
-                    starSystemsPerMap[map.MapID].OrderByDefinition(starSystem => starSystem).ToList(),
+                    starSystems.Select(playable => playable.StarSystem)
+                        .OrderByDefinition(starSystem => starSystem)
+                        .ToList(),
                     map.Weight,
                     terrainCoverage));
         }
