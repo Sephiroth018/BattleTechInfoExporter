@@ -151,19 +151,30 @@ internal static class MechReader
         return usedTonnage;
     }
 
+    internal static Armor ReadArmor(MechDef mech, ChassisLocations location)
+    {
+        var loadout = mech.GetLocationLoadoutDef(location);
+        return new Armor(loadout.CurrentArmor, loadout.AssignedArmor);
+    }
+
+    internal static Armor? ReadRearArmor(MechDef mech, ChassisLocations location)
+    {
+        var loadout = mech.GetLocationLoadoutDef(location);
+        return HasRearArmor(mech.GetChassisLocationDef(location))
+            ? new Armor(loadout.CurrentRearArmor, loadout.AssignedRearArmor)
+            : null;
+    }
+
     internal static IEnumerable<MechComponentRef> ComponentsMountedIn(MechDef mech, ChassisLocations location) =>
         mech.Inventory.Where(component => component.MountedLocation == location);
 
     private static MechLocation ReadLocation(MechDef mech, ChassisLocations location)
     {
-        var loadout = mech.GetLocationLoadoutDef(location);
         return new MechLocation(
             location,
-            new Armor(loadout.CurrentArmor, loadout.AssignedArmor),
-            HasRearArmor(mech.GetChassisLocationDef(location))
-                ? new Armor(loadout.CurrentRearArmor, loadout.AssignedRearArmor)
-                : null,
-            loadout.CurrentInternalStructure,
+            ReadArmor(mech, location),
+            ReadRearArmor(mech, location),
+            mech.GetLocationLoadoutDef(location).CurrentInternalStructure,
             ComponentsMountedIn(mech, location)
                 .Select(component => new MountedComponent(
                     ComponentReferences.ReferenceTo(component),
