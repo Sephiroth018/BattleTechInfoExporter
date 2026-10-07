@@ -355,7 +355,7 @@ name, version and folder, `ModLog` its logger. Folders:
 - `Triggers/`: the patches that decide when to export, and the recorder patches they share.
 - `Export/`: the exporters, the single entry points the triggers call: `GameStateExporter` for the
   career state, the star systems and the financial report, `MissionExporter` for the mission file,
-  one method per write, and `CatalogExporter`
+  one method per write, `CombatExporter` for the combat state, which it also deletes, and `CatalogExporter`
   for the catalog, which rebuilds it only when it's missing or stale (another mod version or
   another `CatalogSourceFingerprint`, the hash of the game's manifest entries it reads), first
   loading the vehicles, turrets and design masks the career doesn't and exporting once they are
@@ -366,7 +366,9 @@ name, version and folder, `ModLog` its logger. Folders:
   changes of abilities, components, terrains and rules; `StarSystemReader` builds the star systems file from the starmap, with
   `RouteReader` reading the route to a system as the starmap plans it; `FinancialReportReader` builds
   the financial report file; `MissionReader` builds the
-  mission file's models from the completed contract; `CatalogReader` builds the catalog from the
+  mission file's models from the completed contract; `CombatStateReader` builds the combat state
+  file from the running battle, with `CombatUnitReader` reading each unit as the HUD shows it and
+  `ObjectiveReader` the objectives and zones; `CatalogReader` builds the catalog from the
   definitions the game has loaded, with `TerrainReader` reading the terrains and biomes from the
   design masks and `MapReader` the maps from the metadata database and their terrain data files.
   `DefinitionReferences` makes the
@@ -423,6 +425,12 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   salvage is final, with `salvage.received` filled in; the offer stays as it was. One file, because
   the game has no id that identifies every contract to link two by. Each mech's ammo use is read
   from its combat mech, which outlives the after-action report; the contract's copy has no ammo.
+- **The running battle is a file of its own,** `combat-state.json`, written when every phase begins
+  and after every unit's activation, and deleted when the game tears the battle down or a career is loaded, so it exists
+  only while its battle runs. It shows what the player's HUD shows and no more: enemies by their
+  visibility (`CombatUnitReader`), from full detail down to a blip's position or the position they
+  were last detected at. Every read is a cached lookup or a statistic; it never reads the career
+  files or the catalog.
 - **The catalog is a file of its own that doesn't depend on the career:** `catalog.json`, with
   every chassis, mech, vehicle, turret, component, terrain, biome and map the game has loaded,
   rebuilt on a career load only when it's missing or stale: written by another mod version or with
@@ -482,6 +490,11 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   the terrain.
 - **Map:** a combat map with fixed terrain (`Map_MDD`, `MapMetaData`); a star system's contracts pick
   among the maps its biomes and map tags allow.
+- **Activation:** one unit's turn within a phase: it moves, attacks or braces, and is done for the
+  round. Reserving a unit postpones its activation to a later phase.
+- **Blip:** an enemy known only from sensors (the game's `VisibilityLevel` from `Blip0Minimum` to
+  `Blip4Maximum`), shown with as much detail as the player's side's sensors reveal. An enemy in
+  sight but hidden by ECM (`BlipGhost`) isn't a blip: the export treats it as in full view.
 - **Statistic change:** a change an ability or component makes to a statistic (the game's
   `EffectData` of type `StatisticEffect`).
 

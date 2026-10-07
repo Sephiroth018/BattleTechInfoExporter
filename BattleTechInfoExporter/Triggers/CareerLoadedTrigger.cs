@@ -22,6 +22,8 @@ internal static class CareerLoadedTrigger
         {
             // The catalog doesn't depend on the career; CatalogExporter rebuilds it only when its sources changed.
             CatalogExporter.Export(simGame, ExportTrigger.CareerLoaded);
+            // A battle that ended without the game tearing it down, e.g. in a crash (CombatEndedTrigger).
+            CombatExporter.Delete();
             // After a mission, the results are only applied a few frames later; ContractCompletedTrigger and
             // SaveTrigger export them.
             if (simGame.CompletedContract == null)

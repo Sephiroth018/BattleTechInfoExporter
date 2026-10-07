@@ -18,5 +18,8 @@ internal enum ExportTrigger
     MechPlacementShown,
     MissionCompleted,
     SalvageChosen,
-    ShipUpgradeStarted
+    ShipUpgradeStarted,
+    PhaseStarted,
+    CombatLoaded,
+    ActivationCompleted
 }

@@ -37,6 +37,15 @@ One more holds the latest mission:
   choose from, how many items the company gets and picks, the components it recovers from its own
   lost mechs, and everything it received, which is `null` until the salvage is final.
 
+One more holds the running battle, and exists only while one runs:
+
+- `combat-state.json`: the battle as the player's HUD shows it, written when it is loaded
+  from a save, when every phase begins and after every unit's activation, and deleted when the battle ends: when the
+  after-action report is left, or when it is quit or restarted. It holds the contract, the map's id in the catalog, the round, the current phase,
+  the lance's resolve, the units keyed by the game's unit id, the objectives the HUD lists with
+  their status, progress line and target units in full view, and the zones drawn on the map with their type, center, radius
+  and objectives. See "Combat state" below.
+
 The last one describes the game rather than the career:
 
 - `catalog.json`: every chassis, mech, vehicle, turret, component, terrain, biome and map the game
@@ -153,6 +162,39 @@ report's upkeep and spending levels, contract pay, reputation and experience by 
 and travel. Each mission type carries the multiplier of its contracts' pay. The reputation payment
 adjustments the game's tooltips show are left out: its pay never applies them.
 
+## Combat state
+
+Every unit has its faction, allegiance (player, ally, enemy or neutral), visibility, position in
+meters (`y` is the elevation), facing in degrees clockwise from the map's +Z axis and the terrain
+it stands in by its catalog id (`null` on open ground). What else it carries follows the HUD:
+
+- **The player's and allied units, and enemies in full view:** the mech, vehicle or turret, by its
+  catalog id, or, for the player's own mechs, by their mech bay id in the game state, which holds
+  their assigned armor; the pilot; and the state: armor front and rear and structure left per
+  location in whole points as the paper doll shows them (cut off, a remainder below 1 shown as 1), evasion pips, the guard level with its sources (braced, cover, Bulwark), entrenched,
+  prone, shut down, unsteady, heat and stability, whether the unit has activated this round, its
+  initiative, every component's damage level with the rounds left in each ammo box and in weapons
+  that carry their own, the pilot's injuries, health and bonus health left (which takes hits before they
+  become injuries), the abilities that can be activated with their cooldowns and uses left,
+  and what Precision Strike and Vigilance cost it now. A Sensor Lock brings an enemy into full view
+  for the player's whole side, and allied units' sensors count for the player. An enemy in sight
+  but hidden by ECM counts as in full view, although the HUD hides its pilot, heat, stability and
+  initiative and it can't be targeted until spotted well enough or sensor locked.
+- **Sensor blips:** the position and as much as the HUD shows: nothing more at the lowest level,
+  the kind of unit at the next, and its tonnage, or a turret's weight class, at the highest.
+- **Enemies out of sensor range:** where the player's side last detected them, without facing or
+  terrain, until they are seen again. Destroyed enemies are left out.
+
+The player's units carry their lines of fire to every enemy in full view, and those enemies theirs
+to the player's units, as hovering over a target shows them from where the unit stands: the line
+of fire (`clear`, `partiallyBlocked`, the game's obstructed, which still allows direct fire with
+the penalties of the rules' `lineOfFire`, or `blocked`), whether a weapon could fire at the target directly, only
+indirectly or not at all, or it is out of range, and whether it is in the firing arc without
+turning. Phase and initiative are on the game's scale, as in the rules: units act from 1 up, which
+the HUD shows counting down from 5. A zone's radius is that of the hexagon the HUD draws; whether a
+unit is inside is decided per map cell. The hit chance isn't exported: it follows from the combat
+rules and changes as soon as a unit moves.
+
 ## Triggers
 
 The game state is exported when:
@@ -186,6 +228,18 @@ The mission file is exported when:
 - **A mission ends**, still in combat, with the salvage received still `null`.
 - **The salvage is final**, after the priority salvage is confirmed or right away when there is
   nothing to choose, with the salvage received filled in.
+
+The combat state is exported when:
+
+- **A phase begins**, before its first unit acts: the battle's first once the lance is deployed,
+  and every later one, also one reached by reserving units.
+- **A battle is loaded** from a save.
+- **A unit's activation is done**, its attacks resolved; out of contact, once the player's units
+  have all moved. Reserving a unit doesn't count.
+
+It is deleted when the game ends the battle (when the after-action report is left after the salvage, or when the battle is quit,
+restarted or left by loading a save) and when a career is loaded, in case the game crashed during
+one, so it never outlives its battle.
 
 ## Planned
 
