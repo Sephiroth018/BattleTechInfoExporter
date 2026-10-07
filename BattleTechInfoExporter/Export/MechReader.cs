@@ -25,16 +25,16 @@ internal static class MechReader
         ChassisLocations.RightLeg
     ];
 
-    /// <summary>A mech or chassis name followed by the variant, e.g. "Atlas (AS7-D)".</summary>
-    /// <remarks>The variant identifies the mech, as in the game's lance and store lists.</remarks>
-    private static string NameWithVariant(string name, ChassisDef chassis) => $"{name} ({chassis.VariantName})";
+    /// <summary>The chassis name followed by the variant, e.g. "Atlas - AS7-D".</summary>
+    /// <remarks>As the mech bay and mech lab show a mech (MechDetails.SetDescriptions), whatever its nickname.</remarks>
+    private static string NameWithVariant(ChassisDef chassis) =>
+        $"{chassis.Description.Name} - {chassis.VariantName}";
 
     internal static DefinitionReference ReferenceTo(ChassisDef chassis) =>
-        new(chassis.Description.Id, NameWithVariant(chassis.Description.Name, chassis));
+        new(chassis.Description.Id, NameWithVariant(chassis));
 
-    // A mech's name is its nickname (renameable in the mech lab).
     internal static DefinitionReference ReferenceTo(MechDef mech) =>
-        new(mech.Description.Id, NameWithVariant(mech.Name, mech.Chassis));
+        new(mech.Description.Id, NameWithVariant(mech.Chassis));
 
     /// <summary>
     ///     The reference to the mech that mech parts assemble into, or <c>null</c> when its definition is missing.
@@ -67,7 +67,7 @@ internal static class MechReader
     }
 
     internal static MechReference ReferenceToBayMech(MechDef mech) =>
-        new(mech.GUID, NameWithVariant(mech.Name, mech.Chassis));
+        new(mech.GUID, NameWithVariant(mech.Chassis));
 
     // Both dictionaries are keyed by the mech bay slot; a slot is in one of them at most.
     internal static List<Mech> ReadMechs(
