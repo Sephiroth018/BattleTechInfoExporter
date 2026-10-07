@@ -209,6 +209,10 @@ assemblies the build references in place.
      `Mods/BattleTechInfoExporter/` folder, to test it in the game.
    - `dotnet build -c Release` also packages it as `artifacts/BattleTechInfoExporter-<version>.zip`.
 
+The version is `Major.Minor.Patch.Build`. The first three parts are set in `Directory.Build.props`;
+the build number counts the commits since they last changed, so the commit that changes them is
+build 0, as is a build with that change uncommitted.
+
 `dotnet tool restore` installs the ReSharper command line tools that format and inspect the code;
 CLAUDE.md lists their commands.
 

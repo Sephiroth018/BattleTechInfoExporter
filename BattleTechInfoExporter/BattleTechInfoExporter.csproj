@@ -9,7 +9,6 @@
     <!-- Avoids IgnoresAccessChecksToAttribute warnings from the publicized game assembly. -->
     <PublicizerRuntimeStrategies>Unsafe</PublicizerRuntimeStrategies>
     <ModDirectoryInGame>$(BattleTechGameDir)\Mods\$(MSBuildProjectName)\</ModDirectoryInGame>
-    <PackageFile>$(MSBuildThisFileDirectory)..\artifacts\$(MSBuildProjectName)-$(Version).zip</PackageFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -42,6 +41,13 @@
   <Target Name="ValidateBattleTechGameDir"
           Condition="'$(BattleTechGameDir)' == '' Or !Exists('$(BattleTechGameDir)\BattleTech_Data\Managed')">
     <Error Text="BattleTechGameDir must point to the BattleTech install; see README.md." />
+  </Target>
+
+  <!-- A target, because Version gets its build number only once ComputeBuildVersion has run. -->
+  <Target Name="SetPackageFile" AfterTargets="ComputeBuildVersion">
+    <PropertyGroup>
+      <PackageFile>$(MSBuildThisFileDirectory)..\artifacts\$(MSBuildProjectName)-$(Version).zip</PackageFile>
+    </PropertyGroup>
   </Target>
 
   <!-- mod.json is generated so its metadata has a single source: the properties in Directory.Build.props. -->

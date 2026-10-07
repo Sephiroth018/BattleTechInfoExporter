@@ -376,9 +376,11 @@ name, version and folder, `ModLog` its logger. Folders:
   marked `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` because only the serializer reads
   them.
 
-The version lives only in `<Version>` in `Directory.Build.props`, next to the description, author,
-repository URL and supported game version; the build stamps the version into the DLL and generates
-`mod.json` from them.
+The version is `Major.Minor.Patch.Build`. Its first three parts live only in `<VersionPrefix>` in
+`Directory.Build.props`, next to the description, author, repository URL and supported game version;
+the build appends the build number (`ComputeBuildVersion` in `Directory.Build.targets`: the commits
+since `<VersionPrefix>` last changed, so a bump is build 0 and every later commit adds one), stamps
+the version into the DLL and generates `mod.json` from them.
 
 Planned features are issues on the GitHub Project "Road to 1.0", whose status follows the work (see
 "Issues and projects").
@@ -487,8 +489,9 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 
 Every merged PR that changes the mod gets a GitHub release, after the merge, from the merged
 `main`: a Release build, then
-`gh release create v<version>` with the zip attached and release notes summarizing the PR (marked as
-generated with Claude Code).
+`gh release create v<Major.Minor.Patch>` with the zip attached and release notes summarizing the PR
+(marked as generated with Claude Code). The tag has no build number: it marks the semantic release,
+and the merged `main` is build 0 of that version.
 
 ## Testing and CI
 
@@ -524,8 +527,8 @@ before the go-ahead. Every checklist starts with the standard checks:
 
 1. The game starts and the main menu shows `/W MODTEK`.
 2. ModTek's log (`Mods/.modtek/battletech_log.txt`) shows ModTek loading the mod with the PR's
-   version (`"BattleTechInfoExporter" <version>` and `Loaded assembly BattleTechInfoExporter
-   (v<version>.0)`), without errors or exceptions from it.
+   four-part version (`"BattleTechInfoExporter" <version>` and `Loaded assembly BattleTechInfoExporter
+   (v<version>)`), without errors or exceptions from it.
 
 followed by the PR's own feature checks.
 
@@ -535,8 +538,9 @@ both checks, check 1 because the mod ran, or stops and reports instead of mergin
 
 ## Versioning
 
-Semantic versioning, bumped in every PR as part of its changes: major for breaking changes to the
-exported JSON (its consumers must adapt), minor for new data, files or triggers, patch for fixes.
+Semantic versioning on the first three parts, bumped in every PR as part of its changes: major for
+breaking changes to the exported JSON (its consumers must adapt), minor for new data, files or
+triggers, patch for fixes. The fourth part, the build number, is never set by hand (see "Structure").
 While the export format is still being worked out, versions stay at 0.x and a breaking format change
 bumps only the minor version; 1.0.0 marks the format as settled. The version is defined once (see
 "Structure") and flows into both the DLL and `mod.json`. Issues name the part their change bumps
