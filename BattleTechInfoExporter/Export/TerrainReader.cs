@@ -17,18 +17,21 @@ internal static class TerrainReader
     // DesignMaskDef's default move cost, which no unit's movement reaches a single meter of.
     private const float ImpassableMoveCost = 9999.9f;
 
+    private static readonly IReadOnlyList<Biome.BIOMESKIN> AllBiomes =
+        Enum.GetValues(typeof(Biome.BIOMESKIN)).Cast<Biome.BIOMESKIN>().ToList();
+
     // The game has no description for the generic biome (DataManagerExtensions.GetBaseDescriptionDef logs an error
     // looking it up) and no map uses it.
-    private static readonly IReadOnlyList<Biome.BIOMESKIN> Biomes = Enum.GetValues(typeof(Biome.BIOMESKIN))
-        .Cast<Biome.BIOMESKIN>()
+    private static readonly IReadOnlyList<Biome.BIOMESKIN> Biomes = AllBiomes
         .Where(biome => biome is not (Biome.BIOMESKIN.UNDEFINED or Biome.BIOMESKIN.generic))
         .ToList();
 
     // The masks that aren't terrains: each biome's mask (MapMetaData.biomeDesignMask), which the maps name as
-    // Biome.GetDesignMaskNameFromBiomeSkin does, and the masks painted onto cells at runtime but never applied as
-    // a cell's terrain (MapMetaData.GetPriorityTerrainMaskFlags), whose values never take effect.
+    // Biome.GetDesignMaskNameFromBiomeSkin does, the generic biome's included, and the masks painted onto cells at
+    // runtime but never applied as a cell's terrain (MapMetaData.GetPriorityTerrainMaskFlags), whose values never
+    // take effect.
     private static readonly HashSet<string> NonTerrainMaskIds = new(
-        Biomes.Select(Biome.GetDesignMaskNameFromBiomeSkin)
+        AllBiomes.Select(Biome.GetDesignMaskNameFromBiomeSkin)
             .Concat(["DesignMaskDropshipLandingZone", "DesignMaskDropPodLandingZone", "DesignMaskDangerousLocation"]),
         StringComparer.Ordinal);
 
