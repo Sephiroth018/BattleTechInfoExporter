@@ -9,8 +9,8 @@ namespace BattleTechInfoExporter.Export;
 
 /// <summary>
 ///     Builds the catalog from the definitions the game has loaded: every mech with its chassis and components
-///     (SimGameState.RequestDataManagerResources), every other component, and every vehicle, turret and design
-///     mask, which <see cref="CatalogExporter" /> loads itself.
+///     and every star system definition (SimGameState.RequestDataManagerResources), every other component, and every
+///     vehicle, turret and design mask, which <see cref="CatalogExporter" /> loads itself.
 /// </summary>
 internal static class CatalogReader
 {
@@ -64,7 +64,8 @@ internal static class CatalogReader
             ReadComponentDefinitions(dataManager, components),
             terrainDefinitions,
             TerrainReader.ReadBiomeDefinitions(dataManager),
-            MapReader.ReadMapDefinitions(simGame, terrainDefinitions));
+            MapReader.ReadMapDefinitions(dataManager, terrainDefinitions),
+            StarSystemDefinitionReader.ReadStarSystemDefinitions(dataManager));
     }
 
     private static SortedDictionary<string, TEntry> ToSortedDictionary<TDefinition, TEntry>(

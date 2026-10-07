@@ -17,10 +17,10 @@ written together on every career export:
   jets, and the combat and campaign rules), which the game state and the mission outcome refer to
   by name instead of repeating thresholds and effects per entry.
 - `star-systems.json`: every star system on the starmap, locked story systems included, keyed by
-  id, with its name, owner, tags, biomes, difficulty, whether its travel requirements are met, and
-  the days and C-Bills the trip from the current system takes as the starmap shows them (0 for the
-  current system, `null` where there is no route). The game state and the mission outcome refer to
-  a star system only by its id and name.
+  the id of its active definition in the catalog, with its name, difficulty, whether its travel
+  requirements are met, and the days and C-Bills the trip from the current system takes as the
+  starmap shows them (0 for the current system, `null` where there is no route). The game state
+  and the mission outcome refer to a star system only by its id and name.
 - `financial-report.json`: the next monthly financial report, as on the finance screen: the day it
   is due, the spending level and its options with their expected expenses (their cost multiplier
   and morale change are in the rules), and the expected expense lines for the ship, its upgrades,
@@ -48,8 +48,8 @@ One more holds the running battle, and exists only while one runs:
 
 The last one describes the game rather than the career:
 
-- `catalog.json`: every chassis, mech, vehicle, turret, component, terrain, biome and map the game
-  has loaded for the career, DLC included, keyed by id, so tools can judge what else exists beyond
+- `catalog.json`: every chassis, mech, vehicle, turret, component, terrain, biome, map and star
+  system the game has loaded, DLC included, keyed by id, so tools can judge what else exists beyond
   what the career refers to, what a mission's enemies can do and what its ground does to them.
   - **Chassis:** the frame: weight class, tonnage and bare tonnage, max jump jets, built-in heat
     dissipation, walk and sprint distance, melee values before upgrades, and per location max
@@ -77,6 +77,10 @@ The last one describes the game rather than the career:
   - **Biomes:** keyed by the biome id the star systems refer to, what a map's biome does to every
     unit on it on top of the terrain: heat sinking, heat per turn and damage dealt, the only
     values the game reads from a biome.
+  - **Star systems:** every star system definition: name, owner, the tags the starmap shows and
+    the biomes its contracts can be fought in. The story swaps some systems' definitions, e.g. when
+    a system's owner changes, so the catalog has every version and `star-systems.json` refers to
+    the active one, which the career currently uses.
   - **Maps:** every map some star system's contracts can be fought on: name, biome, map tags, the
     star systems whose contracts the game can put on it (selected as the contract generator does,
     from the system's biomes and map tags), the contract generator's draw weight and the terrain
@@ -90,9 +94,9 @@ The last one describes the game rather than the career:
     system, drawn by weight. The contract type and the maps the game recently offered filter
     further and aren't exported.
 
-  The other files refer to the catalog's chassis, mechs and components by id instead of repeating
-  their stats or limits, e.g. a location's max armor; a file and the catalog belong together when
-  their `modVersion` matches. The catalog also carries a `sourceFingerprint` of the game's data it
+  The other files refer to the catalog's chassis, mechs, components and star systems by id instead
+  of repeating their stats or limits, e.g. a location's max armor; a file and the catalog belong
+  together when their `modVersion` matches. The catalog also carries a `sourceFingerprint` of the game's data it
   was built from (see "Triggers").
 
   The tutorial's target dummies and target vehicles, the copies of stock mechs the game makes for unlocked skins (e.g.

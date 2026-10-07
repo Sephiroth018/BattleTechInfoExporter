@@ -30,8 +30,8 @@ internal static class CatalogSourceFingerprint
         BattleTechResourceType.DesignMaskDef
     ];
 
-    // Every type the catalog reads: the career's chassis, mechs and components, the ones above, and what the maps
-    // come from: the star systems that select them and the terrain data MapReader reads from disk.
+    // Every type the catalog reads: the career's chassis, mechs, components and star systems, which also select the
+    // maps, the ones above, and the terrain data MapReader reads from disk.
     private static readonly IReadOnlyList<BattleTechResourceType> ResourceTypes =
     [
         BattleTechResourceType.ChassisDef,

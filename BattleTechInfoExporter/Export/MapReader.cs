@@ -6,14 +6,13 @@ using BattleTech;
 using BattleTech.Data;
 using BattleTechInfoExporter.Models;
 using HBS.Util;
-using StarSystem = BattleTech.StarSystem;
 
 namespace BattleTechInfoExporter.Export;
 
 /// <summary>
-///     Builds the catalog's map definitions from the maps the contract generator selects for each star system, the
-///     metadata database's map rows and each map's terrain data file, which the game reads only when the map is
-///     played (MapMetaData.LoadMapMetaData).
+///     Builds the catalog's map definitions from the maps the contract generator selects for each star system
+///     definition, the metadata database's map rows and each map's terrain data file, which the game reads only when
+///     the map is played (MapMetaData.LoadMapMetaData).
 /// </summary>
 internal static class MapReader
 {
@@ -26,16 +25,19 @@ internal static class MapReader
     private const string ImpassableMaskId = "DesignMaskImpassable";
     private const string DestroyedBuildingMaskId = "DesignMaskDestroyedBuilding";
 
-    /// <summary>Every map some star system's contracts can be fought on, keyed by map id.</summary>
+    /// <summary>
+    ///     Every map the contracts of some star system definition can be fought on, keyed by map id; the star systems
+    ///     are those of <see cref="StarSystemDefinitionReader" />.
+    /// </summary>
     internal static SortedDictionary<string, MapDefinition> ReadMapDefinitions(
-        SimGameState simGame,
+        DataManager dataManager,
         IReadOnlyDictionary<string, TerrainDefinition> terrains)
     {
-        var starSystemsPerMap = simGame.StarSystems
-            .SelectMany(system =>
+        var starSystemsPerMap = dataManager.SystemDefs
+            .SelectMany(definition =>
             {
-                var starSystem = DefinitionReferences.ReferenceTo(system.Def.Description);
-                return ReadPlayableMaps(system).Select(map => (Map: map, StarSystem: starSystem));
+                var starSystem = DefinitionReferences.ReferenceTo(definition.Value.Description);
+                return ReadPlayableMaps(definition.Value).Select(map => (Map: map, StarSystem: starSystem));
             })
             .GroupBy(playable => playable.Map.MapID, StringComparer.Ordinal);
 
@@ -43,7 +45,7 @@ internal static class MapReader
         foreach (var starSystems in starSystemsPerMap)
         {
             var map = starSystems.First().Map;
-            if (ReadTerrainCoverage(simGame.DataManager, map, terrains) is not { } terrainCoverage)
+            if (ReadTerrainCoverage(dataManager, map, terrains) is not { } terrainCoverage)
             {
                 continue;
             }
@@ -55,7 +57,7 @@ internal static class MapReader
                 map.MapID,
                 new MapDefinition(
                     map.FriendlyName,
-                    DefinitionReferences.ReferenceTo(simGame.DataManager, (Biome.BIOMESKIN)map.BiomeSkinID),
+                    DefinitionReferences.ReferenceTo(dataManager, (Biome.BIOMESKIN)map.BiomeSkinID),
                     tags,
                     starSystems.Select(playable => playable.StarSystem)
                         .OrderByDefinition(starSystem => starSystem)
@@ -70,12 +72,12 @@ internal static class MapReader
     // The maps the contract generator draws a star system's contracts from
     // (SimGameState.GetSinglePlayerProceduralPlayableMaps): the released maps with a procedural encounter whose
     // biome the system supports and whose tags its required and excluded map tags allow, DLC ownership included.
-    private static IEnumerable<Map_MDD> ReadPlayableMaps(StarSystem system) =>
+    private static IEnumerable<Map_MDD> ReadPlayableMaps(StarSystemDef starSystem) =>
         MetadataDatabase.Instance
             .GetReleasedMapsAndEncountersBySinglePlayerProceduralContractTypeAndTags(
-                system.Def.MapRequiredTags,
-                system.Def.MapExcludedTags,
-                system.Def.SupportedBiomes,
+                starSystem.MapRequiredTags,
+                starSystem.MapExcludedTags,
+                starSystem.SupportedBiomes,
                 true)
             .Select(mapAndEncounters => mapAndEncounters.Map);
 

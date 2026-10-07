@@ -4,9 +4,9 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     The root of <c>catalog.json</c>: every chassis, mech, vehicle, turret, component, terrain, biome and map the
-///     game has loaded for the career, keyed by id. It describes the game, not the career, so it only changes with
-///     the game's data.
+///     The root of <c>catalog.json</c>: every chassis, mech, vehicle, turret, component, terrain, biome, map and star
+///     system definition the game has loaded, keyed by id. It describes the game, not the career, so it only changes
+///     with the game's data.
 /// </summary>
 /// <param name="SourceFingerprint">
 ///     A hash of the game's data the catalog was built from (<see cref="Export.CatalogSourceFingerprint" />); the
@@ -24,4 +24,5 @@ internal sealed record Catalog(
     ComponentDefinitions ComponentDefinitions,
     IReadOnlyDictionary<string, TerrainDefinition> TerrainDefinitions,
     IReadOnlyDictionary<string, BiomeDefinition> BiomeDefinitions,
-    IReadOnlyDictionary<string, MapDefinition> MapDefinitions) : ExportFile(ModVersion, null, Trigger);
+    IReadOnlyDictionary<string, MapDefinition> MapDefinitions,
+    IReadOnlyDictionary<string, StarSystemDefinition> StarSystemDefinitions) : ExportFile(ModVersion, null, Trigger);
