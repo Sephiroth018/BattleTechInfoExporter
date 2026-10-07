@@ -425,8 +425,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   salvage is final, with `salvage.received` filled in; the offer stays as it was. One file, because
   the game has no id that identifies every contract to link two by. Each mech's ammo use is read
   from its combat mech, which outlives the after-action report; the contract's copy has no ammo.
-- **The running battle is a file of its own,** `combat-state.json`, written after every unit's
-  activation and deleted when the game tears the battle down or a career is loaded, so it exists
+- **The running battle is a file of its own,** `combat-state.json`, written when every phase begins
+  and after every unit's activation, and deleted when the game tears the battle down or a career is loaded, so it exists
   only while its battle runs. It shows what the player's HUD shows and no more: enemies by their
   visibility (`CombatUnitReader`), from full detail down to a blip's position or the position they
   were last detected at. Every read is a cached lookup or a statistic; it never reads the career

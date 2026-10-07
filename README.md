@@ -39,8 +39,8 @@ One more holds the latest mission:
 
 One more holds the running battle, and exists only while one runs:
 
-- `combat-state.json`: the battle as the player's HUD shows it, written when it starts or is
-  loaded from a save and after every unit's activation, and deleted when the battle ends: once its
+- `combat-state.json`: the battle as the player's HUD shows it, written when it is loaded
+  from a save, when every phase begins and after every unit's activation, and deleted when the battle ends: once its
   salvage is final, or when it is quit or restarted. It holds the contract, the map's id in the catalog, the round, the current phase,
   the lance's resolve, the units keyed by the game's unit id, the objectives the HUD lists with
   their status and progress line, and the zones drawn on the map with their type, center, radius
@@ -229,7 +229,8 @@ The mission file is exported when:
 
 The combat state is exported when:
 
-- **A battle starts**, once the lance is deployed, before the first unit acts.
+- **A phase begins**, before its first unit acts: the battle's first once the lance is deployed,
+  and every later one, also one reached by reserving units.
 - **A battle is loaded** from a save.
 - **A unit's activation is done**, its attacks resolved; out of contact, once the player's units
   have all moved. Reserving a unit doesn't count.

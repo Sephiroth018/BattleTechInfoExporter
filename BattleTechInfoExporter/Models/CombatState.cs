@@ -4,8 +4,8 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     The root of <c>combat-state.json</c>: the battle as the player's HUD shows it, written after every unit's
-///     activation; the file exists only while a battle is running.
+///     The root of <c>combat-state.json</c>: the battle as the player's HUD shows it, written when every phase
+///     begins and after every unit's activation; the file exists only while a battle is running.
 /// </summary>
 /// <param name="Contract">The contract being fought, as in <see cref="MissionOutcome.Contract" />.</param>
 /// <param name="MapId">The map, keyed as in the catalog's <see cref="Catalog.MapDefinitions" />.</param>

@@ -8,7 +8,7 @@ namespace BattleTechInfoExporter.Triggers;
 
 /// <summary>
 ///     Fires when a battle is loaded from a save, once its units and visibility are restored; such a battle
-///     continues where it was saved, without <see cref="PhaseStartedTrigger" />.
+///     continues mid-phase, without <see cref="PhaseStartedTrigger" />.
 /// </summary>
 [HarmonyPatch(typeof(TurnDirector), nameof(TurnDirector.OnEncounterBegin))]
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

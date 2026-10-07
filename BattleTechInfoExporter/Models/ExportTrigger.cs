@@ -19,7 +19,7 @@ internal enum ExportTrigger
     MissionCompleted,
     SalvageChosen,
     ShipUpgradeStarted,
-    CombatStarted,
+    PhaseStarted,
     CombatLoaded,
     ActivationCompleted
 }
