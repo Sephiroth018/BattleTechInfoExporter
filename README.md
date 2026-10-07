@@ -39,9 +39,9 @@ Two more hold the latest mission:
 
 The last one describes the game rather than the career:
 
-- `catalog.json`: every chassis, mech, vehicle, turret and component the game has loaded for the
-  career, DLC included, keyed by id, so tools can judge what else exists beyond what the career
-  refers to, and what a mission's enemies can do.
+- `catalog.json`: every chassis, mech, vehicle, turret, component, terrain and biome the game has
+  loaded for the career, DLC included, keyed by id, so tools can judge what else exists beyond what
+  the career refers to, what a mission's enemies can do and what its ground does to them.
   - **Chassis:** the frame: weight class, tonnage and bare tonnage, max jump jets, built-in heat
     dissipation, walk and sprint distance, melee values before upgrades, and per location max
     armor, structure, hardpoints and component slots; plus the stock mech, the mech the game treats as the chassis'
@@ -58,6 +58,16 @@ The last one describes the game rather than the career:
   - **Components:** every component's stats, the statistics it changes while mounted (e.g. a
     jump jet's jump distance, an upgrade's melee damage), and whether it can come as salvage; for
     jump jets, the chassis tonnage range that can mount them.
+  - **Terrains:** what forest, water, rough ground, roads and the other terrains do to the units
+    in them: move cost per unit type and weight class (`null` where impassable; open ground costs
+    1.05 per meter), sprint multiplier, visibility, sensor range and signature, to-hit modifiers
+    against and from the terrain, cover, heat sinking and heat per turn, damage dealt and taken,
+    and the statistic changes a unit picks up in it, e.g. rough ground's extra instability. A cell
+    has one terrain at most. Only what the game's combat code reads is exported; its tooltips also
+    claim a stability damage multiplier that only the AI reads.
+  - **Biomes:** keyed by the biome id the star systems refer to, what a map's biome does to every
+    unit on it on top of the terrain: heat sinking, heat per turn and damage dealt, the only
+    values the game reads from a biome.
 
   The other files refer to the catalog's chassis, mechs and components by id instead of repeating
   their stats or limits, e.g. a location's max armor; a file and the catalog belong together when
