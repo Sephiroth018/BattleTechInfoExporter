@@ -10,9 +10,8 @@ internal static class MissionExporter
 {
     private const string MissionOutcomeFileName = "mission-outcome.json";
 
-    // The outcome last exported and its contract. The salvage offer can't be read from the contract once the salvage
-    // is final, so the outcome is kept to be written again with the salvage received; the game can't be saved in
-    // between, so it's never needed across game starts.
+    // The outcome last exported and its contract, kept to be written again with the salvage received; the game
+    // can't be saved in between, so it's never needed across game starts.
     private static (Contract Contract, MissionOutcome Outcome)? _lastExported;
 
     /// <summary>Exports the outcome of a contract the game has just completed, before the salvage is chosen.</summary>

@@ -127,11 +127,11 @@ The game state is exported when:
 The catalog is exported when the career is loaded, also after a mission, and written once after
 every game start. The first time, it waits a moment for the game to load every vehicle and turret.
 
-The mission files are exported when:
+The mission file is exported when:
 
-- **A mission ends**, still in combat: the mission outcome.
+- **A mission ends**, still in combat, with the salvage received still `null`.
 - **The salvage is final**, after the priority salvage is confirmed or right away when there is
-  nothing to choose: the salvage received.
+  nothing to choose, with the salvage received filled in.
 
 ## Planned
 

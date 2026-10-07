@@ -6,7 +6,7 @@ using Contract = BattleTech.Contract;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Builds the mission files' models from a contract the game has completed.</summary>
+/// <summary>Builds the mission file's models from a contract the game has completed.</summary>
 internal static class MissionReader
 {
     // Contract.CompleteContract has filled in every value read here; GenerateSalvage, at its end, the salvage.
