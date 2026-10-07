@@ -18,7 +18,7 @@ internal static class FinancialReportReader
             new Spending(
                 simGame.ExpenditureLevel,
                 simGame.ExpenditureMoraleValue
-                    .Select(option => new SpendingOption(option.Key, simGame.GetExpenditures(option.Key), option.Value))
+                    .Select(option => new SpendingOption(option.Key, simGame.GetExpenditures(option.Key)))
                     .ToList()),
             ReadExpectedExpenses(simGame));
 

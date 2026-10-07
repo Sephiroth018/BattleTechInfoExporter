@@ -16,6 +16,9 @@ namespace BattleTechInfoExporter.Export;
 /// </summary>
 internal static class ContractReader
 {
+    /// <summary>The most priority salvage picks a mission gives, hardcoded in Contract.GenerateSalvage.</summary>
+    internal const int MaxPrioritySalvage = 8;
+
     // The slider positions of the contract negotiation in percent; their step is set in the screen's UI asset.
     private static readonly int[] NegotiationShares = [0, 25, 50, 75, 100];
 
@@ -73,15 +76,14 @@ internal static class ContractReader
     internal static List<ContractTypeDescription> ReadContractTypes(SimGameState simGame)
     {
         var contractTypes = simGame.ContractTypeDescriptions
-            .Select(description => new ContractTypeDescription(
-                ReadContractType(description.Key),
-                GameText.ToPlainText(description.Value.Details)))
+            .Select(description => ReadContractType(description.Key, GameText.ToPlainText(description.Value.Details)))
             .ToList();
         if (simGame.PriorityMissionDescription is { } priority)
         {
             contractTypes.Add(new ContractTypeDescription(
                 PriorityType(simGame),
-                GameText.ToPlainText(priority.Details)));
+                GameText.ToPlainText(priority.Details),
+                null));
         }
 
         return contractTypes;
@@ -140,7 +142,11 @@ internal static class ContractReader
     private static int ReadDifficulty(SimGameState simGame, ContractOverride contractOverride) =>
         Mathf.Min(
             contractOverride.finalDifficulty + contractOverride.difficultyUIModifier,
-            (int)simGame.Constants.Story.GlobalContractDifficultyMax);
+            MaxGlobalDifficulty(simGame));
+
+    /// <summary>The cap on the career's global difficulty, as SimGameState.ContractUserMeetsReputation_Campaign rounds it.</summary>
+    internal static int MaxGlobalDifficulty(SimGameState simGame) =>
+        (int)simGame.Constants.Story.GlobalContractDifficultyMax;
 
     // A travel contract gets a new override without an id (SimGameState.CreateTravelContract); the original's id
     // is only kept in the success action that starts the contract on arrival.
@@ -154,17 +160,21 @@ internal static class ContractReader
                     action.Type == SimGameResultAction.ActionType.System_StartNonProceduralContract)
                 ?.additionalValues[3];
 
-    // GetContractTypeByInt returns null for an id a mod describes without enumerating it; the id stands in.
-    private static DefinitionReference ReadContractType(long contractTypeId)
+    // GetContractTypeByInt returns null for an id a mod describes without enumerating it; the id stands in, with
+    // no pay multiplier to read.
+    private static ContractTypeDescription ReadContractType(long contractTypeId, string description)
     {
         if (ContractTypeEnumeration.GetContractTypeByInt(contractTypeId) is { } contractType)
         {
-            return DefinitionReferences.ReferenceTo(contractType);
+            return new ContractTypeDescription(
+                DefinitionReferences.ReferenceTo(contractType),
+                description,
+                contractType.ContractRewardMultiplier);
         }
 
         ModLog.Logger.LogWarning($"Found no contract type {contractTypeId}; its id stands in");
         var id = contractTypeId.ToString(CultureInfo.InvariantCulture);
-        return new DefinitionReference(id, id);
+        return new ContractTypeDescription(new DefinitionReference(id, id), description, null);
     }
 
     private static DefinitionReference PriorityType(SimGameState simGame) =>
@@ -261,7 +271,7 @@ internal static class ContractReader
             : potential;
         return new Salvage(
             total,
-            Mathf.Min(Mathf.FloorToInt(total * simGame.Constants.Salvage.PrioritySalvageModifier), 8));
+            Mathf.Min(Mathf.FloorToInt(total * simGame.Constants.Salvage.PrioritySalvageModifier), MaxPrioritySalvage));
     }
 
     // Mirrors SGContractsReputationNegotiationWidget.ReputationAdjustment, which derives the target's change from

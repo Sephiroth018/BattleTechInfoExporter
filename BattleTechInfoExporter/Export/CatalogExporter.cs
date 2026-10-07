@@ -10,8 +10,9 @@ internal static class CatalogExporter
     private const string CatalogFileName = "catalog.json";
 
     /// <summary>
-    ///     Loads every vehicle and turret, which the career doesn't (SimGameState.RequestDataManagerResources), and
-    ///     writes the catalog once they are loaded: on a later frame the first time, right away once cached.
+    ///     Loads every vehicle, turret and design mask, which the career doesn't (SimGameState.RequestDataManagerResources;
+    ///     only a combat map loads its own masks), and writes the catalog once they are loaded: on a later frame
+    ///     the first time, right away once cached.
     /// </summary>
     internal static void Export(SimGameState simGame, ExportTrigger trigger) =>
         CampaignExport.Run(
@@ -25,6 +26,7 @@ internal static class CatalogExporter
                     CampaignExport.Run(simGame, trigger, () => Write(simGame, trigger, request)));
                 loadRequest.AddAllOfTypeBlindLoadRequest(BattleTechResourceType.VehicleDef, true);
                 loadRequest.AddAllOfTypeBlindLoadRequest(BattleTechResourceType.TurretDef, true);
+                loadRequest.AddAllOfTypeBlindLoadRequest(BattleTechResourceType.DesignMaskDef, true);
                 loadRequest.ProcessRequests();
             });
 

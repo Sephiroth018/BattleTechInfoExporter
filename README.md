@@ -14,16 +14,17 @@ written together on every career export:
 - `game-state.json`: the career state.
 - `rules.json`: the game's rules for this career (morale and reputation levels, skill training
   tables, spirits levels, mech parts per mech, mission types, jump distance per number of jump
-  jets), which the game state and the mission outcome refer to by name instead of repeating
-  thresholds and effects per entry.
+  jets, and the combat and campaign rules), which the game state and the mission outcome refer to
+  by name instead of repeating thresholds and effects per entry.
 - `star-systems.json`: every star system on the starmap, locked story systems included, keyed by
   id, with its name, owner, tags, biomes, difficulty, whether its travel requirements are met, and
   the days and C-Bills the trip from the current system takes as the starmap shows them (0 for the
   current system, `null` where there is no route). The game state and the mission outcome refer to
   a star system only by its id and name.
 - `financial-report.json`: the next monthly financial report, as on the finance screen: the day it
-  is due, the spending level and its options with their expected expenses and morale change, and
-  the expected expense lines for the ship, its upgrades, each mech and each pilot.
+  is due, the spending level and its options with their expected expenses (their cost multiplier
+  and morale change are in the rules), and the expected expense lines for the ship, its upgrades,
+  each mech and each pilot.
 
 One more holds the latest mission:
 
@@ -38,9 +39,9 @@ One more holds the latest mission:
 
 The last one describes the game rather than the career:
 
-- `catalog.json`: every chassis, mech, vehicle, turret and component the game has loaded for the
-  career, DLC included, keyed by id, so tools can judge what else exists beyond what the career
-  refers to, and what a mission's enemies can do.
+- `catalog.json`: every chassis, mech, vehicle, turret, component, terrain and biome the game has
+  loaded for the career, DLC included, keyed by id, so tools can judge what else exists beyond what
+  the career refers to, what a mission's enemies can do and what its ground does to them.
   - **Chassis:** the frame: weight class, tonnage and bare tonnage, max jump jets, built-in heat
     dissipation, walk and sprint distance, melee values before upgrades, and per location max
     armor, structure, hardpoints and component slots; plus the stock mech, the mech the game treats as the chassis'
@@ -57,6 +58,16 @@ The last one describes the game rather than the career:
   - **Components:** every component's stats, the statistics it changes while mounted (e.g. a
     jump jet's jump distance, an upgrade's melee damage), and whether it can come as salvage; for
     jump jets, the chassis tonnage range that can mount them.
+  - **Terrains:** what forest, water, rough ground, roads and the other terrains do to the units
+    in them: move cost per unit type and weight class (`null` where impassable; open ground costs
+    1.05 per meter), sprint multiplier, visibility, sensor range and signature, to-hit modifiers
+    against and from the terrain, cover, heat sinking and heat per turn, damage dealt and taken,
+    and the statistic changes a unit picks up in it, e.g. rough ground's extra instability. A cell
+    has one terrain at most. Only what the game's combat code reads is exported; its tooltips also
+    claim a stability damage multiplier that only the AI reads.
+  - **Biomes:** keyed by the biome id the star systems refer to, what a map's biome does to every
+    unit on it on top of the terrain: heat sinking, heat per turn and damage dealt, the only
+    values the game reads from a biome.
 
   The other files refer to the catalog's chassis, mechs and components by id instead of repeating
   their stats or limits, e.g. a location's max armor; a file and the catalog belong together when
@@ -107,6 +118,27 @@ statistics it changes: statistic, operation and value, the pilot or weapons it a
 the change lasts and what triggers it. Multi-Target and Sensor Lock change no statistics in the
 game's data, because the game hardcodes them. Initiative is on the game's scale, where units act
 from the lowest value up, so an ability that lets a unit act earlier lowers it.
+
+The rules' `combat` object holds the combat constants the game's code reads, named by what they
+are: to-hit modifiers (positive makes an attack harder, negative is a bonus), evasion, guard levels
+and the damage they cut, line of fire, heat, stability, injuries, melee, critical hits, hit location
+weights by attack direction, visibility and sensor locks, resolve and movement penalties. Values
+the game hardcodes but a tool computes with are exported next to the constants, e.g. the rounding
+and limits of the hit chance in `toHit`; rules it hardcodes with conditions are stated here: a melee
+attack on a turret, a building, a prone or a shut-down mech always has the maximum hit chance; a
+sensor blip shows the unit's type from Tactics 4 and its details from 7. Constants the game never
+reads, reads only in code nothing calls, or reads only for animation, sound, tooltips or the AI are
+left out, as are the melee damage multipliers the game ignores in favour of the chassis' own values.
+
+The rules' `campaign` object holds the campaign constants the game's code reads, as the career's
+difficulty settings adjust them: mech lab costs in tech points and C-Bills (an order takes its tech
+points divided by the company's MechTech, rounded up, in days), med bay heal points and the pilot
+death chances, hiring costs and the limits the Mercenary Review Board rating and the morale put on
+hiring, how salvage picks come about and how a destroyed enemy mech yields its parts (1 for a
+destroyed center torso, 2 for both legs, 3 for the head or an incapacitated pilot), the financial
+report's upkeep and spending levels, contract pay, reputation and experience by outcome, alliances
+and travel. Each mission type carries the multiplier of its contracts' pay. The reputation payment
+adjustments the game's tooltips show are left out: its pay never applies them.
 
 ## Triggers
 

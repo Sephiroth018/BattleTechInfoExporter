@@ -20,7 +20,9 @@ internal static class RulesReader
             ReadSpiritsLevels(simGame),
             simGame.Constants.Story.DefaultMechPartMax,
             ContractReader.ReadContractTypes(simGame),
-            ReadJumpDistances(simGame));
+            ReadJumpDistances(simGame),
+            CombatRulesReader.Read(simGame),
+            CampaignRulesReader.Read(simGame));
 
     // Mech.JumpDistance indexes the move table by the number of working jump jets, clamped to its last entry, and
     // is 0 without any, so the first entry is never used.
@@ -64,6 +66,10 @@ internal static class RulesReader
                     skill == SkillType.Piloting
                         ? HitChancePercent(piloting.PilotingBaseFloor, level, piloting.PilotingDivisor)
                         : null,
+                    // Mirrors Pathing.ResetPathGrid after standing up, whose 0.75 is hardcoded.
+                    skill == SkillType.Piloting
+                        ? RoundedPercent(1f - (0.75f - level / piloting.PilotingDivisor))
+                        : null,
                     abilitiesByLevel[level - 1]
                         // The per-level accuracy traits have no name and no effects, only a label for the
                         // level's hit chance.
@@ -73,9 +79,11 @@ internal static class RulesReader
                 .ToList());
     }
 
-    // Rounded to a tenth, so float noise doesn't show.
     private static float HitChancePercent(float floor, int level, float divisor) =>
-        Mathf.Round((floor + level / divisor) * 1000f) / 10f;
+        RoundedPercent(floor + level / divisor);
+
+    // Rounded to a tenth, so float noise doesn't show.
+    private static float RoundedPercent(float share) => Mathf.Round(share * 1000f) / 10f;
 
     // Names, thresholds and resolve come from two constant files that mods can change separately;
     // only levels present in all three are complete.

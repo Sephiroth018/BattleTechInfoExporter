@@ -28,6 +28,9 @@ internal sealed record Skill(string Description, IReadOnlyList<SkillLevel> Level
 /// <param name="BaseMeleeHitChancePercent">
 ///     Piloting only: the hit chance of melee attacks at this level, before the attack's modifiers.
 /// </param>
+/// <param name="MovementAfterStandingUpPercent">
+///     Piloting only: the share of its walk, sprint and backward distance a mech keeps in the round it stands up.
+/// </param>
 /// <param name="Abilities">The primary abilities and passive traits unlocked at the level.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record SkillLevel(
@@ -35,6 +38,7 @@ internal sealed record SkillLevel(
     int ExperienceCost,
     float? BaseHitChancePercent,
     float? BaseMeleeHitChancePercent,
+    float? MovementAfterStandingUpPercent,
     IReadOnlyList<SkillLevelAbility> Abilities);
 
 /// <param name="IsPrimary">A primary ability is chosen, a passive trait comes with the level.</param>
