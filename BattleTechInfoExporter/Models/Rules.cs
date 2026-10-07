@@ -16,6 +16,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="JumpDistances">
 ///     The jump distance by number of working jump jets, from one up; the last entry applies to any higher number.
 /// </param>
+/// <param name="Combat">The combat rules behind to-hit, heat, stability, hit locations, visibility and resolve.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Rules(
     string ModVersion,
@@ -26,4 +27,5 @@ internal sealed record Rules(
     IReadOnlyList<SpiritsLevelCosts> SpiritsLevels,
     int MechPartsPerMech,
     IReadOnlyList<ContractTypeDescription> ContractTypes,
-    IReadOnlyList<JumpDistance> JumpDistances) : ExportFile(ModVersion, null, Trigger);
+    IReadOnlyList<JumpDistance> JumpDistances,
+    CombatRules Combat) : ExportFile(ModVersion, null, Trigger);

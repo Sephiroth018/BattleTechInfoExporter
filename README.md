@@ -14,8 +14,8 @@ written together on every career export:
 - `game-state.json`: the career state.
 - `rules.json`: the game's rules for this career (morale and reputation levels, skill training
   tables, spirits levels, mech parts per mech, mission types, jump distance per number of jump
-  jets), which the game state and the mission outcome refer to by name instead of repeating
-  thresholds and effects per entry.
+  jets, and the combat rules), which the game state and the mission outcome refer to by name
+  instead of repeating thresholds and effects per entry.
 - `star-systems.json`: every star system on the starmap, locked story systems included, keyed by
   id, with its name, owner, tags, biomes, difficulty, whether its travel requirements are met, and
   the days and C-Bills the trip from the current system takes as the starmap shows them (0 for the
@@ -108,6 +108,17 @@ statistics it changes: statistic, operation and value, the pilot or weapons it a
 the change lasts and what triggers it. Multi-Target and Sensor Lock change no statistics in the
 game's data, because the game hardcodes them. Initiative is on the game's scale, where units act
 from the lowest value up, so an ability that lets a unit act earlier lowers it.
+
+The rules' `combat` object holds the combat constants the game's code reads, named by what they
+are: to-hit modifiers (positive makes an attack harder, negative is a bonus), evasion, guard levels
+and the damage they cut, line of fire, heat, stability, injuries, melee, critical hits, hit location
+weights by attack direction, visibility and sensor locks, resolve and movement penalties. A few
+rules the game hardcodes are stated next to them: the skill level's base hit chance loses 5 % per
+point of difficulty up to 10 and 2.5 % beyond, rounded to 5 % and kept between 5 % and 95 %; a melee
+attack on a turret, a building, a prone or a shut-down mech always has 95 %; a sensor blip shows the
+unit's type from Tactics 4 and its details from 7. Constants the game never reads, reads only in
+code nothing calls, or reads only for animation, sound, tooltips or the AI are left out, as are the
+melee damage multipliers the game ignores in favour of the chassis' own values.
 
 ## Triggers
 
