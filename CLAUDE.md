@@ -486,10 +486,13 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **Vehicle:** a ground unit with fixed armor and loadout (`VehicleDef`), only met as an enemy or
   ally in combat.
 - **Turret:** a fixed emplacement with a single location (`TurretDef`).
-- **Catalog:** the export of every chassis, mech, vehicle, turret, component, terrain and biome
-  definition the game has loaded (`catalog.json`).
+- **Catalog:** the export of every chassis, mech, vehicle, turret, component, terrain, biome, map
+  and star system definition the game has loaded (`catalog.json`).
 - **Star system:** a system on the starmap (`StarSystem`). Never "location" (a mech's body
   location) or "planet".
+- **Star system definition:** a version of a star system (`StarSystemDef`) with its name, owner,
+  tags and biomes. The story swaps a star system's definition, e.g. when its owner changes, so a
+  star system can have several; one is active at a time.
 - **Ship upgrade:** an upgrade of the Argo (`ShipModuleUpgrade`), bought in its engineering
   screen. Never just "upgrade", which components also have.
 - **Terrain:** a design mask applied to a map cell (`DesignMaskDef`): forest, water, rough ground,
