@@ -1,0 +1,33 @@
+<Project>
+  <!--
+    Build counts the commits since VersionPrefix last changed, so the bump commit (on main, the PR's
+    merge commit) and an uncommitted bump are build 0. Merges are diffed against their first parent
+    only, so a merge from main into a branch doesn't reset the count. IDE design-time builds keep the
+    three-part version instead of running git.
+  -->
+  <Target Name="ComputeBuildVersion" BeforeTargets="GetAssemblyVersion" Condition="'$(DesignTimeBuild)' != 'true'">
+    <!-- "hash subject" rather than a format with %H, which a Windows batch file mangles. -->
+    <Exec Command="git log --first-parent -S&quot;&lt;VersionPrefix&gt;$(VersionPrefix)&lt;/VersionPrefix&gt;&quot; --oneline --no-abbrev-commit --max-count=1 -- Directory.Build.props"
+          WorkingDirectory="$(MSBuildThisFileDirectory)" ConsoleToMsBuild="true" StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="VersionPrefixCommitLine" />
+    </Exec>
+    <PropertyGroup>
+      <VersionPrefixCommit>$(VersionPrefixCommitLine.Split(' ')[0])</VersionPrefixCommit>
+    </PropertyGroup>
+    <Exec Command="git rev-list --count $(VersionPrefixCommit)..HEAD" Condition="'$(VersionPrefixCommit)' != ''"
+          WorkingDirectory="$(MSBuildThisFileDirectory)" ConsoleToMsBuild="true" StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="BuildNumber" />
+    </Exec>
+    <!-- No commit introduces the prefix: fine while the bump is uncommitted, an error otherwise. -->
+    <Exec Command="git diff --quiet HEAD -- Directory.Build.props" Condition="'$(VersionPrefixCommit)' == ''"
+          WorkingDirectory="$(MSBuildThisFileDirectory)" IgnoreExitCode="true">
+      <Output TaskParameter="ExitCode" PropertyName="VersionPrefixUnchangedExitCode" />
+    </Exec>
+    <Error Condition="'$(VersionPrefixCommit)' == '' And '$(VersionPrefixUnchangedExitCode)' == '0'"
+           Text="No commit introduces &lt;VersionPrefix&gt;$(VersionPrefix)&lt;/VersionPrefix&gt; in Directory.Build.props; ComputeBuildVersion searches for that exact text." />
+    <PropertyGroup>
+      <BuildNumber Condition="'$(BuildNumber)' == ''">0</BuildNumber>
+      <Version>$(VersionPrefix).$(BuildNumber)</Version>
+    </PropertyGroup>
+  </Target>
+</Project>

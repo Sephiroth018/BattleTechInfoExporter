@@ -11,7 +11,7 @@ internal static class ModAssembly
 
     internal static string Name { get; } = Assembly.GetName().Name;
 
-    internal static string Version { get; } = Assembly.GetName().Version.ToString(3);
+    internal static string Version { get; } = Assembly.GetName().Version.ToString();
 
     /// <summary>The mod's folder in the game's <c>Mods</c> folder, where ModTek loaded the DLL from.</summary>
     internal static string Directory { get; } = Path.GetDirectoryName(Assembly.Location)
