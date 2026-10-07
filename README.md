@@ -14,8 +14,8 @@ written together on every career export:
 - `game-state.json`: the career state.
 - `rules.json`: the game's rules for this career (morale and reputation levels, skill training
   tables, spirits levels, mech parts per mech, mission types, jump distance per number of jump
-  jets, and the combat rules), which the game state and the mission outcome refer to by name
-  instead of repeating thresholds and effects per entry.
+  jets, and the combat and campaign rules), which the game state and the mission outcome refer to
+  by name instead of repeating thresholds and effects per entry.
 - `star-systems.json`: every star system on the starmap, locked story systems included, keyed by
   id, with its name, owner, tags, biomes, difficulty, whether its travel requirements are met, and
   the days and C-Bills the trip from the current system takes as the starmap shows them (0 for the
@@ -119,6 +119,16 @@ attack on a turret, a building, a prone or a shut-down mech always has 95 %; a s
 unit's type from Tactics 4 and its details from 7. Constants the game never reads, reads only in
 code nothing calls, or reads only for animation, sound, tooltips or the AI are left out, as are the
 melee damage multipliers the game ignores in favour of the chassis' own values.
+
+The rules' `campaign` object holds the campaign constants the game's code reads, as the career's
+difficulty settings adjust them: mech lab costs in tech points and C-Bills (an order takes its tech
+points divided by the company's MechTech, rounded up, in days), med bay heal points and the pilot
+death chances, hiring costs and the limits the Mercenary Review Board rating and the morale put on
+hiring, how salvage picks come about and how a destroyed enemy mech yields its parts (1 for a
+destroyed center torso, 2 for both legs, 3 for the head or an incapacitated pilot), the financial
+report's upkeep and spending levels, contract pay, reputation and experience by outcome, alliances
+and travel. Each mission type carries the multiplier of its contracts' pay. The reputation payment
+adjustments the game's tooltips show are left out: its pay never applies them.
 
 ## Triggers
 

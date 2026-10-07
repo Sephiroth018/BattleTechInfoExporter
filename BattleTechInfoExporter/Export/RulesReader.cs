@@ -21,7 +21,8 @@ internal static class RulesReader
             simGame.Constants.Story.DefaultMechPartMax,
             ContractReader.ReadContractTypes(simGame),
             ReadJumpDistances(simGame),
-            CombatRulesReader.Read(simGame));
+            CombatRulesReader.Read(simGame),
+            CampaignRulesReader.Read(simGame));
 
     // Mech.JumpDistance indexes the move table by the number of working jump jets, clamped to its last entry, and
     // is 0 without any, so the first entry is never used.

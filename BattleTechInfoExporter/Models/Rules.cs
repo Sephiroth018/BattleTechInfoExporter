@@ -17,6 +17,9 @@ namespace BattleTechInfoExporter.Models;
 ///     The jump distance by number of working jump jets, from one up; the last entry applies to any higher number.
 /// </param>
 /// <param name="Combat">The combat rules behind to-hit, heat, stability, hit locations, visibility and resolve.</param>
+/// <param name="Campaign">
+///     The campaign rules behind the mech lab, med bay, hiring, salvage, finances, contracts and travel.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Rules(
     string ModVersion,
@@ -28,4 +31,5 @@ internal sealed record Rules(
     int MechPartsPerMech,
     IReadOnlyList<ContractTypeDescription> ContractTypes,
     IReadOnlyList<JumpDistance> JumpDistances,
-    CombatRules Combat) : ExportFile(ModVersion, null, Trigger);
+    CombatRules Combat,
+    CampaignRules Campaign) : ExportFile(ModVersion, null, Trigger);
