@@ -9,6 +9,11 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>Builds the statistic changes of abilities and components from their effects.</summary>
 internal static class EffectReader
 {
+    // The game has no constant for BaseInitiative.
+    private const string BaseInitiativeStatistic = "BaseInitiative";
+    private const string PhaseModifierStatistic = AbstractActorConstants.STAT_PHASEMOD;
+    private const string PhaseModifierSelfStatistic = AbstractActorConstants.STAT_PHASEMODSELF;
+
     // A constants file can leave an effect out, which leaves it null.
     internal static List<StatisticChange> ReadStatisticChanges(IEnumerable<EffectData?> effects) =>
         effects
@@ -27,7 +32,7 @@ internal static class EffectReader
         return new StatisticChange(
             statistic.statName,
             statistic.operation,
-            ReadValue(statistic),
+            ConvertInitiativeToHud(statistic, ReadValue(statistic)),
             ReadTargetCollection(statistic),
             ReadDuration(effect.durationData),
             effect.targetingData.effectTargetType,
@@ -44,6 +49,30 @@ internal static class EffectReader
             "System.Single" => float.Parse(statistic.modValue, CultureInfo.InvariantCulture),
             _ => statistic.modValue
         };
+
+    // A unit's phase is BaseInitiative plus PhaseModifier (AbstractActor.BaseInitiative), which takes over
+    // PhaseModifierSelf when the unit's activation ends (AbstractActor.OnActivationEnd).
+    private static object ConvertInitiativeToHud(StatisticEffectData statistic, object value) =>
+        (statistic.statName, statistic.operation, value) switch
+        {
+            (BaseInitiativeStatistic, StatCollection.StatOperation.Set, int phase) =>
+                HudInitiative.FromGamePhase(phase),
+            (BaseInitiativeStatistic or PhaseModifierStatistic or PhaseModifierSelfStatistic,
+                StatCollection.StatOperation.Int_Add or StatCollection.StatOperation.Int_Subtract, int change) =>
+                -change,
+            (PhaseModifierStatistic or PhaseModifierSelfStatistic, StatCollection.StatOperation.Set, int change) =>
+                -change,
+            (BaseInitiativeStatistic or PhaseModifierStatistic or PhaseModifierSelfStatistic, _, _) =>
+                KeepGameInitiative(statistic, value),
+            _ => value
+        };
+
+    private static object KeepGameInitiative(StatisticEffectData statistic, object value)
+    {
+        ModLog.Logger.LogWarning(
+            $"Exporting {statistic.operation} {value} on {statistic.statName} on the game's initiative scale");
+        return value;
+    }
 
     // The filters as the game's data sets them; EffectManager.GetTargetComponents applies the first one set of
     // sub type, type and category.
