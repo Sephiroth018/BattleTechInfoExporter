@@ -71,7 +71,7 @@ internal sealed record ObjectiveResult(string Title, bool IsPrimary, ObjectiveSt
 ///     What repairing the mech's damage in the mech bay would take, as for a mech bay mech's
 ///     <see cref="Mech.Repair" />; <c>null</c> without damage and for a lost mech.
 /// </param>
-/// <param name="DamagedLocations">The locations with structure damage, from head to legs; armor is repaired for free.</param>
+/// <param name="DamagedLocations">The locations that lost armor or structure, from head to legs.</param>
 /// <param name="DamagedComponents">The components damaged or destroyed.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record LanceUnitOutcome(
@@ -89,9 +89,10 @@ internal sealed record LanceUnitOutcome(
     IReadOnlyList<DamagedLocation> DamagedLocations,
     IReadOnlyList<DamagedComponent> DamagedComponents);
 
-/// <param name="Structure">The structure left: below the chassis', zero when destroyed.</param>
+/// <param name="RearArmor"><c>null</c> outside the torso, which alone has rear armor.</param>
+/// <param name="Structure">The structure left: zero when destroyed.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record DamagedLocation(ChassisLocations Location, float Structure);
+internal sealed record DamagedLocation(ChassisLocations Location, Armor Armor, Armor? RearArmor, float Structure);
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record DamagedComponent(
