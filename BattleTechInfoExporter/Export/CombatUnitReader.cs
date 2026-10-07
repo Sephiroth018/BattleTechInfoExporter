@@ -179,6 +179,8 @@ internal static class CombatUnitReader
             actor.allComponents.Select(component => ReadComponent(actor, component)).ToList(),
             pilot?.Injuries,
             pilot?.Health,
+            // Pilot.InjurePilot takes hits off the bonus health first.
+            pilot?.BonusHealth,
             ReadAbilities(actor),
             actor.OffensivePushCost,
             actor.DefensivePushCost);
