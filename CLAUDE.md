@@ -356,8 +356,10 @@ name, version and folder, `ModLog` its logger. Folders:
 - `Export/`: the exporters, the single entry points the triggers call: `GameStateExporter` for the
   career state, the star systems and the financial report, `MissionExporter` for the mission file,
   one method per write, and `CatalogExporter`
-  for the catalog, which first loads the vehicles, turrets and design masks the career doesn't and
-  exports once they are loaded. All run their export inside `CampaignExport`. `GameStateReader` builds the game
+  for the catalog, which rebuilds it only when it's missing or stale (another mod version or
+  another `CatalogSourceFingerprint`, the hash of the game's manifest entries it reads), first
+  loading the vehicles, turrets and design masks the career doesn't and exporting once they are
+  loaded. All run their export inside `CampaignExport`. `GameStateReader` builds the game
   state file's models from the game, one reader per section of the file; `RulesReader` builds the
   rules file's tables, with `AbilityReader` reading each ability, `CombatRulesReader` the combat
   constants and `CampaignRulesReader` the campaign constants; `EffectReader` reads the statistic
@@ -371,7 +373,7 @@ name, version and folder, `ModLog` its logger. Folders:
   `ComponentReferences` every reference to a component; a reference
   with a naming rule of its own is made by the reader that owns it. `ReferenceOrder` orders the
   lists of entries that refer to a definition, and `GameText` makes every exported game text plain.
-  `ExportFileWriter` writes the files in the mod's `exports/` folder.
+  `ExportFileWriter` writes the files in the mod's `exports/` folder and reads an existing file's header.
 - `Models/`: immutable records, one per JSON object, and the mod's own enums. The records are
   marked `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` because only the serializer reads
   them.
@@ -421,8 +423,11 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   the game has no id that identifies every contract to link two by. Each mech's ammo use is read
   from its combat mech, which outlives the after-action report; the contract's copy has no ammo.
 - **The catalog is a file of its own that doesn't depend on the career:** `catalog.json`, with
-  every chassis, mech, vehicle, turret, component, terrain and biome the game has loaded, written
-  on every career load and so, with an unchanged game, once per game start. Vehicles' and turrets'
+  every chassis, mech, vehicle, turret, component, terrain and biome the game has loaded, rebuilt
+  on a career load only when it's missing or stale: written by another mod version or with another
+  `sourceFingerprint`, the hash of the game's manifest entries for everything it reads (id, file
+  and last write time). A change touching no file it reads (a DLL mod patching definitions in
+  memory) isn't detected; deleting the file forces a rebuild. Vehicles' and turrets'
   armor and structure are their combat values, after the game's vehicle multipliers. Terrains are
   keyed by design mask id, biomes by the biome id the star systems refer to.
 - **The rules export only constants the game's code reads** (`combat` and `campaign` in
@@ -513,8 +518,12 @@ The game is BattleTech 1.9.1 (Unity 2018.4, Mono, .NET Framework 4.7.2). In orde
    ask the user; regenerating it needs a decompiler run on a thread with a large stack, because
    `ilspycmd -p` overflows its stack on `Assembly-CSharp`.
 2. **The game's data files** (`BattleTech_Data/StreamingAssets/data` in the install) for
-   definitions and ids. The DLC's definitions aren't there but in asset bundles, so a search over
-   the loose files isn't complete: say so, or check in the game.
+   definitions and ids. The DLC's definitions aren't there but in the asset bundles under
+   `data/assetbundles` (`flashpoint`, `heavymetal`, `urbanwarfare`, `shadowhawkdlc`), extracted
+   into the sibling folder `../BattleTechDlcData/<bundle>/<id>.json` by the `extract_dlc.py` kept
+   there (Python with UnityPy; re-run after a game update). A search over definitions covers both
+   folders. Like the decompiled code, the extracted files are never copied into this repository;
+   if the folder is missing, ask the user.
 3. **ModTek's documentation** (github.com/BattletechModders/ModTek, `doc/`) for mod loader
    behavior: `mod.json`, DLL entry points, HarmonyX, logging.
 4. **Other mods' source and community answers** are hints only, confirmed in the game code before
