@@ -12,7 +12,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Target">Whose statistic changes: the ability's own unit (<c>Creator</c>) or the unit it targets.</param>
 /// <param name="Trigger">When the change is made, e.g. on the ability's activation or on a hit.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record AbilityEffect(
+internal sealed record StatisticChange(
     string Statistic,
     StatCollection.StatOperation Operation,
     object Value,

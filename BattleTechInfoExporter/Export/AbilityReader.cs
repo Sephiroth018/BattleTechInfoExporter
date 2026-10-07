@@ -37,10 +37,10 @@ internal static class AbilityReader
         return ability.EffectData.Append(resolution.CoolantVentEffect).Append(resolution.CoolantVentCooldownEffect);
     }
 
-    private static AbilityEffect ReadEffect(EffectData effect)
+    private static StatisticChange ReadEffect(EffectData effect)
     {
         var statistic = effect.statisticData;
-        return new AbilityEffect(
+        return new StatisticChange(
             statistic.statName,
             statistic.operation,
             ReadValue(statistic),
