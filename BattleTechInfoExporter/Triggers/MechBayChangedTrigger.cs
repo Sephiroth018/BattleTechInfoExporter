@@ -56,14 +56,6 @@ internal static class MechBayChangedTrigger
         GameStateExporter.Export(mechPlacement.Sim, ExportTrigger.MechBayChanged);
     }
 
-    // Renames the mech; only the name fields of the mech bay and its info widget call it.
-    [HarmonyPatch(typeof(MechBayMechInfoWidget), nameof(MechBayMechInfoWidget.UpdateMechNickname))]
-    [HarmonyPostfix]
-    private static void OnMechRenamed([HarmonyArgument("__instance")] MechBayMechInfoWidget mechInfo)
-    {
-        GameStateExporter.Export(mechInfo.sim, ExportTrigger.MechBayChanged);
-    }
-
     // A rename with no refit returns before the game updates the queue; a refit is exported with the queue.
     [HarmonyPatch(typeof(MechBayPanel), nameof(MechBayPanel.OnMechLabComplete))]
     [HarmonyPostfix]
