@@ -51,6 +51,8 @@ internal static class CatalogReader
             .Concat(MountedComponents(dataManager.VehicleDefs, vehicleDefinitions, vehicle => vehicle.Inventory))
             .Concat(MountedComponents(dataManager.TurretDefs, turretDefinitions, turret => turret.Inventory));
 
+        var terrainDefinitions = TerrainReader.ReadTerrainDefinitions(dataManager);
+
         return new Catalog(
             ModAssembly.Version,
             trigger,
@@ -60,8 +62,9 @@ internal static class CatalogReader
             vehicleDefinitions,
             turretDefinitions,
             ReadComponentDefinitions(dataManager, components),
-            TerrainReader.ReadTerrainDefinitions(dataManager),
-            TerrainReader.ReadBiomeDefinitions(dataManager));
+            terrainDefinitions,
+            TerrainReader.ReadBiomeDefinitions(dataManager),
+            MapReader.ReadMapDefinitions(simGame, terrainDefinitions));
     }
 
     private static SortedDictionary<string, TEntry> ToSortedDictionary<TDefinition, TEntry>(

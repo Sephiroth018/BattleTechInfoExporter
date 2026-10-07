@@ -368,7 +368,8 @@ name, version and folder, `ModLog` its logger. Folders:
   the financial report file; `MissionReader` builds the
   mission file's models from the completed contract; `CatalogReader` builds the catalog from the
   definitions the game has loaded, with `TerrainReader` reading the terrains and biomes from the
-  design masks. `DefinitionReferences` makes the
+  design masks and `MapReader` the maps from the metadata database and their terrain data files.
+  `DefinitionReferences` makes the
   references that need only a description, a faction, a biome or a data-driven enum value, and
   `ComponentReferences` every reference to a component; a reference
   with a naming rule of its own is made by the reader that owns it. `ReferenceOrder` orders the
@@ -423,13 +424,19 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   the game has no id that identifies every contract to link two by. Each mech's ammo use is read
   from its combat mech, which outlives the after-action report; the contract's copy has no ammo.
 - **The catalog is a file of its own that doesn't depend on the career:** `catalog.json`, with
-  every chassis, mech, vehicle, turret, component, terrain and biome the game has loaded, rebuilt
-  on a career load only when it's missing or stale: written by another mod version or with another
-  `sourceFingerprint`, the hash of the game's manifest entries for everything it reads (id, file
-  and last write time). A change touching no file it reads (a DLL mod patching definitions in
+  every chassis, mech, vehicle, turret, component, terrain, biome and map the game has loaded,
+  rebuilt on a career load only when it's missing or stale: written by another mod version or with
+  another `sourceFingerprint`, the hash of the game's manifest entries for everything it reads (id,
+  file and last write time). A change touching no file it reads (a DLL mod patching definitions in
   memory) isn't detected; deleting the file forces a rebuild. Vehicles' and turrets'
   armor and structure are their combat values, after the game's vehicle multipliers. Terrains are
   keyed by design mask id, biomes by the biome id the star systems refer to.
+- **Maps are selected by the game, not derived by the consumer:** each map in the catalog's
+  `mapDefinitions` lists the star systems whose contracts can be fought on it, through the contract
+  generator's own query per star system (`MapReader`), next to its draw weight and terrain
+  coverage, the share of its playable cells per terrain id, read from the map's terrain data file.
+  All of it is game data, so it lives in the catalog and is read only on a rebuild, never per
+  career export.
 - **The rules export only constants the game's code reads** (`combat` and `campaign` in
   `rules.json`): a constant the game never reads, reads only in code nothing calls, or reads only
   for presentation or the AI is left out, so a consumer never plans around a number that does
@@ -473,6 +480,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   roads and the like. A cell has one terrain at most.
 - **Biome:** a map's map-wide design mask, keyed by the game's `Biome.BIOMESKIN`, applied on top of
   the terrain.
+- **Map:** a combat map with fixed terrain (`Map_MDD`, `MapMetaData`); a star system's contracts pick
+  among the maps its biomes and map tags allow.
 - **Statistic change:** a change an ability or component makes to a statistic (the game's
   `EffectData` of type `StatisticEffect`).
 
