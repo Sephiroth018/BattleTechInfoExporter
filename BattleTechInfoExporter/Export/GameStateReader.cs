@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using BattleTech;
@@ -48,8 +49,24 @@ internal static class GameStateReader
                 .Select(faction => ReadReputation(simGame, faction))
                 .ToList(),
             simGame.MechTechSkill,
+            ReadTemporaryChanges(simGame, SimGameState.COMPANYSTAT_MECHTECH),
             simGame.MedTechSkill,
+            ReadTemporaryChanges(simGame, SimGameState.COMPANYSTAT_MEDTECH),
             simGame.GetMaxMechWarriors());
+
+    // SimGameState.UpdateTempResults reverts a temporary result as the day after its last day starts, adding the
+    // negated amount of every stat it doesn't set.
+    private static List<TemporaryChange> ReadTemporaryChanges(SimGameState simGame, string companyStatName) =>
+        simGame.TemporaryResultTracker
+            .Where(result => result.Scope == EventScope.Company && result.Stats is not null)
+            .SelectMany(result => result.Stats
+                .Where(stat => stat.name == companyStatName && !stat.set)
+                .Select(stat => new TemporaryChange(
+                    stat.ToInt(),
+                    // The days left as SimGameState.GetTemporaryTagLength counts them, as for a pilot's spirits.
+                    simGame.DaysPassed + result.ResultDuration - result.DaysElapsed)))
+            .OrderBy(change => change.EndsOnDay)
+            .ToList();
 
     private static FactionReputation ReadReputation(SimGameState simGame, FactionValue faction) =>
         new(
