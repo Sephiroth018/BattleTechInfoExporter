@@ -33,9 +33,7 @@ internal static class MechLabQueueUpdatedTrigger
             if (!passDay)
             {
                 GameStateExporter.Export(simGame,
-                    WorkOrderCompletionRecorder.CompletedCount != completedCountBefore
-                        ? ExportTrigger.WorkOrderCompleted
-                        : ExportTrigger.MechBayChanged);
+                    WorkOrderCompletionRecorder.CompletedSince(completedCountBefore) ?? ExportTrigger.MechBayChanged);
             }
         }
         catch (Exception exception)
