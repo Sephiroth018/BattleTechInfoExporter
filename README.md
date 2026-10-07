@@ -22,17 +22,15 @@ written together on every career export:
   current system, `null` where there is no route). The game state and the mission outcome refer to
   a star system only by its id and name.
 
-Two more hold the latest mission:
+One more holds the latest mission:
 
-- `mission-outcome.json`: written when a mission ends, before the salvage is chosen. It holds the
-  contract, the outcome and objectives, the payment, reputation and experience, the lance with
-  each pilot's injuries, kills and the day they are out of the med bay, each mech's structure and
-  component damage and the days and C-Bills its repair would take, and the salvage
-  on offer: the pool to choose from, how many items the company gets and picks, and the components
-  it recovers from its own lost mechs.
-- `salvage-received.json`: written once the salvage is final, after the priority salvage is
-  confirmed. It holds everything the company gets from the salvage of the mission in
-  `mission-outcome.json`; a new mission outcome deletes it until its salvage is final.
+- `mission-outcome.json`: written when a mission ends, before the salvage is chosen, and again
+  once the salvage is final, after the priority salvage is confirmed. It holds the contract, the
+  outcome and objectives, the payment, reputation and experience, the lance with each pilot's
+  injuries, kills and the day they are out of the med bay, each mech's structure and component
+  damage and the days and C-Bills its repair would take, and the salvage: the pool to choose from,
+  how many items the company gets and picks, the components it recovers from its own lost mechs,
+  and everything it received, which is `null` until the salvage is final.
 
 The last one describes the game rather than the career:
 

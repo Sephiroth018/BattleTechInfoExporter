@@ -36,22 +36,18 @@ internal static class MissionReader
                 .Select(unit => ReadLanceUnit(simGame, contract, unit))
                 .ToList(),
             // Before the choice, SalvageResults holds only the components recovered from the company's lost mechs.
-            new SalvageOffer(
+            new MissionSalvage(
                 contract.FinalSalvageCount,
                 contract.FinalPrioritySalvageCount,
                 ReadSalvageItems(simGame, contract.GetPotentialSalvage()),
-                ReadSalvageItems(simGame, contract.SalvageResults)));
+                ReadSalvageItems(simGame, contract.SalvageResults),
+                null));
     }
 
-    // Contract.FinalizeSalvage adds the priority and the random salvage to SalvageResults, one entry per item.
-    internal static SalvageReceived ReadSalvageReceived(SimGameState simGame, Contract contract, ExportTrigger trigger)
-    {
-        return new SalvageReceived(
-            ModAssembly.Version,
-            trigger,
-            ContractReader.ReadMissionContract(simGame, contract),
-            ReadSalvageItems(simGame, contract.SalvageResults));
-    }
+    // Contract.FinalizeSalvage moves the priority and the random salvage from the pool into SalvageResults, one
+    // entry per item, so the offer can't be read again afterwards.
+    internal static SalvageItems ReadSalvageReceived(SimGameState simGame, Contract contract) =>
+        ReadSalvageItems(simGame, contract.SalvageResults);
 
     // The unit's mech and pilot are copies taken from combat (Mech.ToMechDef keeps the mech bay's GUID); the pilot's
     // kills count this mission only, as Pilot.InitStats resets them when combat starts.
