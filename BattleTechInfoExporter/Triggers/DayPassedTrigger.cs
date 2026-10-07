@@ -1,7 +1,6 @@
 using System;
 using BattleTech;
 using BattleTechInfoExporter.Export;
-using BattleTechInfoExporter.Models;
 using HarmonyLib;
 using JetBrains.Annotations;
 
@@ -25,9 +24,9 @@ internal static class DayPassedTrigger
     {
         try
         {
-            if (WorkOrderCompletionRecorder.CompletedCount != completedCountBefore)
+            if (WorkOrderCompletionRecorder.CompletedSince(completedCountBefore) is { } trigger)
             {
-                GameStateExporter.Export(simGame, ExportTrigger.WorkOrderCompleted);
+                GameStateExporter.Export(simGame, trigger);
             }
         }
         catch (Exception exception)
