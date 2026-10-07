@@ -11,7 +11,7 @@ namespace BattleTechInfoExporter.Triggers;
 /// </summary>
 [HarmonyPatch(typeof(TurnDirector), nameof(TurnDirector.OnPhaseBeginComplete))]
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal static class CombatStartedTrigger
+internal static class PhaseStartedTrigger
 {
     // A prefix: the method starts the phase's first activation (TurnDirector.IncrementActiveTurnActor).
     [HarmonyPrefix]
