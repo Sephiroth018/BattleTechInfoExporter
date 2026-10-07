@@ -467,8 +467,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   formatting tags (`<i>`, `<color=…>`) and tooltip links the game's UI renders. Names are left as they are.
 - **Game enums keep the game's values** (e.g. `IN_SYSTEM`, `LIKED`); the UI shows the same. Our own
   enums are camelCase.
-- **JSON:** camelCase properties, indented, `null` written explicitly, through the game's
-  Newtonsoft.Json.
+- **JSON:** camelCase properties, compact (no indentation, since only tools read the files), `null`
+  written explicitly, through the game's Newtonsoft.Json.
 - **Files are replaced atomically**, so a tool reading them never sees a half-written file, and
   only when their content apart from `exportedAt` and `trigger` changed, so a tool watching them
   sees only real changes. `ExportFileWriter` compares with the content it last wrote, kept in

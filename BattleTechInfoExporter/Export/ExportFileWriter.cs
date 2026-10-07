@@ -20,7 +20,7 @@ internal static class ExportFileWriter
 
     private static readonly JsonSerializerSettings SerializerSettings = new()
     {
-        Formatting = Formatting.Indented,
+        Formatting = Formatting.None,
         ContractResolver = new InheritedFirstContractResolver { NamingStrategy = PropertyNaming },
         NullValueHandling = NullValueHandling.Include,
         Converters = { new OwnEnumConverter(), new StringEnumConverter() }
