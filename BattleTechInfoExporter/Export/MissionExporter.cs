@@ -10,8 +10,8 @@ internal static class MissionExporter
 {
     private const string MissionOutcomeFileName = "mission-outcome.json";
 
-    // The outcome last exported and its contract, kept to be written again with the salvage received; the game
-    // can't be saved in between, so it's never needed across game starts.
+    // The outcome last exported and its contract, kept only until it is written again with the salvage received:
+    // the contract reaches the whole career through its game context, and the game can't be saved in between.
     private static (Contract Contract, MissionOutcome Outcome)? _lastExported;
 
     /// <summary>Exports the outcome of a contract the game has just completed, before the salvage is chosen.</summary>
@@ -36,10 +36,11 @@ internal static class MissionExporter
                 if (_lastExported is not { } exported || exported.Contract != contract)
                 {
                     ModLog.Logger.LogError(
-                        $"Skipped the salvage received of {contract.Name}: its mission outcome wasn't exported");
+                        $"Skipped the salvage received of {contract.Name}: no mission outcome was exported for it");
                     return;
                 }
 
+                _lastExported = null;
                 ExportFileWriter.Write(
                     MissionOutcomeFileName,
                     exported.Outcome with
