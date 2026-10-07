@@ -29,9 +29,10 @@ One more holds the latest mission:
 
 - `mission-outcome.json`: written when a mission ends, before the salvage is chosen, and again
   once the salvage is final, after the priority salvage is confirmed. It holds the contract, the
-  outcome and objectives, the payment, reputation and experience, the lance with each pilot's
-  injuries, kills and the day they are out of the med bay, each mech's armor, structure and
-  component damage and the days and C-Bills its repair would take, and the salvage: the pool to
+  outcome and objectives, the rounds the mission took, the payment, reputation and experience, the
+  lance with each pilot's injuries, kills and the day they are out of the med bay, each mech's
+  armor, structure and component damage, the days and C-Bills its repair would take and the shots
+  it fired from every ammo box and flamer, and the salvage: the pool to
   choose from, how many items the company gets and picks, the components it recovers from its own
   lost mechs, and everything it received, which is `null` until the salvage is final.
 
