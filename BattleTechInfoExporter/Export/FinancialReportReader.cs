@@ -7,13 +7,14 @@ using UnityEngine;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Builds the company's finances and the expense lines of each report from the game's career state.</summary>
-internal static class FinancesReader
+/// <summary>Builds the financial report file and the expense lines of each report from the career state.</summary>
+internal static class FinancialReportReader
 {
-    internal static Finances ReadFinances(SimGameState simGame) =>
+    internal static FinancialReport Read(SimGameState simGame, ExportTrigger trigger) =>
         new(
-            simGame.Funds,
-            ReadNextReportOnDay(simGame),
+            ModAssembly.Version,
+            trigger,
+            ReadDueOnDay(simGame),
             new Spending(
                 simGame.ExpenditureLevel,
                 simGame.ExpenditureMoraleValue
@@ -22,7 +23,7 @@ internal static class FinancesReader
             ReadExpectedExpenses(simGame));
 
     // The financial report's work order counts down the same days (SimGameState.OnDayPassed).
-    internal static int ReadNextReportOnDay(SimGameState simGame) =>
+    internal static int ReadDueOnDay(SimGameState simGame) =>
         simGame.DaysPassed + simGame.DayRemainingInQuarter;
 
     /// <summary>

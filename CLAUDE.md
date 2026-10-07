@@ -354,13 +354,15 @@ name, version and folder, `ModLog` its logger. Folders:
 
 - `Triggers/`: the patches that decide when to export, and the recorder patches they share.
 - `Export/`: the exporters, the single entry points the triggers call: `GameStateExporter` for the
-  career state and the star systems, `MissionExporter` for the mission file, one method per write, and `CatalogExporter`
+  career state, the star systems and the financial report, `MissionExporter` for the mission file,
+  one method per write, and `CatalogExporter`
   for the catalog, which first loads the vehicles and turrets the career doesn't and exports once
   they are loaded. All run their export inside `CampaignExport`. `GameStateReader` builds the game
   state file's models from the game, one reader per section of the file; `RulesReader` builds the
   rules file's tables, with `AbilityReader` reading each ability; `EffectReader` reads the statistic
   changes of abilities and components; `StarSystemReader` builds the star systems file from the starmap, with
-  `RouteReader` reading the route to a system as the starmap plans it; `MissionReader` builds the
+  `RouteReader` reading the route to a system as the starmap plans it; `FinancialReportReader` builds
+  the financial report file; `MissionReader` builds the
   mission file's models from the completed contract; `CatalogReader` builds the catalog from the
   definitions the game has loaded. `DefinitionReferences` makes the
   references that need only a description, a faction, a biome or a data-driven enum value, and
@@ -396,11 +398,13 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   (storage, stores, salvage), are ordered the same way everywhere (`ReferenceOrder`): by component
   type for components, then by name, with the id breaking ties. A mech's components keep the game's
   order.
-- **The career state is three files, read together on every career export:** `game-state.json`,
+- **The career state is four files, read together on every career export:** `game-state.json`,
   `rules.json` for the game tables (e.g. `moraleLevels`, `reputationLevels` at its root): how the
-  game works for this career, which doesn't change between exports, and `star-systems.json` with
-  every star system keyed by id. Values in the game state refer to the rules by name, instead of
-  repeating thresholds and effects per entry. A star system's data lives only in
+  game works for this career, which doesn't change between exports, `star-systems.json` with
+  every star system keyed by id, and `financial-report.json` with the next financial report; the
+  game state keeps only the company's funds and the report's work queue entry. Values in the game
+  state refer to the rules by name, instead of repeating thresholds and effects per entry. A star
+  system's data lives only in
   `star-systems.json`, as definitions do in the catalog: its entries have the name, with the id as
   their key, and the other files refer to a star system by its reference alone (`starSystem`,
   `destination`), next to their own state such as the day of arrival.
