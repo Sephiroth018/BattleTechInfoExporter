@@ -71,7 +71,8 @@ The last one describes the game rather than the career:
 
   The other files refer to the catalog's chassis, mechs and components by id instead of repeating
   their stats or limits, e.g. a location's max armor; a file and the catalog belong together when
-  their `modVersion` matches.
+  their `modVersion` matches. The catalog also carries a `sourceFingerprint` of the game's data it
+  was built from (see "Triggers").
 
   The tutorial's target dummies and target vehicles, the copies of stock mechs the game makes for unlocked skins (e.g.
   the backers' Shadow Hawk-UMBRA) and the game's internal melee and AI weapons are left out, as are
@@ -159,8 +160,14 @@ The game state is exported when:
 - **A new mech needs a place:** the game asks where to put it because every mech bay is full, e.g.
   after salvage completes a mech.
 
-The catalog is exported when the career is loaded, also after a mission, and written once after
-every game start. The first time, it waits a moment for the game to load every vehicle and turret.
+The catalog is rebuilt when the career is loaded, also after a mission, but only when it's missing
+or stale: written by another mod version, or with another `sourceFingerprint` than the game's
+current data. The fingerprint hashes the game's manifest entries for everything the catalog reads
+(each entry's id, file and last write time), so a game update, a DLC bought or removed, a mod
+installed, updated, removed or disabled, or a ModTek merge re-run changes it. A change that touches
+no file the catalog reads, such as a DLL mod patching definitions in memory, isn't detected; delete
+`catalog.json` to force a rebuild. A rebuild waits a moment for the game to load every vehicle and
+turret.
 
 The mission file is exported when:
 
