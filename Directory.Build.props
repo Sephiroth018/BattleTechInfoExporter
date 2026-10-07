@@ -5,7 +5,7 @@
 
   <PropertyGroup>
     <!-- Major.Minor.Patch; the build appends the build number (see ComputeBuildVersion). -->
-    <VersionPrefix>0.50.1</VersionPrefix>
+    <VersionPrefix>0.50.2</VersionPrefix>
     <Description>Exports the story campaign's career state as JSON for tools to read.</Description>
     <Authors>Sephiroth018</Authors>
     <RepositoryUrl>https://github.com/Sephiroth018/BattleTechInfoExporter</RepositoryUrl>
