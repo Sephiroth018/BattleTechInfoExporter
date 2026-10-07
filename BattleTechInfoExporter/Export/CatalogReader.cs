@@ -312,6 +312,7 @@ internal static class CatalogReader
             weapon.AmmoCategoryValue.Is_NotSet || weapon.AmmoCategoryValue.UsesInternalAmmo
                 ? null
                 : weapon.AmmoCategoryValue.FriendlyName,
+            weapon.AmmoCategoryValue.UsesInternalAmmo ? weapon.StartingAmmoCapacity : null,
             weapon.Damage,
             weapon.Instability,
             weapon.ShotsWhenFired,

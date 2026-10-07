@@ -354,8 +354,8 @@ name, version and folder, `ModLog` its logger. Folders:
 
 - `Triggers/`: the patches that decide when to export, and the recorder patches they share.
 - `Export/`: the exporters, the single entry points the triggers call: `GameStateExporter` for the
-  career state, the star systems and the financial report, `MissionExporter` for the mission files,
-  one method per file, and `CatalogExporter`
+  career state, the star systems and the financial report, `MissionExporter` for the mission file,
+  one method per write, and `CatalogExporter`
   for the catalog, which first loads the vehicles, turrets and design masks the career doesn't and
   exports once they are loaded. All run their export inside `CampaignExport`. `GameStateReader` builds the game
   state file's models from the game, one reader per section of the file; `RulesReader` builds the
@@ -364,15 +364,14 @@ name, version and folder, `ModLog` its logger. Folders:
   changes of abilities, components, terrains and rules; `StarSystemReader` builds the star systems file from the starmap, with
   `RouteReader` reading the route to a system as the starmap plans it; `FinancialReportReader` builds
   the financial report file; `MissionReader` builds the
-  mission files' models from the completed contract; `CatalogReader` builds the catalog from the
+  mission file's models from the completed contract; `CatalogReader` builds the catalog from the
   definitions the game has loaded, with `TerrainReader` reading the terrains and biomes from the
   design masks. `DefinitionReferences` makes the
   references that need only a description, a faction, a biome or a data-driven enum value, and
   `ComponentReferences` every reference to a component; a reference
   with a naming rule of its own is made by the reader that owns it. `ReferenceOrder` orders the
   lists of entries that refer to a definition, and `GameText` makes every exported game text plain.
-  `ExportFileWriter` writes and deletes the files in
-  the mod's `exports/` folder.
+  `ExportFileWriter` writes the files in the mod's `exports/` folder.
 - `Models/`: immutable records, one per JSON object, and the mod's own enums. The records are
   marked `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` because only the serializer reads
   them.
@@ -414,11 +413,11 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **Travel days and cost are the starmap's route** (`RouteReader`) from the current system: `null`
   where the game finds no route, always for a system whose travel requirements aren't met. In
   `star-systems.json` the current system has 0 for both.
-- **The latest mission is two files of its own,** written in combat and the after-action report:
-  `mission-outcome.json` when the mission ends, before the salvage is chosen, and
-  `salvage-received.json` once the salvage is final. Writing a mission outcome deletes the salvage
-  file, so it always belongs to the outcome next to it; the game has no id that identifies every
-  contract to link them by.
+- **The latest mission is a file of its own,** `mission-outcome.json`, written in combat when the
+  mission ends, before the salvage is chosen, and again in the after-action report once the
+  salvage is final, with `salvage.received` filled in; the offer stays as it was. One file, because
+  the game has no id that identifies every contract to link two by. Each mech's ammo use is read
+  from its combat mech, which outlives the after-action report; the contract's copy has no ammo.
 - **The catalog is a file of its own that doesn't depend on the career:** `catalog.json`, with
   every chassis, mech, vehicle, turret, component, terrain and biome the game has loaded, written
   on every career load and so, with an unchanged game, once per game start. Vehicles' and turrets'
