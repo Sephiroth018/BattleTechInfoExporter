@@ -422,7 +422,7 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   load and so, with an unchanged game, once per game start. Vehicles' and turrets' armor and
   structure are their combat values, after the game's vehicle multipliers.
 - **Every export file starts with `modVersion`, `exportedAt` and `trigger`** (`ExportFile`, which
-  every file's model inherits), describing the export that last wrote it.
+  every file's model inherits), describing the export that last changed it.
 - **Points in time are day numbers** on the game's `DaysPassed` scale (`company.daysPassed`), e.g.
   `readyOnDay`, never countdowns, so a passing day changes only the company's day and date. Durations
   that don't count down (a route's travel days) stay durations.
@@ -433,9 +433,9 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **JSON:** camelCase properties, indented, `null` written explicitly, through the game's
   Newtonsoft.Json.
 - **Files are replaced atomically**, so a tool reading them never sees a half-written file, and
-  only when their content apart from `exportedAt` changed, so a tool watching them sees only real
-  changes. `ExportFileWriter` compares with the content it last wrote, kept in memory, so each file
-  is also written once after every game start.
+  only when their content apart from `exportedAt` and `trigger` changed, so a tool watching them
+  sees only real changes. `ExportFileWriter` compares with the content it last wrote, kept in
+  memory, so each file is also written once after every game start.
 
 ## Glossary
 
