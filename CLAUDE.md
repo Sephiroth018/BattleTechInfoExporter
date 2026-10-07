@@ -366,7 +366,8 @@ name, version and folder, `ModLog` its logger. Folders:
   the financial report file; `MissionReader` builds the
   mission file's models from the completed contract; `CatalogReader` builds the catalog from the
   definitions the game has loaded, with `TerrainReader` reading the terrains and biomes from the
-  design masks. `DefinitionReferences` makes the
+  design masks and `MapReader` the maps from the metadata database and their terrain data files.
+  `DefinitionReferences` makes the
   references that need only a description, a faction, a biome or a data-driven enum value, and
   `ComponentReferences` every reference to a component; a reference
   with a naming rule of its own is made by the reader that owns it. `ReferenceOrder` orders the
@@ -466,6 +467,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   roads and the like. A cell has one terrain at most.
 - **Biome:** a map's map-wide design mask, keyed by the game's `Biome.BIOMESKIN`, applied on top of
   the terrain.
+- **Map:** a combat map with fixed terrain (`Map_MDD`, `MapMetaData`); a star system's contracts pick
+  among the maps its biomes and map tags allow.
 - **Statistic change:** a change an ability or component makes to a statistic (the game's
   `EffectData` of type `StatisticEffect`).
 

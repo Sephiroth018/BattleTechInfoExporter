@@ -39,9 +39,9 @@ One more holds the latest mission:
 
 The last one describes the game rather than the career:
 
-- `catalog.json`: every chassis, mech, vehicle, turret, component, terrain and biome the game has
-  loaded for the career, DLC included, keyed by id, so tools can judge what else exists beyond what
-  the career refers to, what a mission's enemies can do and what its ground does to them.
+- `catalog.json`: every chassis, mech, vehicle, turret, component, terrain, biome and map the game
+  has loaded for the career, DLC included, keyed by id, so tools can judge what else exists beyond
+  what the career refers to, what a mission's enemies can do and what its ground does to them.
   - **Chassis:** the frame: weight class, tonnage and bare tonnage, max jump jets, built-in heat
     dissipation, walk and sprint distance, melee values before upgrades, and per location max
     armor, structure, hardpoints and component slots; plus the stock mech, the mech the game treats as the chassis'
@@ -68,6 +68,16 @@ The last one describes the game rather than the career:
   - **Biomes:** keyed by the biome id the star systems refer to, what a map's biome does to every
     unit on it on top of the terrain: heat sinking, heat per turn and damage dealt, the only
     values the game reads from a biome.
+  - **Maps:** every combat map in the build whose DLC is owned: name, biome, map tags, the contract
+    generator's draw weight and the terrain coverage: each terrain's share of the map's playable
+    cells by terrain id, plus `none` for the cells with no terrain, the bare biome. Cells are all
+    the same size, so a share is an area share; the shares sum to 1. The same kind of cell is a
+    different terrain per map, e.g. water is ice on a frozen map, so the shares name the terrain
+    directly. Buildings aren't terrain: a cell under a building counts as the terrain below it.
+
+    A tool can derive the terrain a star system's contracts are likely fought on: a star system's
+    biomes and its required and excluded map tags select the maps, and the weight draws among them.
+    The contract type and the maps the game recently offered filter further and aren't exported.
 
   The other files refer to the catalog's chassis, mechs and components by id instead of repeating
   their stats or limits, e.g. a location's max armor; a file and the catalog belong together when

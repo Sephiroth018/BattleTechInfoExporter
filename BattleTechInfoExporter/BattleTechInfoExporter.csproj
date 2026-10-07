@@ -29,6 +29,9 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Assembly-CSharp" />
+    <!-- The metadata database's query API (MetadataDatabase.Query) is typed with Dapper's and System.Data's types. -->
+    <Reference Include="Dapper.Unity" />
+    <Reference Include="System.Data" />
     <Reference Include="Newtonsoft.Json" />
     <!-- Also ships the JetBrains annotations ([UsedImplicitly]) that tell ReSharper what only reflection uses. -->
     <Reference Include="UnityEngine.CoreModule" />
