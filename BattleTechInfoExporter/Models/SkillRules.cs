@@ -54,4 +54,4 @@ internal sealed record SkillLevelAbility(
     AbilityDef.TargetingType? Targeting,
     int? Cooldown,
     int? Uses,
-    IReadOnlyList<AbilityEffect> Effects);
+    IReadOnlyList<StatisticChange> Effects);

@@ -5,11 +5,12 @@ namespace BattleTechInfoExporter.Models;
 
 /// <summary>
 ///     The fields every component definition has; the definitions of types with stats of their own derive from
-///     it. Jump jets and upgrades have no others.
+///     it. Upgrades have no others.
 /// </summary>
 /// <param name="Name">The name the mech lab shows, as in the references to the component.</param>
 /// <param name="Cost">The C-Bill value of the component.</param>
 /// <param name="Bonuses">The short bonus texts shown on the component, e.g. "+ 5 Dmg.".</param>
+/// <param name="Effects">The statistics the component changes while mounted.</param>
 /// <param name="IsSalvageable">
 ///     Whether the component can come as salvage; the game's <c>BLACKLISTED</c> tag rules it out. Nothing else
 ///     follows from it, e.g. about stores.
@@ -21,6 +22,7 @@ internal record ComponentDefinition(
     int Slots,
     int Cost,
     IReadOnlyList<string> Bonuses,
+    IReadOnlyList<StatisticChange> Effects,
     bool IsSalvageable);
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -128,4 +130,21 @@ internal sealed record HeatSinkDefinition : ComponentDefinition
 
     /// <summary>The heat the heat sink removes per round.</summary>
     public float Dissipation { get; }
+}
+
+/// <summary>A jump jet, which only mechs whose chassis tonnage is within its range can mount.</summary>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record JumpJetDefinition : ComponentDefinition
+{
+    internal JumpJetDefinition(ComponentDefinition component, float minTonnage, float maxTonnage) : base(component)
+    {
+        MinTonnage = minTonnage;
+        MaxTonnage = maxTonnage;
+    }
+
+    /// <summary>The lowest chassis tonnage that can mount the jump jet, inclusive.</summary>
+    public float MinTonnage { get; }
+
+    /// <summary>The highest chassis tonnage that can mount the jump jet, inclusive.</summary>
+    public float MaxTonnage { get; }
 }

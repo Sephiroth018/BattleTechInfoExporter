@@ -358,7 +358,8 @@ name, version and folder, `ModLog` its logger. Folders:
   for the catalog, which first loads the vehicles and turrets the career doesn't and exports once
   they are loaded. All run their export inside `CampaignExport`. `GameStateReader` builds the game
   state file's models from the game, one reader per section of the file; `RulesReader` builds the
-  rules file's tables, with `AbilityReader` reading each ability and the statistics it changes; `StarSystemReader` builds the star systems file from the starmap, with
+  rules file's tables, with `AbilityReader` reading each ability; `EffectReader` reads the statistic
+  changes of abilities and components; `StarSystemReader` builds the star systems file from the starmap, with
   `RouteReader` reading the route to a system as the starmap plans it; `MissionReader` builds the
   mission files' models from the completed contract; `CatalogReader` builds the catalog from the
   definitions the game has loaded. `DefinitionReferences` makes the
@@ -450,6 +451,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   location) or "planet".
 - **Ship upgrade:** an upgrade of the Argo (`ShipModuleUpgrade`), bought in its engineering
   screen. Never just "upgrade", which components also have.
+- **Statistic change:** a change an ability or component makes to a statistic (the game's
+  `EffectData` of type `StatisticEffect`).
 
 ## Commands
 

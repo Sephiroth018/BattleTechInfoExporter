@@ -19,7 +19,16 @@ internal static class RulesReader
             ReadSkillRules(simGame),
             ReadSpiritsLevels(simGame),
             simGame.Constants.Story.DefaultMechPartMax,
-            ContractReader.ReadContractTypes(simGame));
+            ContractReader.ReadContractTypes(simGame),
+            ReadJumpDistances(simGame));
+
+    // Mech.JumpDistance indexes the move table by the number of working jump jets, clamped to its last entry, and
+    // is 0 without any, so the first entry is never used.
+    private static List<JumpDistance> ReadJumpDistances(SimGameState simGame) =>
+        simGame.CombatConstants.MoveConstants.MoveTable
+            .Skip(1)
+            .Select((distance, index) => new JumpDistance(index + 1, distance))
+            .ToList();
 
     // The limits are hardcoded in SimGameState.CanPilotTakeAbility.
     private static SkillRules ReadSkillRules(SimGameState simGame)
