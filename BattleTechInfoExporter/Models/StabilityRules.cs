@@ -10,11 +10,14 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="LevelsRecovered">
 ///     The levels of instability an action removes, after the level the mech is in is always emptied.
 /// </param>
-/// <param name="LevelsAdded">The levels of instability an action adds to the mech doing it.</param>
-/// <param name="EntrenchedInstabilityMultiplier">Multiplies the instability a braced mech takes from weapons.</param>
-/// <param name="MinStabilityPerDestroyedLeg">
-///     The share of the stability bar a mech can't recover below for each destroyed leg.
+/// <param name="LevelsAdded">
+///     The levels of instability an action adds to the mech doing it, after the level the mech is in is emptied.
 /// </param>
+/// <param name="EntrenchedInstabilityMultiplier">Multiplies the instability a braced mech takes from weapons.</param>
+/// <param name="MinStabilityPerDestroyedLocation">
+///     The share of the stability bar a mech can't recover below for each destroyed location.
+/// </param>
+/// <param name="OnlyLegsRaiseMinStability">Whether only destroyed legs count for it.</param>
 /// <param name="InstabilityFromDamage">
 ///     The share of the stability bar added when a location is damaged, on top of a weapon's own instability.
 /// </param>
@@ -25,7 +28,8 @@ internal sealed record StabilityRules(
     LevelsRecoveredByAction LevelsRecovered,
     LevelsAddedByAction LevelsAdded,
     float EntrenchedInstabilityMultiplier,
-    float MinStabilityPerDestroyedLeg,
+    float MinStabilityPerDestroyedLocation,
+    bool OnlyLegsRaiseMinStability,
     InstabilityFromDamage InstabilityFromDamage);
 
 /// <param name="Deferred">When the mech's pilot has the ability that resets instability on deferring.</param>

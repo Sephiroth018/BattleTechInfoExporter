@@ -39,10 +39,12 @@ internal sealed record HitTablesOf<TLocation>(
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CalledShotRules(int WeightMultiplier, float DegradePerHit);
 
-/// <param name="Head">Whether the head's weight is multiplied; when not, it's also only hit again after a head hit.</param>
+/// <param name="IsHeadMultiplied">Whether the head's weight is multiplied like the other locations'.</param>
+/// <param name="CanHeadBeClustered">Whether a later hit can land on the head unless the first hit did.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ClusteredHitWeights(
     float SameLocation,
     float AdjacentLocation,
     float OtherLocation,
-    bool Head);
+    bool IsHeadMultiplied,
+    bool CanHeadBeClustered);

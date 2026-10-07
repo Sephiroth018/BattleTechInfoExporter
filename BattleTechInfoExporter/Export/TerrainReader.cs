@@ -17,9 +17,11 @@ internal static class TerrainReader
     // DesignMaskDef's default move cost, which no unit's movement reaches a single meter of.
     private const float ImpassableMoveCost = 9999.9f;
 
+    // The game has no description for the generic biome (DataManagerExtensions.GetBaseDescriptionDef logs an error
+    // looking it up) and no map uses it.
     private static readonly IReadOnlyList<Biome.BIOMESKIN> Biomes = Enum.GetValues(typeof(Biome.BIOMESKIN))
         .Cast<Biome.BIOMESKIN>()
-        .Where(biome => biome != Biome.BIOMESKIN.UNDEFINED)
+        .Where(biome => biome is not (Biome.BIOMESKIN.UNDEFINED or Biome.BIOMESKIN.generic))
         .ToList();
 
     // The masks that aren't terrains: each biome's mask (MapMetaData.biomeDesignMask), which the maps name as

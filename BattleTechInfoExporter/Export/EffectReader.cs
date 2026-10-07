@@ -9,15 +9,17 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>Builds the statistic changes of abilities and components from their effects.</summary>
 internal static class EffectReader
 {
-    internal static List<StatisticChange> ReadStatisticChanges(IEnumerable<EffectData> effects) =>
+    // A constants file can leave an effect out, which leaves it null.
+    internal static List<StatisticChange> ReadStatisticChanges(IEnumerable<EffectData?> effects) =>
         effects
+            .OfType<EffectData>()
             // Floatie effects only show text over the unit.
             .Where(effect => effect.effectType == EffectType.StatisticEffect)
             .Select(ReadStatisticChange)
             .ToList();
 
     /// <summary>The changes of a single effect the game applies on its own, outside any ability or component.</summary>
-    internal static List<StatisticChange> ReadStatisticChanges(EffectData effect) => ReadStatisticChanges([effect]);
+    internal static List<StatisticChange> ReadStatisticChanges(EffectData? effect) => ReadStatisticChanges([effect]);
 
     private static StatisticChange ReadStatisticChange(EffectData effect)
     {

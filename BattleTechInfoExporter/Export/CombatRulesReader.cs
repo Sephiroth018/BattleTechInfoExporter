@@ -197,8 +197,9 @@ internal static class CombatRulesReader
                 resolution.StabilityDumpAbilityDefer),
             new LevelsAddedByAction(-resolution.StabilityDumpDFA, -resolution.StabilityDumpFalling),
             resolution.EntrenchedMultiplier,
-            // Mech.UpdateMinStability; the game's data limits the loss to legs.
-            piloting.OnlyPermanentLossFromLegs ? piloting.LocationDestroyedPermanentStabilityLoss : 0f,
+            // Mech.UpdateMinStability.
+            piloting.LocationDestroyedPermanentStabilityLoss,
+            piloting.OnlyPermanentLossFromLegs,
             // Mech.ApplySideTorsoStructureEffects and the other Apply…StructureEffects methods.
             new InstabilityFromDamage(
                 piloting.SideTorsoBlackRelativeInstability,
@@ -239,7 +240,8 @@ internal static class CombatRulesReader
                 toHit.ClusterChanceOriginalLocationMultiplier,
                 toHit.ClusterChanceAdjacentMultiplier,
                 toHit.ClusterChanceNonadjacentMultiplier,
-                !toHit.ClusterChanceNeverMultiplyHead));
+                !toHit.ClusterChanceNeverMultiplyHead,
+                !toHit.ClusterChanceNeverClusterHead));
     }
 
     // The ranges are LineOfSight.GetSpotterRange's and GetSensorRange's, the sensor lock SensorLockSequence's.
