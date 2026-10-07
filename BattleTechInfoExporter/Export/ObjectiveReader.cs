@@ -59,7 +59,8 @@ internal static class ObjectiveReader
             objective.GetTargetUnits()
                 .OfType<AbstractActor>()
                 .Select(unit => unit.GUID)
-                .Where(units.ContainsKey)
+                // A blip's side isn't something the HUD shows.
+                .Where(id => units.TryGetValue(id, out var unit) && unit.Visibility == UnitVisibility.Full)
                 .ToList());
     }
 }

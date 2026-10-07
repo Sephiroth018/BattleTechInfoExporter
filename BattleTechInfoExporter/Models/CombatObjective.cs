@@ -12,8 +12,8 @@ namespace BattleTechInfoExporter.Models;
 ///     where it shows none.
 /// </param>
 /// <param name="TargetUnitIds">
-///     The units it is about (to destroy, protect or escort), as keys of <see cref="CombatState.Units" />, where the
-///     player knows of them. Buildings are left out.
+///     The units it is about (to destroy, protect or escort), as keys of <see cref="CombatState.Units" />, while
+///     they are in full view: neither blips nor destroyed enemies. Buildings are left out.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatObjective(
