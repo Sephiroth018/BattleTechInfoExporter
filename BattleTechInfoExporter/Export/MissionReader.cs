@@ -6,11 +6,18 @@ using Contract = BattleTech.Contract;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Builds the mission files' models from a contract the game has completed.</summary>
+/// <summary>Builds the mission file's models from a contract the game has completed.</summary>
 internal static class MissionReader
 {
-    // Contract.CompleteContract has filled in every value read here; GenerateSalvage, at its end, the salvage.
-    internal static MissionOutcome ReadOutcome(SimGameState simGame, Contract contract, ExportTrigger trigger)
+    // Contract.CompleteContract has filled in every value read here, and nothing changes until the contract is
+    // resolved, except the salvage: FinalizeSalvage moves the chosen items into SalvageResults, so the offer comes
+    // from the caller.
+    internal static MissionOutcome ReadOutcome(
+        SimGameState simGame,
+        Contract contract,
+        ExportTrigger trigger,
+        SalvageOffer offer,
+        IReadOnlyList<SalvageDef>? received)
     {
         var (employer, target) = ContractReader.ReadFactions(contract);
         return new MissionOutcome(
@@ -35,22 +42,12 @@ internal static class MissionReader
             contract.PlayerUnitResults
                 .Select(unit => ReadLanceUnit(simGame, contract, unit))
                 .ToList(),
-            // Before the choice, SalvageResults holds only the components recovered from the company's lost mechs.
-            new SalvageOffer(
+            new MissionSalvage(
                 contract.FinalSalvageCount,
                 contract.FinalPrioritySalvageCount,
-                ReadSalvageItems(simGame, contract.GetPotentialSalvage()),
-                ReadSalvageItems(simGame, contract.SalvageResults)));
-    }
-
-    // Contract.FinalizeSalvage adds the priority and the random salvage to SalvageResults, one entry per item.
-    internal static SalvageReceived ReadSalvageReceived(SimGameState simGame, Contract contract, ExportTrigger trigger)
-    {
-        return new SalvageReceived(
-            ModAssembly.Version,
-            trigger,
-            ContractReader.ReadMissionContract(simGame, contract),
-            ReadSalvageItems(simGame, contract.SalvageResults));
+                ReadSalvageItems(simGame, offer.Pool),
+                ReadSalvageItems(simGame, offer.Automatic),
+                received is null ? null : ReadSalvageItems(simGame, received)));
     }
 
     // The unit's mech and pilot are copies taken from combat (Mech.ToMechDef keeps the mech bay's GUID); the pilot's

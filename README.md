@@ -25,17 +25,15 @@ written together on every career export:
   is due, the spending level and its options with their expected expenses and morale change, and
   the expected expense lines for the ship, its upgrades, each mech and each pilot.
 
-Two more hold the latest mission:
+One more holds the latest mission:
 
-- `mission-outcome.json`: written when a mission ends, before the salvage is chosen. It holds the
-  contract, the outcome and objectives, the payment, reputation and experience, the lance with
-  each pilot's injuries, kills and the day they are out of the med bay, each mech's armor,
-  structure and component damage and the days and C-Bills its repair would take, and the salvage
-  on offer: the pool to choose from, how many items the company gets and picks, and the components
-  it recovers from its own lost mechs.
-- `salvage-received.json`: written once the salvage is final, after the priority salvage is
-  confirmed. It holds everything the company gets from the salvage of the mission in
-  `mission-outcome.json`; a new mission outcome deletes it until its salvage is final.
+- `mission-outcome.json`: written when a mission ends, before the salvage is chosen, and again
+  once the salvage is final, after the priority salvage is confirmed. It holds the contract, the
+  outcome and objectives, the payment, reputation and experience, the lance with each pilot's
+  injuries, kills and the day they are out of the med bay, each mech's armor, structure and
+  component damage and the days and C-Bills its repair would take, and the salvage: the pool to
+  choose from, how many items the company gets and picks, the components it recovers from its own
+  lost mechs, and everything it received, which is `null` until the salvage is final.
 
 The last one describes the game rather than the career:
 
@@ -131,11 +129,11 @@ The game state is exported when:
 The catalog is exported when the career is loaded, also after a mission, and written once after
 every game start. The first time, it waits a moment for the game to load every vehicle and turret.
 
-The mission files are exported when:
+The mission file is exported when:
 
-- **A mission ends**, still in combat: the mission outcome.
+- **A mission ends**, still in combat, with the salvage received still `null`.
 - **The salvage is final**, after the priority salvage is confirmed or right away when there is
-  nothing to choose: the salvage received.
+  nothing to choose, with the salvage received filled in.
 
 ## Planned
 
