@@ -37,7 +37,7 @@ internal static class PilotReader
             ReadPilotCommon(simGame, pilot),
             // What SG_HiringHall_Screen shows and SimGameState.HirePilot charges.
             simGame.CurSystem.GetPurchaseCostAfterReputationModifier(simGame.GetMechWarriorHiringCost(definition)),
-            FinancesReader.ReadSalary(simGame, definition),
+            FinancialReportReader.ReadSalary(simGame, definition),
             simGame.CanMechWarriorBeHiredAccordingToMRBRating(pilot)
             && simGame.CanMechWarriorBeHiredAccordingToMorale(pilot));
     }

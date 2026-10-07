@@ -14,7 +14,7 @@ internal sealed record Company(
     int DaysPassed,
     string CurrentDate,
     Morale Morale,
-    Finances Finances,
+    FinancialReport FinancialReport,
     MercenaryReviewBoard MercenaryReviewBoard,
     IReadOnlyList<FactionReputation> Reputation,
     int MechTech,

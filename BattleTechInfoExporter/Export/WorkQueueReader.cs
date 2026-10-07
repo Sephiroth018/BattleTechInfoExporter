@@ -36,7 +36,7 @@ internal static class WorkQueueReader
 
         if (simGame.FinancialReportNotification is { } report)
         {
-            entries.Add(new WorkQueueEntry(report.Type, FinancesReader.ReadNextReportOnDay(simGame)));
+            entries.Add(new WorkQueueEntry(report.Type, FinancialReportReader.ReadNextReportOnDay(simGame)));
         }
 
         if (simGame.CurrentUpgradeEntry is { } upgradeOrder)

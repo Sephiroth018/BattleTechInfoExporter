@@ -7,10 +7,10 @@ using UnityEngine;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Builds the company's finances and the expense lines of each report from the game's career state.</summary>
-internal static class FinancesReader
+/// <summary>Builds the financial report and the expense lines of each report from the game's career state.</summary>
+internal static class FinancialReportReader
 {
-    internal static Finances ReadFinances(SimGameState simGame) =>
+    internal static FinancialReport ReadFinancialReport(SimGameState simGame) =>
         new(
             simGame.Funds,
             ReadNextReportOnDay(simGame),

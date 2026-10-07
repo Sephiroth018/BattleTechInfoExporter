@@ -6,7 +6,7 @@ namespace BattleTechInfoExporter.Models;
 ///     The day of the next financial report, on the scale of <see cref="Company.DaysPassed" />.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record Finances(
+internal sealed record FinancialReport(
     int Funds,
     int NextReportOnDay,
     Spending Spending,
