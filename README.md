@@ -22,8 +22,9 @@ written together on every career export:
   current system, `null` where there is no route). The game state and the mission outcome refer to
   a star system only by its id and name.
 - `financial-report.json`: the next monthly financial report, as on the finance screen: the day it
-  is due, the spending level and its options with their expected expenses and morale change, and
-  the expected expense lines for the ship, its upgrades, each mech and each pilot.
+  is due, the spending level and its options with their expected expenses (their cost multiplier
+  and morale change are in the rules), and the expected expense lines for the ship, its upgrades,
+  each mech and each pilot.
 
 One more holds the latest mission:
 

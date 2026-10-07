@@ -462,6 +462,10 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   location) or "planet".
 - **Ship upgrade:** an upgrade of the Argo (`ShipModuleUpgrade`), bought in its engineering
   screen. Never just "upgrade", which components also have.
+- **Terrain:** a design mask applied to a map cell (`DesignMaskDef`): forest, water, rough ground,
+  roads and the like. A cell has one terrain at most.
+- **Biome:** a map's map-wide design mask, keyed by the game's `Biome.BIOMESKIN`, applied on top of
+  the terrain.
 - **Statistic change:** a change an ability or component makes to a statistic (the game's
   `EffectData` of type `StatisticEffect`).
 

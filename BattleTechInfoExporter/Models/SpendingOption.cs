@@ -3,6 +3,6 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
-/// <param name="MoraleChange">Applied once when the level is confirmed at a report.</param>
+/// <param name="Level">The spending level, whose cost multiplier and morale change <see cref="SpendingLevelRules" /> has.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record SpendingOption(EconomyScale Level, int ExpectedExpenses, int MoraleChange);
+internal sealed record SpendingOption(EconomyScale Level, int ExpectedExpenses);
