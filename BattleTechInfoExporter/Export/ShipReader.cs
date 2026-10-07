@@ -67,7 +67,7 @@ internal static class ShipReader
                 .OrderByDefinition(reference => reference)
                 .ToList(),
             Mathf.CeilToInt(upgrade.PurchaseCost * simGame.Constants.CareerMode.ArgoUpgradeCostMultiplier),
-            FinancesReader.ReadUpkeep(simGame, upgrade),
+            FinancialReportReader.ReadUpkeep(simGame, upgrade),
             upgrade.TechCost / simGame.DailyUpgradeValue,
             upgrade.Stats
                 .Select(stat => ReadEffect(simGame, stat))
