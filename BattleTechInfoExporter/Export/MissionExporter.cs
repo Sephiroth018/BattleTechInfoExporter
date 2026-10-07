@@ -21,7 +21,9 @@ internal static class MissionExporter
             ExportTrigger.MissionCompleted,
             () =>
             {
-                var outcome = MissionReader.ReadOutcome(simGame, contract, ExportTrigger.MissionCompleted);
+                // Forgotten before the read, so a failed one leaves no previous mission behind.
+                _lastExported = null;
+                var outcome = MissionReader.ReadOutcome(simGame, contract);
                 _lastExported = (contract, outcome);
                 ExportFileWriter.Write(MissionOutcomeFileName, outcome);
             });

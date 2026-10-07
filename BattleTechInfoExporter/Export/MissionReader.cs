@@ -10,12 +10,12 @@ namespace BattleTechInfoExporter.Export;
 internal static class MissionReader
 {
     // Contract.CompleteContract has filled in every value read here; GenerateSalvage, at its end, the salvage.
-    internal static MissionOutcome ReadOutcome(SimGameState simGame, Contract contract, ExportTrigger trigger)
+    internal static MissionOutcome ReadOutcome(SimGameState simGame, Contract contract)
     {
         var (employer, target) = ContractReader.ReadFactions(contract);
         return new MissionOutcome(
             ModAssembly.Version,
-            trigger,
+            ExportTrigger.MissionCompleted,
             ContractReader.ReadMissionContract(simGame, contract),
             contract.State,
             contract.IsGoodFaithEffort,
