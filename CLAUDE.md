@@ -422,13 +422,17 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   the game has no id that identifies every contract to link two by. Each mech's ammo use is read
   from its combat mech, which outlives the after-action report; the contract's copy has no ammo.
 - **The catalog is a file of its own that doesn't depend on the career:** `catalog.json`, with
-  every chassis, mech, vehicle, turret, component, terrain and biome the game has loaded, rebuilt
-  on a career load only when it's missing or stale: written by another mod version or with another
-  `sourceFingerprint`, the hash of the game's manifest entries for everything it reads (id, file
-  and last write time). A change touching no file it reads (a DLL mod patching definitions in
+  every chassis, mech, vehicle, turret, component, terrain, biome and map the game has loaded,
+  rebuilt on a career load only when it's missing or stale: written by another mod version or with
+  another `sourceFingerprint`, the hash of the game's manifest entries for everything it reads (id,
+  file and last write time). A change touching no file it reads (a DLL mod patching definitions in
   memory) isn't detected; deleting the file forces a rebuild. Vehicles' and turrets'
   armor and structure are their combat values, after the game's vehicle multipliers. Terrains are
   keyed by design mask id, biomes by the biome id the star systems refer to.
+- **Maps are selected by the game, not derived by the consumer:** each star system lists the maps
+  its contracts can be fought on, through the contract generator's own query (`MapReader`), and the
+  catalog's `mapDefinitions` are the union of those lists, with each map's draw weight and terrain
+  coverage, the share of its playable cells per terrain id, read from the map's terrain data file.
 - **The rules export only constants the game's code reads** (`combat` and `campaign` in
   `rules.json`): a constant the game never reads, reads only in code nothing calls, or reads only
   for presentation or the AI is left out, so a consumer never plans around a number that does

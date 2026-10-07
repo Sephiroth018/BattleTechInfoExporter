@@ -4,13 +4,13 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     A combat map and the terrain it is made of. A star system's contracts are fought on the maps whose biome the
-///     system supports and whose tags its required and excluded map tags match, drawn by weight.
+///     A combat map and the terrain it is made of. Each star system lists the maps its contracts can be fought on;
+///     the contract generator draws among them by weight.
 /// </summary>
 /// <param name="Name">The map's friendly name.</param>
 /// <param name="Biome">The map's biome, as the star systems refer to it.</param>
-/// <param name="Tags">The map tags a star system's required and excluded map tags match against.</param>
-/// <param name="Weight">The contract generator's draw weight among the maps a star system can use.</param>
+/// <param name="Tags">The map tags the star systems' required and excluded map tags select the map by.</param>
+/// <param name="Weight">The contract generator's draw weight among a star system's maps.</param>
 /// <param name="TerrainCoverage">
 ///     Each terrain's share of the map's playable cells, keyed by terrain id, plus <c>none</c> for the cells with
 ///     no terrain (bare biome). Cells are all the same size, so a share is an area share; the shares sum to 1.
