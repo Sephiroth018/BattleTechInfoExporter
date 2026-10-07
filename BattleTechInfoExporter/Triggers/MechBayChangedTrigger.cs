@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using BattleTech;
 using BattleTech.UI;
 using BattleTechInfoExporter.Export;
@@ -53,6 +54,26 @@ internal static class MechBayChangedTrigger
         [HarmonyArgument("__instance")] MechPlacementPopup mechPlacement)
     {
         GameStateExporter.Export(mechPlacement.Sim, ExportTrigger.MechBayChanged);
+    }
+
+    // A rename with no refit returns before the game updates the queue; a refit is exported with the queue.
+    [HarmonyPatch(typeof(MechBayPanel), nameof(MechBayPanel.OnMechLabComplete))]
+    [HarmonyPostfix]
+    private static void OnMechLabCompleted(
+        [HarmonyArgument("__instance")] MechBayPanel mechBay,
+        List<WorkOrderEntry>? entries)
+    {
+        try
+        {
+            if (entries is [{ SubEntryCount: < 1 }])
+            {
+                GameStateExporter.Export(mechBay.Sim, ExportTrigger.MechBayChanged);
+            }
+        }
+        catch (Exception exception)
+        {
+            ModLog.Logger.LogException(exception);
+        }
     }
 
     // Queues the repair of a component in storage without updating the queue.
