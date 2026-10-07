@@ -64,9 +64,9 @@ The last one describes the game rather than the career:
   the backers' Shadow Hawk-UMBRA) and the game's internal melee and AI weapons are left out, as are
   the game's role and other advisory texts, which often don't match the best way to use a mech.
 
-Every file starts with `modVersion`, `exportedAt` and the `trigger` of the export that last wrote
+Every file starts with `modVersion`, `exportedAt` and the `trigger` of the export that last changed
 it. A file is replaced in one step, never half-written, and only when its content apart from
-`exportedAt` changed, plus once after every game start. Points in time are day numbers, comparable
+`exportedAt` and `trigger` changed, plus once after every game start. Points in time are day numbers, comparable
 with the company's `daysPassed`, so a day passing with nothing else happening changes only the company's day and date.
 
 The game state holds:
