@@ -71,8 +71,8 @@ with the company's `daysPassed`, so a day passing with nothing else happening ch
 
 The game state holds:
 
-- **Company:** name, date, morale, rating, MechTech and MedTech, and the reputation with every
-  faction.
+- **Company:** name, date, morale, rating, MechTech and MedTech with the changes events made to
+  them for a time and the day each ends, and the reputation with every faction.
 - **Finances:** funds, the day of the next financial report, the spending level and its expected
   expenses.
 - **Work queue:** the timeline's entries in order, each with the day it finishes and the mech,
