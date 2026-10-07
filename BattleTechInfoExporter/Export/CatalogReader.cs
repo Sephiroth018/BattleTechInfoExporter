@@ -192,8 +192,7 @@ internal static class CatalogReader
             chassis.Tonnage,
             chassis.movementType,
             ReadMovement(chassis.MovementCapDef),
-            VehicleLocations
-                .Where(location => location != VehicleChassisLocations.Turret || chassis.HasTurret)
+            VehicleLocationsOf(chassis)
                 .Select(location => new VehicleLocationDefinition(
                     location,
                     vehicle.GetLocationLoadoutDef(location).AssignedArmor * combatMultipliers.ArmorMultiplierVehicle,
@@ -226,6 +225,10 @@ internal static class CatalogReader
             chassis.MaxInternalStructure * combatMultipliers.StructureMultiplierVehicle,
             turret.Inventory.Select(ComponentReferences.ReferenceTo).ToList());
     }
+
+    /// <summary>The vehicle's locations from front to rear, then the turret if it has one.</summary>
+    internal static IEnumerable<VehicleChassisLocations> VehicleLocationsOf(VehicleChassisDef chassis) =>
+        VehicleLocations.Where(location => location != VehicleChassisLocations.Turret || chassis.HasTurret);
 
     private static ChassisMovement ReadMovement(MovementCapabilitiesDef movement) =>
         new(movement.MaxWalkDistance, movement.MaxSprintDistance);

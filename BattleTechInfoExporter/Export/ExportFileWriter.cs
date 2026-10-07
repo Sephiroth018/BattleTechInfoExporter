@@ -117,6 +117,21 @@ internal static class ExportFileWriter
         ModLog.Logger.Log($"Exported {fileName} ({content.Trigger}) to {ExportDirectory}");
     }
 
+    /// <summary>Deletes the file, if it exists, so tools see its data is gone.</summary>
+    internal static void Delete(string fileName)
+    {
+        // Forgotten either way, so the next write of the file isn't skipped as unchanged.
+        LastWrittenContents.Remove(fileName);
+        var path = FilePath(fileName);
+        if (!File.Exists(path))
+        {
+            return;
+        }
+
+        File.Delete(path);
+        ModLog.Logger.Log($"Deleted {fileName} from {ExportDirectory}");
+    }
+
     // Newtonsoft.Json 10, the game's version, has no naming strategy for enums yet.
     private sealed class OwnEnumConverter : StringEnumConverter
     {
