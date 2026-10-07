@@ -162,6 +162,7 @@ internal static class CombatUnitReader
     private static CombatUnitState ReadState(AbstractActor actor)
     {
         var mech = actor as Mech;
+        var pilot = actor.GetPilot();
         return new CombatUnitState(
             actor.IsDead,
             ReadLocations(actor),
@@ -176,6 +177,8 @@ internal static class CombatUnitReader
             actor.HasActivatedThisRound,
             actor.Initiative,
             actor.allComponents.Select(component => ReadComponent(actor, component)).ToList(),
+            pilot?.Injuries,
+            pilot?.Health,
             ReadAbilities(actor),
             actor.OffensivePushCost,
             actor.DefensivePushCost);

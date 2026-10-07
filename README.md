@@ -43,7 +43,7 @@ One more holds the running battle, and exists only while one runs:
   from a save, when every phase begins and after every unit's activation, and deleted when the battle ends: once its
   salvage is final, or when it is quit or restarted. It holds the contract, the map's id in the catalog, the round, the current phase,
   the lance's resolve, the units keyed by the game's unit id, the objectives the HUD lists with
-  their status and progress line, and the zones drawn on the map with their type, center, radius
+  their status, progress line and target units in full view, and the zones drawn on the map with their type, center, radius
   and objectives. See "Combat state" below.
 
 The last one describes the game rather than the career:
@@ -174,7 +174,7 @@ it stands in by its catalog id (`null` on open ground). What else it carries fol
   location in whole points as the paper doll shows them (cut off, a remainder below 1 shown as 1), evasion pips, the guard level with its sources (braced, cover, Bulwark), entrenched,
   prone, shut down, unsteady, heat and stability, whether the unit has activated this round, its
   initiative, every component's damage level with the rounds left in each ammo box and in weapons
-  that carry their own, the abilities that can be activated with their cooldowns and uses left,
+  that carry their own, the pilot's injuries and health, the abilities that can be activated with their cooldowns and uses left,
   and what Precision Strike and Vigilance cost it now. A Sensor Lock brings an enemy into full view
   for the player's whole side, and allied units' sensors count for the player. An enemy in sight
   but hidden by ECM counts as in full view, although the HUD hides its pilot, heat, stability and
