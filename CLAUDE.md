@@ -340,9 +340,9 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
 - **An exception escaping a patch breaks the game's own code.** Every exporter catches and logs
   every exception (`CampaignExport`), so a patch that only calls one needs no handling of its own;
   a patch doing anything else catches its own.
-- **Mutable static state** is allowed in patches, limited to what a patch needs, in
+- **Mutable static state** is allowed in patches, limited to what a patch needs, and in
   `ExportFileWriter`'s cache of the content it last wrote per file, which lives as long as the game
-  runs, and in `MissionExporter`'s outcome last exported, written again once its salvage is final.
+  runs.
 - **Logging** goes through `ModLog.Logger`, the game's `HBS.Logging` logger under the name
   `BattleTechInfoExporter`, and ends up in ModTek's log.
 

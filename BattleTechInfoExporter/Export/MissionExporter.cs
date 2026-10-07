@@ -1,7 +1,6 @@
 using BattleTech;
 using BattleTechInfoExporter.Models;
 using Contract = BattleTech.Contract;
-using MissionOutcome = BattleTechInfoExporter.Models.MissionOutcome;
 
 namespace BattleTechInfoExporter.Export;
 
@@ -10,48 +9,33 @@ internal static class MissionExporter
 {
     private const string MissionOutcomeFileName = "mission-outcome.json";
 
-    // The outcome last exported and its contract, kept only until it is written again with the salvage received:
-    // the contract reaches the whole career through its game context, and the game can't be saved in between.
-    private static (Contract Contract, MissionOutcome Outcome)? _lastExported;
-
     /// <summary>Exports the outcome of a contract the game has just completed, before the salvage is chosen.</summary>
     internal static void ExportOutcome(SimGameState simGame, Contract contract) =>
         CampaignExport.Run(
             simGame,
             ExportTrigger.MissionCompleted,
-            () =>
-            {
-                // Forgotten before the read, so a failed one leaves no previous mission behind.
-                _lastExported = null;
-                var outcome = MissionReader.ReadOutcome(simGame, contract);
-                _lastExported = (contract, outcome);
-                ExportFileWriter.Write(MissionOutcomeFileName, outcome);
-            });
+            () => ExportFileWriter.Write(
+                MissionOutcomeFileName,
+                MissionReader.ReadOutcome(
+                    simGame,
+                    contract,
+                    ExportTrigger.MissionCompleted,
+                    new SalvageOffer(contract.GetPotentialSalvage(), contract.SalvageResults),
+                    null)));
 
-    /// <summary>Exports the outcome again with the salvage of the contract once the game has finalized it.</summary>
-    internal static void ExportSalvageReceived(SimGameState simGame, Contract contract) =>
+    /// <summary>
+    ///     Exports the outcome again, with the salvage received, once the game has finalized the contract's salvage.
+    /// </summary>
+    internal static void ExportSalvageReceived(SimGameState simGame, Contract contract, SalvageOffer offer) =>
         CampaignExport.Run(
             simGame,
             ExportTrigger.SalvageChosen,
-            () =>
-            {
-                if (_lastExported is not { } exported || exported.Contract != contract)
-                {
-                    ModLog.Logger.LogError(
-                        $"Skipped the salvage received of {contract.Name}: no mission outcome was exported for it");
-                    return;
-                }
-
-                _lastExported = null;
-                ExportFileWriter.Write(
-                    MissionOutcomeFileName,
-                    exported.Outcome with
-                    {
-                        Trigger = ExportTrigger.SalvageChosen,
-                        Salvage = exported.Outcome.Salvage with
-                        {
-                            Received = MissionReader.ReadSalvageReceived(simGame, contract)
-                        }
-                    });
-            });
+            () => ExportFileWriter.Write(
+                MissionOutcomeFileName,
+                MissionReader.ReadOutcome(
+                    simGame,
+                    contract,
+                    ExportTrigger.SalvageChosen,
+                    offer,
+                    contract.SalvageResults)));
 }
