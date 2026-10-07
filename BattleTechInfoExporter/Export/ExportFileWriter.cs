@@ -15,13 +15,13 @@ internal static class ExportFileWriter
     // Game enums keep the game's own values (e.g. IN_SYSTEM), which is what the UI shows; the mod's own enums are
     // camelCase. The first converter that can convert a type wins. Dictionary keys are game ids, kept as they are;
     // CamelCasePropertyNamesContractResolver would camel-case them too.
+    private static readonly NamingStrategy PropertyNaming = new CamelCaseNamingStrategy
+        { ProcessDictionaryKeys = false };
+
     private static readonly JsonSerializerSettings SerializerSettings = new()
     {
         Formatting = Formatting.Indented,
-        ContractResolver = new InheritedFirstContractResolver
-        {
-            NamingStrategy = new CamelCaseNamingStrategy { ProcessDictionaryKeys = false }
-        },
+        ContractResolver = new InheritedFirstContractResolver { NamingStrategy = PropertyNaming },
         NullValueHandling = NullValueHandling.Include,
         Converters = { new OwnEnumConverter(), new StringEnumConverter() }
     };
@@ -33,6 +33,53 @@ internal static class ExportFileWriter
     private static readonly Dictionary<string, string> LastWrittenContents = new();
 
     /// <summary>
+    ///     Reads the string properties named by their record members (<c>nameof</c>) from the start of an existing
+    ///     file, parsing only as far as the last of them: the files are large, and the header properties come first.
+    ///     A property the file doesn't have is <c>null</c>.
+    /// </summary>
+    /// <returns><c>null</c> when the file doesn't exist.</returns>
+    /// <exception cref="JsonException">The file is malformed.</exception>
+    /// <exception cref="IOException">The file can't be read.</exception>
+    internal static IReadOnlyDictionary<string, string?>? ReadHeader(string fileName, params string[] memberNames)
+    {
+        var path = FilePath(fileName);
+        if (!File.Exists(path))
+        {
+            return null;
+        }
+
+        var membersByPropertyName = memberNames.ToDictionary(
+            memberName => PropertyNaming.GetPropertyName(memberName, false),
+            memberName => memberName,
+            StringComparer.Ordinal);
+        var header = memberNames.ToDictionary(memberName => memberName, _ => (string?)null, StringComparer.Ordinal);
+        using var reader = new JsonTextReader(File.OpenText(path));
+        if (!reader.Read() || reader.TokenType != JsonToken.StartObject)
+        {
+            throw new JsonReaderException($"{fileName} doesn't start with an object");
+        }
+
+        var remaining = memberNames.Length;
+        while (remaining > 0 && reader.Read() && reader.TokenType == JsonToken.PropertyName)
+        {
+            if (reader.Value is string propertyName
+                && membersByPropertyName.TryGetValue(propertyName, out var memberName))
+            {
+                header[memberName] = reader.ReadAsString();
+                remaining--;
+            }
+            else
+            {
+                reader.Skip();
+            }
+        }
+
+        return header;
+    }
+
+    private static string FilePath(string fileName) => Path.Combine(ExportDirectory, fileName);
+
+    /// <summary>
     ///     Replaces the file in one step, so a tool reading it never sees a half-written file. Leaves it untouched
     ///     when its content, apart from <see cref="ExportFile.ExportedAt" /> and <see cref="ExportFile.Trigger" />,
     ///     is the same as the last one written this session, so tools watching it only see real changes.
@@ -40,7 +87,7 @@ internal static class ExportFileWriter
     internal static void Write(string fileName, ExportFile content)
     {
         Directory.CreateDirectory(ExportDirectory);
-        var path = Path.Combine(ExportDirectory, fileName);
+        var path = FilePath(fileName);
         var comparedContent = JsonConvert.SerializeObject(
             content with { ExportedAt = null, Trigger = default },
             SerializerSettings);
