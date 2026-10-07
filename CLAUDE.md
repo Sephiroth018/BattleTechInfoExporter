@@ -510,8 +510,12 @@ The game is BattleTech 1.9.1 (Unity 2018.4, Mono, .NET Framework 4.7.2). In orde
    ask the user; regenerating it needs a decompiler run on a thread with a large stack, because
    `ilspycmd -p` overflows its stack on `Assembly-CSharp`.
 2. **The game's data files** (`BattleTech_Data/StreamingAssets/data` in the install) for
-   definitions and ids. The DLC's definitions aren't there but in asset bundles, so a search over
-   the loose files isn't complete: say so, or check in the game.
+   definitions and ids. The DLC's definitions aren't there but in the asset bundles under
+   `data/assetbundles` (`flashpoint`, `heavymetal`, `urbanwarfare`, `shadowhawkdlc`), extracted
+   into the sibling folder `../BattleTechDlcData/<bundle>/<id>.json` by the `extract_dlc.py` kept
+   there (Python with UnityPy; re-run after a game update). A search over definitions covers both
+   folders. Like the decompiled code, the extracted files are never copied into this repository;
+   if the folder is missing, ask the user.
 3. **ModTek's documentation** (github.com/BattletechModders/ModTek, `doc/`) for mod loader
    behavior: `mod.json`, DLL entry points, HarmonyX, logging.
 4. **Other mods' source and community answers** are hints only, confirmed in the game code before
