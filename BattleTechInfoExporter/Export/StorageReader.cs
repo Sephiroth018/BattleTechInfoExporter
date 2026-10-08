@@ -31,46 +31,54 @@ internal static class StorageReader
     private static List<StoredComponent> ReadComponents(
         DataManager dataManager,
         IReadOnlyList<StoredItem> storedItems) =>
-        storedItems
-            .Where(item => item.Type != SimGameState.MECH_PART_ITEM && item.Type != MechType)
-            // Working and damaged copies are stats of their own.
-            .GroupBy(item => (item.Type, item.Id))
-            .Select(copies => ComponentReferences.TryReferenceTo(
-                dataManager,
-                (BattleTechResourceType)Enum.Parse(typeof(BattleTechResourceType), copies.Key.Type),
-                copies.Key.Id) is { } component
-                ? new StoredComponent(
+        ReadEntries(
+                storedItems
+                    .Where(item => item.Type != SimGameState.MECH_PART_ITEM && item.Type != MechType)
+                    // Working and damaged copies are stats of their own.
+                    .GroupBy(item => (item.Type, item.Id)),
+                copies => ComponentReferences.TryReferenceTo(
+                    dataManager,
+                    (BattleTechResourceType)Enum.Parse(typeof(BattleTechResourceType), copies.Key.Type),
+                    copies.Key.Id),
+                (component, copies) => new StoredComponent(
                     component,
                     copies.Where(copy => !copy.IsDamaged).Sum(copy => copy.Count),
-                    copies.Where(copy => copy.IsDamaged).Sum(copy => copy.Count))
-                : null)
-            .OfType<StoredComponent>()
-            .OrderByComponent(component => component.Component)
+                    copies.Where(copy => copy.IsDamaged).Sum(copy => copy.Count)))
+            .OrderByComponent()
             .ToList();
 
     // A stored mech's stat is named after its chassis id, though its type is MechDef; selected as
     // SimGameState.GetAllInventoryMechDefs does and counted as MechBayMechStorageWidget.InitInventory does.
     private static List<StoredChassis> ReadChassis(SimGameState simGame, IReadOnlyList<StoredItem> storedItems) =>
-        storedItems
-            .Where(item => item.Type == MechType && !item.IsDamaged)
-            .Select(item => MechReader.TryGetChassis(simGame.DataManager, item.Id) is { } chassis
-                ? new StoredChassis(MechReader.ReferenceTo(chassis), item.Count)
-                : null)
-            .OfType<StoredChassis>()
-            .OrderByDefinition(chassis => chassis.Chassis)
+        ReadEntries(
+                storedItems.Where(item => item.Type == MechType && !item.IsDamaged),
+                item => MechReader.TryGetChassis(simGame.DataManager, item.Id) is { } chassis
+                    ? MechReader.ReferenceTo(chassis)
+                    : null,
+                (chassis, item) => new StoredChassis(chassis, item.Count))
+            .OrderByReference(chassis => chassis.Chassis)
             .ToList();
 
     // A mech part's stat is named after the mech the parts assemble into (SimGameState.AddMechPart). Not read from
     // SimGameState.GetAllInventoryMechParts, which returns only the chassis.
     private static List<StoredMechParts> ReadMechParts(SimGameState simGame, IReadOnlyList<StoredItem> storedItems) =>
-        storedItems
-            .Where(item => item.Type == SimGameState.MECH_PART_ITEM)
-            .Select(item => MechReader.TryReferenceToMech(simGame.DataManager, item.Id) is { } mech
-                ? new StoredMechParts(mech, item.Count)
-                : null)
-            .OfType<StoredMechParts>()
-            .OrderByDefinition(parts => parts.Mech)
+        ReadEntries(
+                storedItems.Where(item => item.Type == SimGameState.MECH_PART_ITEM),
+                item => MechReader.TryReferenceToMech(simGame.DataManager, item.Id),
+                (mech, item) => new StoredMechParts(mech, item.Count))
+            .OrderByReference(parts => parts.Mech)
             .ToList();
+
+    // Leaves out an item whose definition is missing, which the lookup logs.
+    private static IEnumerable<TEntry> ReadEntries<TItem, TReference, TEntry>(
+        IEnumerable<TItem> items,
+        Func<TItem, TReference?> tryReferenceTo,
+        Func<TReference, TItem, TEntry> entryOf)
+        where TReference : Reference
+        where TEntry : class, IStored =>
+        items
+            .Select(item => tryReferenceTo(item) is { } reference ? entryOf(reference, item) : null)
+            .OfType<TEntry>();
 
     // The stats with a count of at least one, as SimGameState.GetAllInventoryItemDefs and GetAllInventoryMechParts
     // select them.

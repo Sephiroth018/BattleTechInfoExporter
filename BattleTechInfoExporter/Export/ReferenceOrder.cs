@@ -9,19 +9,18 @@ namespace BattleTechInfoExporter.Export;
 internal static class ReferenceOrder
 {
     /// <summary>By component type, then name, with the id breaking ties.</summary>
-    internal static IEnumerable<TEntry> OrderByComponent<TEntry>(
-        this IEnumerable<TEntry> entries,
-        Func<TEntry, ComponentReference> component) =>
+    internal static IEnumerable<TEntry> OrderByComponent<TEntry>(this IEnumerable<TEntry> entries)
+        where TEntry : ComponentEntry =>
         entries
-            .OrderBy(entry => component(entry).Type)
-            .ThenBy(entry => component(entry).Name, StringComparer.Ordinal)
-            .ThenBy(entry => component(entry).Id, StringComparer.Ordinal);
+            .OrderBy(entry => entry.Component.Type)
+            .ThenBy(entry => entry.Component.Name, StringComparer.Ordinal)
+            .ThenBy(entry => entry.Component.Id, StringComparer.Ordinal);
 
     /// <summary>By name, with the id breaking ties.</summary>
-    internal static IEnumerable<TEntry> OrderByDefinition<TEntry>(
+    internal static IEnumerable<TEntry> OrderByReference<TEntry>(
         this IEnumerable<TEntry> entries,
-        Func<TEntry, DefinitionReference> definition) =>
+        Func<TEntry, Reference> reference) =>
         entries
-            .OrderBy(entry => definition(entry).Name, StringComparer.Ordinal)
-            .ThenBy(entry => definition(entry).Id, StringComparer.Ordinal);
+            .OrderBy(entry => reference(entry).Name, StringComparer.Ordinal)
+            .ThenBy(entry => reference(entry).Id, StringComparer.Ordinal);
 }

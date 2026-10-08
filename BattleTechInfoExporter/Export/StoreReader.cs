@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using BattleTech;
 using BattleTechInfoExporter.Models;
@@ -41,35 +43,45 @@ internal static class StoreReader
         var items = shop.ActiveInventory.Where(item => IsKnownType(shop, item)).ToList();
         return new Store(
             DefinitionReferences.ReferenceTo(priceFaction),
-            items
-                .Where(item => IsComponent(item.Type))
-                .Select(item => ComponentReferences.TryReferenceTo(
-                    simGame.DataManager,
-                    Shop.ShopItemTypeToComponentType(item.Type),
-                    item.ID) is { } component
-                    ? new ComponentForSale(component, CountOf(item), PriceOf(shop, item))
-                    : null)
-                .OfType<ComponentForSale>()
-                .OrderByComponent(component => component.Component)
+            ReadEntries(
+                    shop,
+                    items.Where(item => IsComponent(item.Type)),
+                    item => ComponentReferences.TryReferenceTo(
+                        simGame.DataManager,
+                        Shop.ShopItemTypeToComponentType(item.Type),
+                        item.ID),
+                    (component, count, price) => new ComponentForSale(component, count, price))
+                .OrderByComponent()
                 .ToList(),
-            items
-                .Where(item => item.Type == ShopItemType.Mech)
-                // Bought as SimGameState.AddFromShopDefItem does: the id is the mech's.
-                .Select(item => MechReader.TryReferenceToMech(simGame.DataManager, item.ID) is { } mech
-                    ? new MechForSale(mech, CountOf(item), PriceOf(shop, item))
-                    : null)
-                .OfType<MechForSale>()
-                .OrderByDefinition(mech => mech.Mech)
+            // Bought as SimGameState.AddFromShopDefItem does: the id is the mech's.
+            ReadEntries(
+                    shop,
+                    items.Where(item => item.Type == ShopItemType.Mech),
+                    item => MechReader.TryReferenceToMech(simGame.DataManager, item.ID),
+                    (mech, count, price) => new MechForSale(mech, count, price))
+                .OrderByReference(mech => mech.Mech)
                 .ToList(),
-            items
-                .Where(item => item.Type == ShopItemType.MechPart)
-                .Select(item => MechReader.TryReferenceToMech(simGame.DataManager, item.ID) is { } mech
-                    ? new MechPartsForSale(mech, CountOf(item), PriceOf(shop, item))
-                    : null)
-                .OfType<MechPartsForSale>()
-                .OrderByDefinition(parts => parts.Mech)
+            ReadEntries(
+                    shop,
+                    items.Where(item => item.Type == ShopItemType.MechPart),
+                    item => MechReader.TryReferenceToMech(simGame.DataManager, item.ID),
+                    (mech, count, price) => new MechPartsForSale(mech, count, price))
+                .OrderByReference(parts => parts.Mech)
                 .ToList());
     }
+
+    private static IEnumerable<TEntry> ReadEntries<TReference, TEntry>(
+        Shop shop,
+        IEnumerable<ShopDefItem> items,
+        Func<ShopDefItem, TReference?> tryReferenceTo,
+        Func<TReference, int?, int, TEntry> entryOf)
+        where TReference : Reference
+        where TEntry : class, IForSale =>
+        items
+            .Select(item => tryReferenceTo(item) is { } reference
+                ? entryOf(reference, CountOf(item), PriceOf(shop, item))
+                : null)
+            .OfType<TEntry>();
 
     // Stores sell components, whole mechs and mech parts; other types only appear in the list of things to sell to
     // them.
