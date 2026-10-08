@@ -31,7 +31,7 @@ internal static class CatalogReader
         VehicleChassisLocations.Turret
     ];
 
-    internal static Catalog Read(SimGameState simGame, ExportTrigger trigger, string sourceFingerprint)
+    internal static Catalog Read(SimGameState simGame, string sourceFingerprint)
     {
         var dataManager = simGame.DataManager;
         var combatMultipliers = simGame.CombatConstants.CombatValueMultipliers;
@@ -54,8 +54,6 @@ internal static class CatalogReader
         var terrainDefinitions = TerrainReader.ReadTerrainDefinitions(dataManager);
 
         return new Catalog(
-            ModAssembly.Version,
-            trigger,
             sourceFingerprint,
             chassisDefinitions,
             mechDefinitions,

@@ -14,14 +14,12 @@ internal static class MissionExporter
         CampaignExport.Run(
             simGame,
             ExportTrigger.MissionCompleted,
-            () => ExportFileWriter.Write(
-                MissionOutcomeFileName,
-                MissionReader.ReadOutcome(
+            () => MissionReader.ReadOutcome(
                     simGame,
                     contract,
-                    ExportTrigger.MissionCompleted,
                     new SalvageOffer(contract.GetPotentialSalvage(), contract.SalvageResults),
-                    null)));
+                    null)
+                .Write(MissionOutcomeFileName, ExportTrigger.MissionCompleted));
 
     /// <summary>
     ///     Exports the outcome again, with the salvage received, once the game has finalized the contract's salvage.
@@ -30,12 +28,6 @@ internal static class MissionExporter
         CampaignExport.Run(
             simGame,
             ExportTrigger.SalvageChosen,
-            () => ExportFileWriter.Write(
-                MissionOutcomeFileName,
-                MissionReader.ReadOutcome(
-                    simGame,
-                    contract,
-                    ExportTrigger.SalvageChosen,
-                    offer,
-                    contract.SalvageResults)));
+            () => MissionReader.ReadOutcome(simGame, contract, offer, contract.SalvageResults)
+                .Write(MissionOutcomeFileName, ExportTrigger.SalvageChosen));
 }

@@ -17,8 +17,6 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record GameState(
-    string ModVersion,
-    ExportTrigger Trigger,
     Company Company,
     IReadOnlyList<WorkQueueEntry> WorkQueue,
     Ship? Ship,
@@ -31,4 +29,13 @@ internal sealed record GameState(
     IReadOnlyList<HiringHallPilot> HiringHall,
     ActiveContract? ActiveContract,
     IReadOnlyList<Contract>? Contracts,
-    Position Position) : ExportFile(ModVersion, null, Trigger);
+    Position Position) : ExportFile
+{
+    // A day passing on its own changes nothing else, and no trigger fires for it; the company's day and date are
+    // those of the export that last changed the file, like its ExportedAt.
+    protected override ExportFile WithoutExportHeader() =>
+        (GameState)base.WithoutExportHeader() with
+        {
+            Company = Company with { DaysPassed = default, CurrentDate = string.Empty }
+        };
+}

@@ -106,7 +106,8 @@ The last one describes the game rather than the career:
 Every file starts with `modVersion`, `exportedAt` and the `trigger` of the export that last changed
 it. A file is replaced in one step, never half-written, and only when its content apart from
 `exportedAt` and `trigger` changed, plus once after every game start. Points in time are day numbers, comparable
-with the company's `daysPassed`, so a day passing with nothing else happening changes only the company's day and date.
+with the company's `daysPassed`, so a day passing with nothing else happening doesn't write the game state at all:
+its company's `daysPassed` and date are those of the export that last changed it, like `exportedAt`.
 
 The game state holds:
 

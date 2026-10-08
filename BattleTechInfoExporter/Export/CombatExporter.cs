@@ -23,7 +23,7 @@ internal static class CombatExporter
         CampaignExport.Run(
             simGame,
             trigger,
-            () => ExportFileWriter.Write(CombatStateFileName, CombatStateReader.Read(simGame, combat, trigger)));
+            () => CombatStateReader.Read(simGame, combat).Write(CombatStateFileName, trigger));
     }
 
     /// <summary>Deletes the file once no battle is running, so an existing file always describes the running one.</summary>
@@ -32,7 +32,7 @@ internal static class CombatExporter
         // Runs inside the game's own code, like every export (CampaignExport.Run).
         try
         {
-            ExportFileWriter.Delete(CombatStateFileName);
+            ExportFile.Delete(CombatStateFileName);
         }
         catch (Exception exception)
         {

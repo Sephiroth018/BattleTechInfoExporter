@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using BattleTech;
-using BattleTechInfoExporter.Models;
 using Starmap = BattleTechInfoExporter.Models.Starmap;
 using StarSystem = BattleTech.StarSystem;
 
@@ -10,7 +9,7 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>Builds the star systems file's model from the game's starmap.</summary>
 internal static class StarSystemReader
 {
-    internal static Starmap Read(SimGameState simGame, ExportTrigger trigger)
+    internal static Starmap Read(SimGameState simGame)
     {
         var starSystems = new SortedDictionary<string, Models.StarSystem>(StringComparer.Ordinal);
         foreach (var system in simGame.StarSystems)
@@ -18,7 +17,7 @@ internal static class StarSystemReader
             starSystems.Add(system.Def.Description.Id, ReadStarSystem(simGame, system));
         }
 
-        return new Starmap(ModAssembly.Version, trigger, starSystems);
+        return new Starmap(starSystems);
     }
 
     private static Models.StarSystem ReadStarSystem(SimGameState simGame, StarSystem system)

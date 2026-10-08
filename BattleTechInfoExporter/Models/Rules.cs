@@ -22,8 +22,6 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Rules(
-    string ModVersion,
-    ExportTrigger Trigger,
     IReadOnlyList<MoraleLevel> MoraleLevels,
     IReadOnlyList<ReputationLevel> ReputationLevels,
     SkillRules Skills,
@@ -32,4 +30,4 @@ internal sealed record Rules(
     IReadOnlyList<ContractTypeDescription> ContractTypes,
     IReadOnlyList<JumpDistance> JumpDistances,
     CombatRules Combat,
-    CampaignRules Campaign) : ExportFile(ModVersion, null, Trigger);
+    CampaignRules Campaign) : ExportFile;

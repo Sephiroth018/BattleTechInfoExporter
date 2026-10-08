@@ -8,8 +8,6 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="DueOnDay">The day the report is due, on the scale of <see cref="Company.DaysPassed" />.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record FinancialReport(
-    string ModVersion,
-    ExportTrigger Trigger,
     int DueOnDay,
     Spending Spending,
-    ExpectedExpenses ExpectedExpenses) : ExportFile(ModVersion, null, Trigger);
+    ExpectedExpenses ExpectedExpenses) : ExportFile;

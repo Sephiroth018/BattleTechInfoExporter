@@ -18,13 +18,13 @@ internal static class GameStateExporter
             () =>
             {
                 // All are read before any is written, so a failing read leaves all files from the same export.
-                var gameState = GameStateReader.Read(simGame, trigger);
-                var rules = RulesReader.Read(simGame, trigger);
-                var starmap = StarSystemReader.Read(simGame, trigger);
-                var financialReport = FinancialReportReader.Read(simGame, trigger);
-                ExportFileWriter.Write(GameStateFileName, gameState);
-                ExportFileWriter.Write(RulesFileName, rules);
-                ExportFileWriter.Write(StarSystemsFileName, starmap);
-                ExportFileWriter.Write(FinancialReportFileName, financialReport);
+                var gameState = GameStateReader.Read(simGame);
+                var rules = RulesReader.Read(simGame);
+                var starmap = StarSystemReader.Read(simGame);
+                var financialReport = FinancialReportReader.Read(simGame);
+                gameState.Write(GameStateFileName, trigger);
+                rules.Write(RulesFileName, trigger);
+                starmap.Write(StarSystemsFileName, trigger);
+                financialReport.Write(FinancialReportFileName, trigger);
             });
 }

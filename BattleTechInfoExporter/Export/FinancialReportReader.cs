@@ -10,10 +10,8 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>Builds the financial report file and the expense lines of each report from the career state.</summary>
 internal static class FinancialReportReader
 {
-    internal static FinancialReport Read(SimGameState simGame, ExportTrigger trigger) =>
+    internal static FinancialReport Read(SimGameState simGame) =>
         new(
-            ModAssembly.Version,
-            trigger,
             ReadDueOnDay(simGame),
             new Spending(
                 simGame.ExpenditureLevel,

@@ -21,8 +21,6 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Lance">The company's mechs and pilots on the mission, in lance order.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MissionOutcome(
-    string ModVersion,
-    ExportTrigger Trigger,
     MissionContract Contract,
     BattleTech.Contract.ContractState State,
     bool IsGoodFaithEffort,
@@ -33,7 +31,7 @@ internal sealed record MissionOutcome(
     int MercenaryReviewBoardReputation,
     int ExperiencePerPilot,
     IReadOnlyList<LanceUnitOutcome> Lance,
-    MissionSalvage Salvage) : ExportFile(ModVersion, null, Trigger);
+    MissionSalvage Salvage) : ExportFile;
 
 /// <summary>The contract a mission was for, as in <see cref="Models.Contract" />.</summary>
 /// <param name="Id">The contract's data file; <c>null</c> where the game keeps no reference to it.</param>

@@ -16,14 +16,11 @@ internal static class MissionReader
     internal static MissionOutcome ReadOutcome(
         SimGameState simGame,
         Contract contract,
-        ExportTrigger trigger,
         SalvageOffer offer,
         IReadOnlyList<SalvageDef>? received)
     {
         var (employer, target) = ContractReader.ReadFactions(contract);
         return new MissionOutcome(
-            ModAssembly.Version,
-            trigger,
             ContractReader.ReadMissionContract(simGame, contract),
             contract.State,
             contract.IsGoodFaithEffort,

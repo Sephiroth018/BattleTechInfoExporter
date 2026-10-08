@@ -10,10 +10,8 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>Builds the rules file's tables from the game's rules for the career.</summary>
 internal static class RulesReader
 {
-    internal static Rules Read(SimGameState simGame, ExportTrigger trigger) =>
+    internal static Rules Read(SimGameState simGame) =>
         new(
-            ModAssembly.Version,
-            trigger,
             ReadMoraleLevels(simGame),
             ReadReputationLevels(simGame),
             ReadSkillRules(simGame),

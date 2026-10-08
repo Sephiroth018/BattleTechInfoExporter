@@ -9,6 +9,4 @@ namespace BattleTechInfoExporter.Models;
 /// </summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Starmap(
-    string ModVersion,
-    ExportTrigger Trigger,
-    IReadOnlyDictionary<string, StarSystem> StarSystems) : ExportFile(ModVersion, null, Trigger);
+    IReadOnlyDictionary<string, StarSystem> StarSystems) : ExportFile;
