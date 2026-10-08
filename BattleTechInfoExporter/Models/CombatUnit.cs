@@ -122,7 +122,7 @@ internal sealed record CombatComponent(
     ComponentReference Component,
     string Location,
     ComponentDamageLevel DamageLevel,
-    int? Ammo);
+    int? Ammo) : ComponentEntry(Component), IDamageable;
 
 /// <param name="Cooldown">The unit's activations until the ability can be used again; 0 when ready.</param>
 /// <param name="UsesLeft">The uses left of an ability that can be used only so often; <c>null</c> without a limit.</param>

@@ -139,7 +139,7 @@ internal static class MissionReader
             salvage
                 .Where(item => item.Type == SalvageDef.SalvageType.COMPONENT)
                 .GroupBy(item => item.Description.Id)
-                .Select(copies => new SalvagedComponent(
+                .Select(copies => new StoredComponent(
                     ComponentReferences.ReferenceTo(
                         copies.First().ComponentType,
                         copies.Key,
@@ -152,9 +152,9 @@ internal static class MissionReader
                 .Where(item => item.Type == SalvageDef.SalvageType.MECH_PART)
                 .GroupBy(item => item.Description.Id)
                 .Select(parts => MechReader.TryReferenceToMech(simGame.DataManager, parts.Key) is { } mech
-                    ? new SalvagedMechParts(mech, parts.Sum(part => part.Count))
+                    ? new StoredMechParts(mech, parts.Sum(part => part.Count))
                     : null)
-                .OfType<SalvagedMechParts>()
+                .OfType<StoredMechParts>()
                 .OrderByDefinition(parts => parts.Mech)
                 .ToList());
 }

@@ -102,7 +102,7 @@ internal sealed record DamagedLocation(ChassisLocations Location, Armor Armor, A
 internal sealed record DamagedComponent(
     ComponentReference Component,
     ChassisLocations Location,
-    ComponentDamageLevel DamageLevel);
+    ComponentDamageLevel DamageLevel) : ComponentEntry(Component), IDamageable;
 
 /// <summary>The shots a mech fired from an ammo box, or from a weapon that carries its own ammo.</summary>
 /// <param name="Used">
@@ -110,7 +110,8 @@ internal sealed record DamagedComponent(
 ///     <see cref="AmmunitionBoxDefinition.Capacity" /> or <see cref="WeaponDefinition.InternalAmmoCapacity" />.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record AmmunitionUse(ComponentReference Component, ChassisLocations Location, int Used);
+internal sealed record AmmunitionUse(ComponentReference Component, ChassisLocations Location, int Used)
+    : ComponentEntry(Component);
 
 /// <summary>The salvage of the mission: the offer as the mission ended, and what the company got once it is final.</summary>
 /// <param name="Total">How many items of <see cref="Pool" /> the company gets.</param>

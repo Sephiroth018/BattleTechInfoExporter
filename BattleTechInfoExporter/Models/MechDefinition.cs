@@ -34,6 +34,6 @@ internal sealed record MechLocationDefinition(
     LocationArmor Armor,
     IReadOnlyList<LoadoutComponent> Components);
 
-/// <param name="IsFixed">Part of the chassis; every mech of the chassis has it, and it can't be removed.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record LoadoutComponent(ComponentReference Component, bool IsFixed);
+internal sealed record LoadoutComponent(ComponentReference Component, bool IsFixed)
+    : ComponentEntry(Component), IFixedOrRemovable;
