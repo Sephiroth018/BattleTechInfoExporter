@@ -523,6 +523,13 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   sight but hidden by ECM (`BlipGhost`) isn't a blip: the export treats it as in full view.
 - **Statistic change:** a change an ability or component makes to a statistic (the game's
   `EffectData` of type `StatisticEffect`).
+- **Reference:** what the export refers to by its id instead of repeating it, with the name the UI
+  shows (`Reference`): a definition, a mech in the mech bay, a component or a pilot.
+- **Entry:** a thing in one of its states, a member of a list: a component stored, for sale,
+  mounted, damaged and so on (`ComponentEntry`), mech parts stored or for sale (`MechPartsEntry`).
+- **Contract identity:** what a contract is in every state, offered, accepted or fought
+  (`ContractIdentity`). **Contract briefing:** what the contract details show before the mission,
+  on top of its identity (`ContractBriefing`).
 
 ## Commands
 

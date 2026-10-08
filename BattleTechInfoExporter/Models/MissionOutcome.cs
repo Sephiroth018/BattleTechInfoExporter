@@ -93,7 +93,7 @@ internal sealed record LanceUnitOutcome(
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record DamagedLocation(ChassisLocations Location, Armor Armor, Armor? RearArmor, float Structure)
-    : MechLocationState(Location, Armor, RearArmor, Structure);
+    : MechLocationCondition(Location, Armor, RearArmor, Structure);
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record DamagedComponent(

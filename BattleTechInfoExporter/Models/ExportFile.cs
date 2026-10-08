@@ -30,7 +30,7 @@ internal abstract record ExportFile
         Converters = { new OwnEnumConverter(), new StringEnumConverter() }
     };
 
-    // The comparable JSON (WithoutExportHeader) last written per file name; empty after every game start, so each
+    // The comparable JSON (ComparableContent) last written per file name; empty after every game start, so each
     // file is written once per session.
     private static readonly Dictionary<string, string> LastWrittenContents = new();
 
@@ -44,12 +44,12 @@ internal abstract record ExportFile
 
     /// <summary>
     ///     Replaces the file in one step (<see cref="ExportFileWriter.Replace" />), stamped with the header. Leaves it
-    ///     untouched when its content without the header (<see cref="WithoutExportHeader" />) is the same as the last
+    ///     untouched when its <see cref="ComparableContent" /> is the same as the last
     ///     one written this session, so tools watching it only see real changes.
     /// </summary>
     internal void Write(string fileName, ExportTrigger trigger)
     {
-        var comparableContent = JsonConvert.SerializeObject(WithoutExportHeader(), SerializerSettings);
+        var comparableContent = JsonConvert.SerializeObject(ComparableContent(), SerializerSettings);
         if (ExportFileWriter.Exists(fileName)
             && LastWrittenContents.TryGetValue(fileName, out var lastWrittenContent)
             && lastWrittenContent == comparableContent)
@@ -80,7 +80,7 @@ internal abstract record ExportFile
     ///     The content <see cref="Write" /> compares: what the file says apart from when and why it was written.
     ///     Values that change without anything else changing, which aren't worth a write of their own, are cleared too.
     /// </summary>
-    protected virtual ExportFile WithoutExportHeader() => this with { ExportedAt = default, Trigger = default };
+    protected virtual ExportFile ComparableContent() => this with { ExportedAt = default, Trigger = default };
 
     /// <summary>
     ///     Reads the string properties named by their record members (<c>nameof</c>) from the header of an existing

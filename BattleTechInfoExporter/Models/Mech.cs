@@ -65,7 +65,7 @@ internal sealed record MechLoadout(
 /// <param name="RearArmor"><c>null</c> outside the torso, which alone has rear armor.</param>
 /// <param name="Structure">The structure left: below the chassis' when damaged, zero when destroyed.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal abstract record MechLocationState(
+internal abstract record MechLocationCondition(
     ChassisLocations Location,
     Armor Armor,
     Armor? RearArmor,
@@ -78,7 +78,7 @@ internal sealed record MechLocation(
     Armor Armor,
     Armor? RearArmor,
     float Structure,
-    IReadOnlyList<MountedComponent> Components) : MechLocationState(Location, Armor, RearArmor, Structure);
+    IReadOnlyList<MountedComponent> Components) : MechLocationCondition(Location, Armor, RearArmor, Structure);
 
 /// <param name="Current">
 ///     What is left after combat damage; refilled to <see cref="Assigned" /> after a mission unless the

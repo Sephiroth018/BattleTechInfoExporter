@@ -31,6 +31,6 @@ internal sealed record GameState(
     IReadOnlyList<Contract>? Contracts,
     Position Position) : ExportFile
 {
-    protected override ExportFile WithoutExportHeader() =>
-        (GameState)base.WithoutExportHeader() with { Company = Company.WithoutDay() };
+    protected override ExportFile ComparableContent() =>
+        (GameState)base.ComparableContent() with { Company = Company.WithoutDay() };
 }
