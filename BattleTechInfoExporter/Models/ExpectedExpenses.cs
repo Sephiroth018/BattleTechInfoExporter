@@ -16,13 +16,13 @@ internal sealed record ExpectedExpenses(
     IReadOnlyList<PilotExpense> Pilots);
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record ShipExpense(string Name, int Amount);
+internal sealed record ShipExpense(string Name, int Amount) : IExpense;
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record ShipUpgradeExpense(DefinitionReference Upgrade, int Amount);
+internal sealed record ShipUpgradeExpense(DefinitionReference Upgrade, int Amount) : IExpense;
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record MechExpense(MechReference Mech, int Amount);
+internal sealed record MechExpense(MechReference Mech, int Amount) : IExpense;
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record PilotExpense(PilotReference Pilot, int Amount);
+internal sealed record PilotExpense(PilotReference Pilot, int Amount) : IExpense;

@@ -91,10 +91,9 @@ internal sealed record LanceUnitOutcome(
     IReadOnlyList<DamagedComponent> DamagedComponents,
     IReadOnlyList<AmmunitionUse> Ammunition);
 
-/// <param name="RearArmor"><c>null</c> outside the torso, which alone has rear armor.</param>
-/// <param name="Structure">The structure left: zero when destroyed.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record DamagedLocation(ChassisLocations Location, Armor Armor, Armor? RearArmor, float Structure);
+internal sealed record DamagedLocation(ChassisLocations Location, Armor Armor, Armor? RearArmor, float Structure)
+    : MechLocationState(Location, Armor, RearArmor, Structure);
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record DamagedComponent(
