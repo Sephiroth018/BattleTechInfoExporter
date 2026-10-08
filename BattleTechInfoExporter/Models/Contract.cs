@@ -4,7 +4,10 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
-/// <summary>A contract the Command Center offers, as its contract list and details show it.</summary>
+/// <summary>
+///     What a contract is in every state: offered (<see cref="Contract" />), accepted (<see cref="ActiveContract" />)
+///     and fought (<see cref="MissionContract" />).
+/// </summary>
 /// <param name="Id">The contract's data file; <c>null</c> where the game keeps no reference to it.</param>
 /// <param name="Type">The mission type, described in <see cref="Rules.ContractTypes" />.</param>
 /// <param name="DisplayStyle">Whether it's a regular, story, restoration or flashpoint contract.</param>
@@ -12,35 +15,71 @@ namespace BattleTechInfoExporter.Models;
 ///     On the scale of <see cref="ReputationLevel.MaxContractDifficulty" />, not the 1-10 the skulls show
 ///     (two per skull).
 /// </param>
-/// <param name="MeetsReputation">
-///     Whether the reputation with the employer allows taking the contract; the list greys it out otherwise. Story,
-///     restoration and flashpoint contracts, and employers that don't gain reputation, are always allowed.
-/// </param>
-/// <param name="Biome"><c>null</c> where the game has no biome for the contract.</param>
-/// <param name="StarSystem">The star system the mission is fought in; a contract elsewhere needs travelling there.</param>
+/// <param name="StarSystem">The star system the mission is fought in.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record Contract(
+internal abstract record ContractIdentity(
     string? Id,
     string Name,
-    string Description,
     DefinitionReference Type,
     ContractDisplayStyle DisplayStyle,
     DefinitionReference Employer,
     DefinitionReference Target,
     int Difficulty,
-    bool MeetsReputation,
-    Negotiation Negotiation,
-    LanceLimits LanceLimits,
-    DefinitionReference? Biome,
     DefinitionReference StarSystem);
 
-/// <summary>The accepted travel contract, until the company proceeds with it on arrival or breaks it.</summary>
-/// <param name="Id">The contract's data file; <c>null</c> where the game keeps no reference to it.</param>
-/// <param name="Type">The mission type, described in <see cref="Rules.ContractTypes" />.</param>
-/// <param name="Difficulty">On the scale of <see cref="ReputationLevel.MaxContractDifficulty" />.</param>
-/// <param name="Terms">The terms the contract was accepted with.</param>
+/// <summary>What the contract details show of a contract before its mission: offered or accepted.</summary>
 /// <param name="Biome"><c>null</c> where the game has no biome for the contract.</param>
-/// <param name="StarSystem">The star system the mission is fought in.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal abstract record ContractBriefing(
+    string? Id,
+    string Name,
+    DefinitionReference Type,
+    ContractDisplayStyle DisplayStyle,
+    DefinitionReference Employer,
+    DefinitionReference Target,
+    int Difficulty,
+    DefinitionReference StarSystem,
+    string Description,
+    LanceLimits LanceLimits,
+    DefinitionReference? Biome)
+    : ContractIdentity(Id, Name, Type, DisplayStyle, Employer, Target, Difficulty, StarSystem);
+
+/// <summary>A contract the Command Center offers, as its contract list and details show it.</summary>
+/// <param name="StarSystem">The star system the mission is fought in; a contract elsewhere needs travelling there.</param>
+/// <param name="MeetsReputation">
+///     Whether the reputation with the employer allows taking the contract; the list greys it out otherwise. Story,
+///     restoration and flashpoint contracts, and employers that don't gain reputation, are always allowed.
+/// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record Contract(
+    string? Id,
+    string Name,
+    DefinitionReference Type,
+    ContractDisplayStyle DisplayStyle,
+    DefinitionReference Employer,
+    DefinitionReference Target,
+    int Difficulty,
+    DefinitionReference StarSystem,
+    string Description,
+    LanceLimits LanceLimits,
+    DefinitionReference? Biome,
+    bool MeetsReputation,
+    Negotiation Negotiation)
+    : ContractBriefing(
+        Id,
+        Name,
+        Type,
+        DisplayStyle,
+        Employer,
+        Target,
+        Difficulty,
+        StarSystem,
+        Description,
+        LanceLimits,
+        Biome);
+
+/// <summary>The accepted travel contract, until the company proceeds with it on arrival or breaks it.</summary>
+/// <param name="Terms">The terms the contract was accepted with.</param>
 /// <param name="ArrivesOnDay">
 ///     While travelling to the star system, the day of arrival, as in <see cref="Travel.ArrivesOnDay" />;
 ///     <c>null</c> otherwise.
@@ -49,17 +88,29 @@ internal sealed record Contract(
 internal sealed record ActiveContract(
     string? Id,
     string Name,
-    string Description,
     DefinitionReference Type,
     ContractDisplayStyle DisplayStyle,
     DefinitionReference Employer,
     DefinitionReference Target,
     int Difficulty,
-    NegotiationOption Terms,
+    DefinitionReference StarSystem,
+    string Description,
     LanceLimits LanceLimits,
     DefinitionReference? Biome,
-    DefinitionReference StarSystem,
-    int? ArrivesOnDay);
+    NegotiationOption Terms,
+    int? ArrivesOnDay)
+    : ContractBriefing(
+        Id,
+        Name,
+        Type,
+        DisplayStyle,
+        Employer,
+        Target,
+        Difficulty,
+        StarSystem,
+        Description,
+        LanceLimits,
+        Biome);
 
 /// <summary>The contract's terms.</summary>
 /// <param name="ValuesByShare">

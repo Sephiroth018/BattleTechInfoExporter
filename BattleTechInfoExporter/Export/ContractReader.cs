@@ -39,16 +39,16 @@ internal static class ContractReader
         return new ActiveContract(
             ReadId(contractOverride),
             contractOverride.contractName,
-            GameText.ToPlainText(contract.ShortDescription),
             ReadType(simGame, contract),
             contractOverride.contractDisplayStyle,
             DefinitionReferences.ReferenceTo(employer),
             DefinitionReferences.ReferenceTo(target),
             ReadDifficulty(simGame, contractOverride),
-            ReadTerms(simGame, contract, employer, target),
+            DefinitionReferences.ReferenceTo(starSystem.Def.Description),
+            GameText.ToPlainText(contract.ShortDescription),
             ReadLanceLimits(contractOverride),
             ReadBiome(simGame, contract.ContractBiome),
-            DefinitionReferences.ReferenceTo(starSystem.Def.Description),
+            ReadTerms(simGame, contract, employer, target),
             // The arrival is the trip's as the position has it, also on the last leg from the jump point.
             travelInProgress is ({ } destination, var arrivesOnDay) && destination.ID == starSystem.ID
                 ? arrivesOnDay
@@ -98,18 +98,18 @@ internal static class ContractReader
             // The contract list and details show the raw name; Contract.Name interpolates it, which the game's
             // contracts don't need.
             contractOverride.contractName,
-            // The contract details show the interpolated description, unlike the name.
-            GameText.ToPlainText(contract.ShortDescription),
             ReadType(simGame, contract),
             contractOverride.contractDisplayStyle,
             DefinitionReferences.ReferenceTo(employer),
             DefinitionReferences.ReferenceTo(target),
             ReadDifficulty(simGame, contractOverride),
-            simGame.ContractUserMeetsReputation(contract),
-            ReadNegotiation(simGame, contract, employer, target),
+            DefinitionReferences.ReferenceTo(ReadStarSystem(simGame, contract).Def.Description),
+            // The contract details show the interpolated description, unlike the name.
+            GameText.ToPlainText(contract.ShortDescription),
             ReadLanceLimits(contractOverride),
             ReadBiome(simGame, contract.ContractBiome),
-            DefinitionReferences.ReferenceTo(ReadStarSystem(simGame, contract).Def.Description));
+            simGame.ContractUserMeetsReputation(contract),
+            ReadNegotiation(simGame, contract, employer, target));
     }
 
     // The mission is fought in the current star system: a contract elsewhere needs travelling there first.

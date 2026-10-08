@@ -33,10 +33,7 @@ internal sealed record MissionOutcome(
     IReadOnlyList<LanceUnitOutcome> Lance,
     MissionSalvage Salvage) : ExportFile;
 
-/// <summary>The contract a mission was for, as in <see cref="Models.Contract" />.</summary>
-/// <param name="Id">The contract's data file; <c>null</c> where the game keeps no reference to it.</param>
-/// <param name="Type">The mission type, described in <c>rules.json</c>'s <see cref="Rules.ContractTypes" />.</param>
-/// <param name="Difficulty">On the scale of <see cref="ReputationLevel.MaxContractDifficulty" />.</param>
+/// <summary>The contract a mission was for.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MissionContract(
     string? Id,
@@ -46,7 +43,8 @@ internal sealed record MissionContract(
     DefinitionReference Employer,
     DefinitionReference Target,
     int Difficulty,
-    DefinitionReference StarSystem);
+    DefinitionReference StarSystem)
+    : ContractIdentity(Id, Name, Type, DisplayStyle, Employer, Target, Difficulty, StarSystem);
 
 /// <summary>An objective as the after-action report lists it.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
