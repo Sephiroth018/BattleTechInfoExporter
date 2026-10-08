@@ -14,7 +14,7 @@ internal sealed record VehicleDefinition(
     float Tonnage,
     VehicleMovementType MovementType,
     ChassisMovement Movement,
-    IReadOnlyList<VehicleLocationDefinition> Locations);
+    IReadOnlyList<VehicleLocationDefinition> Locations) : UnitDefinition(Name, WeightClass, Tonnage);
 
 /// <param name="Armor">The armor in combat, after the game's vehicle multiplier.</param>
 /// <param name="Structure">The internal structure in combat, after the game's vehicle multiplier.</param>
