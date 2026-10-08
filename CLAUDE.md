@@ -387,7 +387,7 @@ name, version and folder, `ModLog` its logger. Folders:
   references that need only a description, a faction, a biome or a data-driven enum value, and
   `ComponentReferences` every reference to a component; a reference
   with a naming rule of its own is made by the reader that owns it. `ReferencedEntries` builds the
-  lists of entries that refer to a definition, leaving out what has none, `ReferenceOrder` orders them, `GameText` makes every exported game text plain,
+  lists of entries that refer to a definition, leaving out what has none, `GameText` makes every exported game text plain,
   and `HudInitiative` numbers phases and initiative as the HUD does.
   `ExportFileWriter` replaces, deletes and reads the header of the files in the mod's `exports/`
   folder, by file name and text, knowing no model.
@@ -420,7 +420,7 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   and their own state, instead of repeating the definition's stats or limits (e.g. a location's max
   armor or slots). A reference whose definition is missing has no entry. Keys keep the game's ids as they are.
 - **Lists of entries that refer to a definition, which the game keeps in no meaningful order**
-  (storage, stores, salvage), are ordered the same way everywhere (`ReferenceOrder`): by component
+  (storage, stores, salvage), are ordered the same way everywhere, by their references' own comparison (`Reference`, `ComponentReference`): by component
   type for components, then by name, with the id breaking ties. A mech's components keep the game's
   order.
 - **The career state is four files, read together on every career export:** `game-state.json`,

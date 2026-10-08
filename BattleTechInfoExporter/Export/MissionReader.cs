@@ -88,7 +88,7 @@ internal static class MissionReader
                     ComponentReferences.ReferenceTo(component),
                     component.MountedLocation,
                     component.DamageLevel))
-                .OrderByComponent()
+                .OrderBy(component => component.Component)
                 .ToList(),
             ReadAmmunitionUse(FindCombatMech(contract, mech)));
     }
@@ -146,7 +146,7 @@ internal static class MissionReader
                         copies.First().MechComponentDef),
                     copies.Where(copy => !copy.Damaged).Sum(copy => copy.Count),
                     copies.Where(copy => copy.Damaged).Sum(copy => copy.Count)))
-                .OrderByComponent()
+                .OrderBy(component => component.Component)
                 .ToList(),
             ReferencedEntries.Read(
                     salvage
@@ -154,6 +154,6 @@ internal static class MissionReader
                         .GroupBy(item => item.Description.Id),
                     parts => MechReader.TryReferenceToMech(simGame.DataManager, parts.Key),
                     (mech, parts) => new StoredMechParts(mech, parts.Sum(part => part.Count)))
-                .OrderByReference(parts => parts.Mech)
+                .OrderBy(parts => parts.Mech)
                 .ToList());
 }

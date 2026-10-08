@@ -13,7 +13,7 @@ internal static class ShipReader
     // screen only on the Argo (SimGameState.AddArgoUpgrade, ApplyArgoUpgrades).
     internal static Ship? ReadShip(SimGameState simGame) =>
         simGame.CurDropship == DropshipType.Argo
-            ? new Ship(ReadShownUpgrades(simGame).OrderByReference(upgrade => upgrade.Upgrade).ToList())
+            ? new Ship(ReadShownUpgrades(simGame).OrderBy(upgrade => upgrade.Upgrade).ToList())
             : null;
 
     // Mirrors SGEngineeringScreen.PopulateUpgradeDictionary: the installed, installing and available upgrades,
@@ -64,7 +64,7 @@ internal static class ShipReader
             GameText.ToPlainText(upgrade.Description.Details),
             upgrade.RequiredModules
                 .Select(id => DefinitionReferences.ReferenceTo(simGame.DataManager.ShipUpgradeDefs.Get(id).Description))
-                .OrderByReference(reference => reference)
+                .OrderBy(reference => reference)
                 .ToList(),
             Mathf.CeilToInt(upgrade.PurchaseCost * simGame.Constants.CareerMode.ArgoUpgradeCostMultiplier),
             FinancialReportReader.ReadUpkeep(simGame, upgrade),

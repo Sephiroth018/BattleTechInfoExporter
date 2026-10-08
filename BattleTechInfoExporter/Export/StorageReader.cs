@@ -44,7 +44,7 @@ internal static class StorageReader
                     component,
                     copies.Where(copy => !copy.IsDamaged).Sum(copy => copy.Count),
                     copies.Where(copy => copy.IsDamaged).Sum(copy => copy.Count)))
-            .OrderByComponent()
+            .OrderBy(component => component.Component)
             .ToList();
 
     // A stored mech's stat is named after its chassis id, though its type is MechDef; selected as
@@ -56,7 +56,7 @@ internal static class StorageReader
                     ? MechReader.ReferenceTo(chassis)
                     : null,
                 (chassis, item) => new StoredChassis(chassis, item.Count))
-            .OrderByReference(chassis => chassis.Chassis)
+            .OrderBy(chassis => chassis.Chassis)
             .ToList();
 
     // A mech part's stat is named after the mech the parts assemble into (SimGameState.AddMechPart). Not read from
@@ -66,7 +66,7 @@ internal static class StorageReader
                 storedItems.Where(item => item.Type == SimGameState.MECH_PART_ITEM),
                 item => MechReader.TryReferenceToMech(simGame.DataManager, item.Id),
                 (mech, item) => new StoredMechParts(mech, item.Count))
-            .OrderByReference(parts => parts.Mech)
+            .OrderBy(parts => parts.Mech)
             .ToList();
 
     // The stats with a count of at least one, as SimGameState.GetAllInventoryItemDefs and GetAllInventoryMechParts

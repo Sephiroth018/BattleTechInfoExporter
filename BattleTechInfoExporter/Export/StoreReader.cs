@@ -48,20 +48,20 @@ internal static class StoreReader
                         Shop.ShopItemTypeToComponentType(item.Type),
                         item.ID),
                     (component, item) => new ComponentForSale(component, CountOf(item), PriceOf(shop, item)))
-                .OrderByComponent()
+                .OrderBy(component => component.Component)
                 .ToList(),
             // Bought as SimGameState.AddFromShopDefItem does: the id is the mech's.
             ReferencedEntries.Read(
                     items.Where(item => item.Type == ShopItemType.Mech),
                     item => MechReader.TryReferenceToMech(simGame.DataManager, item.ID),
                     (mech, item) => new MechForSale(mech, CountOf(item), PriceOf(shop, item)))
-                .OrderByReference(mech => mech.Mech)
+                .OrderBy(mech => mech.Mech)
                 .ToList(),
             ReferencedEntries.Read(
                     items.Where(item => item.Type == ShopItemType.MechPart),
                     item => MechReader.TryReferenceToMech(simGame.DataManager, item.ID),
                     (mech, item) => new MechPartsForSale(mech, CountOf(item), PriceOf(shop, item)))
-                .OrderByReference(parts => parts.Mech)
+                .OrderBy(parts => parts.Mech)
                 .ToList());
     }
 
