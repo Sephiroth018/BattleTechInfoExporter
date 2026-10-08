@@ -60,15 +60,7 @@ internal sealed record CombatUnit(
 /// <param name="Stability"><c>null</c> for vehicles and turrets, which have none.</param>
 /// <param name="Initiative">The phase the unit acts in, on the scale of <see cref="CombatState.Phase" />.</param>
 /// <param name="Components">Every component mounted, in the game's order.</param>
-/// <param name="PilotInjuries">The pilot's injuries, including those from before the mission; <c>null</c> without a pilot.</param>
-/// <param name="PilotHealth">
-///     The injuries the pilot can take before being incapacitated, as in <see cref="LanceUnitOutcome.Health" />;
-///     <c>null</c> without a pilot.
-/// </param>
-/// <param name="PilotBonusHealth">
-///     The bonus health left, which takes hits before they become injuries and is used up by them; the portrait
-///     shows it on top of <see cref="PilotHealth" />. <c>null</c> without a pilot.
-/// </param>
+/// <param name="Pilot">The pilot's condition; <c>null</c> without a pilot.</param>
 /// <param name="Abilities">The pilot's and components' abilities that can be activated, with their cooldowns.</param>
 /// <param name="PrecisionStrikeCost">The resolve a Precision Strike costs the unit now, which its pilot's morale changes.</param>
 /// <param name="VigilanceCost">The resolve Vigilance costs the unit now.</param>
@@ -87,12 +79,21 @@ internal sealed record CombatUnitState(
     bool HasActivated,
     int Initiative,
     IReadOnlyList<CombatComponent> Components,
-    int? PilotInjuries,
-    int? PilotHealth,
-    int? PilotBonusHealth,
+    CombatPilotState? Pilot,
     IReadOnlyList<CombatAbility> Abilities,
     int PrecisionStrikeCost,
     int VigilanceCost);
+
+/// <param name="Injuries">The injuries, including those from before the mission.</param>
+/// <param name="Health">
+///     The injuries the pilot can take before being incapacitated, as in <see cref="LanceUnitOutcome.Health" />.
+/// </param>
+/// <param name="BonusHealth">
+///     The bonus health left, which takes hits before they become injuries and is used up by them; the portrait
+///     shows it on top of <paramref name="Health" />.
+/// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record CombatPilotState(int Injuries, int Health, int BonusHealth);
 
 /// <summary>A location's armor and structure left, in whole points as the paper doll shows them.</summary>
 /// <param name="Location">The game's name of the location (a mech's, vehicle's or turret's).</param>

@@ -198,17 +198,15 @@ internal static class MechReader
         {
             WorkOrderEntry_InstallComponent installation => ReadInstallation(simGame.DataManager, installation),
             WorkOrderEntry_RepairComponent repair => ReadRepair(simGame, mech, repair),
-            WorkOrderEntry_ModifyMechArmor armor => new RefitChange(
-                RefitChangeType.ModifyArmor,
+            WorkOrderEntry_ModifyMechArmor armor => new ModifyArmorChange(
                 step.IsMechLabComplete,
-                Location: armor.Location,
-                FrontArmor: armor.DesiredFrontArmor,
-                RearArmor: HasRearArmor(mech.GetChassisLocationDef(armor.Location)) ? armor.DesiredRearArmor : null),
-            WorkOrderEntry_RepairMechStructure structure => new RefitChange(
-                RefitChangeType.RepairStructure,
+                armor.Location,
+                armor.DesiredFrontArmor,
+                HasRearArmor(mech.GetChassisLocationDef(armor.Location)) ? armor.DesiredRearArmor : null),
+            WorkOrderEntry_RepairMechStructure structure => new RepairStructureChange(
                 step.IsMechLabComplete,
-                Location: structure.Location,
-                Structure: structure.StructureAmount),
+                structure.Location,
+                structure.StructureAmount),
             _ => throw new InvalidOperationException($"Unexpected mech lab work order type {step.Type}")
         };
 
@@ -219,13 +217,21 @@ internal static class MechReader
         DataManager dataManager,
         WorkOrderEntry_InstallComponent installation)
     {
-        var isRemoval = installation.DesiredLocation == ChassisLocations.None;
-        return new RefitChange(
-            isRemoval ? RefitChangeType.RemoveComponent : RefitChangeType.InstallComponent,
-            installation.IsMechLabComplete,
-            ComponentReferences.ReferenceTo(dataManager, installation.ComponentType, installation.MechComponentID),
-            installation.DamageLevel,
-            isRemoval ? installation.PreviousLocation : installation.DesiredLocation);
+        var component = ComponentReferences.ReferenceTo(
+            dataManager,
+            installation.ComponentType,
+            installation.MechComponentID);
+        return installation.DesiredLocation == ChassisLocations.None
+            ? new RemoveComponentChange(
+                installation.IsMechLabComplete,
+                component,
+                installation.DamageLevel,
+                installation.PreviousLocation)
+            : new InstallComponentChange(
+                installation.IsMechLabComplete,
+                component,
+                installation.DamageLevel,
+                installation.DesiredLocation);
     }
 
     // Locations without rear armor have -1 for it.
@@ -233,7 +239,7 @@ internal static class MechReader
 
     // Finds the component as SimGameState.ML_RepairComponent does: on the mech, among the parts held for the work
     // order, or in storage, where it isn't mounted.
-    private static RefitChange ReadRepair(
+    private static RepairComponentChange ReadRepair(
         SimGameState simGame,
         MechDef mech,
         WorkOrderEntry_RepairComponent repair)
@@ -248,8 +254,7 @@ internal static class MechReader
             ChassisLocations.None,
             -1,
             ref isFromStorage);
-        return new RefitChange(
-            RefitChangeType.RepairComponent,
+        return new RepairComponentChange(
             repair.IsMechLabComplete,
             ComponentReferences.ReferenceTo(repair.ComponentType, repair.MechComponentID, component?.Def),
             repair.DamageLevel,

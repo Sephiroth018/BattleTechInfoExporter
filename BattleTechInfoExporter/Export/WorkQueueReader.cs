@@ -26,7 +26,7 @@ internal static class WorkQueueReader
                 .Select(order => new WorkQueueEntry(
                     order.Type,
                     PilotReader.ReadReadyOnDay(simGame, order.Pilot),
-                    Pilot: PilotReader.ReferenceTo(order.Pilot))))
+                    PilotReader.ReferenceTo(order.Pilot))))
             .ToList();
 
         if (simGame.TravelOrder is { } travelOrder)
@@ -36,7 +36,7 @@ internal static class WorkQueueReader
 
         if (simGame.FinancialReportNotification is { } report)
         {
-            entries.Add(new WorkQueueEntry(report.Type, FinancialReportReader.ReadDueOnDay(simGame)));
+            entries.Add(new WorkQueueEntry(report.Type, FinancialReportReader.ReadDueOnDay(simGame), null));
         }
 
         if (simGame.CurrentUpgradeEntry is { } upgradeOrder)
@@ -114,7 +114,7 @@ internal static class WorkQueueReader
         return new WorkQueueEntry(
             travelOrder.Type,
             ReadArrivalDay(simGame, travelOrder),
-            Destination: destination is null ? null : DefinitionReferences.ReferenceTo(destination.Def.Description));
+            destination is null ? null : DefinitionReferences.ReferenceTo(destination.Def.Description));
     }
 
     private static WorkQueueEntry ReadShipUpgradeEntry(
@@ -130,6 +130,6 @@ internal static class WorkQueueReader
         return new WorkQueueEntry(
             upgradeOrder.Type,
             simGame.DaysPassed + DaysUntilFinished(upgradeOrder, simGame.DailyUpgradeValue),
-            ShipUpgrade: upgrade is null ? null : DefinitionReferences.ReferenceTo(upgrade.Description));
+            upgrade is null ? null : DefinitionReferences.ReferenceTo(upgrade.Description));
     }
 }

@@ -113,15 +113,16 @@ The game state holds:
 
 - **Company:** name, date, funds, morale, rating, MechTech and MedTech with the changes events made
   to them for a time and the day each ends, and the reputation with every faction.
-- **Work queue:** the timeline's entries in order, each with the day it finishes and the mech,
-  pilot, destination or ship upgrade it applies to.
+- **Work queue:** the timeline's entries in order, each with the day it finishes and its `target`:
+  the mech, pilot, destination or ship upgrade it applies to, by the entry's type.
 - **Ship:** the Argo's upgrades the engineering screen shows, each installed, installing,
   available or locked, with its required upgrades, price, upkeep, installation days and effects in
   the game's words and as values; `null` while the company still flies the Leopard.
 - **Position:** the current system and, when travelling, the destination and day of arrival.
 - **Pilots:** the commander and the roster with all their relevant stats.
 - **Mechs:** the mech bay's mechs with their status, the day they're ready, loadout, armor and
-  performance summary; a mech in a refit also carries what it will be once the refit is done, and
+  performance summary; a mech in a refit also carries the refit's steps, each with only the fields
+  its type uses, and what it will be once the refit is done, and
   a damaged mech the mech lab isn't working on the days and C-Bills its repair would take.
 - **Mechs awaiting placement:** new mechs the game asks to place, store or scrap because every mech
   bay is full, with the loadout they come with.
@@ -181,7 +182,7 @@ it stands in by its catalog id (`null` on open ground). What else it carries fol
   prone, shut down, unsteady, heat and stability, whether the unit has activated this round, its
   initiative, every component's damage level with the rounds left in each ammo box and in weapons
   that carry their own, the pilot's injuries, health and bonus health left (which takes hits before they
-  become injuries), the abilities that can be activated with their cooldowns and uses left,
+  become injuries), together under `pilot`, which is `null` for a unit without one, the abilities that can be activated with their cooldowns and uses left,
   and what Precision Strike and Vigilance cost it now. A Sensor Lock brings an enemy into full view
   for the player's whole side, and allied units' sensors count for the player. An enemy in sight
   but hidden by ECM counts as in full view, although the HUD hides its pilot, heat, stability and
