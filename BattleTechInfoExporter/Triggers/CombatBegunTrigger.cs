@@ -12,7 +12,7 @@ namespace BattleTechInfoExporter.Triggers;
 /// </summary>
 [HarmonyPatch(typeof(TurnDirector), nameof(TurnDirector.OnEncounterBegin))]
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal static class CombatLoadedTrigger
+internal static class CombatBegunTrigger
 {
     [HarmonyPostfix]
     private static void OnCombatLoaded([HarmonyArgument("__instance")] TurnDirector turnDirector)
