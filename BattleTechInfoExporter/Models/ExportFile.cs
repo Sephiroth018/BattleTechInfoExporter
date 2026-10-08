@@ -91,12 +91,14 @@ internal abstract record ExportFile
     /// <exception cref="System.IO.IOException">The file can't be read.</exception>
     protected static IReadOnlyDictionary<string, string?>? ReadHeader(string fileName, params string[] memberNames)
     {
-        var propertyNames = memberNames.Select(memberName => PropertyNaming.GetPropertyName(memberName, false))
-            .ToArray();
-        return ExportFileWriter.ReadHeader(fileName, propertyNames) is { } header
-            ? memberNames.Zip(propertyNames, (memberName, propertyName) => (memberName, propertyName))
-                .ToDictionary(names => names.memberName, names => header[names.propertyName], StringComparer.Ordinal)
+        return ExportFileWriter.ReadHeader(fileName, memberNames.Select(PropertyNameOf).ToList()) is { } header
+            ? memberNames.ToDictionary(
+                memberName => memberName,
+                memberName => header[PropertyNameOf(memberName)],
+                StringComparer.Ordinal)
             : null;
+
+        static string PropertyNameOf(string memberName) => PropertyNaming.GetPropertyName(memberName, false);
     }
 
     // Newtonsoft.Json 10, the game's version, has no naming strategy for enums yet.

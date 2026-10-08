@@ -148,13 +148,12 @@ internal static class MissionReader
                     copies.Where(copy => copy.Damaged).Sum(copy => copy.Count)))
                 .OrderByComponent()
                 .ToList(),
-            salvage
-                .Where(item => item.Type == SalvageDef.SalvageType.MECH_PART)
-                .GroupBy(item => item.Description.Id)
-                .Select(parts => MechReader.TryReferenceToMech(simGame.DataManager, parts.Key) is { } mech
-                    ? new StoredMechParts(mech, parts.Sum(part => part.Count))
-                    : null)
-                .OfType<StoredMechParts>()
+            ReferencedEntries.Read(
+                    salvage
+                        .Where(item => item.Type == SalvageDef.SalvageType.MECH_PART)
+                        .GroupBy(item => item.Description.Id),
+                    parts => MechReader.TryReferenceToMech(simGame.DataManager, parts.Key),
+                    (mech, parts) => new StoredMechParts(mech, parts.Sum(part => part.Count)))
                 .OrderByReference(parts => parts.Mech)
                 .ToList());
 }

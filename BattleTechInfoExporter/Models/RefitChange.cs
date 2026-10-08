@@ -15,7 +15,7 @@ internal abstract record ComponentRefitChange(
     RefitChangeType Type,
     bool IsDone,
     ComponentReference Component,
-    ComponentDamageLevel DamageLevel) : RefitChange(Type, IsDone);
+    ComponentDamageLevel DamageLevel) : RefitChange(Type, IsDone), IDamageable;
 
 /// <param name="Location">Where the component goes.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

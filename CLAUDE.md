@@ -386,8 +386,8 @@ name, version and folder, `ModLog` its logger. Folders:
   `DefinitionReferences` makes the
   references that need only a description, a faction, a biome or a data-driven enum value, and
   `ComponentReferences` every reference to a component; a reference
-  with a naming rule of its own is made by the reader that owns it. `ReferenceOrder` orders the
-  lists of entries that refer to a definition, `GameText` makes every exported game text plain,
+  with a naming rule of its own is made by the reader that owns it. `ReferencedEntries` builds the
+  lists of entries that refer to a definition, leaving out what has none, `ReferenceOrder` orders them, `GameText` makes every exported game text plain,
   and `HudInitiative` numbers phases and initiative as the HUD does.
   `ExportFileWriter` replaces, deletes and reads the header of the files in the mod's `exports/`
   folder, by file name and text, knowing no model.
