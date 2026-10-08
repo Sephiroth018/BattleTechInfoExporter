@@ -177,10 +177,8 @@ internal static class CombatUnitReader
             actor.HasActivatedThisRound,
             HudInitiative.FromGamePhase(actor.Initiative),
             actor.allComponents.Select(component => ReadComponent(actor, component)).ToList(),
-            pilot?.Injuries,
-            pilot?.Health,
             // Pilot.InjurePilot takes hits off the bonus health first.
-            pilot?.BonusHealth,
+            pilot is null ? null : new CombatPilotState(pilot.Injuries, pilot.Health, pilot.BonusHealth),
             ReadAbilities(actor),
             actor.OffensivePushCost,
             actor.DefensivePushCost);

@@ -21,8 +21,6 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Lance">The company's mechs and pilots on the mission, in lance order.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MissionOutcome(
-    string ModVersion,
-    ExportTrigger Trigger,
     MissionContract Contract,
     BattleTech.Contract.ContractState State,
     bool IsGoodFaithEffort,
@@ -33,12 +31,9 @@ internal sealed record MissionOutcome(
     int MercenaryReviewBoardReputation,
     int ExperiencePerPilot,
     IReadOnlyList<LanceUnitOutcome> Lance,
-    MissionSalvage Salvage) : ExportFile(ModVersion, null, Trigger);
+    MissionSalvage Salvage) : ExportFile;
 
-/// <summary>The contract a mission was for, as in <see cref="Models.Contract" />.</summary>
-/// <param name="Id">The contract's data file; <c>null</c> where the game keeps no reference to it.</param>
-/// <param name="Type">The mission type, described in <c>rules.json</c>'s <see cref="Rules.ContractTypes" />.</param>
-/// <param name="Difficulty">On the scale of <see cref="ReputationLevel.MaxContractDifficulty" />.</param>
+/// <summary>The contract a mission was for.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MissionContract(
     string? Id,
@@ -48,7 +43,8 @@ internal sealed record MissionContract(
     DefinitionReference Employer,
     DefinitionReference Target,
     int Difficulty,
-    DefinitionReference StarSystem);
+    DefinitionReference StarSystem)
+    : ContractIdentity(Id, Name, Type, DisplayStyle, Employer, Target, Difficulty, StarSystem);
 
 /// <summary>An objective as the after-action report lists it.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -95,16 +91,15 @@ internal sealed record LanceUnitOutcome(
     IReadOnlyList<DamagedComponent> DamagedComponents,
     IReadOnlyList<AmmunitionUse> Ammunition);
 
-/// <param name="RearArmor"><c>null</c> outside the torso, which alone has rear armor.</param>
-/// <param name="Structure">The structure left: zero when destroyed.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record DamagedLocation(ChassisLocations Location, Armor Armor, Armor? RearArmor, float Structure);
+internal sealed record DamagedLocation(ChassisLocations Location, Armor Armor, Armor? RearArmor, float Structure)
+    : MechLocationCondition(Location, Armor, RearArmor, Structure);
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record DamagedComponent(
     ComponentReference Component,
     ChassisLocations Location,
-    ComponentDamageLevel DamageLevel);
+    ComponentDamageLevel DamageLevel) : ComponentEntry(Component), IDamageable;
 
 /// <summary>The shots a mech fired from an ammo box, or from a weapon that carries its own ammo.</summary>
 /// <param name="Used">
@@ -112,7 +107,8 @@ internal sealed record DamagedComponent(
 ///     <see cref="AmmunitionBoxDefinition.Capacity" /> or <see cref="WeaponDefinition.InternalAmmoCapacity" />.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record AmmunitionUse(ComponentReference Component, ChassisLocations Location, int Used);
+internal sealed record AmmunitionUse(ComponentReference Component, ChassisLocations Location, int Used)
+    : ComponentEntry(Component);
 
 /// <summary>The salvage of the mission: the offer as the mission ended, and what the company got once it is final.</summary>
 /// <param name="Total">How many items of <see cref="Pool" /> the company gets.</param>

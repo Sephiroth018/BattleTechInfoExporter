@@ -18,4 +18,4 @@ internal sealed record TurretDefinition(
     float FiringArc,
     float Armor,
     float Structure,
-    IReadOnlyList<ComponentReference> Components);
+    IReadOnlyList<ComponentReference> Components) : UnitDefinition(Name, WeightClass, Tonnage);

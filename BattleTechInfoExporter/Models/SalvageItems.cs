@@ -3,19 +3,9 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
-/// <summary>Salvage items, counted like <see cref="Storage" />.</summary>
+/// <summary>Salvage items, counted like <see cref="Storage" />, where they end up.</summary>
+/// <param name="Components">Their <see cref="StoredComponent.DamagedCount" /> is 0: the game generates no damaged salvage.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record SalvageItems(
-    IReadOnlyList<SalvagedComponent> Components,
-    IReadOnlyList<SalvagedMechParts> MechParts);
-
-/// <param name="Count">The working copies.</param>
-/// <param name="DamagedCount">The damaged copies; the game generates none.</param>
-[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record SalvagedComponent(ComponentReference Component, int Count, int DamagedCount);
-
-/// <summary>
-///     Parts of a mech; with <see cref="Rules.MechPartsPerMech" /> of them in storage they become that mech.
-/// </summary>
-[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record SalvagedMechParts(DefinitionReference Mech, int Count);
+    IReadOnlyList<StoredComponent> Components,
+    IReadOnlyList<StoredMechParts> MechParts);

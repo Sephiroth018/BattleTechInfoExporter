@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 
 namespace BattleTechInfoExporter.Models;
 
@@ -14,8 +17,6 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Catalog(
-    string ModVersion,
-    ExportTrigger Trigger,
     string SourceFingerprint,
     IReadOnlyDictionary<string, ChassisDefinition> ChassisDefinitions,
     IReadOnlyDictionary<string, MechDefinition> MechDefinitions,
@@ -25,4 +26,25 @@ internal sealed record Catalog(
     IReadOnlyDictionary<string, TerrainDefinition> TerrainDefinitions,
     IReadOnlyDictionary<string, BiomeDefinition> BiomeDefinitions,
     IReadOnlyDictionary<string, MapDefinition> MapDefinitions,
-    IReadOnlyDictionary<string, StarSystemDefinition> StarSystemDefinitions) : ExportFile(ModVersion, null, Trigger);
+    IReadOnlyDictionary<string, StarSystemDefinition> StarSystemDefinitions) : ExportFile
+{
+    /// <summary>
+    ///     Whether the catalog in the file is current: written by this mod version from the same sources. An unreadable
+    ///     or malformed file isn't; the rebuild replaces it.
+    /// </summary>
+    internal static bool IsCurrent(string fileName, string sourceFingerprint)
+    {
+        try
+        {
+            var header = ReadHeader(fileName, nameof(ModVersion), nameof(SourceFingerprint));
+            return header is not null
+                   && header[nameof(ModVersion)] == ModAssembly.Version
+                   && header[nameof(SourceFingerprint)] == sourceFingerprint;
+        }
+        catch (Exception exception) when (exception is JsonException or IOException)
+        {
+            ModLog.Logger.LogWarning($"Rebuilding the unreadable {fileName}: {exception.Message}");
+            return false;
+        }
+    }
+}

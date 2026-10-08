@@ -61,8 +61,16 @@ internal sealed record MechLoadout(
     MechStats Stats,
     IReadOnlyList<MechLocation> Locations);
 
+/// <summary>A mech location's armor and structure; the chassis' limits are in <see cref="ChassisDefinition" />.</summary>
 /// <param name="RearArmor"><c>null</c> outside the torso, which alone has rear armor.</param>
 /// <param name="Structure">The structure left: below the chassis' when damaged, zero when destroyed.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal abstract record MechLocationCondition(
+    ChassisLocations Location,
+    Armor Armor,
+    Armor? RearArmor,
+    float Structure);
+
 /// <param name="Components">The components mounted in the location, including the chassis' fixed ones.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechLocation(
@@ -70,7 +78,7 @@ internal sealed record MechLocation(
     Armor Armor,
     Armor? RearArmor,
     float Structure,
-    IReadOnlyList<MountedComponent> Components);
+    IReadOnlyList<MountedComponent> Components) : MechLocationCondition(Location, Armor, RearArmor, Structure);
 
 /// <param name="Current">
 ///     What is left after combat damage; refilled to <see cref="Assigned" /> after a mission unless the

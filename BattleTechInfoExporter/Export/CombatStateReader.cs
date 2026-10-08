@@ -7,14 +7,12 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>Builds the combat state file's model from the running battle.</summary>
 internal static class CombatStateReader
 {
-    internal static CombatState Read(SimGameState simGame, CombatGameState combat, ExportTrigger trigger)
+    internal static CombatState Read(SimGameState simGame, CombatGameState combat)
     {
         var contract = combat.ActiveContract;
         var turnDirector = combat.TurnDirector;
         var units = CombatUnitReader.ReadUnits(combat);
         return new CombatState(
-            ModAssembly.Version,
-            trigger,
             ContractReader.ReadMissionContract(simGame, contract),
             // The catalog keys maps by their MapID, which the contract knows only by its path.
             MetadataDatabase.Instance.GetMapByPath(contract.mapPath)?.MapID,

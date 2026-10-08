@@ -16,14 +16,11 @@ internal static class MissionReader
     internal static MissionOutcome ReadOutcome(
         SimGameState simGame,
         Contract contract,
-        ExportTrigger trigger,
         SalvageOffer offer,
         IReadOnlyList<SalvageDef>? received)
     {
         var (employer, target) = ContractReader.ReadFactions(contract);
         return new MissionOutcome(
-            ModAssembly.Version,
-            trigger,
             ContractReader.ReadMissionContract(simGame, contract),
             contract.State,
             contract.IsGoodFaithEffort,
@@ -91,7 +88,7 @@ internal static class MissionReader
                     ComponentReferences.ReferenceTo(component),
                     component.MountedLocation,
                     component.DamageLevel))
-                .OrderByComponent(component => component.Component)
+                .OrderBy(component => component.Component)
                 .ToList(),
             ReadAmmunitionUse(FindCombatMech(contract, mech)));
     }
@@ -142,22 +139,21 @@ internal static class MissionReader
             salvage
                 .Where(item => item.Type == SalvageDef.SalvageType.COMPONENT)
                 .GroupBy(item => item.Description.Id)
-                .Select(copies => new SalvagedComponent(
+                .Select(copies => new StoredComponent(
                     ComponentReferences.ReferenceTo(
                         copies.First().ComponentType,
                         copies.Key,
                         copies.First().MechComponentDef),
                     copies.Where(copy => !copy.Damaged).Sum(copy => copy.Count),
                     copies.Where(copy => copy.Damaged).Sum(copy => copy.Count)))
-                .OrderByComponent(component => component.Component)
+                .OrderBy(component => component.Component)
                 .ToList(),
-            salvage
-                .Where(item => item.Type == SalvageDef.SalvageType.MECH_PART)
-                .GroupBy(item => item.Description.Id)
-                .Select(parts => MechReader.TryReferenceToMech(simGame.DataManager, parts.Key) is { } mech
-                    ? new SalvagedMechParts(mech, parts.Sum(part => part.Count))
-                    : null)
-                .OfType<SalvagedMechParts>()
-                .OrderByDefinition(parts => parts.Mech)
+            ReferencedEntries.Read(
+                    salvage
+                        .Where(item => item.Type == SalvageDef.SalvageType.MECH_PART)
+                        .GroupBy(item => item.Description.Id),
+                    parts => MechReader.TryReferenceToMech(simGame.DataManager, parts.Key),
+                    (mech, parts) => new StoredMechParts(mech, parts.Sum(part => part.Count)))
+                .OrderBy(parts => parts.Mech)
                 .ToList());
 }

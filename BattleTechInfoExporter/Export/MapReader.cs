@@ -60,7 +60,7 @@ internal static class MapReader
                     DefinitionReferences.ReferenceTo(dataManager, (Biome.BIOMESKIN)map.BiomeSkinID),
                     tags,
                     starSystems.Select(playable => playable.StarSystem)
-                        .OrderByDefinition(starSystem => starSystem)
+                        .OrderBy(starSystem => starSystem)
                         .ToList(),
                     map.Weight,
                     terrainCoverage));

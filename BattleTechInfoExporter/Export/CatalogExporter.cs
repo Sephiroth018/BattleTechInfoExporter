@@ -1,9 +1,6 @@
-using System;
-using System.IO;
 using BattleTech;
 using BattleTech.Data;
 using BattleTechInfoExporter.Models;
-using Newtonsoft.Json;
 
 namespace BattleTechInfoExporter.Export;
 
@@ -26,7 +23,7 @@ internal static class CatalogExporter
             () =>
             {
                 var sourceFingerprint = CatalogSourceFingerprint.Compute(simGame.DataManager);
-                if (IsCurrent(sourceFingerprint))
+                if (Catalog.IsCurrent(CatalogFileName, sourceFingerprint))
                 {
                     ModLog.Logger.Log($"Left {CatalogFileName} unchanged ({trigger}): same mod version and sources");
                     return;
@@ -55,26 +52,6 @@ internal static class CatalogExporter
             ModLog.Logger.LogWarning($"Failed to load {entry.Type} {entry.Id} for the catalog");
         }
 
-        ExportFileWriter.Write(CatalogFileName, CatalogReader.Read(simGame, trigger, sourceFingerprint));
-    }
-
-    // An unreadable or malformed file counts as stale; the rebuild replaces it.
-    private static bool IsCurrent(string sourceFingerprint)
-    {
-        try
-        {
-            var header = ExportFileWriter.ReadHeader(
-                CatalogFileName,
-                nameof(Catalog.ModVersion),
-                nameof(Catalog.SourceFingerprint));
-            return header is not null
-                   && header[nameof(Catalog.ModVersion)] == ModAssembly.Version
-                   && header[nameof(Catalog.SourceFingerprint)] == sourceFingerprint;
-        }
-        catch (Exception exception) when (exception is JsonException or IOException)
-        {
-            ModLog.Logger.LogWarning($"Rebuilding the unreadable {CatalogFileName}: {exception.Message}");
-            return false;
-        }
+        CatalogReader.Read(simGame, sourceFingerprint).Write(CatalogFileName, trigger);
     }
 }

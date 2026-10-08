@@ -12,7 +12,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Skills">The training table behind <see cref="Pilot.Skills" /> and <see cref="Pilot.Abilities" />.</param>
 /// <param name="SpiritsLevels">The effects of each spirits level, which <see cref="Spirits.Level" /> refers to.</param>
 /// <param name="MechPartsPerMech">The <see cref="StoredMechParts" /> needed to assemble a mech.</param>
-/// <param name="ContractTypes">The mission types, which <see cref="Contract.Type" /> refers to.</param>
+/// <param name="ContractTypes">The mission types, which <see cref="ContractIdentity.Type" /> refers to.</param>
 /// <param name="JumpDistances">
 ///     The jump distance by number of working jump jets, from one up; the last entry applies to any higher number.
 /// </param>
@@ -22,8 +22,6 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Rules(
-    string ModVersion,
-    ExportTrigger Trigger,
     IReadOnlyList<MoraleLevel> MoraleLevels,
     IReadOnlyList<ReputationLevel> ReputationLevels,
     SkillRules Skills,
@@ -32,4 +30,4 @@ internal sealed record Rules(
     IReadOnlyList<ContractTypeDescription> ContractTypes,
     IReadOnlyList<JumpDistance> JumpDistances,
     CombatRules Combat,
-    CampaignRules Campaign) : ExportFile(ModVersion, null, Trigger);
+    CampaignRules Campaign) : ExportFile;

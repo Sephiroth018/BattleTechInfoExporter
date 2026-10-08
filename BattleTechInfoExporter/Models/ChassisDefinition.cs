@@ -23,7 +23,7 @@ internal sealed record ChassisDefinition(
     ChassisMovement Movement,
     ChassisMelee Melee,
     DefinitionReference? StockMech,
-    IReadOnlyList<ChassisLocationDefinition> Locations);
+    IReadOnlyList<ChassisLocationDefinition> Locations) : UnitDefinition(Name, WeightClass, Tonnage);
 
 /// <summary>The distances in meters; a chassis' speed doesn't depend on its loadout.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

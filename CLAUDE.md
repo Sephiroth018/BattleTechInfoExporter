@@ -353,8 +353,7 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
   every exception (`CampaignExport`), so a patch that only calls one needs no handling of its own;
   a patch doing anything else catches its own.
 - **Mutable static state** is allowed in patches, limited to what a patch needs, and in
-  `ExportFileWriter`'s cache of the content it last wrote per file, which lives as long as the game
-  runs.
+  `ExportFile`'s cache of the content it last wrote per file, which lives as long as the game runs.
 - **Logging** goes through `ModLog.Logger`, the game's `HBS.Logging` logger under the name
   `BattleTechInfoExporter`, and ends up in ModTek's log.
 
@@ -387,13 +386,16 @@ name, version and folder, `ModLog` its logger. Folders:
   `DefinitionReferences` makes the
   references that need only a description, a faction, a biome or a data-driven enum value, and
   `ComponentReferences` every reference to a component; a reference
-  with a naming rule of its own is made by the reader that owns it. `ReferenceOrder` orders the
-  lists of entries that refer to a definition, `GameText` makes every exported game text plain,
+  with a naming rule of its own is made by the reader that owns it. `ReferencedEntries` builds the
+  lists of entries that refer to a definition, leaving out what has none, `GameText` makes every exported game text plain,
   and `HudInitiative` numbers phases and initiative as the HUD does.
-  `ExportFileWriter` writes the files in the mod's `exports/` folder and reads an existing file's header.
+  `ExportFileWriter` replaces, deletes and reads the header of the files in the mod's `exports/`
+  folder, by file name and text, knowing no model.
 - `Models/`: immutable records, one per JSON object, and the mod's own enums. The records are
   marked `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` because only the serializer reads
-  them.
+  them. `ExportFile`, the root of every file, is more than data, by decision: it owns the header,
+  the JSON conventions, the content compared before a write and the writing itself, through
+  `ExportFileWriter` and the clock.
 
 The version is `Major.Minor.Patch.Build`. Its first three parts live only in `<VersionPrefix>` in
 `Directory.Build.props`, next to the description, author, repository URL and supported game version;
@@ -418,7 +420,7 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   and their own state, instead of repeating the definition's stats or limits (e.g. a location's max
   armor or slots). A reference whose definition is missing has no entry. Keys keep the game's ids as they are.
 - **Lists of entries that refer to a definition, which the game keeps in no meaningful order**
-  (storage, stores, salvage), are ordered the same way everywhere (`ReferenceOrder`): by component
+  (storage, stores, salvage), are ordered the same way everywhere, by their references' own comparison (`Reference`, `ComponentReference`): by component
   type for components, then by name, with the id breaking ties. A mech's components keep the game's
   order.
 - **The career state is four files, read together on every career export:** `game-state.json`,
@@ -470,7 +472,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **Every export file starts with `modVersion`, `exportedAt` and `trigger`** (`ExportFile`, which
   every file's model inherits), describing the export that last changed it.
 - **Points in time are day numbers** on the game's `DaysPassed` scale (`company.daysPassed`), e.g.
-  `readyOnDay`, never countdowns, so a passing day changes only the company's day and date. Durations
+  `readyOnDay`, never countdowns, so a passing day changes only the company's day and date, which
+  the comparison before a write leaves out (`Company.WithoutDay`), so the file isn't written then. Durations
   that don't count down (a route's travel days) stay durations.
 - **Phases and initiative are numbered as on the HUD** (`HudInitiative`), from 5 down to 1, never on
   the game's internal scale, where units act from 1 up: in the combat state, and in the rules'
@@ -482,9 +485,9 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **JSON:** camelCase properties, compact (no indentation, since only tools read the files), `null`
   written explicitly, through the game's Newtonsoft.Json.
 - **Files are replaced atomically**, so a tool reading them never sees a half-written file, and
-  only when their content apart from `exportedAt` and `trigger` changed, so a tool watching them
-  sees only real changes. `ExportFileWriter` compares with the content it last wrote, kept in
-  memory, so each file is also written once after every game start.
+  only when their content apart from `exportedAt` and `trigger` (and the game state's company day
+  and date) changed, so a tool watching them sees only real changes. `ExportFile` compares with the
+  content it last wrote, kept in memory, so each file is also written once after every game start.
 
 ## Glossary
 
@@ -520,6 +523,13 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   sight but hidden by ECM (`BlipGhost`) isn't a blip: the export treats it as in full view.
 - **Statistic change:** a change an ability or component makes to a statistic (the game's
   `EffectData` of type `StatisticEffect`).
+- **Reference:** what the export refers to by its id instead of repeating it, with the name the UI
+  shows (`Reference`): a definition, a mech in the mech bay, a component or a pilot.
+- **Entry:** a thing in one of its states, a member of a list: a component stored, for sale,
+  mounted, damaged and so on (`ComponentEntry`), mech parts stored or for sale (`MechPartsEntry`).
+- **Contract identity:** what a contract is in every state, offered, accepted or fought
+  (`ContractIdentity`). **Contract briefing:** what the contract details show before the mission,
+  on top of its identity (`ContractBriefing`).
 
 ## Commands
 

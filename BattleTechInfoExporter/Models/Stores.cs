@@ -22,22 +22,17 @@ internal sealed record Store(
     IReadOnlyList<MechForSale> Mechs,
     IReadOnlyList<MechPartsForSale> MechParts);
 
-/// <param name="Count">The copies in stock; <c>null</c>: unlimited.</param>
-/// <param name="Price">The C-Bills for one copy, after the system's discount and the reputation's price change.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record ComponentForSale(ComponentReference Component, int? Count, int Price);
+internal sealed record ComponentForSale(ComponentReference Component, int? Count, int Price)
+    : ComponentEntry(Component), IForSale;
 
 /// <summary>
 ///     A whole mech, rarely in stock, described in the catalog. Buying it puts the mech with its stock loadout into
 ///     the mech bay.
 /// </summary>
-/// <param name="Count">The mechs in stock; <c>null</c>: unlimited.</param>
-/// <param name="Price">The C-Bills for one mech, after the system's discount and the reputation's price change.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record MechForSale(DefinitionReference Mech, int? Count, int Price);
+internal sealed record MechForSale(DefinitionReference Mech, int? Count, int Price) : IForSale;
 
-/// <summary>Parts of a mech; with <see cref="Rules.MechPartsPerMech" /> of them they become that mech.</summary>
-/// <param name="Count">The parts in stock; <c>null</c>: unlimited.</param>
-/// <param name="Price">The C-Bills for one part, after the system's discount and the reputation's price change.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record MechPartsForSale(DefinitionReference Mech, int? Count, int Price);
+internal sealed record MechPartsForSale(DefinitionReference Mech, int? Count, int Price)
+    : MechPartsEntry(Mech), IForSale;

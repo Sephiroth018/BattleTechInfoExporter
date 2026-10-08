@@ -10,13 +10,11 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>Builds the game state file's models from the game's career state.</summary>
 internal static class GameStateReader
 {
-    internal static GameState Read(SimGameState simGame, ExportTrigger trigger)
+    internal static GameState Read(SimGameState simGame)
     {
         var travelInProgress = ReadTravelInProgress(simGame);
         var mechLabFinishingDays = WorkQueueReader.ReadMechLabFinishingDays(simGame);
         return new GameState(
-            ModAssembly.Version,
-            trigger,
             ReadCompany(simGame),
             WorkQueueReader.ReadWorkQueue(simGame, mechLabFinishingDays),
             ShipReader.ReadShip(simGame),

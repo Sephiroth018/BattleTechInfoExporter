@@ -23,8 +23,6 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Zones">The zones drawn on the map.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatState(
-    string ModVersion,
-    ExportTrigger Trigger,
     MissionContract Contract,
     string? MapId,
     int Round,
@@ -32,7 +30,7 @@ internal sealed record CombatState(
     int Resolve,
     IReadOnlyDictionary<string, CombatUnit> Units,
     IReadOnlyList<CombatObjective> Objectives,
-    IReadOnlyList<ObjectiveZone> Zones) : ExportFile(ModVersion, null, Trigger);
+    IReadOnlyList<ObjectiveZone> Zones) : ExportFile;
 
 /// <summary>A point on the map in meters: <see cref="Y" /> is the elevation.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
