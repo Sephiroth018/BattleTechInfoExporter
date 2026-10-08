@@ -473,7 +473,7 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   every file's model inherits), describing the export that last changed it.
 - **Points in time are day numbers** on the game's `DaysPassed` scale (`company.daysPassed`), e.g.
   `readyOnDay`, never countdowns, so a passing day changes only the company's day and date, which
-  the comparison before a write leaves out (`GameState`), so the file isn't written then. Durations
+  the comparison before a write leaves out (`Company.WithoutDay`), so the file isn't written then. Durations
   that don't count down (a route's travel days) stay durations.
 - **Phases and initiative are numbered as on the HUD** (`HudInitiative`), from 5 down to 1, never on
   the game's internal scale, where units act from 1 up: in the combat state, and in the rules'
@@ -485,9 +485,9 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **JSON:** camelCase properties, compact (no indentation, since only tools read the files), `null`
   written explicitly, through the game's Newtonsoft.Json.
 - **Files are replaced atomically**, so a tool reading them never sees a half-written file, and
-  only when their content apart from `exportedAt` and `trigger` changed, so a tool watching them
-  sees only real changes. `ExportFile` compares with the content it last wrote, kept in memory, so
-  each file is also written once after every game start.
+  only when their content apart from `exportedAt` and `trigger` (and the game state's company day
+  and date) changed, so a tool watching them sees only real changes. `ExportFile` compares with the
+  content it last wrote, kept in memory, so each file is also written once after every game start.
 
 ## Glossary
 

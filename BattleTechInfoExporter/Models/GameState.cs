@@ -31,8 +31,6 @@ internal sealed record GameState(
     IReadOnlyList<Contract>? Contracts,
     Position Position) : ExportFile
 {
-    // A day passing on its own changes nothing else, and no trigger fires for it; the company's day and date are
-    // those of the export that last changed the file, like its ExportedAt.
     protected override ExportFile WithoutExportHeader() =>
         (GameState)base.WithoutExportHeader() with { Company = Company.WithoutDay() };
 }
