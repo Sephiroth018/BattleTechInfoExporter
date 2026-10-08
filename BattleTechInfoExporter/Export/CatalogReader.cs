@@ -98,7 +98,7 @@ internal static class CatalogReader
             chassis.InitialTonnage,
             chassis.MaxJumpjets,
             chassis.Heatsinks,
-            ReadMovement(chassis.MovementCapDef),
+            ReadMovement(chassis.MovementCapDef, chassis.PathingCapDefID),
             MechStatsReader.ReadChassisMelee(chassis),
             // The mech lab's stock popup, the store and mech assembly find the stock mech by this id
             // (MechLabStockInfoPopup, SG_Shop_Screen, SimGameState).
@@ -190,7 +190,7 @@ internal static class CatalogReader
             chassis.weightClass,
             chassis.Tonnage,
             chassis.movementType,
-            ReadMovement(chassis.MovementCapDef),
+            ReadMovement(chassis.MovementCapDef, chassis.PathingCapDefID),
             VehicleLocationsOf(chassis)
                 .Select(location => new VehicleLocationDefinition(
                     location,
@@ -229,8 +229,8 @@ internal static class CatalogReader
     internal static IEnumerable<VehicleChassisLocations> VehicleLocationsOf(VehicleChassisDef chassis) =>
         VehicleLocations.Where(location => location != VehicleChassisLocations.Turret || chassis.HasTurret);
 
-    private static ChassisMovement ReadMovement(MovementCapabilitiesDef movement) =>
-        new(movement.MaxWalkDistance, movement.MaxSprintDistance);
+    private static ChassisMovement ReadMovement(MovementCapabilitiesDef movement, string pathingId) =>
+        new(movement.MaxWalkDistance, movement.MaxSprintDistance, pathingId);
 
     // Every component type, keyed by id, without the dummies' and the game's internal weapons: the melee and jump
     // attacks and the AI's imaginary laser, which aren't mounted (MechDef.CreateMeleeWeaponRefs).

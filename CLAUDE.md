@@ -366,7 +366,7 @@ name, version and folder, `ModLog` its logger. Folders:
 - `Triggers/`: the patches that decide when to export, and the recorder patches they share.
 - `Export/`: the exporters, the single entry points the triggers call: `GameStateExporter` for the
   career state, the star systems and the financial report, `MissionExporter` for the mission file,
-  one method per write, `CombatExporter` for the combat state, which it also deletes, and `CatalogExporter`
+  one method per write, `CombatExporter` for the combat map and the combat state, which it also deletes, and `CatalogExporter`
   for the catalog, which rebuilds it only when it's missing or stale (another mod version or
   another `CatalogSourceFingerprint`, the hash of the game's manifest entries it reads), first
   loading the vehicles, turrets and design masks the career doesn't and exporting once they are
@@ -379,7 +379,10 @@ name, version and folder, `ModLog` its logger. Folders:
   the financial report file; `MissionReader` builds the
   mission file's models from the completed contract; `CombatStateReader` builds the combat state
   file from the running battle, with `CombatUnitReader` reading each unit as the HUD shows it and
-  `ObjectiveReader` the objectives and zones; `CatalogReader` builds the catalog from the
+  `ObjectiveReader` the objectives and zones; `CombatMapReader` builds the combat map file from the
+  battle's map, with `MapHexReader` reading the playable hexes, `HexStepReader` the steps slopes
+  block through the game's own path checks, and `BuildingReader` the buildings, also the damaged
+  ones for the combat state; `CatalogReader` builds the catalog from the
   definitions the game has loaded, with `TerrainReader` reading the terrains and biomes from the
   design masks, `MapReader` the maps from the metadata database and their terrain data files, and
   `StarSystemDefinitionReader` every star system definition.
@@ -450,6 +453,13 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   visibility (`CombatUnitReader`), from full detail down to a blip's position or the position they
   were last detected at. Every read is a cached lookup or a statistic; it never reads the career
   files or the catalog.
+- **The battle's ground is a file of its own,** `combat-map.json`, written once when the battle
+  begins and deleted with the combat state: the map doesn't change, and the combat state lists what
+  does (damaged buildings, a destroyed building's hexes). It isn't in the catalog, because buildings
+  exist only once the battle's map has loaded. It's laid out in rows of characters and numbers,
+  not an object per hex, so an AI chat can read it whole, and spells out its own hex grid
+  (`hexGrid`). A hex is what a unit standing on it gets from the cell at its center (`MapHexReader`);
+  blocked steps follow the game's path node steps (`HexStepReader`).
 - **The catalog is a file of its own that doesn't depend on the career:** `catalog.json`, with
   every chassis, mech, vehicle, turret, component, terrain, biome, map and star system definition
   the game has loaded, rebuilt on a career load only when it's missing or stale: written by another mod version or with
