@@ -139,9 +139,21 @@ Apply these to every change and check them in every review.
 ### Design
 
 - **Simplest thing that works.** No abstractions, options or extension points for needs that don't
-  exist yet.
+  exist yet. Expressing a concept the code already has isn't a future need.
 - **One source of truth.** No duplicated logic, constants or data. Search for an existing helper or
   type before writing a new one.
+- **Types say what things are.** A concept several types share is a shared type: a base record for
+  the common fields, an interface for a role unrelated types play. Judge by concept, not by whether
+  code uses the shared part today. Two types that merely look alike stay separate.
+- **A thing in several states is one base per thing and one derived type per state**, with an
+  interface per state so every entry of a state's list carries what the state needs: a stored
+  component and a component for sale share the component; everything stored has a count.
+- **A choice is structure, not nullable fields.** "Only the fields its type uses are set" means one
+  derived type per case. Fields that are null together become one nullable nested type.
+- **Generics where only a member's type varies**, never its name or meaning. Where members are
+  added, use a base type.
+- **A type owns what's about itself**: its shape, its comparison, its header. Code that handles
+  many types knows only their common base.
 - **Pure logic in the middle, side effects at the edges.** I/O, external systems, time and
   randomness stay at the boundaries, so the core is testable without them.
 - **Validate at boundaries, trust inside.** Input is checked where it enters; inner code doesn't
