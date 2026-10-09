@@ -1,0 +1,2182 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Catalog",
+  "type": "object",
+  "description": "The root of catalog.json: every chassis, mech, vehicle, turret, component, terrain, biome, map and star system definition the game has loaded, keyed by id. It describes the game, not the career, so it only changes with the game's data.",
+  "additionalProperties": false,
+  "required": [
+    "modVersion",
+    "exportedAt",
+    "trigger",
+    "sourceFingerprint",
+    "chassisDefinitions",
+    "mechDefinitions",
+    "vehicleDefinitions",
+    "turretDefinitions",
+    "componentDefinitions",
+    "terrainDefinitions",
+    "biomeDefinitions",
+    "mapDefinitions",
+    "starSystemDefinitions"
+  ],
+  "properties": {
+    "modVersion": {
+      "type": "string",
+      "description": "The four-part version of the mod that wrote the file; the other files match the catalog written by the same version."
+    },
+    "exportedAt": {
+      "type": "string",
+      "description": "When the file was last changed.",
+      "format": "date-time"
+    },
+    "trigger": {
+      "description": "What caused the export that last changed the file.",
+      "$ref": "#/definitions/ExportTrigger"
+    },
+    "sourceFingerprint": {
+      "type": "string",
+      "description": "A hash of the game's data the catalog was built from (CatalogSourceFingerprint); the catalog is rebuilt when it differs from the game's current data."
+    },
+    "chassisDefinitions": {
+      "type": "object",
+      "description": "The chassis, keyed by chassis id.",
+      "additionalProperties": {
+        "$ref": "#/definitions/ChassisDefinition"
+      }
+    },
+    "mechDefinitions": {
+      "type": "object",
+      "description": "The mechs, keyed by mech id.",
+      "additionalProperties": {
+        "$ref": "#/definitions/MechDefinition"
+      }
+    },
+    "vehicleDefinitions": {
+      "type": "object",
+      "description": "The vehicles, keyed by vehicle id.",
+      "additionalProperties": {
+        "$ref": "#/definitions/VehicleDefinition"
+      }
+    },
+    "turretDefinitions": {
+      "type": "object",
+      "description": "The turrets, keyed by turret id.",
+      "additionalProperties": {
+        "$ref": "#/definitions/TurretDefinition"
+      }
+    },
+    "componentDefinitions": {
+      "description": "The components, grouped by type and keyed by component id.",
+      "$ref": "#/definitions/ComponentDefinitions"
+    },
+    "terrainDefinitions": {
+      "type": "object",
+      "description": "The terrains, keyed by design mask id.",
+      "additionalProperties": {
+        "$ref": "#/definitions/TerrainDefinition"
+      }
+    },
+    "biomeDefinitions": {
+      "type": "object",
+      "description": "The biomes, keyed by the biome id the star systems and maps refer to.",
+      "additionalProperties": {
+        "$ref": "#/definitions/BiomeDefinition"
+      }
+    },
+    "mapDefinitions": {
+      "type": "object",
+      "description": "The maps a star system's contracts can be fought on, keyed by map id.",
+      "additionalProperties": {
+        "$ref": "#/definitions/MapDefinition"
+      }
+    },
+    "starSystemDefinitions": {
+      "type": "object",
+      "description": "Every star system definition, keyed by its id.",
+      "additionalProperties": {
+        "$ref": "#/definitions/StarSystemDefinition"
+      }
+    }
+  },
+  "definitions": {
+    "ExportTrigger": {
+      "type": "string",
+      "description": "What caused an export.",
+      "x-enumNames": [
+        "CareerLoaded",
+        "ManualSave",
+        "Autosave",
+        "ContractCompleted",
+        "FinancialReportShown",
+        "MechLabOrderCompleted",
+        "PilotHealed",
+        "ShipUpgradeCompleted",
+        "ContractsGenerated",
+        "StoreClosed",
+        "MechBayChanged",
+        "ExperienceSpent",
+        "MechPlacementShown",
+        "MissionCompleted",
+        "SalvageChosen",
+        "ShipUpgradeStarted",
+        "PhaseStarted",
+        "CombatStarted",
+        "CombatLoaded",
+        "ActivationCompleted"
+      ],
+      "enum": [
+        "careerLoaded",
+        "manualSave",
+        "autosave",
+        "contractCompleted",
+        "financialReportShown",
+        "mechLabOrderCompleted",
+        "pilotHealed",
+        "shipUpgradeCompleted",
+        "contractsGenerated",
+        "storeClosed",
+        "mechBayChanged",
+        "experienceSpent",
+        "mechPlacementShown",
+        "missionCompleted",
+        "salvageChosen",
+        "shipUpgradeStarted",
+        "phaseStarted",
+        "combatStarted",
+        "combatLoaded",
+        "activationCompleted"
+      ]
+    },
+    "ChassisDefinition": {
+      "type": "object",
+      "description": "A chassis: the frame its mechs share, without anything a loadout decides.",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "weightClass",
+        "tonnage",
+        "initialTonnage",
+        "maxJumpJets",
+        "heatDissipation",
+        "movement",
+        "melee",
+        "stockMech",
+        "locations"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name with the variant, as in the references to the chassis."
+        },
+        "weightClass": {
+          "description": "The weight class, from LIGHT to ASSAULT.",
+          "$ref": "#/definitions/WeightClass"
+        },
+        "tonnage": {
+          "type": "number",
+          "description": "The weight in tons; for a chassis, the most a mech of it may weigh.",
+          "format": "float"
+        },
+        "initialTonnage": {
+          "type": "number",
+          "description": "The bare chassis' tonnage, which a mech's tonnage starts from.",
+          "format": "float"
+        },
+        "maxJumpJets": {
+          "type": "integer",
+          "description": "The most jump jets a mech of the chassis can mount; 0 when it can't jump.",
+          "format": "int32"
+        },
+        "heatDissipation": {
+          "type": "integer",
+          "description": "The heat the chassis itself removes per round, on top of its heat sinks.",
+          "format": "int32"
+        },
+        "movement": {
+          "description": "The walk and sprint distances and the pathing, which no loadout changes.",
+          "$ref": "#/definitions/ChassisMovement"
+        },
+        "melee": {
+          "description": "The damage of melee and jump attacks, before upgrades add to them.",
+          "$ref": "#/definitions/ChassisMelee"
+        },
+        "stockMech": {
+          "description": "The mech the game treats as the chassis' stock loadout; null when its definition is missing.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/DefinitionReference"
+            }
+          ]
+        },
+        "locations": {
+          "type": "array",
+          "description": "The body locations, from head to legs.",
+          "items": {
+            "$ref": "#/definitions/ChassisLocationDefinition"
+          }
+        }
+      }
+    },
+    "WeightClass": {
+      "type": "string",
+      "x-enumNames": [
+        "LIGHT",
+        "MEDIUM",
+        "HEAVY",
+        "ASSAULT"
+      ],
+      "enum": [
+        "LIGHT",
+        "MEDIUM",
+        "HEAVY",
+        "ASSAULT"
+      ]
+    },
+    "ChassisMovement": {
+      "type": "object",
+      "description": "How the unit moves, with the distances in meters; a chassis' speed doesn't depend on its loadout.",
+      "additionalProperties": false,
+      "required": [
+        "walk",
+        "sprint",
+        "pathingId"
+      ],
+      "properties": {
+        "walk": {
+          "type": "number",
+          "description": "The movement of a walk, which each step uses up per meter by its terrain's move cost (moveCost).",
+          "format": "float"
+        },
+        "sprint": {
+          "type": "number",
+          "description": "The movement of a sprint, which each step uses up per meter by its terrain's move cost (moveCost) times its sprintMultiplier.",
+          "format": "float"
+        },
+        "pathingId": {
+          "type": "string",
+          "description": "The game's pathing capabilities the unit moves with, which decide the slopes it can climb, as in combat-map.json's pathingGroups."
+        }
+      }
+    },
+    "ChassisMelee": {
+      "type": "object",
+      "description": "The chassis' melee values, before upgrades add to them.",
+      "additionalProperties": false,
+      "required": [
+        "damage",
+        "stabilityDamage",
+        "deathFromAboveDamage",
+        "deathFromAboveSelfDamage"
+      ],
+      "properties": {
+        "damage": {
+          "type": "number",
+          "description": "The damage of a melee attack.",
+          "format": "float"
+        },
+        "stabilityDamage": {
+          "type": "number",
+          "description": "The stability damage of a melee attack.",
+          "format": "float"
+        },
+        "deathFromAboveDamage": {
+          "type": "number",
+          "description": "The damage of a jump attack onto a target.",
+          "format": "float"
+        },
+        "deathFromAboveSelfDamage": {
+          "type": "number",
+          "description": "The damage the mech takes from its own jump attack.",
+          "format": "float"
+        }
+      }
+    },
+    "DefinitionReference": {
+      "type": "object",
+      "description": "A game definition: its id from the game's data files and the name shown in the UI.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name the UI shows."
+        }
+      }
+    },
+    "ChassisLocationDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "location",
+        "maxArmor",
+        "structure",
+        "hardpoints",
+        "slots"
+      ],
+      "properties": {
+        "location": {
+          "description": "The body location, e.g. LeftTorso.",
+          "$ref": "#/definitions/ChassisLocations"
+        },
+        "maxArmor": {
+          "description": "The most armor the location can take.",
+          "$ref": "#/definitions/LocationArmor"
+        },
+        "structure": {
+          "type": "number",
+          "description": "The location's internal structure.",
+          "format": "float"
+        },
+        "hardpoints": {
+          "description": "The location's weapon hardpoints.",
+          "$ref": "#/definitions/Hardpoints"
+        },
+        "slots": {
+          "type": "integer",
+          "description": "The component slots, which a loadout's components fill by their own slots.",
+          "format": "int32"
+        }
+      }
+    },
+    "ChassisLocations": {
+      "type": "string",
+      "x-enumFlags": true,
+      "x-enumNames": [
+        "None",
+        "Head",
+        "LeftArm",
+        "LeftTorso",
+        "CenterTorso",
+        "RightTorso",
+        "Torso",
+        "RightArm",
+        "Arms",
+        "MainBody",
+        "LeftLeg",
+        "RightLeg",
+        "Legs",
+        "All"
+      ],
+      "enum": [
+        "None",
+        "Head",
+        "LeftArm",
+        "LeftTorso",
+        "CenterTorso",
+        "RightTorso",
+        "Torso",
+        "RightArm",
+        "Arms",
+        "MainBody",
+        "LeftLeg",
+        "RightLeg",
+        "Legs",
+        "All"
+      ]
+    },
+    "LocationArmor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "front",
+        "rear"
+      ],
+      "properties": {
+        "front": {
+          "type": "number",
+          "description": "The front armor; outside the torso, the location's only armor.",
+          "format": "float"
+        },
+        "rear": {
+          "type": [
+            "null",
+            "number"
+          ],
+          "description": "null outside the torso, which alone has rear armor.",
+          "format": "float"
+        }
+      }
+    },
+    "Hardpoints": {
+      "type": "object",
+      "description": "The number of weapon hardpoints of each kind.",
+      "additionalProperties": false,
+      "required": [
+        "ballistic",
+        "energy",
+        "missile",
+        "support"
+      ],
+      "properties": {
+        "ballistic": {
+          "type": "integer",
+          "description": "For weapons of the Ballistic category.",
+          "format": "int32"
+        },
+        "energy": {
+          "type": "integer",
+          "description": "For weapons of the Energy category.",
+          "format": "int32"
+        },
+        "missile": {
+          "type": "integer",
+          "description": "For weapons of the Missile category.",
+          "format": "int32"
+        },
+        "support": {
+          "type": "integer",
+          "description": "For weapons of the Support category.",
+          "format": "int32"
+        }
+      }
+    },
+    "MechDefinition": {
+      "type": "object",
+      "description": "A mech: a loadout on a chassis, as a mech assembled from parts or bought comes with it. The frame is in chassisDefinitions.",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "chassis",
+        "value",
+        "usedTonnage",
+        "stats",
+        "isSalvageable",
+        "locations"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name with the variant, as in the references to the mech."
+        },
+        "chassis": {
+          "description": "The mech's chassis, in chassisDefinitions.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "value": {
+          "type": "integer",
+          "description": "The C-Bill value the game computes from the chassis, armor and components.",
+          "format": "int32"
+        },
+        "usedTonnage": {
+          "type": "number",
+          "description": "The tonnage of the chassis, armor and components.",
+          "format": "float"
+        },
+        "stats": {
+          "description": "The performance summary of the mech with this loadout.",
+          "$ref": "#/definitions/MechStats"
+        },
+        "isSalvageable": {
+          "type": "boolean",
+          "description": "Whether defeating it can give its mech parts as salvage; the game's BLACKLISTED tag rules it out, e.g. for hero variants."
+        },
+        "locations": {
+          "type": "array",
+          "description": "The body locations, from head to legs.",
+          "items": {
+            "$ref": "#/definitions/MechLocationDefinition"
+          }
+        }
+      }
+    },
+    "MechStats": {
+      "type": "object",
+      "description": "The performance summary of the mech lab and mech bay: the ratings of the stat bars and the numbers behind them. Only working components count.",
+      "additionalProperties": false,
+      "required": [
+        "ratings",
+        "movement",
+        "heat",
+        "firepower",
+        "range",
+        "durability",
+        "melee"
+      ],
+      "properties": {
+        "ratings": {
+          "description": "The ratings of the stat bars.",
+          "$ref": "#/definitions/StatRatings"
+        },
+        "movement": {
+          "description": "The walk, sprint and jump distances.",
+          "$ref": "#/definitions/MovementStats"
+        },
+        "heat": {
+          "description": "The heat dissipated, generated and tolerated.",
+          "$ref": "#/definitions/HeatStats"
+        },
+        "firepower": {
+          "description": "The damage of firing every weapon at once.",
+          "$ref": "#/definitions/FirepowerStats"
+        },
+        "range": {
+          "description": "The weapons' maximum and average medium range.",
+          "$ref": "#/definitions/RangeStats"
+        },
+        "durability": {
+          "description": "The armor and structure, and the damage taken from the mech's own jump attack.",
+          "$ref": "#/definitions/DurabilityStats"
+        },
+        "melee": {
+          "description": "The damage of melee and jump attacks.",
+          "$ref": "#/definitions/MeleeStats"
+        }
+      }
+    },
+    "StatRatings": {
+      "type": "object",
+      "description": "The stat bars, each rated up to 10 against the game's stock mechs.",
+      "additionalProperties": false,
+      "required": [
+        "firepower",
+        "movement",
+        "range",
+        "heatEfficiency",
+        "durability",
+        "melee"
+      ],
+      "properties": {
+        "firepower": {
+          "type": "integer",
+          "description": "Rated from the weapons' damage and stability damage.",
+          "format": "int32"
+        },
+        "movement": {
+          "type": "integer",
+          "description": "Rated from the sprint distance and the number of jump jets.",
+          "format": "int32"
+        },
+        "range": {
+          "type": "integer",
+          "description": "Rated from the weapons' average medium range.",
+          "format": "int32"
+        },
+        "heatEfficiency": {
+          "type": "integer",
+          "description": "Rated from the heat dissipation against the heat of firing every weapon and jumping, and from bonuses to the shutdown heat.",
+          "format": "int32"
+        },
+        "durability": {
+          "type": "integer",
+          "description": "Rated from the armor, the structure and upgrades reducing stability damage taken.",
+          "format": "int32"
+        },
+        "melee": {
+          "type": "integer",
+          "description": "Rated from the melee attack's damage and stability damage.",
+          "format": "int32"
+        }
+      }
+    },
+    "MovementStats": {
+      "type": "object",
+      "description": "The distances in meters.",
+      "additionalProperties": false,
+      "required": [
+        "walk",
+        "sprint",
+        "jump"
+      ],
+      "properties": {
+        "walk": {
+          "type": "number",
+          "description": "The chassis' walk distance (walk).",
+          "format": "float"
+        },
+        "sprint": {
+          "type": "number",
+          "description": "The chassis' sprint distance (sprint).",
+          "format": "float"
+        },
+        "jump": {
+          "type": "number",
+          "description": "The jump distance with the working jump jets and their bonuses; 0 without any.",
+          "format": "float"
+        }
+      }
+    },
+    "HeatStats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dissipation",
+        "alphaStrike",
+        "averageJump",
+        "shutdown"
+      ],
+      "properties": {
+        "dissipation": {
+          "type": "number",
+          "description": "The heat removed per round by the built-in and mounted heat sinks.",
+          "format": "float"
+        },
+        "alphaStrike": {
+          "type": "number",
+          "description": "The heat generated by firing every weapon at once.",
+          "format": "float"
+        },
+        "averageJump": {
+          "type": "number",
+          "description": "The heat generated by an average jump.",
+          "format": "float"
+        },
+        "shutdown": {
+          "type": "number",
+          "description": "The heat at which the mech shuts down.",
+          "format": "float"
+        }
+      }
+    },
+    "FirepowerStats": {
+      "type": "object",
+      "description": "The damage of firing every weapon at once.",
+      "additionalProperties": false,
+      "required": [
+        "damage",
+        "stabilityDamage"
+      ],
+      "properties": {
+        "damage": {
+          "type": "number",
+          "description": "The damage of all the weapons' shots; COIL weapons count with three evasion pips, as the game's stats assume.",
+          "format": "float"
+        },
+        "stabilityDamage": {
+          "type": "number",
+          "description": "The stability damage of all the weapons' shots.",
+          "format": "float"
+        }
+      }
+    },
+    "RangeStats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max",
+        "optimal"
+      ],
+      "properties": {
+        "max": {
+          "type": "number",
+          "description": "The longest maximum range of the weapons, in meters.",
+          "format": "float"
+        },
+        "optimal": {
+          "type": "number",
+          "description": "The weapons' average medium range, in meters.",
+          "format": "float"
+        }
+      }
+    },
+    "DurabilityStats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "armor",
+        "structure",
+        "deathFromAboveSelfDamage"
+      ],
+      "properties": {
+        "armor": {
+          "type": "number",
+          "description": "The armor left on all locations.",
+          "format": "float"
+        },
+        "structure": {
+          "type": "number",
+          "description": "The structure left on all locations.",
+          "format": "float"
+        },
+        "deathFromAboveSelfDamage": {
+          "type": "number",
+          "description": "The damage the mech takes from its own jump attack.",
+          "format": "float"
+        }
+      }
+    },
+    "MeleeStats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "damage",
+        "stabilityDamage",
+        "deathFromAboveDamage"
+      ],
+      "properties": {
+        "damage": {
+          "type": "number",
+          "description": "The damage of a melee attack, the chassis' plus upgrades' bonuses.",
+          "format": "float"
+        },
+        "stabilityDamage": {
+          "type": "number",
+          "description": "The stability damage of a melee attack, the chassis' plus upgrades' bonuses.",
+          "format": "float"
+        },
+        "deathFromAboveDamage": {
+          "type": "number",
+          "description": "The damage of a jump attack onto a target.",
+          "format": "float"
+        }
+      }
+    },
+    "MechLocationDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "location",
+        "armor",
+        "components"
+      ],
+      "properties": {
+        "location": {
+          "description": "The body location, e.g. LeftTorso.",
+          "$ref": "#/definitions/ChassisLocations"
+        },
+        "armor": {
+          "description": "The armor fitted.",
+          "$ref": "#/definitions/LocationArmor"
+        },
+        "components": {
+          "type": "array",
+          "description": "The components mounted in the location, in the game's order.",
+          "items": {
+            "$ref": "#/definitions/LoadoutComponent"
+          }
+        }
+      }
+    },
+    "LoadoutComponent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "component",
+        "isFixed"
+      ],
+      "properties": {
+        "component": {
+          "description": "The component, by the id its definition is keyed by.",
+          "$ref": "#/definitions/ComponentReference"
+        },
+        "isFixed": {
+          "type": "boolean",
+          "description": "Whether the component is part of the chassis: every mech of the chassis has it, and it can't be removed."
+        }
+      }
+    },
+    "ComponentReference": {
+      "type": "object",
+      "description": "A component's definition, like DefinitionReference, with the type that tells which group of componentDefinitions holds it. Components compare by type first, then as every reference.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "type"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name the UI shows."
+        },
+        "type": {
+          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in componentDefinitions.",
+          "$ref": "#/definitions/ComponentType"
+        }
+      }
+    },
+    "ComponentType": {
+      "type": "string",
+      "x-enumNames": [
+        "NotSet",
+        "Weapon",
+        "AmmunitionBox",
+        "HeatSink",
+        "JumpJet",
+        "Upgrade",
+        "Special",
+        "MechPart"
+      ],
+      "enum": [
+        "NotSet",
+        "Weapon",
+        "AmmunitionBox",
+        "HeatSink",
+        "JumpJet",
+        "Upgrade",
+        "Special",
+        "MechPart"
+      ]
+    },
+    "VehicleDefinition": {
+      "type": "object",
+      "description": "A vehicle with its chassis' data: its armor and loadout are fixed, as it fights in combat.",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "weightClass",
+        "tonnage",
+        "movementType",
+        "movement",
+        "locations"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name the combat HUD shows."
+        },
+        "weightClass": {
+          "description": "The weight class, from LIGHT to ASSAULT.",
+          "$ref": "#/definitions/WeightClass"
+        },
+        "tonnage": {
+          "type": "number",
+          "description": "The weight in tons; for a chassis, the most a mech of it may weigh.",
+          "format": "float"
+        },
+        "movementType": {
+          "description": "How the vehicle moves, Tracked or Wheeled, which picks its row of TerrainMoveCosts.",
+          "$ref": "#/definitions/VehicleMovementType"
+        },
+        "movement": {
+          "description": "The walk and sprint distances and the pathing.",
+          "$ref": "#/definitions/ChassisMovement"
+        },
+        "locations": {
+          "type": "array",
+          "description": "The locations from front to rear, then the turret if the vehicle has one.",
+          "items": {
+            "$ref": "#/definitions/VehicleLocationDefinition"
+          }
+        }
+      }
+    },
+    "VehicleMovementType": {
+      "type": "string",
+      "x-enumNames": [
+        "Wheeled",
+        "Tracked",
+        "Hovered",
+        "Aerospace"
+      ],
+      "enum": [
+        "Wheeled",
+        "Tracked",
+        "Hovered",
+        "Aerospace"
+      ]
+    },
+    "VehicleLocationDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "location",
+        "armor",
+        "structure",
+        "components"
+      ],
+      "properties": {
+        "location": {
+          "description": "The location, e.g. Front or Turret.",
+          "$ref": "#/definitions/VehicleChassisLocations"
+        },
+        "armor": {
+          "type": "number",
+          "description": "The armor in combat, after the game's vehicle multiplier.",
+          "format": "float"
+        },
+        "structure": {
+          "type": "number",
+          "description": "The internal structure in combat, after the game's vehicle multiplier.",
+          "format": "float"
+        },
+        "components": {
+          "type": "array",
+          "description": "The components mounted in the location, in the game's order.",
+          "items": {
+            "$ref": "#/definitions/ComponentReference"
+          }
+        }
+      }
+    },
+    "VehicleChassisLocations": {
+      "type": "string",
+      "x-enumFlags": true,
+      "x-enumNames": [
+        "None",
+        "Turret",
+        "Front",
+        "Left",
+        "Right",
+        "Rear",
+        "MainBody",
+        "All",
+        "Invalid"
+      ],
+      "enum": [
+        "None",
+        "Turret",
+        "Front",
+        "Left",
+        "Right",
+        "Rear",
+        "MainBody",
+        "All",
+        "Invalid"
+      ]
+    },
+    "TurretDefinition": {
+      "type": "object",
+      "description": "A turret with its chassis' data: a fixed emplacement with a single location.",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "weightClass",
+        "tonnage",
+        "firingArc",
+        "armor",
+        "structure",
+        "components"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name the combat HUD shows."
+        },
+        "weightClass": {
+          "description": "The weight class, from LIGHT to ASSAULT.",
+          "$ref": "#/definitions/WeightClass"
+        },
+        "tonnage": {
+          "type": "number",
+          "description": "The weight in tons; for a chassis, the most a mech of it may weigh.",
+          "format": "float"
+        },
+        "firingArc": {
+          "type": "number",
+          "description": "The arc it can fire into, in degrees.",
+          "format": "float"
+        },
+        "armor": {
+          "type": "number",
+          "description": "The armor in combat, after the game's vehicle multiplier.",
+          "format": "float"
+        },
+        "structure": {
+          "type": "number",
+          "description": "The internal structure in combat, after the game's vehicle multiplier.",
+          "format": "float"
+        },
+        "components": {
+          "type": "array",
+          "description": "The components mounted, in the game's order.",
+          "items": {
+            "$ref": "#/definitions/ComponentReference"
+          }
+        }
+      }
+    },
+    "ComponentDefinitions": {
+      "type": "object",
+      "description": "The catalog's component definitions, which every export file's references point to, grouped by type and keyed by component id. A reference whose definition the game can't find has no entry; its id stands in for its name.",
+      "additionalProperties": false,
+      "required": [
+        "weapons",
+        "ammunitionBoxes",
+        "heatSinks",
+        "jumpJets",
+        "upgrades"
+      ],
+      "properties": {
+        "weapons": {
+          "type": "object",
+          "description": "The weapons, keyed by component id, without the game's internal melee, jump attack and AI weapons, which no unit mounts.",
+          "additionalProperties": {
+            "$ref": "#/definitions/WeaponDefinition"
+          }
+        },
+        "ammunitionBoxes": {
+          "type": "object",
+          "description": "The ammunition boxes, keyed by component id.",
+          "additionalProperties": {
+            "$ref": "#/definitions/AmmunitionBoxDefinition"
+          }
+        },
+        "heatSinks": {
+          "type": "object",
+          "description": "The heat sinks, keyed by component id.",
+          "additionalProperties": {
+            "$ref": "#/definitions/HeatSinkDefinition"
+          }
+        },
+        "jumpJets": {
+          "type": "object",
+          "description": "The jump jets, keyed by component id.",
+          "additionalProperties": {
+            "$ref": "#/definitions/JumpJetDefinition"
+          }
+        },
+        "upgrades": {
+          "type": "object",
+          "description": "The upgrades, e.g. actuators, cockpit mods and gyros, keyed by component id; they have only the common fields.",
+          "additionalProperties": {
+            "$ref": "#/definitions/ComponentDefinition"
+          }
+        }
+      }
+    },
+    "WeaponDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "tonnage",
+        "slots",
+        "cost",
+        "bonuses",
+        "effects",
+        "isSalvageable",
+        "category",
+        "ammoCategory",
+        "internalAmmoCapacity",
+        "damage",
+        "instability",
+        "shotsWhenFired",
+        "projectilesPerShot",
+        "heatDamage",
+        "heatGenerated",
+        "ranges",
+        "accuracyModifier",
+        "criticalChanceMultiplier",
+        "refireModifier",
+        "isIndirectFireCapable"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name the mech lab shows, as in the references to the component."
+        },
+        "tonnage": {
+          "type": "number",
+          "description": "The component's weight in tons.",
+          "format": "float"
+        },
+        "slots": {
+          "type": "integer",
+          "description": "The slots the component takes up in the location it's mounted in.",
+          "format": "int32"
+        },
+        "cost": {
+          "type": "integer",
+          "description": "The C-Bill value of the component.",
+          "format": "int32"
+        },
+        "bonuses": {
+          "type": "array",
+          "description": "The short bonus texts shown on the component, e.g. \"+ 5 Dmg.\".",
+          "items": {
+            "type": "string"
+          }
+        },
+        "effects": {
+          "type": "array",
+          "description": "The statistics the component changes while mounted.",
+          "items": {
+            "$ref": "#/definitions/StatisticChange"
+          }
+        },
+        "isSalvageable": {
+          "type": "boolean",
+          "description": "Whether the component can come as salvage; the game's BLACKLISTED tag rules it out. Nothing else follows from it, e.g. about stores."
+        },
+        "category": {
+          "type": "string",
+          "description": "The hardpoint kind the weapon needs, e.g. \"Ballistic\" or \"Support\"."
+        },
+        "ammoCategory": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "The ammo the weapon fires, as ammoCategory names it; null when it needs none."
+        },
+        "internalAmmoCapacity": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The shots a weapon that carries its own ammo instead of using ammo boxes, like a flamer, has per mission; null for every other weapon.",
+          "format": "int32"
+        },
+        "damage": {
+          "type": "number",
+          "description": "The damage of one shot.",
+          "format": "float"
+        },
+        "instability": {
+          "type": "number",
+          "description": "The stability damage of one shot.",
+          "format": "float"
+        },
+        "shotsWhenFired": {
+          "type": "integer",
+          "description": "The shots fired per attack.",
+          "format": "int32"
+        },
+        "projectilesPerShot": {
+          "type": "integer",
+          "description": "The projectiles the attack's animation shows per shot; only the visuals use it, each shot hits or misses whole.",
+          "format": "int32"
+        },
+        "heatDamage": {
+          "type": "number",
+          "description": "The heat the target takes per shot.",
+          "format": "float"
+        },
+        "heatGenerated": {
+          "type": "integer",
+          "description": "The heat the mech takes per attack.",
+          "format": "int32"
+        },
+        "ranges": {
+          "description": "The range brackets, which decide the to-hit modifier by the target's distance.",
+          "$ref": "#/definitions/WeaponRanges"
+        },
+        "accuracyModifier": {
+          "type": "number",
+          "description": "The weapon's own to-hit modifier, which the hit chance adds to the others.",
+          "format": "float"
+        },
+        "criticalChanceMultiplier": {
+          "type": "number",
+          "description": "Multiplies the chance of the weapon's hits to cause a critical hit; 1 leaves it unchanged.",
+          "format": "float"
+        },
+        "refireModifier": {
+          "type": "integer",
+          "description": "The accuracy penalty for firing again in the next round.",
+          "format": "int32"
+        },
+        "isIndirectFireCapable": {
+          "type": "boolean",
+          "description": "Whether the weapon can fire at targets out of line of sight."
+        }
+      }
+    },
+    "StatisticChange": {
+      "type": "object",
+      "description": "A change an ability or a component makes to a statistic of the unit, its pilot or its components.",
+      "additionalProperties": false,
+      "required": [
+        "statistic",
+        "operation",
+        "value",
+        "appliesTo",
+        "duration",
+        "target",
+        "trigger"
+      ],
+      "properties": {
+        "statistic": {
+          "type": "string",
+          "description": "The statistic's name, as the game names it."
+        },
+        "operation": {
+          "description": "How value changes the statistic, e.g. Set, Int_Add.",
+          "$ref": "#/definitions/StatOperation"
+        },
+        "value": {
+          "description": "A boolean, integer or number, as the statistic's type requires. Changes to the initiative statistics (BaseInitiative, PhaseModifier, PhaseModifierSelf) are as the HUD numbers phases, so a positive change makes the unit act earlier."
+        },
+        "appliesTo": {
+          "description": "The pilot or the components whose statistic changes; null for the unit's own.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/EffectTargetCollection"
+            }
+          ]
+        },
+        "duration": {
+          "description": "How long the change lasts; null when it lasts for the whole mission.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/EffectDuration"
+            }
+          ]
+        },
+        "target": {
+          "description": "Whose statistic changes: the unit with the ability or component (Creator) or the unit it targets.",
+          "$ref": "#/definitions/EffectTargetType"
+        },
+        "trigger": {
+          "description": "When the change is made, e.g. on the ability's activation, on a hit or always (Passive).",
+          "$ref": "#/definitions/EffectTriggerType"
+        }
+      }
+    },
+    "StatOperation": {
+      "type": "string",
+      "x-enumNames": [
+        "Set",
+        "Int_Add",
+        "Int_Subtract",
+        "Int_Multiply",
+        "Int_Divide",
+        "Int_Divide_Denom",
+        "Int_Mod",
+        "Int_Multiply_Float",
+        "Int_Divide_Float",
+        "Int_Divide_Denom_Float",
+        "Float_Add",
+        "Float_Subtract",
+        "Float_Multiply",
+        "Float_Divide",
+        "Float_Divide_Denom",
+        "Float_Multiply_Int",
+        "Float_Divide_Int",
+        "Float_Divide_Denom_Int",
+        "String_Append",
+        "String_Prepend",
+        "Bitflag_SetBit",
+        "Bitflag_FlipBit",
+        "Bitflag_Combine"
+      ],
+      "enum": [
+        "Set",
+        "Int_Add",
+        "Int_Subtract",
+        "Int_Multiply",
+        "Int_Divide",
+        "Int_Divide_Denom",
+        "Int_Mod",
+        "Int_Multiply_Float",
+        "Int_Divide_Float",
+        "Int_Divide_Denom_Float",
+        "Float_Add",
+        "Float_Subtract",
+        "Float_Multiply",
+        "Float_Divide",
+        "Float_Divide_Denom",
+        "Float_Multiply_Int",
+        "Float_Divide_Int",
+        "Float_Divide_Denom_Int",
+        "String_Append",
+        "String_Prepend",
+        "Bitflag_SetBit",
+        "Bitflag_FlipBit",
+        "Bitflag_Combine"
+      ]
+    },
+    "EffectTargetCollection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "collection",
+        "weaponSubType",
+        "weaponType",
+        "weaponCategory",
+        "ammoCategory"
+      ],
+      "properties": {
+        "collection": {
+          "description": "The pilot, the weapons, the ammunition boxes, one random working weapon or the strongest working weapon.",
+          "$ref": "#/definitions/TargetCollection"
+        },
+        "weaponSubType": {
+          "description": "Only weapons of this sub type; null when not filtered by it.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/WeaponSubType"
+            }
+          ]
+        },
+        "weaponType": {
+          "description": "Only weapons of this type; null when not filtered by it.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/WeaponType"
+            }
+          ]
+        },
+        "weaponCategory": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "The weapon category, as the catalog's weapons name theirs."
+        },
+        "ammoCategory": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "The ammunition category, as the catalog's ammunition boxes name theirs."
+        }
+      }
+    },
+    "TargetCollection": {
+      "type": "string",
+      "x-enumNames": [
+        "NotSet",
+        "Pilot",
+        "Weapon",
+        "AmmoBox",
+        "SingleRandomWeapon",
+        "StrongestWeapon"
+      ],
+      "enum": [
+        "NotSet",
+        "Pilot",
+        "Weapon",
+        "AmmoBox",
+        "SingleRandomWeapon",
+        "StrongestWeapon"
+      ]
+    },
+    "WeaponSubType": {
+      "type": "string",
+      "x-enumNames": [
+        "NotSet",
+        "AC2",
+        "AC5",
+        "AC10",
+        "AC20",
+        "Gauss",
+        "SmallLaser",
+        "MediumLaser",
+        "LargeLaser",
+        "PPC",
+        "LRM5",
+        "LRM10",
+        "LRM15",
+        "LRM20",
+        "SRM2",
+        "SRM4",
+        "SRM6",
+        "Flamer",
+        "MachineGun",
+        "Melee",
+        "AMS",
+        "DFA",
+        "AIImaginary",
+        "SmallLaserPulse",
+        "MediumLaserPulse",
+        "LargeLaserPulse",
+        "SmallLaserER",
+        "MediumLaserER",
+        "LargeLaserER",
+        "PPCER",
+        "UAC2",
+        "UAC5",
+        "UAC10",
+        "UAC20",
+        "LB2X",
+        "LB5X",
+        "LB10X",
+        "LB20X",
+        "SRMInferno",
+        "Narc",
+        "PPCSnub",
+        "TAG",
+        "COILS",
+        "COILM",
+        "COILL"
+      ],
+      "enum": [
+        "NotSet",
+        "AC2",
+        "AC5",
+        "AC10",
+        "AC20",
+        "Gauss",
+        "SmallLaser",
+        "MediumLaser",
+        "LargeLaser",
+        "PPC",
+        "LRM5",
+        "LRM10",
+        "LRM15",
+        "LRM20",
+        "SRM2",
+        "SRM4",
+        "SRM6",
+        "Flamer",
+        "MachineGun",
+        "Melee",
+        "AMS",
+        "DFA",
+        "AIImaginary",
+        "SmallLaserPulse",
+        "MediumLaserPulse",
+        "LargeLaserPulse",
+        "SmallLaserER",
+        "MediumLaserER",
+        "LargeLaserER",
+        "PPCER",
+        "UAC2",
+        "UAC5",
+        "UAC10",
+        "UAC20",
+        "LB2X",
+        "LB5X",
+        "LB10X",
+        "LB20X",
+        "SRMInferno",
+        "Narc",
+        "PPCSnub",
+        "TAG",
+        "COILS",
+        "COILM",
+        "COILL"
+      ]
+    },
+    "WeaponType": {
+      "type": "string",
+      "x-enumNames": [
+        "NotSet",
+        "Autocannon",
+        "Gauss",
+        "Laser",
+        "PPC",
+        "LRM",
+        "SRM",
+        "Flamer",
+        "MachineGun",
+        "Melee",
+        "AMS",
+        "COIL"
+      ],
+      "enum": [
+        "NotSet",
+        "Autocannon",
+        "Gauss",
+        "Laser",
+        "PPC",
+        "LRM",
+        "SRM",
+        "Flamer",
+        "MachineGun",
+        "Melee",
+        "AMS",
+        "COIL"
+      ]
+    },
+    "EffectDuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "count",
+        "unit"
+      ],
+      "properties": {
+        "count": {
+          "type": "integer",
+          "description": "How many of unit the change lasts, at least 1.",
+          "format": "int32"
+        },
+        "unit": {
+          "description": "What the duration counts.",
+          "$ref": "#/definitions/EffectDurationUnit"
+        }
+      }
+    },
+    "EffectDurationUnit": {
+      "type": "string",
+      "description": "What an effect's duration counts, as Effect picks its ETimer.",
+      "x-enumNames": [
+        "Activations",
+        "TargetActivations",
+        "Rounds",
+        "Movements",
+        "Phases"
+      ],
+      "enum": [
+        "activations",
+        "targetActivations",
+        "rounds",
+        "movements",
+        "phases"
+      ]
+    },
+    "EffectTargetType": {
+      "type": "string",
+      "x-enumNames": [
+        "NotSet",
+        "Creator",
+        "SingleTarget",
+        "LanceMatesWithinRange",
+        "AlliesWithinRange",
+        "EnemiesWithinRange",
+        "AllLanceMates",
+        "AllAllies",
+        "AllEnemies"
+      ],
+      "enum": [
+        "NotSet",
+        "Creator",
+        "SingleTarget",
+        "LanceMatesWithinRange",
+        "AlliesWithinRange",
+        "EnemiesWithinRange",
+        "AllLanceMates",
+        "AllAllies",
+        "AllEnemies"
+      ]
+    },
+    "EffectTriggerType": {
+      "type": "string",
+      "x-enumNames": [
+        "Passive",
+        "OnActivation",
+        "OnHit",
+        "OnDamaged",
+        "OnWeaponFire",
+        "OnUnitActivationBegin",
+        "OnUnitActivationEnd",
+        "OnUnitActivationBeginOrEnd",
+        "TurnUpdate",
+        "Preview"
+      ],
+      "enum": [
+        "Passive",
+        "OnActivation",
+        "OnHit",
+        "OnDamaged",
+        "OnWeaponFire",
+        "OnUnitActivationBegin",
+        "OnUnitActivationEnd",
+        "OnUnitActivationBeginOrEnd",
+        "TurnUpdate",
+        "Preview"
+      ]
+    },
+    "WeaponRanges": {
+      "type": "object",
+      "description": "The range brackets in meters: the weapon is less accurate below short range and beyond long range.",
+      "additionalProperties": false,
+      "required": [
+        "min",
+        "short",
+        "medium",
+        "long",
+        "max"
+      ],
+      "properties": {
+        "min": {
+          "type": "number",
+          "description": "Below it the weapon can't fire.",
+          "format": "float"
+        },
+        "short": {
+          "type": "number",
+          "description": "The end of the short bracket, from min, where rules.json's short applies.",
+          "format": "float"
+        },
+        "medium": {
+          "type": "number",
+          "description": "The end of the medium bracket, from short, where rules.json's medium applies.",
+          "format": "float"
+        },
+        "long": {
+          "type": "number",
+          "description": "The end of the long bracket, from medium, where rules.json's long applies.",
+          "format": "float"
+        },
+        "max": {
+          "type": "number",
+          "description": "The end of the maximum bracket, from long, where rules.json's maximum applies; the weapon can't fire beyond it.",
+          "format": "float"
+        }
+      }
+    },
+    "AmmunitionBoxDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "tonnage",
+        "slots",
+        "cost",
+        "bonuses",
+        "effects",
+        "isSalvageable",
+        "ammoCategory",
+        "capacity"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name the mech lab shows, as in the references to the component."
+        },
+        "tonnage": {
+          "type": "number",
+          "description": "The component's weight in tons.",
+          "format": "float"
+        },
+        "slots": {
+          "type": "integer",
+          "description": "The slots the component takes up in the location it's mounted in.",
+          "format": "int32"
+        },
+        "cost": {
+          "type": "integer",
+          "description": "The C-Bill value of the component.",
+          "format": "int32"
+        },
+        "bonuses": {
+          "type": "array",
+          "description": "The short bonus texts shown on the component, e.g. \"+ 5 Dmg.\".",
+          "items": {
+            "type": "string"
+          }
+        },
+        "effects": {
+          "type": "array",
+          "description": "The statistics the component changes while mounted.",
+          "items": {
+            "$ref": "#/definitions/StatisticChange"
+          }
+        },
+        "isSalvageable": {
+          "type": "boolean",
+          "description": "Whether the component can come as salvage; the game's BLACKLISTED tag rules it out. Nothing else follows from it, e.g. about stores."
+        },
+        "ammoCategory": {
+          "type": "string",
+          "description": "The weapons the ammo fits, e.g. \"AC/5\"."
+        },
+        "capacity": {
+          "type": "integer",
+          "description": "The shots in the box; it is full at the start of every mission.",
+          "format": "int32"
+        }
+      }
+    },
+    "HeatSinkDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "tonnage",
+        "slots",
+        "cost",
+        "bonuses",
+        "effects",
+        "isSalvageable",
+        "dissipation"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name the mech lab shows, as in the references to the component."
+        },
+        "tonnage": {
+          "type": "number",
+          "description": "The component's weight in tons.",
+          "format": "float"
+        },
+        "slots": {
+          "type": "integer",
+          "description": "The slots the component takes up in the location it's mounted in.",
+          "format": "int32"
+        },
+        "cost": {
+          "type": "integer",
+          "description": "The C-Bill value of the component.",
+          "format": "int32"
+        },
+        "bonuses": {
+          "type": "array",
+          "description": "The short bonus texts shown on the component, e.g. \"+ 5 Dmg.\".",
+          "items": {
+            "type": "string"
+          }
+        },
+        "effects": {
+          "type": "array",
+          "description": "The statistics the component changes while mounted.",
+          "items": {
+            "$ref": "#/definitions/StatisticChange"
+          }
+        },
+        "isSalvageable": {
+          "type": "boolean",
+          "description": "Whether the component can come as salvage; the game's BLACKLISTED tag rules it out. Nothing else follows from it, e.g. about stores."
+        },
+        "dissipation": {
+          "type": "number",
+          "description": "The heat the heat sink removes per round.",
+          "format": "float"
+        }
+      }
+    },
+    "JumpJetDefinition": {
+      "type": "object",
+      "description": "A jump jet, which only mechs whose chassis tonnage is within its range can mount.",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "tonnage",
+        "slots",
+        "cost",
+        "bonuses",
+        "effects",
+        "isSalvageable",
+        "minTonnage",
+        "maxTonnage"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name the mech lab shows, as in the references to the component."
+        },
+        "tonnage": {
+          "type": "number",
+          "description": "The component's weight in tons.",
+          "format": "float"
+        },
+        "slots": {
+          "type": "integer",
+          "description": "The slots the component takes up in the location it's mounted in.",
+          "format": "int32"
+        },
+        "cost": {
+          "type": "integer",
+          "description": "The C-Bill value of the component.",
+          "format": "int32"
+        },
+        "bonuses": {
+          "type": "array",
+          "description": "The short bonus texts shown on the component, e.g. \"+ 5 Dmg.\".",
+          "items": {
+            "type": "string"
+          }
+        },
+        "effects": {
+          "type": "array",
+          "description": "The statistics the component changes while mounted.",
+          "items": {
+            "$ref": "#/definitions/StatisticChange"
+          }
+        },
+        "isSalvageable": {
+          "type": "boolean",
+          "description": "Whether the component can come as salvage; the game's BLACKLISTED tag rules it out. Nothing else follows from it, e.g. about stores."
+        },
+        "minTonnage": {
+          "type": "number",
+          "description": "The lowest chassis tonnage that can mount the jump jet, inclusive.",
+          "format": "float"
+        },
+        "maxTonnage": {
+          "type": "number",
+          "description": "The highest chassis tonnage that can mount the jump jet, inclusive.",
+          "format": "float"
+        }
+      }
+    },
+    "ComponentDefinition": {
+      "type": "object",
+      "description": "The fields every component definition has; the definitions of types with stats of their own derive from it. Upgrades have no others.",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "tonnage",
+        "slots",
+        "cost",
+        "bonuses",
+        "effects",
+        "isSalvageable"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name the mech lab shows, as in the references to the component."
+        },
+        "tonnage": {
+          "type": "number",
+          "description": "The component's weight in tons.",
+          "format": "float"
+        },
+        "slots": {
+          "type": "integer",
+          "description": "The slots the component takes up in the location it's mounted in.",
+          "format": "int32"
+        },
+        "cost": {
+          "type": "integer",
+          "description": "The C-Bill value of the component.",
+          "format": "int32"
+        },
+        "bonuses": {
+          "type": "array",
+          "description": "The short bonus texts shown on the component, e.g. \"+ 5 Dmg.\".",
+          "items": {
+            "type": "string"
+          }
+        },
+        "effects": {
+          "type": "array",
+          "description": "The statistics the component changes while mounted.",
+          "items": {
+            "$ref": "#/definitions/StatisticChange"
+          }
+        },
+        "isSalvageable": {
+          "type": "boolean",
+          "description": "Whether the component can come as salvage; the game's BLACKLISTED tag rules it out. Nothing else follows from it, e.g. about stores."
+        }
+      }
+    },
+    "TerrainDefinition": {
+      "type": "object",
+      "description": "A terrain's effects on the units in it: forest, water, rough ground, roads and the like. A cell has one terrain at most, so the effects never stack; the map's biome applies on top (see BiomeDefinition).",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "moveCost",
+        "sprintMultiplier",
+        "visibilityMultiplier",
+        "visibilityHeight",
+        "sensorRangeMultiplier",
+        "signatureMultiplier",
+        "rangedTargetability",
+        "meleeTargetability",
+        "toHitFrom",
+        "grantsGuarded",
+        "heatSinkMultiplier",
+        "heatPerTurn",
+        "damageDealt",
+        "damageTaken",
+        "stickyEffects"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "As the combat HUD shows it."
+        },
+        "moveCost": {
+          "description": "What a step into the terrain costs of the unit's movement, per meter of the step: open ground costs 1.05; null where the unit can't enter.",
+          "$ref": "#/definitions/TerrainMoveCosts"
+        },
+        "sprintMultiplier": {
+          "type": "number",
+          "description": "Multiplies the move cost when sprinting.",
+          "format": "float"
+        },
+        "visibilityMultiplier": {
+          "type": "number",
+          "description": "Multiplies the spotting distance a sight line uses up while it passes through the terrain below visibilityHeight.",
+          "format": "float"
+        },
+        "visibilityHeight": {
+          "type": "number",
+          "description": "In meters above the ground.",
+          "format": "float"
+        },
+        "sensorRangeMultiplier": {
+          "type": "number",
+          "description": "Multiplies the sensor range of a unit in the terrain.",
+          "format": "float"
+        },
+        "signatureMultiplier": {
+          "type": "number",
+          "description": "Multiplies the signature of a unit in the terrain.",
+          "format": "float"
+        },
+        "rangedTargetability": {
+          "type": "number",
+          "description": "The to-hit modifier of ranged attacks against a unit in the terrain.",
+          "format": "float"
+        },
+        "meleeTargetability": {
+          "type": "number",
+          "description": "The to-hit modifier of melee attacks against a unit in the terrain.",
+          "format": "float"
+        },
+        "toHitFrom": {
+          "type": "number",
+          "description": "The to-hit modifier of ranged attacks by a unit in the terrain.",
+          "format": "float"
+        },
+        "grantsGuarded": {
+          "type": "boolean",
+          "description": "Whether a unit in the terrain has a guard level from cover."
+        },
+        "heatSinkMultiplier": {
+          "type": "number",
+          "description": "Multiplies the heat sink capacity of a mech in the terrain.",
+          "format": "float"
+        },
+        "heatPerTurn": {
+          "type": "integer",
+          "description": "Added to a mech's heat at the end of its activation in the terrain.",
+          "format": "int32"
+        },
+        "damageDealt": {
+          "description": "Multiplies the damage of a unit firing from the terrain, by weapon category.",
+          "$ref": "#/definitions/DamageMultipliers"
+        },
+        "damageTaken": {
+          "description": "Multiplies the damage a unit in the terrain takes, by weapon category.",
+          "$ref": "#/definitions/DamageMultipliers"
+        },
+        "stickyEffects": {
+          "type": "array",
+          "description": "What a unit gets when it enters, crosses or starts its activation in the terrain.",
+          "items": {
+            "$ref": "#/definitions/StatisticChange"
+          }
+        }
+      }
+    },
+    "TerrainMoveCosts": {
+      "type": "object",
+      "description": "By the unit: a mech, a tracked vehicle or a wheeled vehicle, and its weight class.",
+      "additionalProperties": false,
+      "required": [
+        "mech",
+        "tracked",
+        "wheeled"
+      ],
+      "properties": {
+        "mech": {
+          "description": "For mechs, by their weight class.",
+          "$ref": "#/definitions/ByWeightClassOfNullableSingle"
+        },
+        "tracked": {
+          "description": "For tracked vehicles, by their weight class.",
+          "$ref": "#/definitions/ByWeightClassOfNullableSingle"
+        },
+        "wheeled": {
+          "description": "For wheeled vehicles, by their weight class.",
+          "$ref": "#/definitions/ByWeightClassOfNullableSingle"
+        }
+      }
+    },
+    "ByWeightClassOfNullableSingle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "light",
+        "medium",
+        "heavy",
+        "assault"
+      ],
+      "properties": {
+        "light": {
+          "type": [
+            "null",
+            "number"
+          ],
+          "description": "The value for light units.",
+          "format": "float"
+        },
+        "medium": {
+          "type": [
+            "null",
+            "number"
+          ],
+          "description": "The value for medium units.",
+          "format": "float"
+        },
+        "heavy": {
+          "type": [
+            "null",
+            "number"
+          ],
+          "description": "The value for heavy units.",
+          "format": "float"
+        },
+        "assault": {
+          "type": [
+            "null",
+            "number"
+          ],
+          "description": "The value for assault units.",
+          "format": "float"
+        }
+      }
+    },
+    "DamageMultipliers": {
+      "type": "object",
+      "description": "all and the weapon category's multiplier both apply; melee has no category.",
+      "additionalProperties": false,
+      "required": [
+        "all",
+        "support",
+        "energy",
+        "ballistic",
+        "missile"
+      ],
+      "properties": {
+        "all": {
+          "type": "number",
+          "description": "For every attack.",
+          "format": "float"
+        },
+        "support": {
+          "type": "number",
+          "description": "For weapons of the Support category.",
+          "format": "float"
+        },
+        "energy": {
+          "type": "number",
+          "description": "For weapons of the Energy category.",
+          "format": "float"
+        },
+        "ballistic": {
+          "type": "number",
+          "description": "For weapons of the Ballistic category.",
+          "format": "float"
+        },
+        "missile": {
+          "type": "number",
+          "description": "For weapons of the Missile category.",
+          "format": "float"
+        }
+      }
+    },
+    "BiomeDefinition": {
+      "type": "object",
+      "description": "A biome's effects on every unit on its maps, on top of the terrain's (see TerrainDefinition); the game reads nothing else from a biome.",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "heatSinkMultiplier",
+        "heatPerTurn",
+        "damageDealt"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "As in the references to the biome."
+        },
+        "heatSinkMultiplier": {
+          "type": "number",
+          "description": "Multiplies every mech's heat sink capacity.",
+          "format": "float"
+        },
+        "heatPerTurn": {
+          "type": "integer",
+          "description": "Added to every mech's heat at the end of its activation.",
+          "format": "int32"
+        },
+        "damageDealt": {
+          "description": "Multiplies every unit's weapon damage, by weapon category.",
+          "$ref": "#/definitions/DamageMultipliers"
+        }
+      }
+    },
+    "MapDefinition": {
+      "type": "object",
+      "description": "A combat map, the star systems whose contracts can be fought on it and the terrain it is made of. The contract generator draws a star system's map among the maps that list the system, by weight.",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "biome",
+        "tags",
+        "starSystems",
+        "weight",
+        "terrainCoverage"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The map's friendly name."
+        },
+        "biome": {
+          "description": "The map's biome, as the star systems refer to it.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "tags": {
+          "type": "array",
+          "description": "The map tags the star systems' required and excluded map tags select the map by.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "starSystems": {
+          "type": "array",
+          "description": "The star systems whose contracts can be fought on the map, as the contract generator selects them from the system's biomes and map tags.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
+          }
+        },
+        "weight": {
+          "type": "integer",
+          "description": "The contract generator's draw weight among a star system's maps.",
+          "format": "int32"
+        },
+        "terrainCoverage": {
+          "type": "object",
+          "description": "Each terrain's share of the map's playable cells, keyed by terrain id, plus none for the cells with no terrain (bare biome). Cells are all the same size, so a share is an area share; the shares sum to 1.",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      }
+    },
+    "StarSystemDefinition": {
+      "type": "object",
+      "description": "A star system definition. The story swaps some star systems' definitions (e.g. to change their owner), so a star system can have several; star-systems.json keys each star system by its active one.",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "owner",
+        "tags",
+        "biomes"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name, as in the references to the star system."
+        },
+        "owner": {
+          "description": "The faction that owns the star system in this definition.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "tags": {
+          "type": "array",
+          "description": "The star system's tags, as its starmap panel shows them.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
+          }
+        },
+        "biomes": {
+          "type": "array",
+          "description": "The biomes the star system's missions can be on.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
+          }
+        }
+      }
+    }
+  }
+}

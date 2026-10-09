@@ -1,0 +1,807 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "MissionOutcome",
+  "type": "object",
+  "description": "The root of mission-outcome.json: the latest mission as it ended, written again once its salvage is final.",
+  "additionalProperties": false,
+  "required": [
+    "modVersion",
+    "exportedAt",
+    "trigger",
+    "contract",
+    "state",
+    "isGoodFaithEffort",
+    "rounds",
+    "objectives",
+    "payment",
+    "reputation",
+    "mercenaryReviewBoardReputation",
+    "experiencePerPilot",
+    "lance",
+    "salvage"
+  ],
+  "properties": {
+    "modVersion": {
+      "type": "string",
+      "description": "The four-part version of the mod that wrote the file; the other files match the catalog written by the same version."
+    },
+    "exportedAt": {
+      "type": "string",
+      "description": "When the file was last changed.",
+      "format": "date-time"
+    },
+    "trigger": {
+      "description": "What caused the export that last changed the file.",
+      "$ref": "#/definitions/ExportTrigger"
+    },
+    "contract": {
+      "description": "The contract the mission was for.",
+      "$ref": "#/definitions/MissionContract"
+    },
+    "state": {
+      "description": "Whether the contract was completed, retreated from or failed.",
+      "$ref": "#/definitions/ContractState"
+    },
+    "isGoodFaithEffort": {
+      "type": "boolean",
+      "description": "Whether a retreated or failed contract still counts as a good faith effort, which softens its penalties."
+    },
+    "rounds": {
+      "type": "integer",
+      "description": "The combat rounds the mission took, counted from 1.",
+      "format": "int32"
+    },
+    "objectives": {
+      "type": "array",
+      "description": "The objectives as the after-action report lists them.",
+      "items": {
+        "$ref": "#/definitions/ObjectiveResult"
+      }
+    },
+    "payment": {
+      "type": "integer",
+      "description": "The C-Bills paid, with the good faith modifier and the bonuses applied.",
+      "format": "int32"
+    },
+    "reputation": {
+      "description": "The final reputation changes with the employer and the target.",
+      "$ref": "#/definitions/ReputationChange"
+    },
+    "mercenaryReviewBoardReputation": {
+      "type": "integer",
+      "description": "The change of the Mercenary Review Board rating.",
+      "format": "int32"
+    },
+    "experiencePerPilot": {
+      "type": "integer",
+      "description": "The experience every pilot of lance gets.",
+      "format": "int32"
+    },
+    "lance": {
+      "type": "array",
+      "description": "The company's mechs and pilots on the mission, in lance order.",
+      "items": {
+        "$ref": "#/definitions/LanceUnitOutcome"
+      }
+    },
+    "salvage": {
+      "description": "The salvage offer, and what the company got once it is final.",
+      "$ref": "#/definitions/MissionSalvage"
+    }
+  },
+  "definitions": {
+    "ExportTrigger": {
+      "type": "string",
+      "description": "What caused an export.",
+      "x-enumNames": [
+        "CareerLoaded",
+        "ManualSave",
+        "Autosave",
+        "ContractCompleted",
+        "FinancialReportShown",
+        "MechLabOrderCompleted",
+        "PilotHealed",
+        "ShipUpgradeCompleted",
+        "ContractsGenerated",
+        "StoreClosed",
+        "MechBayChanged",
+        "ExperienceSpent",
+        "MechPlacementShown",
+        "MissionCompleted",
+        "SalvageChosen",
+        "ShipUpgradeStarted",
+        "PhaseStarted",
+        "CombatStarted",
+        "CombatLoaded",
+        "ActivationCompleted"
+      ],
+      "enum": [
+        "careerLoaded",
+        "manualSave",
+        "autosave",
+        "contractCompleted",
+        "financialReportShown",
+        "mechLabOrderCompleted",
+        "pilotHealed",
+        "shipUpgradeCompleted",
+        "contractsGenerated",
+        "storeClosed",
+        "mechBayChanged",
+        "experienceSpent",
+        "mechPlacementShown",
+        "missionCompleted",
+        "salvageChosen",
+        "shipUpgradeStarted",
+        "phaseStarted",
+        "combatStarted",
+        "combatLoaded",
+        "activationCompleted"
+      ]
+    },
+    "MissionContract": {
+      "type": "object",
+      "description": "The contract a mission was for.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "type",
+        "displayStyle",
+        "employer",
+        "target",
+        "difficulty",
+        "starSystem"
+      ],
+      "properties": {
+        "id": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "The contract's data file; null where the game keeps no reference to it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The contract's name, as the contract list shows it."
+        },
+        "type": {
+          "description": "The mission type, described in contractTypes.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "displayStyle": {
+          "description": "Whether it's a regular, story, restoration or flashpoint contract.",
+          "$ref": "#/definitions/ContractDisplayStyle"
+        },
+        "employer": {
+          "description": "The faction that hires the company.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "target": {
+          "description": "The faction the mission is fought against.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "difficulty": {
+          "type": "integer",
+          "description": "On the scale of maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
+          "format": "int32"
+        },
+        "starSystem": {
+          "description": "The star system the mission is fought in.",
+          "$ref": "#/definitions/DefinitionReference"
+        }
+      }
+    },
+    "DefinitionReference": {
+      "type": "object",
+      "description": "A game definition: its id from the game's data files and the name shown in the UI.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name the UI shows."
+        }
+      }
+    },
+    "ContractDisplayStyle": {
+      "type": "string",
+      "x-enumNames": [
+        "INVALID_UNSET",
+        "BaseCampaignNormal",
+        "BaseCampaignStory",
+        "BaseCampaignRestoration",
+        "BaseFlashpoint",
+        "HeavyMetalFlashpointCampaign"
+      ],
+      "enum": [
+        "INVALID_UNSET",
+        "BaseCampaignNormal",
+        "BaseCampaignStory",
+        "BaseCampaignRestoration",
+        "BaseFlashpoint",
+        "HeavyMetalFlashpointCampaign"
+      ]
+    },
+    "ContractState": {
+      "type": "string",
+      "x-enumNames": [
+        "Negotiable",
+        "Finalized",
+        "InProgress",
+        "Complete",
+        "Retreated",
+        "Failed"
+      ],
+      "enum": [
+        "Negotiable",
+        "Finalized",
+        "InProgress",
+        "Complete",
+        "Retreated",
+        "Failed"
+      ]
+    },
+    "ObjectiveResult": {
+      "type": "object",
+      "description": "An objective as the after-action report lists it.",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "isPrimary",
+        "status"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "The objective's title as plain text."
+        },
+        "isPrimary": {
+          "type": "boolean",
+          "description": "Whether the after-action report lists it as a primary objective."
+        },
+        "status": {
+          "description": "The objective's game status, e.g. Succeeded, Failed, or Active for one left unresolved.",
+          "$ref": "#/definitions/ObjectiveStatus"
+        }
+      }
+    },
+    "ObjectiveStatus": {
+      "type": "string",
+      "x-enumNames": [
+        "Active",
+        "Ignored",
+        "Succeeded",
+        "Failed",
+        "Hidden"
+      ],
+      "enum": [
+        "Active",
+        "Ignored",
+        "Succeeded",
+        "Failed",
+        "Hidden"
+      ]
+    },
+    "ReputationChange": {
+      "type": "object",
+      "description": "The reputation changes of a contract: of its success, as the negotiation shows them, or of a mission's outcome.",
+      "additionalProperties": false,
+      "required": [
+        "employer",
+        "target"
+      ],
+      "properties": {
+        "employer": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The change, usually a gain, with the employer; null when the employer doesn't gain reputation.",
+          "format": "int32"
+        },
+        "target": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The change, usually a loss, with the target; null when the target doesn't gain reputation.",
+          "format": "int32"
+        }
+      }
+    },
+    "LanceUnitOutcome": {
+      "type": "object",
+      "description": "A mech and its pilot after the mission.",
+      "additionalProperties": false,
+      "required": [
+        "pilot",
+        "injuries",
+        "health",
+        "isIncapacitated",
+        "isKilled",
+        "pilotReadyOnDay",
+        "mechKills",
+        "otherKills",
+        "mech",
+        "isMechLost",
+        "repair",
+        "damagedLocations",
+        "damagedComponents",
+        "ammunition"
+      ],
+      "properties": {
+        "pilot": {
+          "description": "The pilot who fought in the mech.",
+          "$ref": "#/definitions/PilotReference"
+        },
+        "injuries": {
+          "type": "integer",
+          "description": "The pilot's injuries, including those from before the mission.",
+          "format": "int32"
+        },
+        "health": {
+          "type": "integer",
+          "description": "The injuries the pilot can take before being incapacitated.",
+          "format": "int32"
+        },
+        "isIncapacitated": {
+          "type": "boolean",
+          "description": "Whether the pilot was incapacitated: injuries reached health, or a lethal injury such as the mech's head destroyed."
+        },
+        "isKilled": {
+          "type": "boolean",
+          "description": "Whether the pilot died; an incapacitated pilot may survive."
+        },
+        "pilotReadyOnDay": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The day the pilot is out of the med bay, as the barracks counts it once the contract is resolved; null for an uninjured or killed pilot.",
+          "format": "int32"
+        },
+        "mechKills": {
+          "type": "integer",
+          "description": "The enemy mechs the pilot destroyed in this mission.",
+          "format": "int32"
+        },
+        "otherKills": {
+          "type": "integer",
+          "description": "The other enemy units the pilot destroyed in this mission.",
+          "format": "int32"
+        },
+        "mech": {
+          "description": "The mech, as in the mech bay.",
+          "$ref": "#/definitions/MechReference"
+        },
+        "isMechLost": {
+          "type": "boolean",
+          "description": "Whether the mech was destroyed and not recovered; its surviving components are in automatic."
+        },
+        "repair": {
+          "description": "What repairing the mech's damage in the mech bay would take, as for a mech bay mech's repair; null without damage and for a lost mech.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/RepairEstimate"
+            }
+          ]
+        },
+        "damagedLocations": {
+          "type": "array",
+          "description": "The locations that lost armor or structure, from head to legs.",
+          "items": {
+            "$ref": "#/definitions/DamagedLocation"
+          }
+        },
+        "damagedComponents": {
+          "type": "array",
+          "description": "The components damaged or destroyed.",
+          "items": {
+            "$ref": "#/definitions/DamagedComponent"
+          }
+        },
+        "ammunition": {
+          "type": "array",
+          "description": "The shots fired from every ammo box and every weapon that carries its own ammo, in the mech's component order.",
+          "items": {
+            "$ref": "#/definitions/AmmunitionUse"
+          }
+        }
+      }
+    },
+    "PilotReference": {
+      "type": "object",
+      "description": "A pilot: their id, full name without callsign, and callsign.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "callsign"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name the UI shows."
+        },
+        "callsign": {
+          "type": "string",
+          "description": "The pilot's callsign, which isn't part of name."
+        }
+      }
+    },
+    "MechReference": {
+      "type": "object",
+      "description": "A mech in the mech bay: its own id, as in id, and its chassis name with the variant.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name the UI shows."
+        }
+      }
+    },
+    "RepairEstimate": {
+      "type": "object",
+      "description": "What the mech bay's Repair would take if ordered now, as its confirmation shows it.",
+      "additionalProperties": false,
+      "required": [
+        "days",
+        "cost"
+      ],
+      "properties": {
+        "days": {
+          "type": "integer",
+          "description": "The days the mech lab needs for the repair alone; it works on one order at a time, so an order queued behind others finishes later.",
+          "format": "int32"
+        },
+        "cost": {
+          "type": "integer",
+          "description": "The C-Bills the repair costs.",
+          "format": "int32"
+        }
+      }
+    },
+    "DamagedLocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "location",
+        "armor",
+        "rearArmor",
+        "structure"
+      ],
+      "properties": {
+        "location": {
+          "description": "The mech's body location.",
+          "$ref": "#/definitions/ChassisLocations"
+        },
+        "armor": {
+          "description": "The front armor, or the only armor outside the torso.",
+          "$ref": "#/definitions/Armor"
+        },
+        "rearArmor": {
+          "description": "null outside the torso, which alone has rear armor.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/Armor"
+            }
+          ]
+        },
+        "structure": {
+          "type": "number",
+          "description": "The structure left: below the chassis' when damaged, zero when destroyed.",
+          "format": "float"
+        }
+      }
+    },
+    "ChassisLocations": {
+      "type": "string",
+      "x-enumFlags": true,
+      "x-enumNames": [
+        "None",
+        "Head",
+        "LeftArm",
+        "LeftTorso",
+        "CenterTorso",
+        "RightTorso",
+        "Torso",
+        "RightArm",
+        "Arms",
+        "MainBody",
+        "LeftLeg",
+        "RightLeg",
+        "Legs",
+        "All"
+      ],
+      "enum": [
+        "None",
+        "Head",
+        "LeftArm",
+        "LeftTorso",
+        "CenterTorso",
+        "RightTorso",
+        "Torso",
+        "RightArm",
+        "Arms",
+        "MainBody",
+        "LeftLeg",
+        "RightLeg",
+        "Legs",
+        "All"
+      ]
+    },
+    "Armor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "current",
+        "assigned"
+      ],
+      "properties": {
+        "current": {
+          "type": "number",
+          "description": "What is left after combat damage; refilled to assigned after a mission unless the location was destroyed.",
+          "format": "float"
+        },
+        "assigned": {
+          "type": "number",
+          "description": "The armor fitted in the mech lab.",
+          "format": "float"
+        }
+      }
+    },
+    "DamagedComponent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "component",
+        "location",
+        "damageLevel"
+      ],
+      "properties": {
+        "component": {
+          "description": "The component, by the id its definition is keyed by.",
+          "$ref": "#/definitions/ComponentReference"
+        },
+        "location": {
+          "description": "The location it is mounted in.",
+          "$ref": "#/definitions/ChassisLocations"
+        },
+        "damageLevel": {
+          "description": "The game's damage level, e.g. Penalized or Destroyed.",
+          "$ref": "#/definitions/ComponentDamageLevel"
+        }
+      }
+    },
+    "ComponentReference": {
+      "type": "object",
+      "description": "A component's definition, like DefinitionReference, with the type that tells which group of componentDefinitions holds it. Components compare by type first, then as every reference.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "type"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name the UI shows."
+        },
+        "type": {
+          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in componentDefinitions.",
+          "$ref": "#/definitions/ComponentType"
+        }
+      }
+    },
+    "ComponentType": {
+      "type": "string",
+      "x-enumNames": [
+        "NotSet",
+        "Weapon",
+        "AmmunitionBox",
+        "HeatSink",
+        "JumpJet",
+        "Upgrade",
+        "Special",
+        "MechPart"
+      ],
+      "enum": [
+        "NotSet",
+        "Weapon",
+        "AmmunitionBox",
+        "HeatSink",
+        "JumpJet",
+        "Upgrade",
+        "Special",
+        "MechPart"
+      ]
+    },
+    "ComponentDamageLevel": {
+      "type": "string",
+      "x-enumNames": [
+        "Functional",
+        "Misaligned",
+        "Penalized",
+        "NonFunctional",
+        "Destroyed",
+        "Installing",
+        "InstallingNonFunctional"
+      ],
+      "enum": [
+        "Functional",
+        "Misaligned",
+        "Penalized",
+        "NonFunctional",
+        "Destroyed",
+        "Installing",
+        "InstallingNonFunctional"
+      ]
+    },
+    "AmmunitionUse": {
+      "type": "object",
+      "description": "The shots a mech fired from an ammo box, or from a weapon that carries its own ammo.",
+      "additionalProperties": false,
+      "required": [
+        "component",
+        "location",
+        "used"
+      ],
+      "properties": {
+        "component": {
+          "description": "The component, by the id its definition is keyed by.",
+          "$ref": "#/definitions/ComponentReference"
+        },
+        "location": {
+          "description": "The location the box or weapon is mounted in.",
+          "$ref": "#/definitions/ChassisLocations"
+        },
+        "used": {
+          "type": "integer",
+          "description": "The shots fired, also from a box destroyed since; the capacity is the catalog's capacity or internalAmmoCapacity.",
+          "format": "int32"
+        }
+      }
+    },
+    "MissionSalvage": {
+      "type": "object",
+      "description": "The salvage of the mission: the offer as the mission ended, and what the company got once it is final.",
+      "additionalProperties": false,
+      "required": [
+        "total",
+        "priority",
+        "pool",
+        "automatic",
+        "received"
+      ],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "description": "How many items of pool the company gets.",
+          "format": "int32"
+        },
+        "priority": {
+          "type": "integer",
+          "description": "How many of them the company picks itself; the rest are drawn at random from what is left.",
+          "format": "int32"
+        },
+        "pool": {
+          "description": "The items to choose from.",
+          "$ref": "#/definitions/SalvageItems"
+        },
+        "automatic": {
+          "description": "The surviving components of the company's own lost mechs, which it gets back on top of total.",
+          "$ref": "#/definitions/SalvageItems"
+        },
+        "received": {
+          "description": "Everything the company gets: the priority salvage, the salvage drawn at random and automatic; null until the salvage is final.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/SalvageItems"
+            }
+          ]
+        }
+      }
+    },
+    "SalvageItems": {
+      "type": "object",
+      "description": "Salvage items, counted like Storage, where they end up.",
+      "additionalProperties": false,
+      "required": [
+        "components",
+        "mechParts"
+      ],
+      "properties": {
+        "components": {
+          "type": "array",
+          "description": "Their damagedCount is 0: the game generates no damaged salvage.",
+          "items": {
+            "$ref": "#/definitions/StoredComponent"
+          }
+        },
+        "mechParts": {
+          "type": "array",
+          "description": "The mech parts, by the mech they assemble into.",
+          "items": {
+            "$ref": "#/definitions/StoredMechParts"
+          }
+        }
+      }
+    },
+    "StoredComponent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "component",
+        "count",
+        "damagedCount"
+      ],
+      "properties": {
+        "component": {
+          "description": "The component, by the id its definition is keyed by.",
+          "$ref": "#/definitions/ComponentReference"
+        },
+        "count": {
+          "type": "integer",
+          "description": "The working copies; the damaged ones are in damagedCount.",
+          "format": "int32"
+        },
+        "damagedCount": {
+          "type": "integer",
+          "description": "The damaged copies, which need a repair once mounted.",
+          "format": "int32"
+        }
+      }
+    },
+    "StoredMechParts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mech",
+        "count"
+      ],
+      "properties": {
+        "mech": {
+          "description": "The mech the parts assemble into, described in mechDefinitions.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "count": {
+          "type": "integer",
+          "description": "The parts kept.",
+          "format": "int32"
+        }
+      }
+    }
+  }
+}

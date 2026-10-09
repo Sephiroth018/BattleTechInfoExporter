@@ -9,12 +9,22 @@
     <!-- Avoids IgnoresAccessChecksToAttribute warnings from the publicized game assembly. -->
     <PublicizerRuntimeStrategies>Unsafe</PublicizerRuntimeStrategies>
     <ModDirectoryInGame>$(BattleTechGameDir)\Mods\$(MSBuildProjectName)\</ModDirectoryInGame>
+    <!-- The models' doc comments are the schemas' descriptions. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <SchemaGeneratorProject>$(MSBuildThisFileDirectory)..\BattleTechInfoExporter.SchemaGenerator\BattleTechInfoExporter.SchemaGenerator.csproj</SchemaGeneratorProject>
+    <!-- No trailing backslash, which would escape the closing quote of the generator's argument. -->
+    <SchemaDirectory>$(MSBuildThisFileDirectory)..\schemas</SchemaDirectory>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="HarmonyX" PrivateAssets="all" ExcludeAssets="runtime" />
     <PackageReference Include="Krafs.Publicizer" PrivateAssets="all" />
     <Publicize Include="Assembly-CSharp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Reads the serializer settings the files are written with. -->
+    <InternalsVisibleTo Include="BattleTechInfoExporter.SchemaGenerator" />
   </ItemGroup>
 
   <!-- The game provides these at runtime; they're never copied into the mod. -->
@@ -50,6 +60,31 @@
     </PropertyGroup>
   </Target>
 
+  <!--
+    The schemas are generated from this build's models on every build, so schemas/ always matches them, before
+    mod.json, the deployment and the zip, which ship them. Declared before WriteModJson, so they run first. The
+    generator's build inherits this build's configuration and references the mod this build wrote.
+  -->
+  <Target Name="BuildSchemaGenerator" AfterTargets="Build" Condition="'$(DesignTimeBuild)' != 'true'">
+    <!-- Without the solution's configuration, which turns the generator's build dependency on this project into a
+         project reference, a circular one from here. -->
+    <MSBuild Projects="$(SchemaGeneratorProject)" Targets="Build" Properties="ModAssemblyPath=$(TargetPath)"
+             RemoveProperties="CurrentSolutionConfigurationContents">
+      <Output TaskParameter="TargetOutputs" PropertyName="SchemaGeneratorPath" />
+    </MSBuild>
+  </Target>
+
+  <Target Name="GenerateSchemas" AfterTargets="BuildSchemaGenerator" Condition="'$(DesignTimeBuild)' != 'true'">
+    <Exec Command="dotnet &quot;$(SchemaGeneratorPath)&quot; &quot;$(BattleTechGameDir)&quot; &quot;$(SchemaDirectory)&quot;" />
+  </Target>
+
+  <!-- In a target, so a new export file's schema ships with the build that generates it. -->
+  <Target Name="AddSchemasToModFiles" AfterTargets="GenerateSchemas">
+    <ItemGroup>
+      <ModFile Include="$(SchemaDirectory)\*.schema.json" ModFolder="schemas\" />
+    </ItemGroup>
+  </Target>
+
   <!-- mod.json is generated so its metadata has a single source: the properties in Directory.Build.props. -->
   <Target Name="WriteModJson" AfterTargets="Build">
     <!-- Release only: a timestamp in every build would rewrite and redeploy mod.json each time. -->
@@ -74,7 +109,8 @@
 
   <!-- Opt-in, so a build in one worktree doesn't replace the mod the game is testing from another. -->
   <Target Name="DeployToGame" AfterTargets="WriteModJson" Condition="'$(DeployToGame)' == 'true'">
-    <Copy SourceFiles="@(ModFile)" DestinationFolder="$(ModDirectoryInGame)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(ModFile)" DestinationFiles="@(ModFile->'$(ModDirectoryInGame)%(ModFolder)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
   </Target>
 
   <!-- The release zip extracts into the game's Mods folder. -->
@@ -84,7 +120,8 @@
       <PackageStagingDir>$(IntermediateOutputPath)package\</PackageStagingDir>
     </PropertyGroup>
     <RemoveDir Directories="$(PackageStagingDir)" />
-    <Copy SourceFiles="@(ModFile)" DestinationFolder="$(PackageStagingDir)$(MSBuildProjectName)\" />
+    <Copy SourceFiles="@(ModFile)"
+          DestinationFiles="@(ModFile->'$(PackageStagingDir)$(MSBuildProjectName)\%(ModFolder)%(Filename)%(Extension)')" />
     <MakeDir Directories="$([System.IO.Path]::GetDirectoryName($(PackageFile)))" />
     <ZipDirectory SourceDirectory="$(PackageStagingDir)" DestinationFile="$(PackageFile)" Overwrite="true" />
     <Message Importance="high" Text="Packaged $(PackageFile)" />

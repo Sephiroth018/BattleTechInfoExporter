@@ -175,6 +175,12 @@ report's upkeep and spending levels, contract pay, reputation and experience by 
 and travel. Each mission type carries the multiplier of its contracts' pay. The reputation payment
 adjustments the game's tooltips show are left out: its pay never applies them.
 
+Every file has a JSON Schema (draft-04) in `Mods/BattleTechInfoExporter/schemas/`, e.g.
+`game-state.schema.json`, generated from the same models the mod writes the files from, so it
+always matches the mod version it ships with. It describes every property: its type, whether it can
+be `null`, the values of enums, and what it means. A property that holds one of several record
+shapes, such as a refit step, is any of them, without tying its `type` to a shape.
+
 ## Combat state
 
 Every unit has its faction, allegiance (player, ally, enemy or neutral), visibility, position in
@@ -329,10 +335,19 @@ assemblies the build references in place.
 
 2. Build:
 
-   - `dotnet build` builds the mod.
-   - `dotnet build -p:DeployToGame=true` also copies it into the game's
+   - `dotnet build` builds the mod and regenerates the schemas in `schemas/` with the schema
+     generator (`BattleTechInfoExporter.SchemaGenerator`), from the models and their doc comments.
+     It fails when an exported property has no description.
+   - `dotnet build -p:DeployToGame=true` also copies the mod and its schemas into the game's
      `Mods/BattleTechInfoExporter/` folder, to test it in the game.
-   - `dotnet build -c Release` also packages it as `artifacts/BattleTechInfoExporter-<version>.zip`.
+   - `dotnet build -c Release` also packages them as `artifacts/BattleTechInfoExporter-<version>.zip`.
+
+The schemas are committed, so a change to the export format shows in their diff. To check export
+files against them, e.g. the ones the game just wrote:
+
+```bash
+dotnet BattleTechInfoExporter.SchemaGenerator/bin/Debug/net9.0/BattleTechInfoExporter.SchemaGenerator.dll <game folder> --validate <game folder>/Mods/BattleTechInfoExporter/exports
+```
 
 The version is `Major.Minor.Patch.Build`. The first three parts are set in `Directory.Build.props`;
 the build number counts the commits since they last changed, so the commit that changes them is

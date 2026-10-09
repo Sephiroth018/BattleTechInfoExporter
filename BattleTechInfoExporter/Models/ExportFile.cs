@@ -19,10 +19,10 @@ internal abstract record ExportFile
     // Game enums keep the game's own values (e.g. IN_SYSTEM), which is what the UI shows; the mod's own enums are
     // camelCase. The first converter that can convert a type wins. Dictionary keys are game ids, kept as they are;
     // CamelCasePropertyNamesContractResolver would camel-case them too.
-    private static readonly NamingStrategy PropertyNaming = new CamelCaseNamingStrategy
+    internal static readonly NamingStrategy PropertyNaming = new CamelCaseNamingStrategy
         { ProcessDictionaryKeys = false };
 
-    private static readonly JsonSerializerSettings SerializerSettings = new()
+    internal static readonly JsonSerializerSettings SerializerSettings = new()
     {
         Formatting = Formatting.None,
         ContractResolver = new InheritedFirstContractResolver { NamingStrategy = PropertyNaming },
@@ -34,6 +34,10 @@ internal abstract record ExportFile
     // file is written once per session.
     private static readonly Dictionary<string, string> LastWrittenContents = new();
 
+    /// <summary>
+    ///     The four-part version of the mod that wrote the file; the other files match the catalog written by the same
+    ///     version.
+    /// </summary>
     public string ModVersion { get; private init; } = string.Empty;
 
     /// <summary>When the file was last changed.</summary>

@@ -127,3 +127,8 @@ dotnet_diagnostic.CA1852.severity = warning
 # Unused parameters and values.
 dotnet_diagnostic.IDE0060.severity = warning
 dotnet_diagnostic.IDE0059.severity = warning
+
+[BattleTechInfoExporter/Models/*.cs]
+# A derived record repeats its base's parameters, whose descriptions the base already has. The schema generator
+# checks instead that every exported property has a description, looking up the base records' too.
+dotnet_diagnostic.CS1573.severity = none

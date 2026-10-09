@@ -1,0 +1,3530 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Rules",
+  "type": "object",
+  "description": "The root of rules.json: how the game works for this career, level tables that values in GameState refer to.",
+  "additionalProperties": false,
+  "required": [
+    "modVersion",
+    "exportedAt",
+    "trigger",
+    "moraleLevels",
+    "reputationLevels",
+    "skills",
+    "spiritsLevels",
+    "mechPartsPerMech",
+    "contractTypes",
+    "jumpDistances",
+    "combat",
+    "campaign"
+  ],
+  "properties": {
+    "modVersion": {
+      "type": "string",
+      "description": "The four-part version of the mod that wrote the file; the other files match the catalog written by the same version."
+    },
+    "exportedAt": {
+      "type": "string",
+      "description": "When the file was last changed.",
+      "format": "date-time"
+    },
+    "trigger": {
+      "description": "What caused the export that last changed the file.",
+      "$ref": "#/definitions/ExportTrigger"
+    },
+    "moraleLevels": {
+      "type": "array",
+      "description": "The morale levels, which level refers to.",
+      "items": {
+        "$ref": "#/definitions/MoraleLevel"
+      }
+    },
+    "reputationLevels": {
+      "type": "array",
+      "description": "The reputation levels, which level refers to.",
+      "items": {
+        "$ref": "#/definitions/ReputationLevel"
+      }
+    },
+    "skills": {
+      "description": "The training table behind skills and abilities.",
+      "$ref": "#/definitions/SkillRules"
+    },
+    "spiritsLevels": {
+      "type": "array",
+      "description": "The effects of each spirits level, which level refers to.",
+      "items": {
+        "$ref": "#/definitions/SpiritsLevelCosts"
+      }
+    },
+    "mechPartsPerMech": {
+      "type": "integer",
+      "description": "The StoredMechParts needed to assemble a mech.",
+      "format": "int32"
+    },
+    "contractTypes": {
+      "type": "array",
+      "description": "The mission types, which type refers to.",
+      "items": {
+        "$ref": "#/definitions/ContractTypeDescription"
+      }
+    },
+    "jumpDistances": {
+      "type": "array",
+      "description": "The jump distance by number of working jump jets, from one up; the last entry applies to any higher number.",
+      "items": {
+        "$ref": "#/definitions/JumpDistance"
+      }
+    },
+    "combat": {
+      "description": "The combat rules behind to-hit, heat, stability, hit locations, visibility and resolve.",
+      "$ref": "#/definitions/CombatRules"
+    },
+    "campaign": {
+      "description": "The campaign rules behind the mech lab, med bay, hiring, salvage, finances, contracts and travel.",
+      "$ref": "#/definitions/CampaignRules"
+    }
+  },
+  "definitions": {
+    "ExportTrigger": {
+      "type": "string",
+      "description": "What caused an export.",
+      "x-enumNames": [
+        "CareerLoaded",
+        "ManualSave",
+        "Autosave",
+        "ContractCompleted",
+        "FinancialReportShown",
+        "MechLabOrderCompleted",
+        "PilotHealed",
+        "ShipUpgradeCompleted",
+        "ContractsGenerated",
+        "StoreClosed",
+        "MechBayChanged",
+        "ExperienceSpent",
+        "MechPlacementShown",
+        "MissionCompleted",
+        "SalvageChosen",
+        "ShipUpgradeStarted",
+        "PhaseStarted",
+        "CombatStarted",
+        "CombatLoaded",
+        "ActivationCompleted"
+      ],
+      "enum": [
+        "careerLoaded",
+        "manualSave",
+        "autosave",
+        "contractCompleted",
+        "financialReportShown",
+        "mechLabOrderCompleted",
+        "pilotHealed",
+        "shipUpgradeCompleted",
+        "contractsGenerated",
+        "storeClosed",
+        "mechBayChanged",
+        "experienceSpent",
+        "mechPlacementShown",
+        "missionCompleted",
+        "salvageChosen",
+        "shipUpgradeStarted",
+        "phaseStarted",
+        "combatStarted",
+        "combatLoaded",
+        "activationCompleted"
+      ]
+    },
+    "MoraleLevel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "startsAt",
+        "resolvePerTurn"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The level's name as the UI shows it, which level refers to."
+        },
+        "startsAt": {
+          "type": "integer",
+          "description": "The lowest company morale in the level.",
+          "format": "int32"
+        },
+        "resolvePerTurn": {
+          "type": "integer",
+          "description": "The morale level's share of the resolve gained per combat turn; the lance's own bonuses add to it.",
+          "format": "int32"
+        }
+      }
+    },
+    "ReputationLevel": {
+      "type": "object",
+      "description": "A faction reputation level and its effects.",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "startsAt",
+        "maxContractDifficulty",
+        "canUseSystemStore",
+        "storePriceChangePercent"
+      ],
+      "properties": {
+        "level": {
+          "description": "The level as the game names it, e.g. LIKED.",
+          "$ref": "#/definitions/SimGameReputation"
+        },
+        "startsAt": {
+          "type": "integer",
+          "description": "The lowest reputation value in the level.",
+          "format": "int32"
+        },
+        "maxContractDifficulty": {
+          "type": "integer",
+          "description": "The highest difficulty of the faction's contracts offered at this level, including the career's current global difficulty. Story, restoration and flashpoint contracts aren't limited.",
+          "format": "int32"
+        },
+        "canUseSystemStore": {
+          "type": "boolean",
+          "description": "Whether the system owner's store is open at this level."
+        },
+        "storePriceChangePercent": {
+          "type": "integer",
+          "description": "The change of store prices at this level with the store's faction (the system owner, or the pirates at the black market), as a percentage of an item's cost added to its price, as the UI shows it. It adds to the system's own discount.",
+          "format": "int32"
+        }
+      }
+    },
+    "SimGameReputation": {
+      "type": "string",
+      "x-enumNames": [
+        "INDIFFERENT",
+        "LIKED",
+        "FRIENDLY",
+        "HONORED",
+        "ALLIED",
+        "LOATHED",
+        "HATED",
+        "DISLIKED"
+      ],
+      "enum": [
+        "INDIFFERENT",
+        "LIKED",
+        "FRIENDLY",
+        "HONORED",
+        "HONORED",
+        "LOATHED",
+        "HATED",
+        "DISLIKED"
+      ]
+    },
+    "SkillRules": {
+      "type": "object",
+      "description": "The training table of each pilot skill and the limits on choosing primary abilities.",
+      "additionalProperties": false,
+      "required": [
+        "maxPrimaryAbilities",
+        "maxPrimaryAbilitiesPerSkill",
+        "gunnery",
+        "piloting",
+        "guts",
+        "tactics"
+      ],
+      "properties": {
+        "maxPrimaryAbilities": {
+          "type": "integer",
+          "description": "How many primary abilities a pilot can hold in total.",
+          "format": "int32"
+        },
+        "maxPrimaryAbilitiesPerSkill": {
+          "type": "integer",
+          "description": "How many of them can come from one skill.",
+          "format": "int32"
+        },
+        "gunnery": {
+          "description": "The Gunnery skill's training table.",
+          "$ref": "#/definitions/Skill"
+        },
+        "piloting": {
+          "description": "The Piloting skill's training table.",
+          "$ref": "#/definitions/Skill"
+        },
+        "guts": {
+          "description": "The Guts skill's training table.",
+          "$ref": "#/definitions/Skill"
+        },
+        "tactics": {
+          "description": "The Tactics skill's training table.",
+          "$ref": "#/definitions/Skill"
+        }
+      }
+    },
+    "Skill": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "description",
+        "levels"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "What the skill controls, as the barracks explains it."
+        },
+        "levels": {
+          "type": "array",
+          "description": "The levels a pilot can train to; every pilot starts at level 1.",
+          "items": {
+            "$ref": "#/definitions/SkillLevel"
+          }
+        }
+      }
+    },
+    "SkillLevel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "experienceCost",
+        "baseHitChancePercent",
+        "baseMeleeHitChancePercent",
+        "movementAfterStandingUpPercent",
+        "abilities"
+      ],
+      "properties": {
+        "level": {
+          "type": "integer",
+          "description": "The skill level, from 2.",
+          "format": "int32"
+        },
+        "experienceCost": {
+          "type": "integer",
+          "description": "The experience spent to reach the level from the one below.",
+          "format": "int32"
+        },
+        "baseHitChancePercent": {
+          "type": [
+            "null",
+            "number"
+          ],
+          "description": "Gunnery only: the hit chance of ranged attacks at this level, before the attack's modifiers.",
+          "format": "float"
+        },
+        "baseMeleeHitChancePercent": {
+          "type": [
+            "null",
+            "number"
+          ],
+          "description": "Piloting only: the hit chance of melee attacks at this level, before the attack's modifiers.",
+          "format": "float"
+        },
+        "movementAfterStandingUpPercent": {
+          "type": [
+            "null",
+            "number"
+          ],
+          "description": "Piloting only: the share of its walk, sprint and backward distance a mech keeps in the round it stands up.",
+          "format": "float"
+        },
+        "abilities": {
+          "type": "array",
+          "description": "The primary abilities and passive traits unlocked at the level.",
+          "items": {
+            "$ref": "#/definitions/SkillLevelAbility"
+          }
+        }
+      }
+    },
+    "SkillLevelAbility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ability",
+        "isPrimary",
+        "description",
+        "activationTiming",
+        "targeting",
+        "cooldown",
+        "uses",
+        "effects"
+      ],
+      "properties": {
+        "ability": {
+          "description": "The ability, by its definition's id and name.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "isPrimary": {
+          "type": "boolean",
+          "description": "A primary ability is chosen, a passive trait comes with the level."
+        },
+        "description": {
+          "type": "string",
+          "description": "The game's description of the ability, as plain text."
+        },
+        "activationTiming": {
+          "description": "The game's activation timing of the ability, e.g. Passive, ConsumedByFiring or CommandAbility.",
+          "$ref": "#/definitions/ActivationTiming"
+        },
+        "targeting": {
+          "description": "How the ability is aimed; null for one that isn't.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/TargetingType"
+            }
+          ]
+        },
+        "cooldown": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The rounds before the ability can be used again; null without a cooldown.",
+          "format": "int32"
+        },
+        "uses": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "How often the ability can be used per mission; null without a limit.",
+          "format": "int32"
+        },
+        "effects": {
+          "type": "array",
+          "description": "The statistics the ability changes; empty for an ability whose effect the game hardcodes, e.g. Multi-Target or Sensor Lock.",
+          "items": {
+            "$ref": "#/definitions/StatisticChange"
+          }
+        }
+      }
+    },
+    "DefinitionReference": {
+      "type": "object",
+      "description": "A game definition: its id from the game's data files and the name shown in the UI.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name the UI shows."
+        }
+      }
+    },
+    "ActivationTiming": {
+      "type": "string",
+      "x-enumNames": [
+        "NotSet",
+        "Passive",
+        "ConsumedByMovement",
+        "ConsumedByFiring",
+        "CommandAbility"
+      ],
+      "enum": [
+        "NotSet",
+        "Passive",
+        "ConsumedByMovement",
+        "ConsumedByFiring",
+        "CommandAbility"
+      ]
+    },
+    "TargetingType": {
+      "type": "string",
+      "x-enumNames": [
+        "NotSet",
+        "ActorSelf",
+        "ActorTarget",
+        "SensorLock",
+        "CommandInstant",
+        "CommandTargetSingleEnemy",
+        "CommandTargetSingleAlly",
+        "CommandTargetSinglePoint",
+        "CommandTargetTwoPoints",
+        "CommandSpawnPosition",
+        "ShadowMove",
+        "MultiFire",
+        "ConfirmCoolantVent",
+        "ActiveProbe"
+      ],
+      "enum": [
+        "NotSet",
+        "ActorSelf",
+        "ActorTarget",
+        "SensorLock",
+        "CommandInstant",
+        "CommandTargetSingleEnemy",
+        "CommandTargetSingleAlly",
+        "CommandTargetSinglePoint",
+        "CommandTargetTwoPoints",
+        "CommandSpawnPosition",
+        "ShadowMove",
+        "MultiFire",
+        "ConfirmCoolantVent",
+        "ActiveProbe"
+      ]
+    },
+    "StatisticChange": {
+      "type": "object",
+      "description": "A change an ability or a component makes to a statistic of the unit, its pilot or its components.",
+      "additionalProperties": false,
+      "required": [
+        "statistic",
+        "operation",
+        "value",
+        "appliesTo",
+        "duration",
+        "target",
+        "trigger"
+      ],
+      "properties": {
+        "statistic": {
+          "type": "string",
+          "description": "The statistic's name, as the game names it."
+        },
+        "operation": {
+          "description": "How value changes the statistic, e.g. Set, Int_Add.",
+          "$ref": "#/definitions/StatOperation"
+        },
+        "value": {
+          "description": "A boolean, integer or number, as the statistic's type requires. Changes to the initiative statistics (BaseInitiative, PhaseModifier, PhaseModifierSelf) are as the HUD numbers phases, so a positive change makes the unit act earlier."
+        },
+        "appliesTo": {
+          "description": "The pilot or the components whose statistic changes; null for the unit's own.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/EffectTargetCollection"
+            }
+          ]
+        },
+        "duration": {
+          "description": "How long the change lasts; null when it lasts for the whole mission.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/EffectDuration"
+            }
+          ]
+        },
+        "target": {
+          "description": "Whose statistic changes: the unit with the ability or component (Creator) or the unit it targets.",
+          "$ref": "#/definitions/EffectTargetType"
+        },
+        "trigger": {
+          "description": "When the change is made, e.g. on the ability's activation, on a hit or always (Passive).",
+          "$ref": "#/definitions/EffectTriggerType"
+        }
+      }
+    },
+    "StatOperation": {
+      "type": "string",
+      "x-enumNames": [
+        "Set",
+        "Int_Add",
+        "Int_Subtract",
+        "Int_Multiply",
+        "Int_Divide",
+        "Int_Divide_Denom",
+        "Int_Mod",
+        "Int_Multiply_Float",
+        "Int_Divide_Float",
+        "Int_Divide_Denom_Float",
+        "Float_Add",
+        "Float_Subtract",
+        "Float_Multiply",
+        "Float_Divide",
+        "Float_Divide_Denom",
+        "Float_Multiply_Int",
+        "Float_Divide_Int",
+        "Float_Divide_Denom_Int",
+        "String_Append",
+        "String_Prepend",
+        "Bitflag_SetBit",
+        "Bitflag_FlipBit",
+        "Bitflag_Combine"
+      ],
+      "enum": [
+        "Set",
+        "Int_Add",
+        "Int_Subtract",
+        "Int_Multiply",
+        "Int_Divide",
+        "Int_Divide_Denom",
+        "Int_Mod",
+        "Int_Multiply_Float",
+        "Int_Divide_Float",
+        "Int_Divide_Denom_Float",
+        "Float_Add",
+        "Float_Subtract",
+        "Float_Multiply",
+        "Float_Divide",
+        "Float_Divide_Denom",
+        "Float_Multiply_Int",
+        "Float_Divide_Int",
+        "Float_Divide_Denom_Int",
+        "String_Append",
+        "String_Prepend",
+        "Bitflag_SetBit",
+        "Bitflag_FlipBit",
+        "Bitflag_Combine"
+      ]
+    },
+    "EffectTargetCollection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "collection",
+        "weaponSubType",
+        "weaponType",
+        "weaponCategory",
+        "ammoCategory"
+      ],
+      "properties": {
+        "collection": {
+          "description": "The pilot, the weapons, the ammunition boxes, one random working weapon or the strongest working weapon.",
+          "$ref": "#/definitions/TargetCollection"
+        },
+        "weaponSubType": {
+          "description": "Only weapons of this sub type; null when not filtered by it.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/WeaponSubType"
+            }
+          ]
+        },
+        "weaponType": {
+          "description": "Only weapons of this type; null when not filtered by it.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/WeaponType"
+            }
+          ]
+        },
+        "weaponCategory": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "The weapon category, as the catalog's weapons name theirs."
+        },
+        "ammoCategory": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "The ammunition category, as the catalog's ammunition boxes name theirs."
+        }
+      }
+    },
+    "TargetCollection": {
+      "type": "string",
+      "x-enumNames": [
+        "NotSet",
+        "Pilot",
+        "Weapon",
+        "AmmoBox",
+        "SingleRandomWeapon",
+        "StrongestWeapon"
+      ],
+      "enum": [
+        "NotSet",
+        "Pilot",
+        "Weapon",
+        "AmmoBox",
+        "SingleRandomWeapon",
+        "StrongestWeapon"
+      ]
+    },
+    "WeaponSubType": {
+      "type": "string",
+      "x-enumNames": [
+        "NotSet",
+        "AC2",
+        "AC5",
+        "AC10",
+        "AC20",
+        "Gauss",
+        "SmallLaser",
+        "MediumLaser",
+        "LargeLaser",
+        "PPC",
+        "LRM5",
+        "LRM10",
+        "LRM15",
+        "LRM20",
+        "SRM2",
+        "SRM4",
+        "SRM6",
+        "Flamer",
+        "MachineGun",
+        "Melee",
+        "AMS",
+        "DFA",
+        "AIImaginary",
+        "SmallLaserPulse",
+        "MediumLaserPulse",
+        "LargeLaserPulse",
+        "SmallLaserER",
+        "MediumLaserER",
+        "LargeLaserER",
+        "PPCER",
+        "UAC2",
+        "UAC5",
+        "UAC10",
+        "UAC20",
+        "LB2X",
+        "LB5X",
+        "LB10X",
+        "LB20X",
+        "SRMInferno",
+        "Narc",
+        "PPCSnub",
+        "TAG",
+        "COILS",
+        "COILM",
+        "COILL"
+      ],
+      "enum": [
+        "NotSet",
+        "AC2",
+        "AC5",
+        "AC10",
+        "AC20",
+        "Gauss",
+        "SmallLaser",
+        "MediumLaser",
+        "LargeLaser",
+        "PPC",
+        "LRM5",
+        "LRM10",
+        "LRM15",
+        "LRM20",
+        "SRM2",
+        "SRM4",
+        "SRM6",
+        "Flamer",
+        "MachineGun",
+        "Melee",
+        "AMS",
+        "DFA",
+        "AIImaginary",
+        "SmallLaserPulse",
+        "MediumLaserPulse",
+        "LargeLaserPulse",
+        "SmallLaserER",
+        "MediumLaserER",
+        "LargeLaserER",
+        "PPCER",
+        "UAC2",
+        "UAC5",
+        "UAC10",
+        "UAC20",
+        "LB2X",
+        "LB5X",
+        "LB10X",
+        "LB20X",
+        "SRMInferno",
+        "Narc",
+        "PPCSnub",
+        "TAG",
+        "COILS",
+        "COILM",
+        "COILL"
+      ]
+    },
+    "WeaponType": {
+      "type": "string",
+      "x-enumNames": [
+        "NotSet",
+        "Autocannon",
+        "Gauss",
+        "Laser",
+        "PPC",
+        "LRM",
+        "SRM",
+        "Flamer",
+        "MachineGun",
+        "Melee",
+        "AMS",
+        "COIL"
+      ],
+      "enum": [
+        "NotSet",
+        "Autocannon",
+        "Gauss",
+        "Laser",
+        "PPC",
+        "LRM",
+        "SRM",
+        "Flamer",
+        "MachineGun",
+        "Melee",
+        "AMS",
+        "COIL"
+      ]
+    },
+    "EffectDuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "count",
+        "unit"
+      ],
+      "properties": {
+        "count": {
+          "type": "integer",
+          "description": "How many of unit the change lasts, at least 1.",
+          "format": "int32"
+        },
+        "unit": {
+          "description": "What the duration counts.",
+          "$ref": "#/definitions/EffectDurationUnit"
+        }
+      }
+    },
+    "EffectDurationUnit": {
+      "type": "string",
+      "description": "What an effect's duration counts, as Effect picks its ETimer.",
+      "x-enumNames": [
+        "Activations",
+        "TargetActivations",
+        "Rounds",
+        "Movements",
+        "Phases"
+      ],
+      "enum": [
+        "activations",
+        "targetActivations",
+        "rounds",
+        "movements",
+        "phases"
+      ]
+    },
+    "EffectTargetType": {
+      "type": "string",
+      "x-enumNames": [
+        "NotSet",
+        "Creator",
+        "SingleTarget",
+        "LanceMatesWithinRange",
+        "AlliesWithinRange",
+        "EnemiesWithinRange",
+        "AllLanceMates",
+        "AllAllies",
+        "AllEnemies"
+      ],
+      "enum": [
+        "NotSet",
+        "Creator",
+        "SingleTarget",
+        "LanceMatesWithinRange",
+        "AlliesWithinRange",
+        "EnemiesWithinRange",
+        "AllLanceMates",
+        "AllAllies",
+        "AllEnemies"
+      ]
+    },
+    "EffectTriggerType": {
+      "type": "string",
+      "x-enumNames": [
+        "Passive",
+        "OnActivation",
+        "OnHit",
+        "OnDamaged",
+        "OnWeaponFire",
+        "OnUnitActivationBegin",
+        "OnUnitActivationEnd",
+        "OnUnitActivationBeginOrEnd",
+        "TurnUpdate",
+        "Preview"
+      ],
+      "enum": [
+        "Passive",
+        "OnActivation",
+        "OnHit",
+        "OnDamaged",
+        "OnWeaponFire",
+        "OnUnitActivationBegin",
+        "OnUnitActivationEnd",
+        "OnUnitActivationBeginOrEnd",
+        "TurnUpdate",
+        "Preview"
+      ]
+    },
+    "SpiritsLevelCosts": {
+      "type": "object",
+      "description": "The combat effect of a pilot's spirits: the resolve their mech's Precision Strike and Vigilance cost.",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "precisionStrikeCost",
+        "vigilanceCost"
+      ],
+      "properties": {
+        "level": {
+          "description": "The pilot's spirits level the costs apply at.",
+          "$ref": "#/definitions/SpiritsLevel"
+        },
+        "precisionStrikeCost": {
+          "type": "integer",
+          "description": "The resolve a Precision Strike costs.",
+          "format": "int32"
+        },
+        "vigilanceCost": {
+          "type": "integer",
+          "description": "The resolve Vigilance costs.",
+          "format": "int32"
+        }
+      }
+    },
+    "SpiritsLevel": {
+      "type": "string",
+      "description": "A pilot's spirits: normal, or temporarily high or low from an event.",
+      "x-enumNames": [
+        "Normal",
+        "High",
+        "Low"
+      ],
+      "enum": [
+        "normal",
+        "high",
+        "low"
+      ]
+    },
+    "ContractTypeDescription": {
+      "type": "object",
+      "description": "A mission type with the game's description of its objectives, which type refers to.",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "description",
+        "payMultiplier"
+      ],
+      "properties": {
+        "type": {
+          "description": "The mission type; the id Priority stands for every priority mission.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "description": {
+          "type": "string",
+          "description": "The game's description of the type's objectives, as plain text."
+        },
+        "payMultiplier": {
+          "type": [
+            "null",
+            "number"
+          ],
+          "description": "Multiplies the pay of the type's contracts (see ContractRules); null for priority missions, whose pay the story sets.",
+          "format": "float"
+        }
+      }
+    },
+    "JumpDistance": {
+      "type": "object",
+      "description": "How far a mech jumps with a number of working jump jets.",
+      "additionalProperties": false,
+      "required": [
+        "jumpJets",
+        "distance"
+      ],
+      "properties": {
+        "jumpJets": {
+          "type": "integer",
+          "description": "The number of working jump jets, from 1; more than the last entry jump as far as it.",
+          "format": "int32"
+        },
+        "distance": {
+          "type": "number",
+          "description": "The distance in meters, before the jump jets' JumpDistanceMultiplier effects, which add to a multiplier of 1.",
+          "format": "float"
+        }
+      }
+    },
+    "CombatRules": {
+      "type": "object",
+      "description": "The combat rules: the constants behind to-hit, evasion, cover, heat, stability, melee, hit locations, visibility, resolve and movement. A to-hit modifier is added to the attack's difficulty: positive makes the shot harder, negative is a bonus.",
+      "additionalProperties": false,
+      "required": [
+        "toHit",
+        "evasion",
+        "guard",
+        "lineOfFire",
+        "heat",
+        "stability",
+        "injuries",
+        "melee",
+        "criticalHits",
+        "hitTables",
+        "visibility",
+        "resolve",
+        "movement"
+      ],
+      "properties": {
+        "toHit": {
+          "description": "How an attack's hit chance follows from its modifiers.",
+          "$ref": "#/definitions/ToHitRules"
+        },
+        "evasion": {
+          "description": "The evasive pips units earn by moving.",
+          "$ref": "#/definitions/EvasionRules"
+        },
+        "guard": {
+          "description": "How guard levels reduce damage.",
+          "$ref": "#/definitions/GuardRules"
+        },
+        "lineOfFire": {
+          "description": "How cover between attacker and target affects ranged attacks.",
+          "$ref": "#/definitions/LineOfFireRules"
+        },
+        "heat": {
+          "description": "The heat rules of mechs.",
+          "$ref": "#/definitions/HeatRules"
+        },
+        "stability": {
+          "description": "The stability rules of mechs.",
+          "$ref": "#/definitions/StabilityRules"
+        },
+        "injuries": {
+          "description": "What injures a mech's pilot.",
+          "$ref": "#/definitions/InjuryRules"
+        },
+        "melee": {
+          "description": "The melee rules, jump attacks included.",
+          "$ref": "#/definitions/MeleeAttackRules"
+        },
+        "criticalHits": {
+          "description": "The chance of critical hits on a mech's components.",
+          "$ref": "#/definitions/CriticalHitRules"
+        },
+        "hitTables": {
+          "description": "Which location a hit lands on.",
+          "$ref": "#/definitions/HitTables"
+        },
+        "visibility": {
+          "description": "Spotting, sensors and sensor locks.",
+          "$ref": "#/definitions/VisibilityRules"
+        },
+        "resolve": {
+          "description": "The lance's resolve in combat.",
+          "$ref": "#/definitions/ResolveRules"
+        },
+        "movement": {
+          "description": "What shortens a mech's movement.",
+          "$ref": "#/definitions/MovementRules"
+        }
+      }
+    },
+    "ToHitRules": {
+      "type": "object",
+      "description": "How an attack's hit chance follows from its difficulty: the base chance of the skill level (see baseHitChancePercent) loses difficultySteps per point of the summed modifiers, is rounded to roundedToPercent and clamped between minChancePercent and maxChancePercent.",
+      "additionalProperties": false,
+      "required": [
+        "difficultySteps",
+        "roundedToPercent",
+        "minChancePercent",
+        "maxChancePercent",
+        "canTotalModifierBeNegative",
+        "rangeBands",
+        "targetWeightClass",
+        "elevation",
+        "targetShutdown",
+        "targetProne",
+        "attackerSprinted",
+        "attackerWalked",
+        "attackerStoodUp",
+        "attackerOverheated",
+        "armMountedWeapon",
+        "damagedWeapon",
+        "weaponInDamagedLocation",
+        "precisionStrike",
+        "mechFiringArcDegrees",
+        "turretGunnery"
+      ],
+      "properties": {
+        "difficultySteps": {
+          "type": "array",
+          "description": "The chance lost per point of difficulty, by step from the lowest difficulty up.",
+          "items": {
+            "$ref": "#/definitions/DifficultyStep"
+          }
+        },
+        "roundedToPercent": {
+          "type": "integer",
+          "description": "The hit chance is rounded to the nearest multiple of this, in percent.",
+          "format": "int32"
+        },
+        "minChancePercent": {
+          "type": "integer",
+          "description": "The lowest hit chance, in percent.",
+          "format": "int32"
+        },
+        "maxChancePercent": {
+          "type": "integer",
+          "description": "The highest hit chance, in percent.",
+          "format": "int32"
+        },
+        "canTotalModifierBeNegative": {
+          "type": "boolean",
+          "description": "Whether bonuses can push the chance above the base chance; when not, they only cancel penalties."
+        },
+        "rangeBands": {
+          "description": "The modifier of each range band of the weapon.",
+          "$ref": "#/definitions/RangeBandModifiers"
+        },
+        "targetWeightClass": {
+          "description": "The modifier for the target's size.",
+          "$ref": "#/definitions/TargetWeightClassModifiers"
+        },
+        "elevation": {
+          "description": "The modifier for the height difference between attacker and target.",
+          "$ref": "#/definitions/ElevationModifier"
+        },
+        "targetShutdown": {
+          "type": "number",
+          "description": "Against a shut-down mech, ranged attacks.",
+          "format": "float"
+        },
+        "targetProne": {
+          "type": "number",
+          "description": "Against a prone mech, ranged attacks.",
+          "format": "float"
+        },
+        "attackerSprinted": {
+          "type": "number",
+          "description": "When the attacker sprinted this round.",
+          "format": "float"
+        },
+        "attackerWalked": {
+          "description": "When the attacker moved more than 10 meters this round without sprinting.",
+          "$ref": "#/definitions/AttackerWalkedModifiers"
+        },
+        "attackerStoodUp": {
+          "type": "number",
+          "description": "When the attacker stood up this round.",
+          "format": "float"
+        },
+        "attackerOverheated": {
+          "type": "number",
+          "description": "When the attacking mech is overheated.",
+          "format": "float"
+        },
+        "armMountedWeapon": {
+          "type": "number",
+          "description": "For a mech's ranged weapon mounted in an arm.",
+          "format": "float"
+        },
+        "damagedWeapon": {
+          "type": "number",
+          "description": "For a mech's weapon damaged by a critical hit but not destroyed.",
+          "format": "float"
+        },
+        "weaponInDamagedLocation": {
+          "description": "For a weapon in a damaged location of a mech.",
+          "$ref": "#/definitions/DamagedLocationModifiers"
+        },
+        "precisionStrike": {
+          "type": "number",
+          "description": "For an attack made with Precision Strike.",
+          "format": "float"
+        },
+        "mechFiringArcDegrees": {
+          "type": "number",
+          "description": "How far to either side of its facing a mech can fire without turning; a turret's arc is in the catalog.",
+          "format": "float"
+        },
+        "turretGunnery": {
+          "type": "integer",
+          "description": "The gunnery every turret shoots with; turrets have no pilot.",
+          "format": "int32"
+        }
+      }
+    },
+    "DifficultyStep": {
+      "type": "object",
+      "description": "The hit chance lost per point of difficulty from fromDifficulty up to the next step.",
+      "additionalProperties": false,
+      "required": [
+        "fromDifficulty",
+        "chanceLostPerPoint"
+      ],
+      "properties": {
+        "fromDifficulty": {
+          "type": "integer",
+          "description": "The summed modifiers, rounded to a whole number, from which the step applies.",
+          "format": "int32"
+        },
+        "chanceLostPerPoint": {
+          "type": "number",
+          "description": "As a fraction from 0 to 1, e.g. 0.05 for 5 percentage points.",
+          "format": "float"
+        }
+      }
+    },
+    "RangeBandModifiers": {
+      "type": "object",
+      "description": "The modifier by the target's distance against the weapon's ranges in the catalog.",
+      "additionalProperties": false,
+      "required": [
+        "withinMinimumRange",
+        "short",
+        "medium",
+        "long",
+        "maximum"
+      ],
+      "properties": {
+        "withinMinimumRange": {
+          "type": "number",
+          "description": "Closer than the weapon's minimum range.",
+          "format": "float"
+        },
+        "short": {
+          "type": "number",
+          "description": "From the minimum range up to the short range.",
+          "format": "float"
+        },
+        "medium": {
+          "type": "number",
+          "description": "Beyond the short range, up to the medium range.",
+          "format": "float"
+        },
+        "long": {
+          "type": "number",
+          "description": "Beyond the medium range, up to the long range.",
+          "format": "float"
+        },
+        "maximum": {
+          "type": "number",
+          "description": "Beyond the long range, up to the maximum range.",
+          "format": "float"
+        }
+      }
+    },
+    "TargetWeightClassModifiers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mech",
+        "vehicle",
+        "turret"
+      ],
+      "properties": {
+        "mech": {
+          "description": "Against a mech, by its weight class.",
+          "$ref": "#/definitions/ByWeightClassOfSingle"
+        },
+        "vehicle": {
+          "description": "Against a vehicle, by its weight class.",
+          "$ref": "#/definitions/ByWeightClassOfSingle"
+        },
+        "turret": {
+          "description": "Against a turret, by its chassis' weight class.",
+          "$ref": "#/definitions/ByWeightClassOfSingle"
+        }
+      }
+    },
+    "ByWeightClassOfSingle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "light",
+        "medium",
+        "heavy",
+        "assault"
+      ],
+      "properties": {
+        "light": {
+          "type": "number",
+          "description": "The value for light units.",
+          "format": "float"
+        },
+        "medium": {
+          "type": "number",
+          "description": "The value for medium units.",
+          "format": "float"
+        },
+        "heavy": {
+          "type": "number",
+          "description": "The value for heavy units.",
+          "format": "float"
+        },
+        "assault": {
+          "type": "number",
+          "description": "The value for assault units.",
+          "format": "float"
+        }
+      }
+    },
+    "ElevationModifier": {
+      "type": "object",
+      "description": "The modifier for the height difference: modifierPerLevel per full levelHeight the attacker stands above the target.",
+      "additionalProperties": false,
+      "required": [
+        "levelHeight",
+        "modifierPerLevel",
+        "usesMultipleLevels",
+        "appliesPenalties"
+      ],
+      "properties": {
+        "levelHeight": {
+          "type": "number",
+          "description": "In meters.",
+          "format": "float"
+        },
+        "modifierPerLevel": {
+          "type": "number",
+          "description": "Subtracted per level the attacker stands above the target, added per level below.",
+          "format": "float"
+        },
+        "usesMultipleLevels": {
+          "type": "boolean",
+          "description": "Whether more than one level counts."
+        },
+        "appliesPenalties": {
+          "type": "boolean",
+          "description": "Whether an attacker below the target is penalized."
+        }
+      }
+    },
+    "AttackerWalkedModifiers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mech",
+        "vehicle"
+      ],
+      "properties": {
+        "mech": {
+          "description": "For an attacking mech, by its weight class.",
+          "$ref": "#/definitions/ByWeightClassOfSingle"
+        },
+        "vehicle": {
+          "type": "number",
+          "description": "For an attacking vehicle.",
+          "format": "float"
+        }
+      }
+    },
+    "DamagedLocationModifiers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "penalized",
+        "nonFunctional"
+      ],
+      "properties": {
+        "penalized": {
+          "type": "number",
+          "description": "The location is damaged.",
+          "format": "float"
+        },
+        "nonFunctional": {
+          "type": "number",
+          "description": "The location is damaged beyond use.",
+          "format": "float"
+        }
+      }
+    },
+    "EvasionRules": {
+      "type": "object",
+      "description": "How a unit earns evasive pips by moving and what each pip does to ranged attacks against it. A sensor lock strips pips (see evasivePipsStripped).",
+      "additionalProperties": false,
+      "required": [
+        "pipsByDistanceMoved",
+        "modifierByPips",
+        "weaponTypesAffected",
+        "vehiclePipMultiplier",
+        "canVehiclesBeEvasive"
+      ],
+      "properties": {
+        "pipsByDistanceMoved": {
+          "type": "array",
+          "description": "The pips for moving more than a distance; a jump adds one, and the unit's own maximum caps them.",
+          "items": {
+            "$ref": "#/definitions/EvasivePips"
+          }
+        },
+        "modifierByPips": {
+          "type": "array",
+          "description": "The to-hit modifier by the number of pips, from one pip up; each pip beyond the last entry adds the difference of the last two.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "weaponTypesAffected": {
+          "type": "array",
+          "description": "The weapon types the pips apply to, by the game's names.",
+          "items": {
+            "$ref": "#/definitions/WeaponType"
+          }
+        },
+        "vehiclePipMultiplier": {
+          "type": "number",
+          "description": "A vehicle's pips are multiplied by this and rounded down.",
+          "format": "float"
+        },
+        "canVehiclesBeEvasive": {
+          "type": "boolean",
+          "description": "Whether vehicles get evasive pips at all."
+        }
+      }
+    },
+    "EvasivePips": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "moreThan",
+        "pips"
+      ],
+      "properties": {
+        "moreThan": {
+          "type": "number",
+          "description": "The distance in meters the unit has to exceed.",
+          "format": "float"
+        },
+        "pips": {
+          "type": "integer",
+          "description": "The pips the unit gets for it.",
+          "format": "int32"
+        }
+      }
+    },
+    "GuardRules": {
+      "type": "object",
+      "description": "How guard levels reduce damage: bracing, Bulwark and cover from terrain each add a level. Attacks from behind, melee and breaching shots ignore them.",
+      "additionalProperties": false,
+      "required": [
+        "damageMultiplierByLevel",
+        "unsteadyBreaksGuard",
+        "solidDamageBreaksGuard",
+        "sensorLockBreaksGuard",
+        "canVehiclesBeGuarded"
+      ],
+      "properties": {
+        "damageMultiplierByLevel": {
+          "type": "array",
+          "description": "Indexed by the guard level, from unguarded up.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "unsteadyBreaksGuard": {
+          "type": "boolean",
+          "description": "Whether an unsteady unit loses the levels from bracing and Bulwark; cover still counts."
+        },
+        "solidDamageBreaksGuard": {
+          "type": "boolean",
+          "description": "Whether a mech hit without guard since its last activation loses the levels from bracing and Bulwark."
+        },
+        "sensorLockBreaksGuard": {
+          "type": "boolean",
+          "description": "Whether a sensor-locked unit loses the levels from bracing and Bulwark."
+        },
+        "canVehiclesBeGuarded": {
+          "type": "boolean",
+          "description": "Whether vehicles get every guard level; when not, they get one at most."
+        }
+      }
+    },
+    "LineOfFireRules": {
+      "type": "object",
+      "description": "The line of fire by the share of clear sight lines between attacker and target: clear at clearRatio or more, obstructed at obstructedRatio or more, blocked below.",
+      "additionalProperties": false,
+      "required": [
+        "obstructedToHit",
+        "obstructedDamageMultiplier",
+        "indirectFireToHit",
+        "indirectFireDamageMultiplier",
+        "clearRatio",
+        "obstructedRatio",
+        "minRatioFromUnits"
+      ],
+      "properties": {
+        "obstructedToHit": {
+          "type": "number",
+          "description": "The to-hit modifier of an obstructed line of fire.",
+          "format": "float"
+        },
+        "obstructedDamageMultiplier": {
+          "type": "number",
+          "description": "Multiplies the damage through an obstructed line of fire.",
+          "format": "float"
+        },
+        "indirectFireToHit": {
+          "type": "number",
+          "description": "The to-hit modifier of indirect fire, at a blocked line of fire.",
+          "format": "float"
+        },
+        "indirectFireDamageMultiplier": {
+          "type": "number",
+          "description": "Multiplies the damage of indirect fire.",
+          "format": "float"
+        },
+        "clearRatio": {
+          "type": "number",
+          "description": "The share of clear sight lines, from 0 to 1, for a clear line of fire.",
+          "format": "float"
+        },
+        "obstructedRatio": {
+          "type": "number",
+          "description": "The share of clear sight lines, from 0 to 1, for an obstructed line of fire.",
+          "format": "float"
+        },
+        "minRatioFromUnits": {
+          "type": "number",
+          "description": "Units in the way alone can't lower the share below this.",
+          "format": "float"
+        }
+      }
+    },
+    "HeatRules": {
+      "type": "object",
+      "description": "The heat rules of mechs; vehicles and turrets have no heat. What Coolant Vent does is with the ability in SkillRules.",
+      "additionalProperties": false,
+      "required": [
+        "maxHeat",
+        "overheatsAbove",
+        "walkHeat",
+        "sprintHeat",
+        "jumpHeat",
+        "engineDamageHeat",
+        "engineHeatSinks",
+        "engineHeatSinkDissipation",
+        "maxHeatAfterRestart",
+        "heatGeneratedMultiplier",
+        "heatSinkMultiplier",
+        "overheatStructureDamageByWeightClass"
+      ],
+      "properties": {
+        "maxHeat": {
+          "type": "integer",
+          "description": "The heat at which a mech shuts down.",
+          "format": "int32"
+        },
+        "overheatsAbove": {
+          "type": "integer",
+          "description": "Above this heat the mech is overheated: it takes overheatStructureDamageByWeightClass in every location but the head whenever its heat is reconciled, and its attacks and movement are penalized.",
+          "format": "int32"
+        },
+        "walkHeat": {
+          "type": "integer",
+          "description": "The heat a mech gains from a move other than a sprint or a jump.",
+          "format": "int32"
+        },
+        "sprintHeat": {
+          "type": "integer",
+          "description": "The heat a mech gains from a sprint.",
+          "format": "int32"
+        },
+        "jumpHeat": {
+          "description": "The heat a mech gains from a jump.",
+          "$ref": "#/definitions/JumpHeat"
+        },
+        "engineDamageHeat": {
+          "type": "integer",
+          "description": "The heat a mech gains at the end of each activation while its center torso is damaged beyond use.",
+          "format": "int32"
+        },
+        "engineHeatSinks": {
+          "type": "integer",
+          "description": "The heat sinks every mech has built in, on top of the chassis' dissipation.",
+          "format": "int32"
+        },
+        "engineHeatSinkDissipation": {
+          "type": "number",
+          "description": "The heat each of the engineHeatSinks dissipates.",
+          "format": "float"
+        },
+        "maxHeatAfterRestart": {
+          "type": "integer",
+          "description": "A mech restarting from shutdown is cooled to at most this heat.",
+          "format": "int32"
+        },
+        "heatGeneratedMultiplier": {
+          "type": "number",
+          "description": "Multiplies all heat a mech generates itself.",
+          "format": "float"
+        },
+        "heatSinkMultiplier": {
+          "type": "number",
+          "description": "Multiplies a mech's heat sink capacity, together with the terrain's and biome's.",
+          "format": "float"
+        },
+        "overheatStructureDamageByWeightClass": {
+          "description": "The structure damage per location an overheated mech takes, by its weight class.",
+          "$ref": "#/definitions/ByWeightClassOfSingle"
+        }
+      }
+    },
+    "JumpHeat": {
+      "type": "object",
+      "description": "A jump's heat: perUnit for each started unitSize meters of the distance, at least minimum.",
+      "additionalProperties": false,
+      "required": [
+        "unitSize",
+        "perUnit",
+        "minimum"
+      ],
+      "properties": {
+        "unitSize": {
+          "type": "number",
+          "description": "In meters.",
+          "format": "float"
+        },
+        "perUnit": {
+          "type": "integer",
+          "description": "The heat per unit of distance.",
+          "format": "int32"
+        },
+        "minimum": {
+          "type": "integer",
+          "description": "The least heat a jump generates.",
+          "format": "int32"
+        }
+      }
+    },
+    "StabilityRules": {
+      "type": "object",
+      "description": "The stability rules of mechs. A mech's stability bar has levels levels; a mech that reaches unsteadyThresholdPercent of its stability is unsteady and loses its evasive pips, and an unsteady mech that fills the bar is knocked down.",
+      "additionalProperties": false,
+      "required": [
+        "unsteadyThresholdPercent",
+        "levels",
+        "levelsRecovered",
+        "levelsAdded",
+        "entrenchedInstabilityMultiplier",
+        "minStabilityPerDestroyedLocation",
+        "onlyLegsRaiseMinStability",
+        "instabilityFromDamage"
+      ],
+      "properties": {
+        "unsteadyThresholdPercent": {
+          "type": "integer",
+          "description": "In percent of the stability bar; a mech's UnsteadyThreshold statistic starts at it.",
+          "format": "int32"
+        },
+        "levels": {
+          "type": "integer",
+          "description": "The number of equal levels the stability bar is divided into.",
+          "format": "int32"
+        },
+        "levelsRecovered": {
+          "description": "The levels of instability an action removes, after the level the mech is in is always emptied.",
+          "$ref": "#/definitions/LevelsRecoveredByAction"
+        },
+        "levelsAdded": {
+          "description": "The levels of instability an action adds to the mech doing it, after the level the mech is in is emptied.",
+          "$ref": "#/definitions/LevelsAddedByAction"
+        },
+        "entrenchedInstabilityMultiplier": {
+          "type": "number",
+          "description": "Multiplies the instability a braced mech takes from weapons.",
+          "format": "float"
+        },
+        "minStabilityPerDestroyedLocation": {
+          "type": "number",
+          "description": "The share of the stability bar a mech can't recover below for each destroyed location.",
+          "format": "float"
+        },
+        "onlyLegsRaiseMinStability": {
+          "type": "boolean",
+          "description": "Whether only destroyed legs count for it."
+        },
+        "instabilityFromDamage": {
+          "description": "The share of the stability bar added when a location is damaged, on top of a weapon's own instability.",
+          "$ref": "#/definitions/InstabilityFromDamage"
+        }
+      }
+    },
+    "LevelsRecoveredByAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stationary",
+        "walked",
+        "jumped",
+        "stoodUp",
+        "braced",
+        "deferred"
+      ],
+      "properties": {
+        "stationary": {
+          "type": "integer",
+          "description": "When the mech moved less than a meter this round, or not at all.",
+          "format": "int32"
+        },
+        "walked": {
+          "type": "integer",
+          "description": "When the mech moved without sprinting or jumping; a sprint recovers nothing.",
+          "format": "int32"
+        },
+        "jumped": {
+          "type": "integer",
+          "description": "When the mech jumped.",
+          "format": "int32"
+        },
+        "stoodUp": {
+          "type": "integer",
+          "description": "When the mech stood up.",
+          "format": "int32"
+        },
+        "braced": {
+          "type": "integer",
+          "description": "When the mech braced.",
+          "format": "int32"
+        },
+        "deferred": {
+          "type": "integer",
+          "description": "When the mech's pilot has the ability that resets instability on deferring.",
+          "format": "int32"
+        }
+      }
+    },
+    "LevelsAddedByAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "deathFromAbove",
+        "falling"
+      ],
+      "properties": {
+        "deathFromAbove": {
+          "type": "integer",
+          "description": "When the mech's own jump attack makes it unsteady.",
+          "format": "int32"
+        },
+        "falling": {
+          "type": "integer",
+          "description": "When the building the mech stands on is destroyed and it falls.",
+          "format": "int32"
+        }
+      }
+    },
+    "InstabilityFromDamage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sideTorsoDestroyed",
+        "centerTorsoDamaged",
+        "armDestroyed",
+        "legDamaged"
+      ],
+      "properties": {
+        "sideTorsoDestroyed": {
+          "type": "number",
+          "description": "Added when a side torso is destroyed.",
+          "format": "float"
+        },
+        "centerTorsoDamaged": {
+          "type": "number",
+          "description": "Added when the center torso's damage reaches each of its two damage levels.",
+          "format": "float"
+        },
+        "armDestroyed": {
+          "type": "number",
+          "description": "Added when an arm is destroyed.",
+          "format": "float"
+        },
+        "legDamaged": {
+          "type": "number",
+          "description": "Added on any leg damage; a destroyed leg fills the bar instead.",
+          "format": "float"
+        }
+      }
+    },
+    "InjuryRules": {
+      "type": "object",
+      "description": "What injures a mech's pilot, besides head hits and knockdowns.",
+      "additionalProperties": false,
+      "required": [
+        "fromSideTorsoDestruction",
+        "fromAmmoExplosion",
+        "fromHeatShutdown"
+      ],
+      "properties": {
+        "fromSideTorsoDestruction": {
+          "type": "boolean",
+          "description": "Whether the destruction of a side torso injures the pilot."
+        },
+        "fromAmmoExplosion": {
+          "type": "boolean",
+          "description": "Whether an exploding ammunition box or other component injures the pilot."
+        },
+        "fromHeatShutdown": {
+          "type": "boolean",
+          "description": "Whether shutting down from heat injures the pilot."
+        }
+      }
+    },
+    "MeleeAttackRules": {
+      "type": "object",
+      "description": "The melee rules; damage and instability are the chassis' in the catalog. A melee attack against a turret, a building, a prone or a shut-down mech always has the maximum hit chance.",
+      "additionalProperties": false,
+      "required": [
+        "deathFromAboveToHit",
+        "maxHeightDifference"
+      ],
+      "properties": {
+        "deathFromAboveToHit": {
+          "type": "number",
+          "description": "The to-hit modifier of a jump attack.",
+          "format": "float"
+        },
+        "maxHeightDifference": {
+          "type": "number",
+          "description": "In meters, between the attacker's and the target's position.",
+          "format": "float"
+        }
+      }
+    },
+    "CriticalHitRules": {
+      "type": "object",
+      "description": "Critical hits on a mech's components, rolled when a shot damages a location's structure: the chance is the location's share of lost structure, at least minChance, times the weapon's multiplier.",
+      "additionalProperties": false,
+      "required": [
+        "minChance",
+        "aiAttackerMultiplier",
+        "emptySlotsAbsorbCrits"
+      ],
+      "properties": {
+        "minChance": {
+          "type": "number",
+          "description": "As a fraction from 0 to 1.",
+          "format": "float"
+        },
+        "aiAttackerMultiplier": {
+          "type": "number",
+          "description": "Multiplies the chance when the attacker isn't player-controlled.",
+          "format": "float"
+        },
+        "emptySlotsAbsorbCrits": {
+          "type": "boolean",
+          "description": "Whether a critical hit on an empty or destroyed slot does nothing."
+        }
+      }
+    },
+    "HitTables": {
+      "type": "object",
+      "description": "Which location a hit lands on: relative weights per location by the direction the attack comes from, in the target's four quadrants, or against a prone mech from any side.",
+      "additionalProperties": false,
+      "required": [
+        "mech",
+        "vehicle",
+        "calledShot",
+        "clusteredHits"
+      ],
+      "properties": {
+        "mech": {
+          "description": "The weights of a mech's armor locations.",
+          "$ref": "#/definitions/HitTablesOfOfArmorLocation"
+        },
+        "vehicle": {
+          "description": "The weights of a vehicle's locations.",
+          "$ref": "#/definitions/HitTablesOfOfVehicleChassisLocations"
+        },
+        "calledShot": {
+          "description": "How a called shot raises the chosen location's weight.",
+          "$ref": "#/definitions/CalledShotRules"
+        },
+        "clusteredHits": {
+          "description": "Multiplies the weights for the later hits of a weapon that fires several, by their place relative to the first hit.",
+          "$ref": "#/definitions/ClusteredHitWeights"
+        }
+      }
+    },
+    "HitTablesOfOfArmorLocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fromFront",
+        "fromLeft",
+        "fromRight",
+        "fromBack",
+        "prone",
+        "artillery"
+      ],
+      "properties": {
+        "fromFront": {
+          "type": "object",
+          "description": "The weight of each location for an attack from the front.",
+          "x-dictionaryKey": {
+            "$ref": "#/definitions/ArmorLocation"
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "fromLeft": {
+          "type": "object",
+          "description": "The weight of each location for an attack from the left.",
+          "x-dictionaryKey": {
+            "$ref": "#/definitions/ArmorLocation"
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "fromRight": {
+          "type": "object",
+          "description": "The weight of each location for an attack from the right.",
+          "x-dictionaryKey": {
+            "$ref": "#/definitions/ArmorLocation"
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "fromBack": {
+          "type": "object",
+          "description": "The weight of each location for an attack from behind.",
+          "x-dictionaryKey": {
+            "$ref": "#/definitions/ArmorLocation"
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "prone": {
+          "type": [
+            "null",
+            "object"
+          ],
+          "description": "null for vehicles, which can't be prone.",
+          "x-dictionaryKey": {
+            "$ref": "#/definitions/ArmorLocation"
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "artillery": {
+          "type": "array",
+          "description": "The locations an artillery strike or mortar hits, each with its own damage.",
+          "items": {
+            "$ref": "#/definitions/ArmorLocation"
+          }
+        }
+      }
+    },
+    "ArmorLocation": {
+      "type": "string",
+      "x-enumFlags": true,
+      "x-enumNames": [
+        "None",
+        "Head",
+        "LeftArm",
+        "LeftTorso",
+        "CenterTorso",
+        "RightTorso",
+        "RightArm",
+        "LeftLeg",
+        "RightLeg",
+        "LeftTorsoRear",
+        "CenterTorsoRear",
+        "RightTorsoRear",
+        "Invalid"
+      ],
+      "enum": [
+        "None",
+        "Head",
+        "LeftArm",
+        "LeftTorso",
+        "CenterTorso",
+        "RightTorso",
+        "RightArm",
+        "LeftLeg",
+        "RightLeg",
+        "LeftTorsoRear",
+        "CenterTorsoRear",
+        "RightTorsoRear",
+        "Invalid"
+      ]
+    },
+    "HitTablesOfOfVehicleChassisLocations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fromFront",
+        "fromLeft",
+        "fromRight",
+        "fromBack",
+        "prone",
+        "artillery"
+      ],
+      "properties": {
+        "fromFront": {
+          "type": "object",
+          "description": "The weight of each location for an attack from the front.",
+          "x-dictionaryKey": {
+            "$ref": "#/definitions/VehicleChassisLocations"
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "fromLeft": {
+          "type": "object",
+          "description": "The weight of each location for an attack from the left.",
+          "x-dictionaryKey": {
+            "$ref": "#/definitions/VehicleChassisLocations"
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "fromRight": {
+          "type": "object",
+          "description": "The weight of each location for an attack from the right.",
+          "x-dictionaryKey": {
+            "$ref": "#/definitions/VehicleChassisLocations"
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "fromBack": {
+          "type": "object",
+          "description": "The weight of each location for an attack from behind.",
+          "x-dictionaryKey": {
+            "$ref": "#/definitions/VehicleChassisLocations"
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "prone": {
+          "type": [
+            "null",
+            "object"
+          ],
+          "description": "null for vehicles, which can't be prone.",
+          "x-dictionaryKey": {
+            "$ref": "#/definitions/VehicleChassisLocations"
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "artillery": {
+          "type": "array",
+          "description": "The locations an artillery strike or mortar hits, each with its own damage.",
+          "items": {
+            "$ref": "#/definitions/VehicleChassisLocations"
+          }
+        }
+      }
+    },
+    "VehicleChassisLocations": {
+      "type": "string",
+      "x-enumFlags": true,
+      "x-enumNames": [
+        "None",
+        "Turret",
+        "Front",
+        "Left",
+        "Right",
+        "Rear",
+        "MainBody",
+        "All",
+        "Invalid"
+      ],
+      "enum": [
+        "None",
+        "Turret",
+        "Front",
+        "Left",
+        "Right",
+        "Rear",
+        "MainBody",
+        "All",
+        "Invalid"
+      ]
+    },
+    "CalledShotRules": {
+      "type": "object",
+      "description": "A called shot multiplies the chosen location's weight by weightMultiplier times the pilot's own multiplier; after every hit of the attack the multiplier moves towards 1 by degradePerHit of the way.",
+      "additionalProperties": false,
+      "required": [
+        "weightMultiplier",
+        "degradePerHit"
+      ],
+      "properties": {
+        "weightMultiplier": {
+          "type": "integer",
+          "description": "Multiplies the chosen location's weight, before the pilot's own multiplier.",
+          "format": "int32"
+        },
+        "degradePerHit": {
+          "type": "number",
+          "description": "The share of the way to 1, from 0 to 1, the multiplier moves after each hit.",
+          "format": "float"
+        }
+      }
+    },
+    "ClusteredHitWeights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sameLocation",
+        "adjacentLocation",
+        "otherLocation",
+        "isHeadMultiplied",
+        "canHeadBeClustered"
+      ],
+      "properties": {
+        "sameLocation": {
+          "type": "number",
+          "description": "For the location the first hit landed on.",
+          "format": "float"
+        },
+        "adjacentLocation": {
+          "type": "number",
+          "description": "For the locations adjacent to the first hit's.",
+          "format": "float"
+        },
+        "otherLocation": {
+          "type": "number",
+          "description": "For every other location.",
+          "format": "float"
+        },
+        "isHeadMultiplied": {
+          "type": "boolean",
+          "description": "Whether the head's weight is multiplied like the other locations'."
+        },
+        "canHeadBeClustered": {
+          "type": "boolean",
+          "description": "Whether a later hit can land on the head unless the first hit did."
+        }
+      }
+    },
+    "VisibilityRules": {
+      "type": "object",
+      "description": "Spotting and sensors. A unit is seen within the spotter range with a line of sight, and shows as a sensor blip within the sensor range; both are multiplied by the chassis' values, and the sensor range by the target's signature. The blip's detail depends on the spotter's Tactics: 4 shows the unit's type, 7 its details.",
+      "additionalProperties": false,
+      "required": [
+        "spotterRange",
+        "spotterRangePerTactics",
+        "sensorRange",
+        "sensorHysteresis",
+        "shutdownSpotterMultiplier",
+        "proneSpotterMultiplier",
+        "shutdownSignatureModifier",
+        "shutdownVisibilityModifier",
+        "ghostedUnitsHideBlips",
+        "sensorLock",
+        "firedWeaponsEffects"
+      ],
+      "properties": {
+        "spotterRange": {
+          "type": "number",
+          "description": "In meters.",
+          "format": "float"
+        },
+        "spotterRangePerTactics": {
+          "type": "number",
+          "description": "Added to the spotter range per point of Tactics.",
+          "format": "float"
+        },
+        "sensorRange": {
+          "type": "number",
+          "description": "In meters.",
+          "format": "float"
+        },
+        "sensorHysteresis": {
+          "type": "number",
+          "description": "Added to the sensor range against a target already detected.",
+          "format": "float"
+        },
+        "shutdownSpotterMultiplier": {
+          "type": "number",
+          "description": "A shut-down unit's spotter range, as a share of the base range alone.",
+          "format": "float"
+        },
+        "proneSpotterMultiplier": {
+          "type": "number",
+          "description": "A prone mech's spotter range, as a share of the base range alone.",
+          "format": "float"
+        },
+        "shutdownSignatureModifier": {
+          "type": "number",
+          "description": "Added to a shut-down unit's signature.",
+          "format": "float"
+        },
+        "shutdownVisibilityModifier": {
+          "type": "number",
+          "description": "Added to a shut-down unit's visibility multiplier.",
+          "format": "float"
+        },
+        "ghostedUnitsHideBlips": {
+          "type": "boolean",
+          "description": "Whether a unit in stealth hides from sensors altogether."
+        },
+        "sensorLock": {
+          "description": "What a sensor lock does to its target.",
+          "$ref": "#/definitions/SensorLockRules"
+        },
+        "firedWeaponsEffects": {
+          "type": "array",
+          "description": "The statistic changes a unit makes to itself when it fires.",
+          "items": {
+            "$ref": "#/definitions/StatisticChange"
+          }
+        }
+      }
+    },
+    "SensorLockRules": {
+      "type": "object",
+      "description": "What a sensor lock does to its target, besides making it visible to the whole lance.",
+      "additionalProperties": false,
+      "required": [
+        "evasivePipsStripped",
+        "targetEffects"
+      ],
+      "properties": {
+        "evasivePipsStripped": {
+          "type": "integer",
+          "description": "The evasive pips the target loses; 0 when a sensor lock strips none.",
+          "format": "int32"
+        },
+        "targetEffects": {
+          "type": "array",
+          "description": "The statistic changes the target gets, one entry per application of a change the game applies repeatedly.",
+          "items": {
+            "$ref": "#/definitions/StatisticChange"
+          }
+        }
+      }
+    },
+    "ResolveRules": {
+      "type": "object",
+      "description": "The lance's resolve in combat, which Precision Strike and Vigilance spend (see SpiritsLevelCosts).",
+      "additionalProperties": false,
+      "required": [
+        "min",
+        "max",
+        "startsAt",
+        "inspiredAt",
+        "inspireCost",
+        "isAutoInspired",
+        "inspiredEffects",
+        "baselineGainPerRound",
+        "baselineGainMultiplier",
+        "addsMoraleLevelResolve",
+        "addsUnitResolveBonuses",
+        "onlyBiggestUnitResolveBonus",
+        "eventThresholds",
+        "fromEvents",
+        "initiativeDelayEffects",
+        "canAiGainResolve"
+      ],
+      "properties": {
+        "min": {
+          "type": "integer",
+          "description": "The lowest resolve the lance can have.",
+          "format": "int32"
+        },
+        "max": {
+          "type": "integer",
+          "description": "The highest resolve the lance can have.",
+          "format": "int32"
+        },
+        "startsAt": {
+          "type": "integer",
+          "description": "The resolve at the start of a mission, unless the contract sets its own.",
+          "format": "int32"
+        },
+        "inspiredAt": {
+          "type": "integer",
+          "description": "At this resolve the lance's mechs get inspiredEffects.",
+          "format": "int32"
+        },
+        "inspireCost": {
+          "type": "integer",
+          "description": "The resolve each mech spends when inspired.",
+          "format": "int32"
+        },
+        "isAutoInspired": {
+          "type": "boolean",
+          "description": "Whether the whole lance is inspired as soon as the resolve allows, and loses it below."
+        },
+        "inspiredEffects": {
+          "type": "array",
+          "description": "The statistic changes an inspired mech gets.",
+          "items": {
+            "$ref": "#/definitions/StatisticChange"
+          }
+        },
+        "baselineGainPerRound": {
+          "type": "integer",
+          "description": "Gained every round from the second, times the units baselineGainMultiplier counts.",
+          "format": "int32"
+        },
+        "baselineGainMultiplier": {
+          "description": "What baselineGainPerRound is multiplied by.",
+          "$ref": "#/definitions/ResolveGainMultiplier"
+        },
+        "addsMoraleLevelResolve": {
+          "type": "boolean",
+          "description": "Whether the company's morale level adds its resolve per turn (see resolvePerTurn)."
+        },
+        "addsUnitResolveBonuses": {
+          "type": "boolean",
+          "description": "Whether the units' resolve bonuses add to the gain, the MoraleBonusGain statistic that cockpit mods change."
+        },
+        "onlyBiggestUnitResolveBonus": {
+          "type": "boolean",
+          "description": "Whether only the biggest unit bonus counts instead of their sum."
+        },
+        "eventThresholds": {
+          "description": "The shares of shots and armor at which an attack's events happen.",
+          "$ref": "#/definitions/ResolveEventThresholds"
+        },
+        "fromEvents": {
+          "description": "The resolve gained from what the lance's attacks do and from objectives.",
+          "$ref": "#/definitions/ResolveFromEvents"
+        },
+        "initiativeDelayEffects": {
+          "type": "array",
+          "description": "What a Precision Strike or a knockdown does to the target, on top of the stability damage.",
+          "items": {
+            "$ref": "#/definitions/StatisticChange"
+          }
+        },
+        "canAiGainResolve": {
+          "type": "boolean",
+          "description": "Whether the enemy gains resolve at all."
+        }
+      }
+    },
+    "ResolveGainMultiplier": {
+      "type": "string",
+      "description": "What the baseline gain is multiplied by.",
+      "x-enumNames": [
+        "None",
+        "LivingUnits",
+        "LivingElitePilots"
+      ],
+      "enum": [
+        "none",
+        "livingUnits",
+        "livingElitePilots"
+      ]
+    },
+    "ResolveEventThresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "majorityHit",
+        "majorityMiss",
+        "minorArmorDamage",
+        "majorArmorDamage"
+      ],
+      "properties": {
+        "majorityHit": {
+          "type": "number",
+          "description": "The share of an attack's shots that have to hit for the majority-hit event.",
+          "format": "float"
+        },
+        "majorityMiss": {
+          "type": "number",
+          "description": "The share of shots below which the majority-miss event happens.",
+          "format": "float"
+        },
+        "minorArmorDamage": {
+          "type": "number",
+          "description": "The share of the target's starting armor an attack has to take off.",
+          "format": "float"
+        },
+        "majorArmorDamage": {
+          "type": "number",
+          "description": "The share above which the damage counts as major instead.",
+          "format": "float"
+        }
+      }
+    },
+    "ResolveFromEvents": {
+      "type": "object",
+      "description": "The resolve the lance gains from what its attacks do to enemies, each once per attack.",
+      "additionalProperties": false,
+      "required": [
+        "enemyDestroyed",
+        "enemyDestroyedInMelee",
+        "enemyCriticalHit",
+        "enemyAmmoExplosion",
+        "enemyWeaponDestroyed",
+        "enemyLocationDestroyed",
+        "enemyKnockedDown",
+        "deathFromAboveDealt",
+        "enemyMinorArmorDamage",
+        "enemyMajorArmorDamage",
+        "majorityHit",
+        "majorityMiss",
+        "objectiveCompleted",
+        "objectiveFailed"
+      ],
+      "properties": {
+        "enemyDestroyed": {
+          "description": "By the enemy's weight class; a turret counts as light.",
+          "$ref": "#/definitions/ByWeightClassOfInteger"
+        },
+        "enemyDestroyedInMelee": {
+          "type": "integer",
+          "description": "Added to enemyDestroyed for a melee kill.",
+          "format": "int32"
+        },
+        "enemyCriticalHit": {
+          "type": "integer",
+          "description": "For a critical hit on an enemy.",
+          "format": "int32"
+        },
+        "enemyAmmoExplosion": {
+          "type": "integer",
+          "description": "For an exploding ammunition box or other component of an enemy.",
+          "format": "int32"
+        },
+        "enemyWeaponDestroyed": {
+          "type": "integer",
+          "description": "For a destroyed weapon of an enemy.",
+          "format": "int32"
+        },
+        "enemyLocationDestroyed": {
+          "type": "integer",
+          "description": "For a destroyed location of an enemy.",
+          "format": "int32"
+        },
+        "enemyKnockedDown": {
+          "type": "integer",
+          "description": "For knocking an enemy down.",
+          "format": "int32"
+        },
+        "deathFromAboveDealt": {
+          "type": "integer",
+          "description": "For a death from above attack that damages its target.",
+          "format": "int32"
+        },
+        "enemyMinorArmorDamage": {
+          "type": "integer",
+          "description": "For taking off more than minorArmorDamage of an enemy's armor.",
+          "format": "int32"
+        },
+        "enemyMajorArmorDamage": {
+          "type": "integer",
+          "description": "For taking off more than majorArmorDamage of an enemy's armor, instead of enemyMinorArmorDamage; counted for every enemy the attack damages so.",
+          "format": "int32"
+        },
+        "majorityHit": {
+          "type": "integer",
+          "description": "For an attack of which more than majorityHit of the shots hit.",
+          "format": "int32"
+        },
+        "majorityMiss": {
+          "type": "integer",
+          "description": "For an attack of which less than majorityMiss of the shots hit, when the attack changes the lance's resolve in no other way.",
+          "format": "int32"
+        },
+        "objectiveCompleted": {
+          "type": "integer",
+          "description": "For a secondary objective; primary ones count nothing.",
+          "format": "int32"
+        },
+        "objectiveFailed": {
+          "type": "integer",
+          "description": "For a failed secondary objective; primary ones count nothing.",
+          "format": "int32"
+        }
+      }
+    },
+    "ByWeightClassOfInteger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "light",
+        "medium",
+        "heavy",
+        "assault"
+      ],
+      "properties": {
+        "light": {
+          "type": "integer",
+          "description": "The value for light units.",
+          "format": "int32"
+        },
+        "medium": {
+          "type": "integer",
+          "description": "The value for medium units.",
+          "format": "int32"
+        },
+        "heavy": {
+          "type": "integer",
+          "description": "The value for heavy units.",
+          "format": "int32"
+        },
+        "assault": {
+          "type": "integer",
+          "description": "The value for assault units.",
+          "format": "int32"
+        }
+      }
+    },
+    "MovementRules": {
+      "type": "object",
+      "description": "What shortens a mech's walk, sprint and backward distance; the penalties add up and the distance keeps at least minMultiplier. Jump distance is unaffected (see jumpDistances).",
+      "additionalProperties": false,
+      "required": [
+        "overheatedPenalty",
+        "legDamagePenalty",
+        "minMultiplier",
+        "pivotInPlaceThreshold",
+        "hexWidth"
+      ],
+      "properties": {
+        "overheatedPenalty": {
+          "type": "number",
+          "description": "The share lost while overheated.",
+          "format": "float"
+        },
+        "legDamagePenalty": {
+          "description": "The share lost per leg, by its damage.",
+          "$ref": "#/definitions/LegDamagePenalties"
+        },
+        "minMultiplier": {
+          "type": "number",
+          "description": "The least share of the distance a mech keeps, from 0 to 1.",
+          "format": "float"
+        },
+        "pivotInPlaceThreshold": {
+          "type": "number",
+          "description": "A move that ends closer than this to where it started, in meters, only turns the mech and costs no move.",
+          "format": "float"
+        },
+        "hexWidth": {
+          "type": "number",
+          "description": "The width of the movement grid's hexes in meters.",
+          "format": "float"
+        }
+      }
+    },
+    "LegDamagePenalties": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "penalized",
+        "nonFunctional",
+        "destroyed"
+      ],
+      "properties": {
+        "penalized": {
+          "type": "number",
+          "description": "The leg is damaged.",
+          "format": "float"
+        },
+        "nonFunctional": {
+          "type": "number",
+          "description": "The leg is damaged beyond use but not destroyed.",
+          "format": "float"
+        },
+        "destroyed": {
+          "type": "number",
+          "description": "The leg is destroyed.",
+          "format": "float"
+        }
+      }
+    },
+    "CampaignRules": {
+      "type": "object",
+      "description": "The campaign rules: the constants behind the mech lab, the med bay, hiring, salvage, finances, contracts, alliances and travel, as the game uses them with the career's difficulty settings.",
+      "additionalProperties": false,
+      "required": [
+        "mechLab",
+        "medBay",
+        "hiring",
+        "salvage",
+        "finances",
+        "contracts",
+        "alliances",
+        "travel"
+      ],
+      "properties": {
+        "mechLab": {
+          "description": "What mech lab work costs and how long it takes.",
+          "$ref": "#/definitions/MechLabRules"
+        },
+        "medBay": {
+          "description": "How long pilots take to heal and how likely an incapacitated pilot dies.",
+          "$ref": "#/definitions/MedBayRules"
+        },
+        "hiring": {
+          "description": "Hiring and paying pilots, and the roster and mech bay sizes the ship's pods allow.",
+          "$ref": "#/definitions/HiringRules"
+        },
+        "salvage": {
+          "description": "How a mission's salvage is made.",
+          "$ref": "#/definitions/SalvageRules"
+        },
+        "finances": {
+          "description": "The financial reports and their expenses, jump costs, store and scrap shares, debt limit and morale changes.",
+          "$ref": "#/definitions/FinancesRules"
+        },
+        "contracts": {
+          "description": "How contracts are generated, paid and rewarded.",
+          "$ref": "#/definitions/ContractRules"
+        },
+        "alliances": {
+          "description": "Allying with factions and breaking alliances.",
+          "$ref": "#/definitions/AllianceRules"
+        },
+        "travel": {
+          "description": "How long a trip takes and how far a jump reaches.",
+          "$ref": "#/definitions/TravelRules"
+        }
+      }
+    },
+    "MechLabRules": {
+      "type": "object",
+      "description": "What mech lab work costs. The mech lab works through its orders one at a time, paying the company's mechTech tech points a day, so an order takes its tech points divided by that, rounded up, at least a day.",
+      "additionalProperties": false,
+      "required": [
+        "structureRepair",
+        "destroyedLocationRepairMultipliers",
+        "componentRepair",
+        "install",
+        "armorChange",
+        "uninstallTechPointsPerSlot",
+        "readyMechTechPoints",
+        "cancelRefundShare"
+      ],
+      "properties": {
+        "structureRepair": {
+          "description": "Per point of structure.",
+          "$ref": "#/definitions/MechLabCost"
+        },
+        "destroyedLocationRepairMultipliers": {
+          "description": "Multiply structureRepair for a location that was destroyed.",
+          "$ref": "#/definitions/MechLabCostMultipliers"
+        },
+        "componentRepair": {
+          "description": "Per slot of the component; a chassis' fixed components are repaired for free.",
+          "$ref": "#/definitions/MechLabCost"
+        },
+        "install": {
+          "description": "Per slot of the component, by its category.",
+          "$ref": "#/definitions/InstallCosts"
+        },
+        "armorChange": {
+          "description": "Per point of armor added or removed.",
+          "$ref": "#/definitions/MechLabCost"
+        },
+        "uninstallTechPointsPerSlot": {
+          "type": "integer",
+          "description": "Removing a component costs no C-Bills.",
+          "format": "int32"
+        },
+        "readyMechTechPoints": {
+          "type": "integer",
+          "description": "For readying a stored chassis.",
+          "format": "int32"
+        },
+        "cancelRefundShare": {
+          "type": "number",
+          "description": "The share of the unpaid work refunded when a started order is cancelled.",
+          "format": "float"
+        }
+      }
+    },
+    "MechLabCost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "techPoints",
+        "cBills"
+      ],
+      "properties": {
+        "techPoints": {
+          "type": "number",
+          "description": "The tech points the work takes, per the unit its use names.",
+          "format": "float"
+        },
+        "cBills": {
+          "type": "number",
+          "description": "The C-Bills the work costs, per the same unit.",
+          "format": "float"
+        }
+      }
+    },
+    "MechLabCostMultipliers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "techPoints",
+        "cBills"
+      ],
+      "properties": {
+        "techPoints": {
+          "type": "number",
+          "description": "Multiplies the tech points.",
+          "format": "float"
+        },
+        "cBills": {
+          "type": "number",
+          "description": "Multiplies the C-Bills.",
+          "format": "float"
+        }
+      }
+    },
+    "InstallCosts": {
+      "type": "object",
+      "description": "By the component's category: weapons by their type, where ballistic covers autocannons, Gauss rifles and machine guns, missile LRMs and SRMs, energy lasers, PPCs and COILs, and support flamers; other weapons and upgrades are other.",
+      "additionalProperties": false,
+      "required": [
+        "ballistic",
+        "missile",
+        "energy",
+        "support",
+        "ammunition",
+        "jumpJet",
+        "heatSink",
+        "other"
+      ],
+      "properties": {
+        "ballistic": {
+          "description": "For autocannons, Gauss rifles and machine guns.",
+          "$ref": "#/definitions/MechLabCost"
+        },
+        "missile": {
+          "description": "For LRMs and SRMs.",
+          "$ref": "#/definitions/MechLabCost"
+        },
+        "energy": {
+          "description": "For lasers, PPCs and COILs.",
+          "$ref": "#/definitions/MechLabCost"
+        },
+        "support": {
+          "description": "For flamers.",
+          "$ref": "#/definitions/MechLabCost"
+        },
+        "ammunition": {
+          "description": "For ammunition boxes.",
+          "$ref": "#/definitions/MechLabCost"
+        },
+        "jumpJet": {
+          "description": "For jump jets.",
+          "$ref": "#/definitions/MechLabCost"
+        },
+        "heatSink": {
+          "description": "For heat sinks.",
+          "$ref": "#/definitions/MechLabCost"
+        },
+        "other": {
+          "description": "For other weapons and upgrades.",
+          "$ref": "#/definitions/MechLabCost"
+        }
+      }
+    },
+    "MedBayRules": {
+      "type": "object",
+      "description": "How long healing takes: a pilot's injuries cost heal points, and the med bay pays healPointsBase plus healPointsPerMedTech times the company's medTech a day to each injured pilot.",
+      "additionalProperties": false,
+      "required": [
+        "healPointsBase",
+        "healPointsPerMedTech",
+        "injuryCost",
+        "lethalInjuryCost",
+        "incapacitatedCost",
+        "deathChance"
+      ],
+      "properties": {
+        "healPointsBase": {
+          "type": "integer",
+          "description": "The heal points each injured pilot gets a day, whatever the med tech.",
+          "format": "int32"
+        },
+        "healPointsPerMedTech": {
+          "type": "integer",
+          "description": "The heal points added per point of medTech.",
+          "format": "int32"
+        },
+        "injuryCost": {
+          "type": "integer",
+          "description": "Divided by the pilot's health for each injury, rounded down.",
+          "format": "int32"
+        },
+        "lethalInjuryCost": {
+          "type": "integer",
+          "description": "Added once for a pilot who took lethal injuries and survived.",
+          "format": "int32"
+        },
+        "incapacitatedCost": {
+          "type": "integer",
+          "description": "Added once for a pilot who was incapacitated.",
+          "format": "int32"
+        },
+        "deathChance": {
+          "description": "The chance that an incapacitated pilot dies after the mission.",
+          "$ref": "#/definitions/PilotDeathChance"
+        }
+      }
+    },
+    "PilotDeathChance": {
+      "type": "object",
+      "description": "The chance that an incapacitated pilot dies after the mission: incapacitated, or lethal after lethal injuries, less reductionPerGuts per point of Guts.",
+      "additionalProperties": false,
+      "required": [
+        "incapacitated",
+        "lethal",
+        "reductionPerGuts"
+      ],
+      "properties": {
+        "incapacitated": {
+          "type": "number",
+          "description": "Without lethal injuries, as a 0-1 fraction; 1 or more is certain before Guts.",
+          "format": "float"
+        },
+        "lethal": {
+          "type": "number",
+          "description": "After lethal injuries, as a 0-1 fraction; 1 or more is certain before Guts.",
+          "format": "float"
+        },
+        "reductionPerGuts": {
+          "type": "number",
+          "description": "As a 0-1 fraction; the chance doesn't fall below 0.",
+          "format": "float"
+        }
+      }
+    },
+    "HiringRules": {
+      "type": "object",
+      "description": "Hiring and paying pilots. A pilot's skill total is the sum of their four skills; their base skills are the ones they were hired with, the bonus skills the ones trained since.",
+      "additionalProperties": false,
+      "required": [
+        "costPerBaseSkillPoint",
+        "salaryPerBaseSkillPoint",
+        "salaryPerBonusSkillPoint",
+        "pilotsPerSystem",
+        "roninChance",
+        "generatedPilotHealth",
+        "mercenaryReviewBoardLevels",
+        "moraleLimits",
+        "maxPilotsPerBarracksPod",
+        "maxMechsPerMechBayPod"
+      ],
+      "properties": {
+        "costPerBaseSkillPoint": {
+          "type": "number",
+          "description": "The hiring cost, before the system owner's reputation adjustment.",
+          "format": "float"
+        },
+        "salaryPerBaseSkillPoint": {
+          "type": "number",
+          "description": "Per financial report.",
+          "format": "float"
+        },
+        "salaryPerBonusSkillPoint": {
+          "type": "number",
+          "description": "Per financial report.",
+          "format": "float"
+        },
+        "pilotsPerSystem": {
+          "type": "integer",
+          "description": "How many pilots a system's hiring hall offers.",
+          "format": "int32"
+        },
+        "roninChance": {
+          "type": "number",
+          "description": "The chance of each of them being a ronin, unless the system sets its own.",
+          "format": "float"
+        },
+        "generatedPilotHealth": {
+          "type": "integer",
+          "description": "The health, the injuries they can take, of the pilots the game generates.",
+          "format": "int32"
+        },
+        "mercenaryReviewBoardLevels": {
+          "type": "array",
+          "description": "The rating levels, which level refers to.",
+          "items": {
+            "$ref": "#/definitions/MercenaryReviewBoardLevel"
+          }
+        },
+        "moraleLimits": {
+          "type": "array",
+          "description": "Low company morale limits who can be hired.",
+          "items": {
+            "$ref": "#/definitions/MoraleHiringLimit"
+          }
+        },
+        "maxPilotsPerBarracksPod": {
+          "type": "integer",
+          "description": "The roster size each barracks pod of the ship allows.",
+          "format": "int32"
+        },
+        "maxMechsPerMechBayPod": {
+          "type": "integer",
+          "description": "The mech bays each mech bay pod of the ship allows.",
+          "format": "int32"
+        }
+      }
+    },
+    "MercenaryReviewBoardLevel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "startsAt",
+        "maxHireableSkillTotal",
+        "contractReputationMultiplier"
+      ],
+      "properties": {
+        "level": {
+          "type": "integer",
+          "description": "The rating level, from 0, which level refers to.",
+          "format": "int32"
+        },
+        "startsAt": {
+          "type": "integer",
+          "description": "The lowest rating value in the level.",
+          "format": "int32"
+        },
+        "maxHireableSkillTotal": {
+          "type": "integer",
+          "description": "The highest skill total of a pilot the company can hire at this level.",
+          "format": "int32"
+        },
+        "contractReputationMultiplier": {
+          "type": "number",
+          "description": "Multiplies a contract's difficulty into the rating gained from it.",
+          "format": "float"
+        }
+      }
+    },
+    "MoraleHiringLimit": {
+      "type": "object",
+      "description": "Below a company morale, only pilots up to a skill total can be hired; the first matching limit applies.",
+      "additionalProperties": false,
+      "required": [
+        "belowMorale",
+        "maxHireableSkillTotal"
+      ],
+      "properties": {
+        "belowMorale": {
+          "type": "integer",
+          "description": "The company morale below which the limit applies.",
+          "format": "int32"
+        },
+        "maxHireableSkillTotal": {
+          "type": "integer",
+          "description": "The highest skill total of a pilot the company can hire under the limit.",
+          "format": "int32"
+        }
+      }
+    },
+    "SalvageRules": {
+      "type": "object",
+      "description": "How a mission's salvage is made. The picks are the contract's salvage potential times the negotiated share plus floorBonus, times the outcome's chance less its loss per mech the company lost; the priority picks are priorityShare of them, at most maxPriorityPicks. The rest is drawn from the pool by pickWeights. A destroyed enemy mech yields its parts by how it died: 1 for a destroyed center torso, 2 for both legs, 3 for the head or an incapacitated pilot.",
+      "additionalProperties": false,
+      "required": [
+        "defaultPotential",
+        "victory",
+        "retreat",
+        "defeat",
+        "priorityShare",
+        "maxPriorityPicks",
+        "floorBonus",
+        "pickWeights",
+        "rareSwaps",
+        "culledComponentRarity",
+        "destroyedMechRecoveryChance",
+        "assembledMechsComeEquipped"
+      ],
+      "properties": {
+        "defaultPotential": {
+          "type": "integer",
+          "description": "The salvage potential of a contract that sets none.",
+          "format": "int32"
+        },
+        "victory": {
+          "description": "For a mission won.",
+          "$ref": "#/definitions/SalvageOutcome"
+        },
+        "retreat": {
+          "description": "For a mission the company retreated from.",
+          "$ref": "#/definitions/SalvageOutcome"
+        },
+        "defeat": {
+          "description": "For a mission failed.",
+          "$ref": "#/definitions/SalvageOutcome"
+        },
+        "priorityShare": {
+          "type": "number",
+          "description": "The share of the picks that are priority picks, a 0-1 fraction, rounded down.",
+          "format": "float"
+        },
+        "maxPriorityPicks": {
+          "type": "integer",
+          "description": "The most priority picks a mission gives, hardcoded by the game.",
+          "format": "int32"
+        },
+        "floorBonus": {
+          "type": "integer",
+          "description": "Picks added to the negotiated share of a contract's salvage potential, unless the potential is 0.",
+          "format": "int32"
+        },
+        "pickWeights": {
+          "description": "The relative weights the picks are drawn from the pool by.",
+          "$ref": "#/definitions/SalvagePickWeights"
+        },
+        "rareSwaps": {
+          "description": "The chance of a salvaged component being swapped for a rarer one.",
+          "$ref": "#/definitions/RareSalvageSwaps"
+        },
+        "culledComponentRarity": {
+          "type": "integer",
+          "description": "Components of this rarity or above never come as salvage.",
+          "format": "int32"
+        },
+        "destroyedMechRecoveryChance": {
+          "type": "number",
+          "description": "The chance of getting back a lost mech whose center torso was destroyed; a mech with its center torso intact always comes back.",
+          "format": "float"
+        },
+        "assembledMechsComeEquipped": {
+          "type": "boolean",
+          "description": "Whether a mech assembled from parts or bought comes with its stock loadout instead of only its fixed components."
+        }
+      }
+    },
+    "SalvageOutcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chance",
+        "chanceLostPerMechDestroyed"
+      ],
+      "properties": {
+        "chance": {
+          "type": "number",
+          "description": "Multiplies the picks, as a 0-1 fraction.",
+          "format": "float"
+        },
+        "chanceLostPerMechDestroyed": {
+          "type": "number",
+          "description": "Taken off chance for each of the company's mechs destroyed or whose pilot was incapacitated, down to 0.",
+          "format": "float"
+        }
+      }
+    },
+    "SalvagePickWeights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "weapon",
+        "component",
+        "mechPart"
+      ],
+      "properties": {
+        "weapon": {
+          "type": "integer",
+          "description": "The weight of a weapon.",
+          "format": "int32"
+        },
+        "component": {
+          "type": "integer",
+          "description": "The weight of any other component.",
+          "format": "int32"
+        },
+        "mechPart": {
+          "type": "integer",
+          "description": "The weight of a mech part.",
+          "format": "int32"
+        }
+      }
+    },
+    "RareSalvageSwaps": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "weapons",
+        "upgrades"
+      ],
+      "properties": {
+        "weapons": {
+          "description": "For weapons, which keep their kind.",
+          "$ref": "#/definitions/RareSalvageSwap"
+        },
+        "upgrades": {
+          "description": "For other components.",
+          "$ref": "#/definitions/RareSalvageSwap"
+        }
+      }
+    },
+    "RareSalvageSwap": {
+      "type": "object",
+      "description": "The chance of a swap is the contract's difficulty plus the tier's ChanceOffset, divided by divisor; the very rare tier is rolled first.",
+      "additionalProperties": false,
+      "required": [
+        "veryRare",
+        "rare",
+        "divisor"
+      ],
+      "properties": {
+        "veryRare": {
+          "description": "The very rare tier, rolled first.",
+          "$ref": "#/definitions/RareSalvageTier"
+        },
+        "rare": {
+          "description": "The rare tier, compared with the same roll, so it applies when the roll is below its chance but not the very rare tier's.",
+          "$ref": "#/definitions/RareSalvageTier"
+        },
+        "divisor": {
+          "type": "number",
+          "description": "Divides the contract's difficulty plus a tier's offset, giving the tier's 0-1 chance.",
+          "format": "float"
+        }
+      }
+    },
+    "RareSalvageTier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rarities",
+        "chanceOffset"
+      ],
+      "properties": {
+        "rarities": {
+          "type": "array",
+          "description": "The rarities the swapped-in component is drawn from.",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "chanceOffset": {
+          "type": "number",
+          "description": "Added to the contract's difficulty before divisor.",
+          "format": "float"
+        }
+      }
+    },
+    "FinancesRules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "daysPerReport",
+        "mechCostPerReport",
+        "shipMaintenance",
+        "spendingLevels",
+        "jumpCost",
+        "sellShare",
+        "sellDamagedShare",
+        "scrapShare",
+        "maxDebt",
+        "badFaithMoraleChange",
+        "catastropheMoraleChange"
+      ],
+      "properties": {
+        "daysPerReport": {
+          "type": "integer",
+          "description": "The days between financial reports, which deduct the expenses.",
+          "format": "int32"
+        },
+        "mechCostPerReport": {
+          "type": "integer",
+          "description": "The upkeep of each mech in a mech bay.",
+          "format": "int32"
+        },
+        "shipMaintenance": {
+          "description": "The ship's own maintenance in each report's expenses.",
+          "$ref": "#/definitions/ShipMaintenance"
+        },
+        "spendingLevels": {
+          "type": "array",
+          "description": "The spending levels, which level refers to.",
+          "items": {
+            "$ref": "#/definitions/SpendingLevelRules"
+          }
+        },
+        "jumpCost": {
+          "type": "integer",
+          "description": "The C-Bills each jump of a trip costs.",
+          "format": "int32"
+        },
+        "sellShare": {
+          "type": "number",
+          "description": "The share of its value a store pays for a mech or an undamaged component.",
+          "format": "float"
+        },
+        "sellDamagedShare": {
+          "type": "number",
+          "description": "The share of its value a store pays for a damaged component.",
+          "format": "float"
+        },
+        "scrapShare": {
+          "type": "number",
+          "description": "The share of the chassis' value scrapping a mech, chassis or mech part pays.",
+          "format": "float"
+        },
+        "maxDebt": {
+          "type": "integer",
+          "description": "The company is dissolved when its funds fall below this.",
+          "format": "int32"
+        },
+        "badFaithMoraleChange": {
+          "type": "integer",
+          "description": "When a mission is failed without a good faith effort.",
+          "format": "int32"
+        },
+        "catastropheMoraleChange": {
+          "type": "integer",
+          "description": "When every pilot sent on a mission is killed.",
+          "format": "int32"
+        }
+      }
+    },
+    "ShipMaintenance": {
+      "type": "object",
+      "description": "The ship's own line in the expenses of each report, before the spending level's multiplier.",
+      "additionalProperties": false,
+      "required": [
+        "leopard",
+        "argo"
+      ],
+      "properties": {
+        "leopard": {
+          "type": "integer",
+          "description": "The C-Bills while the company's ship is the Leopard.",
+          "format": "int32"
+        },
+        "argo": {
+          "type": "integer",
+          "description": "The C-Bills while the company's ship is the Argo.",
+          "format": "int32"
+        }
+      }
+    },
+    "SpendingLevelRules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "costMultiplier",
+        "moraleChange"
+      ],
+      "properties": {
+        "level": {
+          "description": "The spending level, as the game names it, e.g. Spartan.",
+          "$ref": "#/definitions/EconomyScale"
+        },
+        "costMultiplier": {
+          "type": "number",
+          "description": "Multiplies the expenses of each report.",
+          "format": "float"
+        },
+        "moraleChange": {
+          "type": "integer",
+          "description": "Applied once when the level is confirmed at a report.",
+          "format": "int32"
+        }
+      }
+    },
+    "EconomyScale": {
+      "type": "string",
+      "x-enumNames": [
+        "Normal",
+        "Generous",
+        "Extravagant",
+        "Spartan",
+        "Restrictive"
+      ],
+      "enum": [
+        "Normal",
+        "Generous",
+        "Extravagant",
+        "Spartan",
+        "Restrictive"
+      ]
+    },
+    "ContractRules": {
+      "type": "object",
+      "description": "How contracts are generated, paid and rewarded. A contract's pay is payPerDifficulty times the mission type's payMultiplier times a scale of its difficulty (the sum of 1 / (0.4 n) for n from 1 to the difficulty, less 1.5), varied by up to payVariance either way and rounded to thousands.",
+      "additionalProperties": false,
+      "required": [
+        "payPerDifficulty",
+        "payVariance",
+        "guaranteedPayShare",
+        "goodFaithPayShare",
+        "noFaithPayShare",
+        "reputation",
+        "experience",
+        "maxGlobalDifficulty",
+        "difficultyVariance",
+        "maxPerSystem",
+        "renewedPerRefresh",
+        "refreshDays",
+        "removedPerCompleted"
+      ],
+      "properties": {
+        "payPerDifficulty": {
+          "type": "integer",
+          "description": "In C-Bills, before the type's multiplier, the difficulty scale and the variance.",
+          "format": "int32"
+        },
+        "payVariance": {
+          "type": "number",
+          "description": "The most the pay varies either way, as a 0-1 fraction of it.",
+          "format": "float"
+        },
+        "guaranteedPayShare": {
+          "type": "number",
+          "description": "The share of the pay the company gets on top of the negotiated share.",
+          "format": "float"
+        },
+        "goodFaithPayShare": {
+          "type": "number",
+          "description": "The share of the pay for a mission not completed, with a good faith effort.",
+          "format": "float"
+        },
+        "noFaithPayShare": {
+          "type": "number",
+          "description": "The share without a good faith effort.",
+          "format": "float"
+        },
+        "reputation": {
+          "description": "The reputation a contract changes.",
+          "$ref": "#/definitions/ContractReputationRules"
+        },
+        "experience": {
+          "description": "The experience a contract's pilots earn.",
+          "$ref": "#/definitions/ContractExperienceRules"
+        },
+        "maxGlobalDifficulty": {
+          "type": "integer",
+          "description": "The career's global difficulty never exceeds this.",
+          "format": "int32"
+        },
+        "difficultyVariance": {
+          "type": "integer",
+          "description": "A contract's difficulty is the system's plus the global one, varied by up to this either way.",
+          "format": "int32"
+        },
+        "maxPerSystem": {
+          "type": "integer",
+          "description": "The most contracts a system offers at once, unless it sets its own.",
+          "format": "int32"
+        },
+        "renewedPerRefresh": {
+          "type": "number",
+          "description": "Added to a system's open contract slots every refreshDays.",
+          "format": "float"
+        },
+        "refreshDays": {
+          "type": "integer",
+          "description": "A system's open contract slots are renewed once more than this many days passed since their last renewal.",
+          "format": "int32"
+        },
+        "removedPerCompleted": {
+          "type": "number",
+          "description": "Taken off a system's open contract slots for each contract completed there.",
+          "format": "float"
+        }
+      }
+    },
+    "ContractReputationRules": {
+      "type": "object",
+      "description": "The reputation a contract changes: the employer gains the base plus the negotiated share of the negotiable value, the target loses the employer's gain times its multiplier, and the Mercenary Review Board rating gains the difficulty times the rating level's multiplier (see MercenaryReviewBoardLevel).",
+      "additionalProperties": false,
+      "required": [
+        "basePerDifficulty",
+        "baseAddition",
+        "negotiablePerDifficulty",
+        "negotiableAddition",
+        "employer",
+        "target",
+        "mercenaryReviewBoard"
+      ],
+      "properties": {
+        "basePerDifficulty": {
+          "type": "number",
+          "description": "Rounded, plus baseAddition.",
+          "format": "float"
+        },
+        "baseAddition": {
+          "type": "integer",
+          "description": "Added to basePerDifficulty times the difficulty, rounded.",
+          "format": "int32"
+        },
+        "negotiablePerDifficulty": {
+          "type": "number",
+          "description": "Rounded, plus negotiableAddition.",
+          "format": "float"
+        },
+        "negotiableAddition": {
+          "type": "integer",
+          "description": "Added to negotiablePerDifficulty times the difficulty, rounded.",
+          "format": "int32"
+        },
+        "employer": {
+          "description": "Multiplies the employer's gain.",
+          "$ref": "#/definitions/OutcomeMultipliers"
+        },
+        "target": {
+          "description": "Multiplies the employer's gain, before employer, into the target's change; negative for a loss.",
+          "$ref": "#/definitions/OutcomeMultipliers"
+        },
+        "mercenaryReviewBoard": {
+          "description": "Multiplies the Mercenary Review Board rating gained.",
+          "$ref": "#/definitions/OutcomeMultipliers"
+        }
+      }
+    },
+    "OutcomeMultipliers": {
+      "type": "object",
+      "description": "What the mission's outcome does to a reward.",
+      "additionalProperties": false,
+      "required": [
+        "completed",
+        "goodFaith",
+        "badFaith"
+      ],
+      "properties": {
+        "completed": {
+          "type": "number",
+          "description": "Completed successfully.",
+          "format": "float"
+        },
+        "goodFaith": {
+          "type": "number",
+          "description": "Not completed, with a good faith effort.",
+          "format": "float"
+        },
+        "badFaith": {
+          "type": "number",
+          "description": "Not completed, without one.",
+          "format": "float"
+        }
+      }
+    },
+    "ContractExperienceRules": {
+      "type": "object",
+      "description": "The experience every pilot sent on the mission earns.",
+      "additionalProperties": false,
+      "required": [
+        "perDifficulty",
+        "failed",
+        "retreatedGoodFaith",
+        "retreatedBadFaith"
+      ],
+      "properties": {
+        "perDifficulty": {
+          "type": "number",
+          "description": "Times the contract's difficulty, rounded down.",
+          "format": "float"
+        },
+        "failed": {
+          "type": "number",
+          "description": "Multiplies it for a failed mission.",
+          "format": "float"
+        },
+        "retreatedGoodFaith": {
+          "type": "number",
+          "description": "Multiplies it for a retreat with a good faith effort.",
+          "format": "float"
+        },
+        "retreatedBadFaith": {
+          "type": "number",
+          "description": "Multiplies it for a retreat without one.",
+          "format": "float"
+        }
+      }
+    },
+    "AllianceRules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reputationNeeded",
+        "reputationAfterBreaking",
+        "cooldownDays"
+      ],
+      "properties": {
+        "reputationNeeded": {
+          "type": "integer",
+          "description": "The faction reputation an alliance needs.",
+          "format": "int32"
+        },
+        "reputationAfterBreaking": {
+          "type": "integer",
+          "description": "The faction reputation after breaking the alliance.",
+          "format": "int32"
+        },
+        "cooldownDays": {
+          "type": "integer",
+          "description": "The days before a broken alliance can be renewed.",
+          "format": "int32"
+        }
+      }
+    },
+    "TravelRules": {
+      "type": "object",
+      "description": "How long a trip takes, which the star systems file states per system: the days of each jump plus the days to and from the jump point of the systems at both ends, scaled by the Argo's drive upgrades.",
+      "additionalProperties": false,
+      "required": [
+        "daysPerJump",
+        "daysPerJumpFromFuelStation",
+        "defaultDaysToJumpPoint",
+        "maxJumpDistance"
+      ],
+      "properties": {
+        "daysPerJump": {
+          "type": "integer",
+          "description": "Of a jump from a system without a fuel station.",
+          "format": "int32"
+        },
+        "daysPerJumpFromFuelStation": {
+          "type": "integer",
+          "description": "Of a jump from a system with one.",
+          "format": "int32"
+        },
+        "defaultDaysToJumpPoint": {
+          "type": "integer",
+          "description": "For a system that sets no distance of its own.",
+          "format": "int32"
+        },
+        "maxJumpDistance": {
+          "type": "integer",
+          "description": "The farthest a jump reaches on the starmap, in light years.",
+          "format": "int32"
+        }
+      }
+    }
+  }
+}
