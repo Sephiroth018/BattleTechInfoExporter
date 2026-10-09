@@ -1,0 +1,127 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Starmap",
+  "type": "object",
+  "description": "The root of star-systems.json: every star system on the starmap, keyed by the id of its active definition in the catalog (StarSystemDefinition).",
+  "additionalProperties": false,
+  "required": [
+    "modVersion",
+    "exportedAt",
+    "trigger",
+    "starSystems"
+  ],
+  "properties": {
+    "modVersion": {
+      "type": "string",
+      "description": "The four-part version of the mod that wrote the file; the other files match the catalog written by the same version."
+    },
+    "exportedAt": {
+      "type": "string",
+      "description": "When the file was last changed.",
+      "format": "date-time"
+    },
+    "trigger": {
+      "description": "What caused the export that last changed the file.",
+      "$ref": "#/definitions/ExportTrigger"
+    },
+    "starSystems": {
+      "type": "object",
+      "description": "Every star system's career state, keyed by the id of its active starSystemDefinitions entry.",
+      "additionalProperties": {
+        "$ref": "#/definitions/StarSystem"
+      }
+    }
+  },
+  "definitions": {
+    "ExportTrigger": {
+      "type": "string",
+      "description": "What caused an export.",
+      "x-enumNames": [
+        "CareerLoaded",
+        "ManualSave",
+        "Autosave",
+        "ContractCompleted",
+        "FinancialReportShown",
+        "MechLabOrderCompleted",
+        "PilotHealed",
+        "ShipUpgradeCompleted",
+        "ContractsGenerated",
+        "StoreClosed",
+        "MechBayChanged",
+        "ExperienceSpent",
+        "MechPlacementShown",
+        "MissionCompleted",
+        "SalvageChosen",
+        "ShipUpgradeStarted",
+        "PhaseStarted",
+        "CombatStarted",
+        "CombatLoaded",
+        "ActivationCompleted"
+      ],
+      "enum": [
+        "careerLoaded",
+        "manualSave",
+        "autosave",
+        "contractCompleted",
+        "financialReportShown",
+        "mechLabOrderCompleted",
+        "pilotHealed",
+        "shipUpgradeCompleted",
+        "contractsGenerated",
+        "storeClosed",
+        "mechBayChanged",
+        "experienceSpent",
+        "mechPlacementShown",
+        "missionCompleted",
+        "salvageChosen",
+        "shipUpgradeStarted",
+        "phaseStarted",
+        "combatStarted",
+        "combatLoaded",
+        "activationCompleted"
+      ]
+    },
+    "StarSystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "difficulty",
+        "canTravelTo",
+        "travelDays",
+        "travelCost"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name, as in the references to the star system."
+        },
+        "difficulty": {
+          "type": "integer",
+          "description": "The star system's difficulty, as the starmap shows it.",
+          "format": "int32"
+        },
+        "canTravelTo": {
+          "type": "boolean",
+          "description": "Whether the star system's travel requirements are met; story systems stay locked until then."
+        },
+        "travelDays": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The days the trip from the current star system takes, as the starmap shows them; 0 for the current star system and null where the game finds no route, always while canTravelTo is false.",
+          "format": "int32"
+        },
+        "travelCost": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The C-Bills the trip costs, under the same rules as travelDays.",
+          "format": "int32"
+        }
+      }
+    }
+  }
+}

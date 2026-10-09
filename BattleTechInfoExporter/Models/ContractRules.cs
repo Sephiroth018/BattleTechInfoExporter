@@ -8,15 +8,23 @@ namespace BattleTechInfoExporter.Models;
 ///     (the sum of 1 / (0.4 n) for n from 1 to the difficulty, less 1.5), varied by up to
 ///     <see cref="PayVariance" /> either way and rounded to thousands.
 /// </summary>
+/// <param name="PayPerDifficulty">In C-Bills, before the type's multiplier, the difficulty scale and the variance.</param>
+/// <param name="PayVariance">The most the pay varies either way, as a 0-1 fraction of it.</param>
 /// <param name="GuaranteedPayShare">The share of the pay the company gets on top of the negotiated share.</param>
 /// <param name="GoodFaithPayShare">The share of the pay for a mission not completed, with a good faith effort.</param>
 /// <param name="NoFaithPayShare">The share without a good faith effort.</param>
+/// <param name="Reputation">The reputation a contract changes.</param>
+/// <param name="Experience">The experience a contract's pilots earn.</param>
 /// <param name="MaxGlobalDifficulty">The career's global difficulty never exceeds this.</param>
 /// <param name="DifficultyVariance">
 ///     A contract's difficulty is the system's plus the global one, varied by up to this either way.
 /// </param>
 /// <param name="MaxPerSystem">The most contracts a system offers at once, unless it sets its own.</param>
-/// <param name="RenewedPerRefresh">Added to a system's open contract slots every <see cref="RefreshDays" />.</param>
+/// <param name="RenewedPerRefresh">Added to a system's open contract slots at each renewal.</param>
+/// <param name="RefreshDays">
+///     A system's open contract slots are renewed once more than this many days passed since their last renewal, so
+///     every <see cref="RefreshDays" /> + 1 days.
+/// </param>
 /// <param name="RemovedPerCompleted">Taken off a system's open contract slots for each contract completed there.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ContractRules(
@@ -40,7 +48,16 @@ internal sealed record ContractRules(
 ///     gains the difficulty times the rating level's multiplier (see <see cref="MercenaryReviewBoardLevel" />).
 /// </summary>
 /// <param name="BasePerDifficulty">Rounded, plus <see cref="BaseAddition" />.</param>
+/// <param name="BaseAddition">Added to <see cref="BasePerDifficulty" /> times the difficulty, rounded.</param>
 /// <param name="NegotiablePerDifficulty">Rounded, plus <see cref="NegotiableAddition" />.</param>
+/// <param name="NegotiableAddition">
+///     Added to <see cref="NegotiablePerDifficulty" /> times the difficulty, rounded.
+/// </param>
+/// <param name="Employer">Multiplies the employer's gain.</param>
+/// <param name="Target">
+///     Multiplies the employer's gain, before <see cref="Employer" />, into the target's change; negative for a loss.
+/// </param>
+/// <param name="MercenaryReviewBoard">Multiplies the Mercenary Review Board rating gained.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ContractReputationRules(
     float BasePerDifficulty,
@@ -52,6 +69,7 @@ internal sealed record ContractReputationRules(
     OutcomeMultipliers MercenaryReviewBoard);
 
 /// <summary>What the mission's outcome does to a reward.</summary>
+/// <param name="Completed">Completed successfully.</param>
 /// <param name="GoodFaith">Not completed, with a good faith effort.</param>
 /// <param name="BadFaith">Not completed, without one.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

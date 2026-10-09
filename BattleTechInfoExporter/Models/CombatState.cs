@@ -37,7 +37,10 @@ internal sealed record CombatState(
     IReadOnlyDictionary<string, CombatUnit> Units,
     IReadOnlyList<CombatObjective> Objectives,
     IReadOnlyList<ObjectiveZone> Zones,
-    IReadOnlyList<DamagedBuilding> DamagedBuildings) : ExportFile;
+    IReadOnlyList<DamagedBuilding> DamagedBuildings) : ExportFile
+{
+    internal const string FileName = "combat-state.json";
+}
 
 /// <param name="Id">The building's id in <see cref="CombatMap.Buildings" />.</param>
 /// <param name="Structure">The structure left; its max is in <see cref="CombatBuilding.MaxStructure" />.</param>
@@ -49,6 +52,8 @@ internal sealed record CombatState(
 internal sealed record DamagedBuilding(string Id, float Structure, IReadOnlyList<MapHex>? DestroyedHexes);
 
 /// <summary>A hex of <see cref="CombatMap.Rows" /> as it is now.</summary>
+/// <param name="Q">The hex's axial <c>q</c>, as in <see cref="CombatMap.HexGrid" />.</param>
+/// <param name="R">The hex's axial <c>r</c>, as in <see cref="CombatMap.HexGrid" />.</param>
 /// <param name="Elevation">As in <see cref="HexRow.Elevations" />.</param>
 /// <param name="Terrain">
 ///     Keyed as in the catalog's <see cref="Catalog.TerrainDefinitions" />; <c>null</c> on open ground.
@@ -57,5 +62,8 @@ internal sealed record DamagedBuilding(string Id, float Structure, IReadOnlyList
 internal sealed record MapHex(int Q, int R, double Elevation, string? Terrain);
 
 /// <summary>A point on the map in meters: <see cref="Y" /> is the elevation.</summary>
+/// <param name="X">Along the map's x axis, 0 at the map's center.</param>
+/// <param name="Y">The elevation, on the scale of <see cref="HexRow.Elevations" />.</param>
+/// <param name="Z">Along the map's z axis, 0 at the map's center.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MapPosition(float X, float Y, float Z);

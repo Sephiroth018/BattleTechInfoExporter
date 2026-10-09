@@ -6,9 +6,11 @@ namespace BattleTechInfoExporter.Models;
 
 /// <summary>A unit in combat, with as much of it as the HUD shows at its <see cref="Visibility" />.</summary>
 /// <param name="Faction">The faction of the unit's team.</param>
+/// <param name="Allegiance">Whose side the unit is on, seen from the player.</param>
+/// <param name="Visibility">How much of the unit the HUD shows, deciding which of its other fields are set.</param>
 /// <param name="Kind">
-///     The kind of unit; <c>null</c> where the HUD doesn't tell (<see cref="UnitVisibility.BlipMinimum" />
-///     ).
+///     The kind of unit; <c>null</c> where the HUD doesn't tell: at <see cref="UnitVisibility.BlipMinimum" /> and
+///     <see cref="UnitVisibility.LastSeen" />.
 /// </param>
 /// <param name="Tonnage">
 ///     A blip's tonnage, which the HUD shows at <see cref="UnitVisibility.BlipMaximum" /> for mechs and vehicles;
@@ -17,7 +19,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="WeightClass">A blip's weight class, which the HUD shows instead of the tonnage for turrets.</param>
 /// <param name="Definition">
 ///     The mech, vehicle or turret in the catalog, which holds its armor and loadout; <c>null</c> for the player's
-///     mechs, which have <see cref="BayMech" /> instead, and for blips.
+///     mechs, which have <see cref="BayMech" /> instead, and for units out of full view.
 /// </param>
 /// <param name="BayMech">The player's mech in <c>game-state.json</c>, whose loadout holds its assigned armor.</param>
 /// <param name="Position">Where the unit is, or was last detected at for <see cref="UnitVisibility.LastSeen" />.</param>
@@ -56,13 +58,29 @@ internal sealed record CombatUnit(
     IReadOnlyList<LineOfFire>? LinesOfFire,
     UnitMovement? Movement);
 
+/// <param name="IsDestroyed">
+///     Whether the unit is destroyed; only the player's and allied units stay listed once destroyed.
+/// </param>
 /// <param name="Locations">
 ///     The armor and structure left per location, in the game's order: a mech's from head to legs, a vehicle's from
 ///     front to rear and turret, a turret's single one. The limits are in <see cref="CombatUnit.Definition" /> or
 ///     <see cref="CombatUnit.BayMech" />.
 /// </param>
+/// <param name="EvasionPips">The evasive pips the unit has, earned by moving (see <see cref="EvasionRules" />).</param>
+/// <param name="Guard">The unit's guard level and its sources.</param>
+/// <param name="IsEntrenched">
+///     Whether the unit is entrenched, e.g. by bracing, until its next activation: weapons' instability against it
+///     is multiplied by <see cref="StabilityRules.EntrenchedInstabilityMultiplier" />.
+/// </param>
+/// <param name="IsProne">Whether the mech has been knocked down; only mechs can be.</param>
+/// <param name="IsShutDown">Whether the unit is shut down, e.g. from overheating.</param>
+/// <param name="IsUnsteady">
+///     Whether the mech is unsteady, which it becomes at <see cref="StabilityRules.UnsteadyThresholdPercent" /> of
+///     its stability; only mechs can be.
+/// </param>
 /// <param name="Heat"><c>null</c> for vehicles and turrets, which have none.</param>
 /// <param name="Stability"><c>null</c> for vehicles and turrets, which have none.</param>
+/// <param name="HasActivated">Whether the unit has finished its activation this round.</param>
 /// <param name="Initiative">The phase the unit acts in, on the scale of <see cref="CombatState.Phase" />.</param>
 /// <param name="Components">Every component mounted, in the game's order.</param>
 /// <param name="Pilot">The pilot's condition; <c>null</c> without a pilot.</param>
@@ -102,7 +120,9 @@ internal sealed record CombatPilotState(int Injuries, int Health, int BonusHealt
 
 /// <summary>A location's armor and structure left, in whole points as the paper doll shows them.</summary>
 /// <param name="Location">The game's name of the location (a mech's, vehicle's or turret's).</param>
+/// <param name="Armor">The armor left; on a mech's torso, the front armor.</param>
 /// <param name="RearArmor"><c>null</c> outside a mech's torso, which alone has rear armor.</param>
+/// <param name="Structure">The structure left; 0 once the location is destroyed.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record UnitLocation(string Location, int Armor, int? RearArmor, int Structure);
 
@@ -119,6 +139,7 @@ internal sealed record UnitLocation(string Location, int Armor, int? RearArmor, 
 internal sealed record Guard(int Level, bool IsBraced, bool HasCover, bool HasBulwark);
 
 /// <param name="Location">The game's name of the location it is mounted in.</param>
+/// <param name="DamageLevel">The game's damage level, e.g. <c>Functional</c> or <c>Destroyed</c>.</param>
 /// <param name="Ammo">
 ///     The rounds left in an ammunition box, or in a weapon that carries its own; <c>null</c> for other components.
 ///     A destroyed box has none.
@@ -130,6 +151,7 @@ internal sealed record CombatComponent(
     ComponentDamageLevel DamageLevel,
     int? Ammo) : ComponentEntry(Component), IDamageable;
 
+/// <param name="Ability">The ability, the pilot's or a mounted component's.</param>
 /// <param name="Cooldown">The unit's activations until the ability can be used again; 0 when ready.</param>
 /// <param name="UsesLeft">The uses left of an ability that can be used only so often; <c>null</c> without a limit.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -142,6 +164,10 @@ internal sealed record CombatAbility(DefinitionReference Ability, int Cooldown, 
 /// <param name="Level">
 ///     How much of the line of fire itself is blocked. A target beyond every weapon's range and the unit's sensors is
 ///     blocked too.
+/// </param>
+/// <param name="Fire">
+///     Whether the unit's weapons could fire at the target directly, only indirectly or not at all, or it is out of
+///     their range.
 /// </param>
 /// <param name="IsInFiringArc">Whether the target is in the unit's firing arc without turning.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

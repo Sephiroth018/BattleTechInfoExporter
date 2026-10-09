@@ -1,16 +1,12 @@
 using BattleTech;
 using BattleTechInfoExporter.Models;
+using Starmap = BattleTechInfoExporter.Models.Starmap;
 
 namespace BattleTechInfoExporter.Export;
 
 /// <summary>The single entry point every trigger of the career state export calls.</summary>
 internal static class GameStateExporter
 {
-    private const string GameStateFileName = "game-state.json";
-    private const string RulesFileName = "rules.json";
-    private const string StarSystemsFileName = "star-systems.json";
-    private const string FinancialReportFileName = "financial-report.json";
-
     internal static void Export(SimGameState simGame, ExportTrigger trigger) =>
         CampaignExport.Run(
             simGame,
@@ -22,9 +18,9 @@ internal static class GameStateExporter
                 var rules = RulesReader.Read(simGame);
                 var starmap = StarSystemReader.Read(simGame);
                 var financialReport = FinancialReportReader.Read(simGame);
-                gameState.Write(GameStateFileName, trigger);
-                rules.Write(RulesFileName, trigger);
-                starmap.Write(StarSystemsFileName, trigger);
-                financialReport.Write(FinancialReportFileName, trigger);
+                gameState.Write(GameState.FileName, trigger);
+                rules.Write(Rules.FileName, trigger);
+                starmap.Write(Starmap.FileName, trigger);
+                financialReport.Write(FinancialReport.FileName, trigger);
             });
 }

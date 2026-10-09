@@ -4,6 +4,8 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>A change an ability or a component makes to a statistic of the unit, its pilot or its components.</summary>
+/// <param name="Statistic">The statistic's name, as the game names it.</param>
+/// <param name="Operation">How <see cref="Value" /> changes the statistic, e.g. <c>Set</c>, <c>Int_Add</c>.</param>
 /// <param name="Value">
 ///     A boolean, integer or number, as the statistic's type requires. Changes to the initiative statistics
 ///     (<c>BaseInitiative</c>, <c>PhaseModifier</c>, <c>PhaseModifierSelf</c>) are as the HUD numbers phases, so a
@@ -27,6 +29,11 @@ internal sealed record StatisticChange(
     EffectTargetType Target,
     EffectTriggerType Trigger);
 
+/// <param name="Collection">
+///     The pilot, the weapons, the ammunition boxes, one random working weapon or the strongest working weapon.
+/// </param>
+/// <param name="WeaponSubType">Only weapons of this sub type; <c>null</c> when not filtered by it.</param>
+/// <param name="WeaponType">Only weapons of this type; <c>null</c> when not filtered by it.</param>
 /// <param name="WeaponCategory">The weapon category, as the catalog's weapons name theirs.</param>
 /// <param name="AmmoCategory">The ammunition category, as the catalog's ammunition boxes name theirs.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -37,5 +44,7 @@ internal sealed record EffectTargetCollection(
     string? WeaponCategory,
     string? AmmoCategory);
 
+/// <param name="Count">How many of <see cref="Unit" /> the change lasts, at least 1.</param>
+/// <param name="Unit">What the duration counts.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record EffectDuration(int Count, EffectDurationUnit Unit);

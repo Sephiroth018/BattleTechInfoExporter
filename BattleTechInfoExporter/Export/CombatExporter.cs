@@ -12,9 +12,6 @@ namespace BattleTechInfoExporter.Export;
 /// </summary>
 internal static class CombatExporter
 {
-    private const string CombatMapFileName = "combat-map.json";
-    private const string CombatStateFileName = "combat-state.json";
-
     /// <summary>Exports the battle's map; a skirmish's, which belongs to no career, is skipped.</summary>
     internal static void ExportMap(CombatGameState combat, ExportTrigger trigger) =>
         Run(
@@ -27,9 +24,9 @@ internal static class CombatExporter
                 var stopwatch = Stopwatch.StartNew();
                 var map = CombatMapReader.Read(combat);
                 ModLog.Logger.Log(
-                    $"Read {CombatMapFileName} in {stopwatch.ElapsedMilliseconds} ms, pathing groups "
+                    $"Read {CombatMap.FileName} in {stopwatch.ElapsedMilliseconds} ms, pathing groups "
                     + string.Join("; ", map.PathingGroups.Select(pathingIds => string.Join(", ", pathingIds))));
-                map.Write(CombatMapFileName, trigger);
+                map.Write(CombatMap.FileName, trigger);
             });
 
     /// <summary>Exports the running battle; a skirmish's, which belongs to no career, is skipped.</summary>
@@ -43,8 +40,8 @@ internal static class CombatExporter
                 // fire checks per hex.
                 var stopwatch = Stopwatch.StartNew();
                 var state = CombatStateReader.Read(combat.BattleTechGame.Simulation, combat);
-                ModLog.Logger.Log($"Read {CombatStateFileName} in {stopwatch.ElapsedMilliseconds} ms");
-                state.Write(CombatStateFileName, trigger);
+                ModLog.Logger.Log($"Read {CombatState.FileName} in {stopwatch.ElapsedMilliseconds} ms");
+                state.Write(CombatState.FileName, trigger);
             });
 
     /// <summary>Deletes the files once no battle is running, so existing files always describe the running one.</summary>
@@ -53,8 +50,8 @@ internal static class CombatExporter
         // Runs inside the game's own code, like every export (CampaignExport.Run).
         try
         {
-            ExportFile.Delete(CombatMapFileName);
-            ExportFile.Delete(CombatStateFileName);
+            ExportFile.Delete(CombatMap.FileName);
+            ExportFile.Delete(CombatState.FileName);
         }
         catch (Exception exception)
         {

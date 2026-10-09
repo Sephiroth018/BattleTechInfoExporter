@@ -7,6 +7,8 @@
     <!-- The version ModTek ships and loads at runtime. -->
     <PackageVersion Include="HarmonyX" Version="2.16.0" />
     <PackageVersion Include="Krafs.Publicizer" Version="2.3.2" />
+    <!-- Only the schema generator, which runs at build time; brings Newtonsoft.Json 13, which the game never loads. -->
+    <PackageVersion Include="NJsonSchema.NewtonsoftJson" Version="11.6.1" />
   </ItemGroup>
 
   <ItemGroup>

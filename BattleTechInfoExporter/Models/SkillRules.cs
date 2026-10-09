@@ -7,6 +7,10 @@ namespace BattleTechInfoExporter.Models;
 /// <summary>The training table of each pilot skill and the limits on choosing primary abilities.</summary>
 /// <param name="MaxPrimaryAbilities">How many primary abilities a pilot can hold in total.</param>
 /// <param name="MaxPrimaryAbilitiesPerSkill">How many of them can come from one skill.</param>
+/// <param name="Gunnery">The Gunnery skill's training table.</param>
+/// <param name="Piloting">The Piloting skill's training table.</param>
+/// <param name="Guts">The Guts skill's training table.</param>
+/// <param name="Tactics">The Tactics skill's training table.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record SkillRules(
     int MaxPrimaryAbilities,
@@ -21,6 +25,7 @@ internal sealed record SkillRules(
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Skill(string Description, IReadOnlyList<SkillLevel> Levels);
 
+/// <param name="Level">The skill level, from 2.</param>
 /// <param name="ExperienceCost">The experience spent to reach the level from the one below.</param>
 /// <param name="BaseHitChancePercent">
 ///     Gunnery only: the hit chance of ranged attacks at this level, before the attack's modifiers.
@@ -41,7 +46,13 @@ internal sealed record SkillLevel(
     float? MovementAfterStandingUpPercent,
     IReadOnlyList<SkillLevelAbility> Abilities);
 
+/// <param name="Ability">The ability, by its definition's id and name.</param>
 /// <param name="IsPrimary">A primary ability is chosen, a passive trait comes with the level.</param>
+/// <param name="Description">The game's description of the ability, as plain text.</param>
+/// <param name="ActivationTiming">
+///     The game's activation timing of the ability, e.g. <c>Passive</c>, <c>ConsumedByFiring</c> or
+///     <c>CommandAbility</c>.
+/// </param>
 /// <param name="Targeting">How the ability is aimed; <c>null</c> for one that isn't.</param>
 /// <param name="Cooldown">The rounds before the ability can be used again; <c>null</c> without a cooldown.</param>
 /// <param name="Uses">How often the ability can be used per mission; <c>null</c> without a limit.</param>

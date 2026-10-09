@@ -17,6 +17,8 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="ShutdownSignatureModifier">Added to a shut-down unit's signature.</param>
 /// <param name="ShutdownVisibilityModifier">Added to a shut-down unit's visibility multiplier.</param>
 /// <param name="GhostedUnitsHideBlips">Whether a unit in stealth hides from sensors altogether.</param>
+/// <param name="SensorLock">What a sensor lock does to its target.</param>
+/// <param name="FiredWeaponsEffects">The statistic changes a unit makes to itself when it fires.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record VisibilityRules(
     float SpotterRange,
@@ -32,5 +34,9 @@ internal sealed record VisibilityRules(
     IReadOnlyList<StatisticChange> FiredWeaponsEffects);
 
 /// <summary>What a sensor lock does to its target, besides making it visible to the whole lance.</summary>
+/// <param name="EvasivePipsStripped">The evasive pips the target loses; 0 when a sensor lock strips none.</param>
+/// <param name="TargetEffects">
+///     The statistic changes the target gets, one entry per application of a change the game applies repeatedly.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record SensorLockRules(int EvasivePipsStripped, IReadOnlyList<StatisticChange> TargetEffects);

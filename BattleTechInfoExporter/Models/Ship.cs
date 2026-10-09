@@ -12,7 +12,10 @@ namespace BattleTechInfoExporter.Models;
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Ship(IReadOnlyList<ShipUpgrade> Upgrades);
 
+/// <param name="Upgrade">The ship upgrade's id and name.</param>
+/// <param name="Status">Where the upgrade stands, as the engineering screen shows it.</param>
 /// <param name="Category">The engineering screen's group, e.g. "Mech Bay".</param>
+/// <param name="Location">The room of the ship the upgrade's details name, e.g. <c>MECH_BAY</c>.</param>
 /// <param name="Details">The upgrade's description, which also names effects the stats don't, e.g. training.</param>
 /// <param name="RequiredUpgrades">The upgrades that must be installed before this one can be bought.</param>
 /// <param name="PurchaseCost">The one-time C-Bills to buy the upgrade.</param>
@@ -21,6 +24,9 @@ internal sealed record Ship(IReadOnlyList<ShipUpgrade> Upgrades);
 ///     <see cref="ExpectedExpenses.ShipUpgrades" /> is the same.
 /// </param>
 /// <param name="InstallDays">The days the upgrade takes to install.</param>
+/// <param name="Effects">
+///     The changes the upgrade makes to company statistics once installed, as the engineering screen lists them.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ShipUpgrade(
     DefinitionReference Upgrade,
@@ -36,6 +42,7 @@ internal sealed record ShipUpgrade(
 
 /// <summary>A change the upgrade makes to a company statistic once installed.</summary>
 /// <param name="Statistic">The game's name of the company statistic, e.g. "MechTechSkill".</param>
+/// <param name="Value">The amount added to the statistic, or the value it is set to when <see cref="IsSet" />.</param>
 /// <param name="IsSet">Whether the upgrade sets the statistic to <see cref="Value" /> instead of adding it.</param>
 /// <param name="Description">The effect in the game's words, e.g. "+2 Morale".</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

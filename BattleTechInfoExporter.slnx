@@ -1,3 +1,7 @@
 <Solution>
   <Project Path="BattleTechInfoExporter/BattleTechInfoExporter.csproj" />
+  <Project Path="BattleTechInfoExporter.SchemaGenerator/BattleTechInfoExporter.SchemaGenerator.csproj">
+    <!-- It references the built mod by path, so the mod must build first. -->
+    <BuildDependency Project="BattleTechInfoExporter/BattleTechInfoExporter.csproj" />
+  </Project>
 </Solution>

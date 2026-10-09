@@ -341,7 +341,8 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
   a compile-only package in the version ModTek ships (2.16.0 with ModTek 4.5.1, in
   `Mods/ModTek/lib`). The JetBrains annotations (`[UsedImplicitly]`) come from the game's
   `UnityEngine.CoreModule`, which embeds them on purpose; a `JetBrains.Annotations` package would
-  clash with them.
+  clash with them. The schema generator alone uses Newtonsoft.Json 13, which NJsonSchema brings:
+  it runs at build time only, and the game never loads it.
 - **Private game members are accessed through Krafs.Publicizer**, never reflection. This is the
   one allowed escape hatch, and only for game types.
 - **Hook into the game with Harmony patches**, as ModTek's guide does; the game's `MessageCenter`
@@ -359,7 +360,15 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
 
 ## Structure
 
-One project, `BattleTechInfoExporter/`, in `BattleTechInfoExporter.slnx`. `ModEntryPoint` is the
+Two projects in `BattleTechInfoExporter.slnx`: the mod, `BattleTechInfoExporter/`, and the schema
+generator, `BattleTechInfoExporter.SchemaGenerator/` (net9.0, never shipped). The mod's build builds
+and runs the generator on the built mod; it writes a JSON Schema per export file into `schemas/`
+(`ExportFileModels` lists the files, `ExportSchemaGenerator` generates them with the mod's own
+serializer settings, `ModelDocumentation` turns the models' doc comments into their descriptions),
+and fails the build when an exported property has no description. The mod grants it
+`InternalsVisibleTo` for the serializer settings, the one exception to "its own test project only".
+
+In the mod, `ModEntryPoint` is the
 only public type; it applies all Harmony patches in the assembly. `ModAssembly` holds the mod's
 name, version and folder, `ModLog` its logger. Folders:
 
@@ -396,7 +405,10 @@ name, version and folder, `ModLog` its logger. Folders:
   folder, by file name and text, knowing no model.
 - `Models/`: immutable records, one per JSON object, and the mod's own enums. The records are
   marked `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` because only the serializer reads
-  them. `ExportFile`, the root of every file, is more than data, by decision: it owns the header,
+  them. Every exported property has a doc comment, overriding "XML doc comments only where name and
+  signature aren't enough": a `<param>` on its record, or a `<summary>` on a body property, on the
+  record that declares it. It's the schema's description, so it's short (a fragment is fine) and
+  says what the value is, its unit or scale and what `null` means. `ExportFile`, the root of every file, is more than data, by decision: it owns the header,
   the JSON conventions, the content compared before a write and the writing itself, through
   `ExportFileWriter` and the clock.
 
@@ -483,6 +495,10 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   for presentation or the AI is left out, so a consumer never plans around a number that does
   nothing. A value the game hardcodes but a tool computes with (a rounding, a limit) is exported
   next to the constants; a rule it hardcodes with conditions is stated in the README.
+- **Every export file has a JSON Schema** (draft-04), `schemas/<file>.schema.json`, generated on
+  every build, committed, and shipped in the mod folder's `schemas/`. Every property is required,
+  since the mod writes them all, `null` included; an abstract record declared as a property's type
+  is `anyOf` its derived records. A change to the export format shows in the schemas' diff.
 - **Every export file starts with `modVersion`, `exportedAt` and `trigger`** (`ExportFile`, which
   every file's model inherits), describing the export that last changed it.
 - **Points in time are day numbers** on the game's `DaysPassed` scale (`company.daysPassed`), e.g.
@@ -551,7 +567,11 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 
 ## Commands
 
-- **Build:** `dotnet build`.
+- **Build:** `dotnet build`, which also regenerates the schemas.
+- **Validate exports:** `dotnet
+  BattleTechInfoExporter.SchemaGenerator/bin/Debug/net9.0/BattleTechInfoExporter.SchemaGenerator.dll
+  <game> --validate <game>/Mods/BattleTechInfoExporter/exports` checks the game's current export
+  files against the schemas of the last build, without writing any.
 - **Deploy:** `dotnet build -p:DeployToGame=true` also copies the DLL and `mod.json` into
   `<game>/Mods/BattleTechInfoExporter/`, for testing a branch in the game.
 - **Package:** `dotnet build -c Release` also writes `artifacts/BattleTechInfoExporter-<version>.zip`.

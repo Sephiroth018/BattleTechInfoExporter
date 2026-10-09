@@ -30,4 +30,7 @@ internal sealed record Rules(
     IReadOnlyList<ContractTypeDescription> ContractTypes,
     IReadOnlyList<JumpDistance> JumpDistances,
     CombatRules Combat,
-    CampaignRules Campaign) : ExportFile;
+    CampaignRules Campaign) : ExportFile
+{
+    internal const string FileName = "rules.json";
+}

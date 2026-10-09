@@ -1,0 +1,1198 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "CombatState",
+  "type": "object",
+  "description": "The root of combat-state.json: the battle as the player's HUD shows it, written when every phase begins and after every unit's activation; the file exists only while a battle is running.",
+  "additionalProperties": false,
+  "required": [
+    "modVersion",
+    "exportedAt",
+    "trigger",
+    "contract",
+    "mapId",
+    "round",
+    "phase",
+    "resolve",
+    "movementLegend",
+    "units",
+    "objectives",
+    "zones",
+    "damagedBuildings"
+  ],
+  "properties": {
+    "modVersion": {
+      "type": "string",
+      "description": "The four-part version of the mod that wrote the file; the other files match the catalog written by the same version."
+    },
+    "exportedAt": {
+      "type": "string",
+      "description": "When the file was last changed.",
+      "format": "date-time"
+    },
+    "trigger": {
+      "description": "What caused the export that last changed the file.",
+      "$ref": "#/definitions/ExportTrigger"
+    },
+    "contract": {
+      "description": "The contract being fought, as in contract.",
+      "$ref": "#/definitions/MissionContract"
+    },
+    "mapId": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "description": "The map, keyed as in the catalog's mapDefinitions."
+    },
+    "round": {
+      "type": "integer",
+      "description": "The combat round, counted from 1.",
+      "format": "int32"
+    },
+    "phase": {
+      "type": "integer",
+      "description": "The current phase as the HUD numbers it, as initiative: units act from 5 down to 1.",
+      "format": "int32"
+    },
+    "resolve": {
+      "type": "integer",
+      "description": "The lance's resolve now; its limits are in rules.json's ResolveRules.",
+      "format": "int32"
+    },
+    "movementLegend": {
+      "description": "How to read the units' movement.",
+      "$ref": "#/definitions/MovementLegend"
+    },
+    "units": {
+      "type": "object",
+      "description": "Every unit the player knows of, keyed by the game's unit id: the player's and allied units, and the enemies and neutral units the HUD shows or last showed.",
+      "additionalProperties": {
+        "$ref": "#/definitions/CombatUnit"
+      }
+    },
+    "objectives": {
+      "type": "array",
+      "description": "The objectives the HUD lists, finished ones included, in the HUD's order.",
+      "items": {
+        "$ref": "#/definitions/CombatObjective"
+      }
+    },
+    "zones": {
+      "type": "array",
+      "description": "The zones drawn on the map.",
+      "items": {
+        "$ref": "#/definitions/ObjectiveZone"
+      }
+    },
+    "damagedBuildings": {
+      "type": "array",
+      "description": "The buildings of buildings below their max structure, destroyed ones included, in the order of their ids; the others are undamaged.",
+      "items": {
+        "$ref": "#/definitions/DamagedBuilding"
+      }
+    }
+  },
+  "definitions": {
+    "ExportTrigger": {
+      "type": "string",
+      "description": "What caused an export.",
+      "x-enumNames": [
+        "CareerLoaded",
+        "ManualSave",
+        "Autosave",
+        "ContractCompleted",
+        "FinancialReportShown",
+        "MechLabOrderCompleted",
+        "PilotHealed",
+        "ShipUpgradeCompleted",
+        "ContractsGenerated",
+        "StoreClosed",
+        "MechBayChanged",
+        "ExperienceSpent",
+        "MechPlacementShown",
+        "MissionCompleted",
+        "SalvageChosen",
+        "ShipUpgradeStarted",
+        "PhaseStarted",
+        "CombatStarted",
+        "CombatLoaded",
+        "ActivationCompleted"
+      ],
+      "enum": [
+        "careerLoaded",
+        "manualSave",
+        "autosave",
+        "contractCompleted",
+        "financialReportShown",
+        "mechLabOrderCompleted",
+        "pilotHealed",
+        "shipUpgradeCompleted",
+        "contractsGenerated",
+        "storeClosed",
+        "mechBayChanged",
+        "experienceSpent",
+        "mechPlacementShown",
+        "missionCompleted",
+        "salvageChosen",
+        "shipUpgradeStarted",
+        "phaseStarted",
+        "combatStarted",
+        "combatLoaded",
+        "activationCompleted"
+      ]
+    },
+    "MissionContract": {
+      "type": "object",
+      "description": "The contract a mission was for.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "type",
+        "displayStyle",
+        "employer",
+        "target",
+        "difficulty",
+        "starSystem"
+      ],
+      "properties": {
+        "id": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "The contract's data file; null where the game keeps no reference to it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The contract's name, as the contract list shows it."
+        },
+        "type": {
+          "description": "The mission type, described in contractTypes.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "displayStyle": {
+          "description": "Whether it's a regular, story, restoration or flashpoint contract.",
+          "$ref": "#/definitions/ContractDisplayStyle"
+        },
+        "employer": {
+          "description": "The faction that hires the company.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "target": {
+          "description": "The faction the mission is fought against.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "difficulty": {
+          "type": "integer",
+          "description": "On the scale of maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
+          "format": "int32"
+        },
+        "starSystem": {
+          "description": "The star system the mission is fought in.",
+          "$ref": "#/definitions/DefinitionReference"
+        }
+      }
+    },
+    "DefinitionReference": {
+      "type": "object",
+      "description": "A game definition: its id from the game's data files and the name shown in the UI.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name the UI shows."
+        }
+      }
+    },
+    "ContractDisplayStyle": {
+      "type": "string",
+      "x-enumNames": [
+        "INVALID_UNSET",
+        "BaseCampaignNormal",
+        "BaseCampaignStory",
+        "BaseCampaignRestoration",
+        "BaseFlashpoint",
+        "HeavyMetalFlashpointCampaign"
+      ],
+      "enum": [
+        "INVALID_UNSET",
+        "BaseCampaignNormal",
+        "BaseCampaignStory",
+        "BaseCampaignRestoration",
+        "BaseFlashpoint",
+        "HeavyMetalFlashpointCampaign"
+      ]
+    },
+    "MovementLegend": {
+      "type": "object",
+      "description": "How to read UnitMovement's rows, spelled out so the file explains itself.",
+      "additionalProperties": false,
+      "required": [
+        "moves",
+        "fire",
+        "side"
+      ],
+      "properties": {
+        "moves": {
+          "type": "string",
+          "description": "How to read the characters of the moves."
+        },
+        "fire": {
+          "type": "object",
+          "description": "The first character of an attack: how the unit could fire at the target from the hex.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "side": {
+          "type": "object",
+          "description": "The second character of an attack: the side of the target an attack from the hex hits.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "CombatUnit": {
+      "type": "object",
+      "description": "A unit in combat, with as much of it as the HUD shows at its visibility.",
+      "additionalProperties": false,
+      "required": [
+        "faction",
+        "allegiance",
+        "visibility",
+        "kind",
+        "tonnage",
+        "weightClass",
+        "definition",
+        "bayMech",
+        "position",
+        "facing",
+        "terrain",
+        "pilot",
+        "state",
+        "linesOfFire",
+        "movement"
+      ],
+      "properties": {
+        "faction": {
+          "description": "The faction of the unit's team.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "allegiance": {
+          "description": "Whose side the unit is on, seen from the player.",
+          "$ref": "#/definitions/UnitAllegiance"
+        },
+        "visibility": {
+          "description": "How much of the unit the HUD shows, deciding which of its other fields are set.",
+          "$ref": "#/definitions/UnitVisibility"
+        },
+        "kind": {
+          "description": "The kind of unit; null where the HUD doesn't tell: at blipMinimum and lastSeen.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/UnitKind"
+            }
+          ]
+        },
+        "tonnage": {
+          "type": [
+            "null",
+            "number"
+          ],
+          "description": "A blip's tonnage, which the HUD shows at blipMaximum for mechs and vehicles; otherwise null, as the definition has it.",
+          "format": "float"
+        },
+        "weightClass": {
+          "description": "A blip's weight class, which the HUD shows instead of the tonnage for turrets.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/WeightClass"
+            }
+          ]
+        },
+        "definition": {
+          "description": "The mech, vehicle or turret in the catalog, which holds its armor and loadout; null for the player's mechs, which have bayMech instead, and for units out of full view.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/DefinitionReference"
+            }
+          ]
+        },
+        "bayMech": {
+          "description": "The player's mech in game-state.json, whose loadout holds its assigned armor.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/MechReference"
+            }
+          ]
+        },
+        "position": {
+          "description": "Where the unit is, or was last detected at for lastSeen.",
+          "$ref": "#/definitions/MapPosition"
+        },
+        "facing": {
+          "type": [
+            "null",
+            "number"
+          ],
+          "description": "The direction the unit faces, in degrees clockwise from the map's +Z axis; null when last seen.",
+          "format": "float"
+        },
+        "terrain": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "The terrain the unit stands in, keyed as in the catalog's terrainDefinitions; null on open ground and when last seen."
+        },
+        "pilot": {
+          "description": "The pilot, which the HUD names only at full.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/PilotReference"
+            }
+          ]
+        },
+        "state": {
+          "description": "The unit's condition, shown at full.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/CombatUnitState"
+            }
+          ]
+        },
+        "linesOfFire": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "The lines of fire to the units it could attack: from the player's units to every enemy at full, and from those enemies to the player's units. null for the others.",
+          "items": {
+            "$ref": "#/definitions/LineOfFire"
+          }
+        },
+        "movement": {
+          "description": "Where the player's unit can move and what it gets there; null for the others, and for a unit that can't move (a turret, a prone or shut down mech).",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/UnitMovement"
+            }
+          ]
+        }
+      }
+    },
+    "UnitAllegiance": {
+      "type": "string",
+      "description": "Whose side a unit in combat is on, seen from the player.",
+      "x-enumNames": [
+        "Player",
+        "Ally",
+        "Enemy",
+        "Neutral"
+      ],
+      "enum": [
+        "player",
+        "ally",
+        "enemy",
+        "neutral"
+      ]
+    },
+    "UnitVisibility": {
+      "type": "string",
+      "description": "How much of a unit the player's HUD shows (the game's VisibilityLevel).",
+      "x-enumNames": [
+        "Full",
+        "BlipMaximum",
+        "BlipType",
+        "BlipMinimum",
+        "LastSeen"
+      ],
+      "enum": [
+        "full",
+        "blipMaximum",
+        "blipType",
+        "blipMinimum",
+        "lastSeen"
+      ]
+    },
+    "UnitKind": {
+      "type": "string",
+      "description": "The kind of a unit in combat, which tells the catalog group of its definition.",
+      "x-enumNames": [
+        "Mech",
+        "Vehicle",
+        "Turret"
+      ],
+      "enum": [
+        "mech",
+        "vehicle",
+        "turret"
+      ]
+    },
+    "WeightClass": {
+      "type": "string",
+      "x-enumNames": [
+        "LIGHT",
+        "MEDIUM",
+        "HEAVY",
+        "ASSAULT"
+      ],
+      "enum": [
+        "LIGHT",
+        "MEDIUM",
+        "HEAVY",
+        "ASSAULT"
+      ]
+    },
+    "MechReference": {
+      "type": "object",
+      "description": "A mech in the mech bay: its own id, as in id, and its chassis name with the variant.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name the UI shows."
+        }
+      }
+    },
+    "MapPosition": {
+      "type": "object",
+      "description": "A point on the map in meters: y is the elevation.",
+      "additionalProperties": false,
+      "required": [
+        "x",
+        "y",
+        "z"
+      ],
+      "properties": {
+        "x": {
+          "type": "number",
+          "description": "Along the map's x axis, 0 at the map's center.",
+          "format": "float"
+        },
+        "y": {
+          "type": "number",
+          "description": "The elevation, on the scale of elevations.",
+          "format": "float"
+        },
+        "z": {
+          "type": "number",
+          "description": "Along the map's z axis, 0 at the map's center.",
+          "format": "float"
+        }
+      }
+    },
+    "PilotReference": {
+      "type": "object",
+      "description": "A pilot: their id, full name without callsign, and callsign.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "callsign"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name the UI shows."
+        },
+        "callsign": {
+          "type": "string",
+          "description": "The pilot's callsign, which isn't part of name."
+        }
+      }
+    },
+    "CombatUnitState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "isDestroyed",
+        "locations",
+        "evasionPips",
+        "guard",
+        "isEntrenched",
+        "isProne",
+        "isShutDown",
+        "isUnsteady",
+        "heat",
+        "stability",
+        "hasActivated",
+        "initiative",
+        "components",
+        "pilot",
+        "abilities",
+        "precisionStrikeCost",
+        "vigilanceCost"
+      ],
+      "properties": {
+        "isDestroyed": {
+          "type": "boolean",
+          "description": "Whether the unit is destroyed; only the player's and allied units stay listed once destroyed."
+        },
+        "locations": {
+          "type": "array",
+          "description": "The armor and structure left per location, in the game's order: a mech's from head to legs, a vehicle's from front to rear and turret, a turret's single one. The limits are in definition or bayMech.",
+          "items": {
+            "$ref": "#/definitions/UnitLocation"
+          }
+        },
+        "evasionPips": {
+          "type": "integer",
+          "description": "The evasive pips the unit has, earned by moving (see EvasionRules).",
+          "format": "int32"
+        },
+        "guard": {
+          "description": "The unit's guard level and its sources.",
+          "$ref": "#/definitions/Guard"
+        },
+        "isEntrenched": {
+          "type": "boolean",
+          "description": "Whether the unit is entrenched, e.g. by bracing, until its next activation: weapons' instability against it is multiplied by entrenchedInstabilityMultiplier."
+        },
+        "isProne": {
+          "type": "boolean",
+          "description": "Whether the mech has been knocked down; only mechs can be."
+        },
+        "isShutDown": {
+          "type": "boolean",
+          "description": "Whether the unit is shut down, e.g. from overheating."
+        },
+        "isUnsteady": {
+          "type": "boolean",
+          "description": "Whether the mech is unsteady, which it becomes at unsteadyThresholdPercent of its stability; only mechs can be."
+        },
+        "heat": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "null for vehicles and turrets, which have none.",
+          "format": "int32"
+        },
+        "stability": {
+          "type": [
+            "null",
+            "number"
+          ],
+          "description": "null for vehicles and turrets, which have none.",
+          "format": "float"
+        },
+        "hasActivated": {
+          "type": "boolean",
+          "description": "Whether the unit has finished its activation this round."
+        },
+        "initiative": {
+          "type": "integer",
+          "description": "The phase the unit acts in, on the scale of phase.",
+          "format": "int32"
+        },
+        "components": {
+          "type": "array",
+          "description": "Every component mounted, in the game's order.",
+          "items": {
+            "$ref": "#/definitions/CombatComponent"
+          }
+        },
+        "pilot": {
+          "description": "The pilot's condition; null without a pilot.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/CombatPilotState"
+            }
+          ]
+        },
+        "abilities": {
+          "type": "array",
+          "description": "The pilot's and components' abilities that can be activated, with their cooldowns.",
+          "items": {
+            "$ref": "#/definitions/CombatAbility"
+          }
+        },
+        "precisionStrikeCost": {
+          "type": "integer",
+          "description": "The resolve a Precision Strike costs the unit now, which its pilot's morale changes.",
+          "format": "int32"
+        },
+        "vigilanceCost": {
+          "type": "integer",
+          "description": "The resolve Vigilance costs the unit now.",
+          "format": "int32"
+        }
+      }
+    },
+    "UnitLocation": {
+      "type": "object",
+      "description": "A location's armor and structure left, in whole points as the paper doll shows them.",
+      "additionalProperties": false,
+      "required": [
+        "location",
+        "armor",
+        "rearArmor",
+        "structure"
+      ],
+      "properties": {
+        "location": {
+          "type": "string",
+          "description": "The game's name of the location (a mech's, vehicle's or turret's)."
+        },
+        "armor": {
+          "type": "integer",
+          "description": "The armor left; on a mech's torso, the front armor.",
+          "format": "int32"
+        },
+        "rearArmor": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "null outside a mech's torso, which alone has rear armor.",
+          "format": "int32"
+        },
+        "structure": {
+          "type": "integer",
+          "description": "The structure left; 0 once the location is destroyed.",
+          "format": "int32"
+        }
+      }
+    },
+    "Guard": {
+      "type": "object",
+      "description": "The unit's guard, which the HUD shows as guarded at level 1 or more.",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "isBraced",
+        "hasCover",
+        "hasBulwark"
+      ],
+      "properties": {
+        "level": {
+          "type": "integer",
+          "description": "What the sources below add up to: bracing and cover 1 each, Bulwark 1 more on top of either. Bracing and Bulwark don't count while the guard is broken (unsteady, prone, shut down, sensor locked or hit), and none while the unit moves.",
+          "format": "int32"
+        },
+        "isBraced": {
+          "type": "boolean",
+          "description": "Braced in its last activation, until its next one."
+        },
+        "hasCover": {
+          "type": "boolean",
+          "description": "Standing in a terrain that grants guard."
+        },
+        "hasBulwark": {
+          "type": "boolean",
+          "description": "The pilot has Bulwark."
+        }
+      }
+    },
+    "CombatComponent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "component",
+        "location",
+        "damageLevel",
+        "ammo"
+      ],
+      "properties": {
+        "component": {
+          "description": "The component, by the id its definition is keyed by.",
+          "$ref": "#/definitions/ComponentReference"
+        },
+        "location": {
+          "type": "string",
+          "description": "The game's name of the location it is mounted in."
+        },
+        "damageLevel": {
+          "description": "The game's damage level, e.g. Functional or Destroyed.",
+          "$ref": "#/definitions/ComponentDamageLevel"
+        },
+        "ammo": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The rounds left in an ammunition box, or in a weapon that carries its own; null for other components. A destroyed box has none.",
+          "format": "int32"
+        }
+      }
+    },
+    "ComponentReference": {
+      "type": "object",
+      "description": "A component's definition, like DefinitionReference, with the type that tells which group of componentDefinitions holds it. Components compare by type first, then as every reference.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "type"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name the UI shows."
+        },
+        "type": {
+          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in componentDefinitions.",
+          "$ref": "#/definitions/ComponentType"
+        }
+      }
+    },
+    "ComponentType": {
+      "type": "string",
+      "x-enumNames": [
+        "NotSet",
+        "Weapon",
+        "AmmunitionBox",
+        "HeatSink",
+        "JumpJet",
+        "Upgrade",
+        "Special",
+        "MechPart"
+      ],
+      "enum": [
+        "NotSet",
+        "Weapon",
+        "AmmunitionBox",
+        "HeatSink",
+        "JumpJet",
+        "Upgrade",
+        "Special",
+        "MechPart"
+      ]
+    },
+    "ComponentDamageLevel": {
+      "type": "string",
+      "x-enumNames": [
+        "Functional",
+        "Misaligned",
+        "Penalized",
+        "NonFunctional",
+        "Destroyed",
+        "Installing",
+        "InstallingNonFunctional"
+      ],
+      "enum": [
+        "Functional",
+        "Misaligned",
+        "Penalized",
+        "NonFunctional",
+        "Destroyed",
+        "Installing",
+        "InstallingNonFunctional"
+      ]
+    },
+    "CombatPilotState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "injuries",
+        "health",
+        "bonusHealth"
+      ],
+      "properties": {
+        "injuries": {
+          "type": "integer",
+          "description": "The injuries, including those from before the mission.",
+          "format": "int32"
+        },
+        "health": {
+          "type": "integer",
+          "description": "The injuries the pilot can take before being incapacitated, as in health.",
+          "format": "int32"
+        },
+        "bonusHealth": {
+          "type": "integer",
+          "description": "The bonus health left, which takes hits before they become injuries and is used up by them; the portrait shows it on top of health.",
+          "format": "int32"
+        }
+      }
+    },
+    "CombatAbility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ability",
+        "cooldown",
+        "usesLeft"
+      ],
+      "properties": {
+        "ability": {
+          "description": "The ability, the pilot's or a mounted component's.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "cooldown": {
+          "type": "integer",
+          "description": "The unit's activations until the ability can be used again; 0 when ready.",
+          "format": "int32"
+        },
+        "usesLeft": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The uses left of an ability that can be used only so often; null without a limit.",
+          "format": "int32"
+        }
+      }
+    },
+    "LineOfFire": {
+      "type": "object",
+      "description": "How a unit could fire at a target from where it stands, as hovering over the target shows it.",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "level",
+        "fire",
+        "isInFiringArc"
+      ],
+      "properties": {
+        "target": {
+          "type": "string",
+          "description": "The target's unit id, a key of units."
+        },
+        "level": {
+          "description": "How much of the line of fire itself is blocked. A target beyond every weapon's range and the unit's sensors is blocked too.",
+          "$ref": "#/definitions/LineOfFireBlocking"
+        },
+        "fire": {
+          "description": "Whether the unit's weapons could fire at the target directly, only indirectly or not at all, or it is out of their range.",
+          "$ref": "#/definitions/FireAvailability"
+        },
+        "isInFiringArc": {
+          "type": "boolean",
+          "description": "Whether the target is in the unit's firing arc without turning."
+        }
+      }
+    },
+    "LineOfFireBlocking": {
+      "type": "string",
+      "description": "How much of a line of fire is blocked (the game's LineOfFireLevel).",
+      "x-enumNames": [
+        "Clear",
+        "PartiallyBlocked",
+        "Blocked"
+      ],
+      "enum": [
+        "clear",
+        "partiallyBlocked",
+        "blocked"
+      ]
+    },
+    "FireAvailability": {
+      "type": "string",
+      "description": "How a unit could fire at a target from where it stands (the game's FiringPreviewManager).",
+      "x-enumNames": [
+        "Direct",
+        "Indirect",
+        "OutOfRange",
+        "None"
+      ],
+      "enum": [
+        "direct",
+        "indirect",
+        "outOfRange",
+        "none"
+      ]
+    },
+    "UnitMovement": {
+      "type": "object",
+      "description": "The hexes a player's unit can end its move on, read from the game's own pathing, with the evasion it gets and the attacks it has there. A unit that has activated gets those of its next activation, from where it stands. Laid out in rows of characters, as MovementLegend explains, like rows, whose hexes give each hex's terrain and elevation.",
+      "additionalProperties": false,
+      "required": [
+        "targets",
+        "rows"
+      ],
+      "properties": {
+        "targets": {
+          "type": "array",
+          "description": "The enemies at full by unit id, in the order of attacks.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rows": {
+          "type": "array",
+          "description": "The rows with a hex the unit can reach, by r.",
+          "items": {
+            "$ref": "#/definitions/MovementRow"
+          }
+        }
+      }
+    },
+    "MovementRow": {
+      "type": "object",
+      "description": "Consecutive hexes of one row, from (q, r) to the last one the unit can reach, one character per hex in each move and two per hex in each attack.",
+      "additionalProperties": false,
+      "required": [
+        "r",
+        "q",
+        "walk",
+        "sprint",
+        "reverse",
+        "jump",
+        "attacks"
+      ],
+      "properties": {
+        "r": {
+          "type": "integer",
+          "description": "The axial r of every hex in the row.",
+          "format": "int32"
+        },
+        "q": {
+          "type": "integer",
+          "description": "The axial q of the row's first hex, the first character of each move and attack.",
+          "format": "int32"
+        },
+        "walk": {
+          "type": "string",
+          "description": "The evasion pips per hex as moves says."
+        },
+        "sprint": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "null for a legged or unsteady mech, which can't sprint."
+        },
+        "reverse": {
+          "type": "string",
+          "description": "Moving backward."
+        },
+        "jump": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "null for a vehicle and a mech without a working jump jet."
+        },
+        "attacks": {
+          "type": "array",
+          "description": "Per entry of targets, the fire and side as fire and side say.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "CombatObjective": {
+      "type": "object",
+      "description": "An objective in the HUD's objective list.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "status",
+        "isPrimary",
+        "progress",
+        "targetUnitIds"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The game's id of the objective, which objectiveIds refer to."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title the HUD shows, as plain text."
+        },
+        "status": {
+          "description": "The objective's game status, e.g. Active, Succeeded or Failed.",
+          "$ref": "#/definitions/ObjectiveStatus"
+        },
+        "isPrimary": {
+          "type": "boolean",
+          "description": "Whether the HUD lists it as a primary objective."
+        },
+        "progress": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "The progress line the HUD shows under the title, e.g. a count of units destroyed; null where it shows none."
+        },
+        "targetUnitIds": {
+          "type": "array",
+          "description": "The units it is about (to destroy, protect or escort), as keys of units, while they are in full view: neither blips nor destroyed enemies. Buildings are left out.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ObjectiveStatus": {
+      "type": "string",
+      "x-enumNames": [
+        "Active",
+        "Ignored",
+        "Succeeded",
+        "Failed",
+        "Hidden"
+      ],
+      "enum": [
+        "Active",
+        "Ignored",
+        "Succeeded",
+        "Failed",
+        "Hidden"
+      ]
+    },
+    "ObjectiveZone": {
+      "type": "object",
+      "description": "A zone drawn on the map, e.g. a capture or evacuation zone.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "center",
+        "radius",
+        "isPreview",
+        "objectiveIds"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The game's id of the zone."
+        },
+        "type": {
+          "type": "string",
+          "description": "The game's id of the zone type, e.g. regionDef_EvacZone."
+        },
+        "center": {
+          "description": "The zone's center on the map.",
+          "$ref": "#/definitions/MapPosition"
+        },
+        "radius": {
+          "type": "number",
+          "description": "The radius of the hexagon the HUD draws; whether a unit is inside is decided per map cell, which this only approximates.",
+          "format": "float"
+        },
+        "isPreview": {
+          "type": "boolean",
+          "description": "Drawn as a zone that becomes active later."
+        },
+        "objectiveIds": {
+          "type": "array",
+          "description": "The objectives the zone belongs to, as id.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "DamagedBuilding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "structure",
+        "destroyedHexes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The building's id in buildings."
+        },
+        "structure": {
+          "type": "number",
+          "description": "The structure left; its max is in maxStructure.",
+          "format": "float"
+        },
+        "destroyedHexes": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "The hexes the building stood on as they are now, since combat-map.json isn't rewritten when it falls: units on its roof drop to the ground, which the rubble's terrain covers. null while it stands.",
+          "items": {
+            "$ref": "#/definitions/MapHex"
+          }
+        }
+      }
+    },
+    "MapHex": {
+      "type": "object",
+      "description": "A hex of rows as it is now.",
+      "additionalProperties": false,
+      "required": [
+        "q",
+        "r",
+        "elevation",
+        "terrain"
+      ],
+      "properties": {
+        "q": {
+          "type": "integer",
+          "description": "The hex's axial q, as in hexGrid.",
+          "format": "int32"
+        },
+        "r": {
+          "type": "integer",
+          "description": "The hex's axial r, as in hexGrid.",
+          "format": "int32"
+        },
+        "elevation": {
+          "type": "number",
+          "description": "As in elevations.",
+          "format": "double"
+        },
+        "terrain": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "Keyed as in the catalog's terrainDefinitions; null on open ground."
+        }
+      }
+    }
+  }
+}

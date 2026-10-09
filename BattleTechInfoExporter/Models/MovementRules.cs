@@ -8,6 +8,7 @@ namespace BattleTechInfoExporter.Models;
 /// </summary>
 /// <param name="OverheatedPenalty">The share lost while overheated.</param>
 /// <param name="LegDamagePenalty">The share lost per leg, by its damage.</param>
+/// <param name="MinMultiplier">The least share of the distance a mech keeps, from 0 to 1.</param>
 /// <param name="PivotInPlaceThreshold">
 ///     A move that ends closer than this to where it started, in meters, only turns the mech and costs no move.
 /// </param>
@@ -22,5 +23,6 @@ internal sealed record MovementRules(
 
 /// <param name="Penalized">The leg is damaged.</param>
 /// <param name="NonFunctional">The leg is damaged beyond use but not destroyed.</param>
+/// <param name="Destroyed">The leg is destroyed.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record LegDamagePenalties(float Penalized, float NonFunctional, float Destroyed);

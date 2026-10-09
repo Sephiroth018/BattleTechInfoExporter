@@ -52,6 +52,9 @@ internal sealed record TerrainDefinition(
     IReadOnlyList<StatisticChange> StickyEffects);
 
 /// <summary>By the unit: a mech, a tracked vehicle or a wheeled vehicle, and its weight class.</summary>
+/// <param name="Mech">For mechs, by their weight class.</param>
+/// <param name="Tracked">For tracked vehicles, by their weight class.</param>
+/// <param name="Wheeled">For wheeled vehicles, by their weight class.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record TerrainMoveCosts(
     ByWeightClass<float?> Mech,
@@ -61,5 +64,10 @@ internal sealed record TerrainMoveCosts(
 /// <summary>
 ///     <see cref="All" /> and the weapon category's multiplier both apply; melee has no category.
 /// </summary>
+/// <param name="All">For every attack.</param>
+/// <param name="Support">For weapons of the <c>Support</c> <see cref="WeaponDefinition.Category" />.</param>
+/// <param name="Energy">For weapons of the <c>Energy</c> <see cref="WeaponDefinition.Category" />.</param>
+/// <param name="Ballistic">For weapons of the <c>Ballistic</c> <see cref="WeaponDefinition.Category" />.</param>
+/// <param name="Missile">For weapons of the <c>Missile</c> <see cref="WeaponDefinition.Category" />.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record DamageMultipliers(float All, float Support, float Energy, float Ballistic, float Missile);

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Writes a JSON Schema per export file from the mod's models; run by the mod's build, never shipped. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <!-- Set by the mod's build to the DLL it wrote; the default is where a plain solution build writes it. -->
+    <ModAssemblyPath Condition="'$(ModAssemblyPath)' == ''">$(MSBuildThisFileDirectory)..\BattleTechInfoExporter\bin\$(Configuration)\net472\BattleTechInfoExporter.dll</ModAssemblyPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NJsonSchema.NewtonsoftJson" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      The built mod, with its XML docs, not a project reference: the mod's build runs this generator after compiling,
+      which a project reference would make circular. Its reference to the game's Newtonsoft.Json 10 resolves to the
+      13 NJsonSchema brings, so the mod's serializer settings are passed to NJsonSchema as they are.
+    -->
+    <Reference Include="BattleTechInfoExporter">
+      <HintPath>$(ModAssemblyPath)</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

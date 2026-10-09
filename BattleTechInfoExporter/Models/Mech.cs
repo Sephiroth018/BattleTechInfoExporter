@@ -10,8 +10,10 @@ namespace BattleTechInfoExporter.Models;
 /// </summary>
 /// <param name="Id">The mech's own id, unique among the company's mechs.</param>
 /// <param name="Name">The mech's name, which the player can change in the mech lab.</param>
+/// <param name="Chassis">The mech's chassis, described in <see cref="Catalog.ChassisDefinitions" />.</param>
 /// <param name="Bay">The mech bay row, counted from 1, as the mech bay shows it.</param>
 /// <param name="Position">The position in the bay row, counted from 1.</param>
+/// <param name="Status">Whether the mech is free for use or held by the mech lab.</param>
 /// <param name="ReadyOnDay">
 ///     The day the mech lab finishes its work order, as in <see cref="GameState.WorkQueue" />; <c>null</c> when
 ///     <see cref="MechStatus.Ready" />.
@@ -53,6 +55,7 @@ internal sealed record Mech(
 /// </summary>
 /// <param name="UsedTonnage">The tonnage of the chassis, armor and components.</param>
 /// <param name="Value">The C-Bill value the game computes from the chassis, armor and components.</param>
+/// <param name="Stats">The mech lab's stat bars and the numbers behind them, for this loadout.</param>
 /// <param name="Locations">The body locations with their armor, structure and components, from head to legs.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechLoadout(
@@ -62,6 +65,8 @@ internal sealed record MechLoadout(
     IReadOnlyList<MechLocation> Locations);
 
 /// <summary>A mech location's armor and structure; the chassis' limits are in <see cref="ChassisDefinition" />.</summary>
+/// <param name="Location">The mech's body location.</param>
+/// <param name="Armor">The front armor, or the only armor outside the torso.</param>
 /// <param name="RearArmor"><c>null</c> outside the torso, which alone has rear armor.</param>
 /// <param name="Structure">The structure left: below the chassis' when damaged, zero when destroyed.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

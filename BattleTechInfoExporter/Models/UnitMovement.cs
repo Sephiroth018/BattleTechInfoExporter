@@ -20,6 +20,8 @@ internal sealed record UnitMovement(IReadOnlyList<string> Targets, IReadOnlyList
 ///     Consecutive hexes of one row, from (<see cref="Q" />, <see cref="R" />) to the last one the unit can reach,
 ///     one character per hex in each move and two per hex in each attack.
 /// </summary>
+/// <param name="R">The axial <c>r</c> of every hex in the row.</param>
+/// <param name="Q">The axial <c>q</c> of the row's first hex, the first character of each move and attack.</param>
 /// <param name="Walk">The evasion pips per hex as <see cref="MovementLegend.Moves" /> says.</param>
 /// <param name="Sprint"><c>null</c> for a legged or unsteady mech, which can't sprint.</param>
 /// <param name="Reverse">Moving backward.</param>

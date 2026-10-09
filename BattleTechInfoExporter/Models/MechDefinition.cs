@@ -9,8 +9,10 @@ namespace BattleTechInfoExporter.Models;
 ///     <see cref="Catalog.ChassisDefinitions" />.
 /// </summary>
 /// <param name="Name">The name with the variant, as in the references to the mech.</param>
+/// <param name="Chassis">The mech's chassis, in <see cref="Catalog.ChassisDefinitions" />.</param>
 /// <param name="Value">The C-Bill value the game computes from the chassis, armor and components.</param>
 /// <param name="UsedTonnage">The tonnage of the chassis, armor and components.</param>
+/// <param name="Stats">The performance summary of the mech with this loadout.</param>
 /// <param name="IsSalvageable">
 ///     Whether defeating it can give its mech parts as salvage; the game's <c>BLACKLISTED</c> tag rules it out,
 ///     e.g. for hero variants.
@@ -26,6 +28,7 @@ internal sealed record MechDefinition(
     bool IsSalvageable,
     IReadOnlyList<MechLocationDefinition> Locations);
 
+/// <param name="Location">The body location, e.g. <c>LeftTorso</c>.</param>
 /// <param name="Armor">The armor fitted.</param>
 /// <param name="Components">The components mounted in the location, in the game's order.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -34,6 +37,9 @@ internal sealed record MechLocationDefinition(
     LocationArmor Armor,
     IReadOnlyList<LoadoutComponent> Components);
 
+/// <param name="IsFixed">
+///     Whether the component is part of the chassis: every mech of the chassis has it, and it can't be removed.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record LoadoutComponent(ComponentReference Component, bool IsFixed)
     : ComponentEntry(Component), IFixedOrRemovable;

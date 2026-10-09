@@ -1,0 +1,2721 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "GameState",
+  "type": "object",
+  "description": "The root of game-state.json.",
+  "additionalProperties": false,
+  "required": [
+    "modVersion",
+    "exportedAt",
+    "trigger",
+    "company",
+    "workQueue",
+    "ship",
+    "pilots",
+    "mechs",
+    "mechsAwaitingPlacement",
+    "lastLance",
+    "storage",
+    "stores",
+    "hiringHall",
+    "activeContract",
+    "contracts",
+    "position"
+  ],
+  "properties": {
+    "modVersion": {
+      "type": "string",
+      "description": "The four-part version of the mod that wrote the file; the other files match the catalog written by the same version."
+    },
+    "exportedAt": {
+      "type": "string",
+      "description": "When the file was last changed.",
+      "format": "date-time"
+    },
+    "trigger": {
+      "description": "What caused the export that last changed the file.",
+      "$ref": "#/definitions/ExportTrigger"
+    },
+    "company": {
+      "description": "The company's day, funds, morale, reputation and techs.",
+      "$ref": "#/definitions/Company"
+    },
+    "workQueue": {
+      "type": "array",
+      "description": "The timeline's entries, by the day they finish; entries finishing on the same day are in the order mech lab, med bay, travel, financial report, ship upgrade.",
+      "items": {
+        "$ref": "#/definitions/WorkQueueEntry"
+      }
+    },
+    "ship": {
+      "description": "The Argo; null while the company still flies the Leopard.",
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/definitions/Ship"
+        }
+      ]
+    },
+    "pilots": {
+      "type": "array",
+      "description": "The pilots in the barracks, the commander first.",
+      "items": {
+        "$ref": "#/definitions/BarracksPilot"
+      }
+    },
+    "mechs": {
+      "type": "array",
+      "description": "The mechs in the mech bay, readying ones included, by bay row and position.",
+      "items": {
+        "$ref": "#/definitions/Mech"
+      }
+    },
+    "mechsAwaitingPlacement": {
+      "type": "array",
+      "description": "The new mechs the game asks to place, store or scrap, in order.",
+      "items": {
+        "$ref": "#/definitions/MechAwaitingPlacement"
+      }
+    },
+    "lastLance": {
+      "type": "array",
+      "description": "The units of the lance last sent on a mission.",
+      "items": {
+        "$ref": "#/definitions/LastLanceUnit"
+      }
+    },
+    "storage": {
+      "description": "What the company keeps in storage.",
+      "$ref": "#/definitions/Storage"
+    },
+    "stores": {
+      "description": "The current system's stores.",
+      "$ref": "#/definitions/Stores"
+    },
+    "hiringHall": {
+      "type": "array",
+      "description": "The pilots for hire in the current system's hiring hall.",
+      "items": {
+        "$ref": "#/definitions/HiringHallPilot"
+      }
+    },
+    "activeContract": {
+      "description": "The travel contract the company has accepted; null without one.",
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/definitions/ActiveContract"
+        }
+      ]
+    },
+    "contracts": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "description": "The contracts the Command Center offers, without the active contract; null until the game has generated the current system's contracts, which it does when the contract screen first opens in a system or after a contract.",
+      "items": {
+        "$ref": "#/definitions/Contract"
+      }
+    },
+    "position": {
+      "description": "Where the ship is: the star system, and the travel under way.",
+      "$ref": "#/definitions/Position"
+    }
+  },
+  "definitions": {
+    "ExportTrigger": {
+      "type": "string",
+      "description": "What caused an export.",
+      "x-enumNames": [
+        "CareerLoaded",
+        "ManualSave",
+        "Autosave",
+        "ContractCompleted",
+        "FinancialReportShown",
+        "MechLabOrderCompleted",
+        "PilotHealed",
+        "ShipUpgradeCompleted",
+        "ContractsGenerated",
+        "StoreClosed",
+        "MechBayChanged",
+        "ExperienceSpent",
+        "MechPlacementShown",
+        "MissionCompleted",
+        "SalvageChosen",
+        "ShipUpgradeStarted",
+        "PhaseStarted",
+        "CombatStarted",
+        "CombatLoaded",
+        "ActivationCompleted"
+      ],
+      "enum": [
+        "careerLoaded",
+        "manualSave",
+        "autosave",
+        "contractCompleted",
+        "financialReportShown",
+        "mechLabOrderCompleted",
+        "pilotHealed",
+        "shipUpgradeCompleted",
+        "contractsGenerated",
+        "storeClosed",
+        "mechBayChanged",
+        "experienceSpent",
+        "mechPlacementShown",
+        "missionCompleted",
+        "salvageChosen",
+        "shipUpgradeStarted",
+        "phaseStarted",
+        "combatStarted",
+        "combatLoaded",
+        "activationCompleted"
+      ]
+    },
+    "Company": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "dropship",
+        "daysPassed",
+        "currentDate",
+        "morale",
+        "funds",
+        "mercenaryReviewBoard",
+        "reputation",
+        "mechTech",
+        "temporaryMechTechChanges",
+        "medTech",
+        "temporaryMedTechChanges",
+        "maxPilots"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The company's name, as the player chose it."
+        },
+        "dropship": {
+          "description": "The company's ship: the Leopard at the start, later the Argo.",
+          "$ref": "#/definitions/DropshipType"
+        },
+        "daysPassed": {
+          "type": "integer",
+          "description": "The days passed since the career began; every day number in the export (e.g. readyOnDay) is on this scale.",
+          "format": "int32"
+        },
+        "currentDate": {
+          "type": "string",
+          "description": "The in-game calendar date, as yyyy-MM-dd."
+        },
+        "morale": {
+          "description": "The company's morale, with its level in moraleLevels.",
+          "$ref": "#/definitions/Morale"
+        },
+        "funds": {
+          "type": "integer",
+          "description": "The company's C-Bills.",
+          "format": "int32"
+        },
+        "mercenaryReviewBoard": {
+          "description": "The company's standing with the Mercenary Review Board.",
+          "$ref": "#/definitions/MercenaryReviewBoard"
+        },
+        "reputation": {
+          "type": "array",
+          "description": "The reputation with each faction that gains it, except the Mercenary Review Board.",
+          "items": {
+            "$ref": "#/definitions/FactionReputation"
+          }
+        },
+        "mechTech": {
+          "type": "integer",
+          "description": "The tech points the mech lab works a day (mechLab), including temporaryMechTechChanges.",
+          "format": "int32"
+        },
+        "temporaryMechTechChanges": {
+          "type": "array",
+          "description": "The changes events made to mechTech for a time, by end day.",
+          "items": {
+            "$ref": "#/definitions/TemporaryChange"
+          }
+        },
+        "medTech": {
+          "type": "integer",
+          "description": "The med tech skill, which adds heal points for each injured pilot a day (medBay), including temporaryMedTechChanges.",
+          "format": "int32"
+        },
+        "temporaryMedTechChanges": {
+          "type": "array",
+          "description": "The changes events made to medTech for a time, by end day.",
+          "items": {
+            "$ref": "#/definitions/TemporaryChange"
+          }
+        },
+        "maxPilots": {
+          "type": "integer",
+          "description": "The pilots the barracks hold, not counting the commander; no more can be hired.",
+          "format": "int32"
+        }
+      }
+    },
+    "DropshipType": {
+      "type": "string",
+      "x-enumNames": [
+        "INVALID_UNSET",
+        "Leopard",
+        "Union",
+        "Argo"
+      ],
+      "enum": [
+        "INVALID_UNSET",
+        "Leopard",
+        "Union",
+        "Argo"
+      ]
+    },
+    "Morale": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "level"
+      ],
+      "properties": {
+        "value": {
+          "type": "integer",
+          "description": "The company's morale, which startsAt compares with.",
+          "format": "int32"
+        },
+        "level": {
+          "type": "string",
+          "description": "The name of the current level in moraleLevels."
+        }
+      }
+    },
+    "MercenaryReviewBoard": {
+      "type": "object",
+      "description": "The company's standing with the Mercenary Review Board, shown as its own bar in the UI.",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "level"
+      ],
+      "properties": {
+        "value": {
+          "type": "integer",
+          "description": "The rating value, which startsAt compares with.",
+          "format": "int32"
+        },
+        "level": {
+          "type": "integer",
+          "description": "The rating level, from 0, as in level.",
+          "format": "int32"
+        }
+      }
+    },
+    "FactionReputation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "faction",
+        "value",
+        "level",
+        "isAllied",
+        "isEnemy",
+        "isDisplayed"
+      ],
+      "properties": {
+        "faction": {
+          "description": "The faction the reputation is with.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "value": {
+          "type": "integer",
+          "description": "The reputation points with the faction, which level follows from.",
+          "format": "int32"
+        },
+        "level": {
+          "description": "The reputation level, described in reputationLevels.",
+          "$ref": "#/definitions/SimGameReputation"
+        },
+        "isAllied": {
+          "type": "boolean",
+          "description": "Whether the company is allied with the faction."
+        },
+        "isEnemy": {
+          "type": "boolean",
+          "description": "Whether the faction is an enemy of a faction the company is allied with."
+        },
+        "isDisplayed": {
+          "type": "boolean",
+          "description": "Whether the game's reputation screen lists the faction; story events add and remove factions."
+        }
+      }
+    },
+    "DefinitionReference": {
+      "type": "object",
+      "description": "A game definition: its id from the game's data files and the name shown in the UI.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name the UI shows."
+        }
+      }
+    },
+    "SimGameReputation": {
+      "type": "string",
+      "x-enumNames": [
+        "INDIFFERENT",
+        "LIKED",
+        "FRIENDLY",
+        "HONORED",
+        "ALLIED",
+        "LOATHED",
+        "HATED",
+        "DISLIKED"
+      ],
+      "enum": [
+        "INDIFFERENT",
+        "LIKED",
+        "FRIENDLY",
+        "HONORED",
+        "HONORED",
+        "LOATHED",
+        "HATED",
+        "DISLIKED"
+      ]
+    },
+    "TemporaryChange": {
+      "type": "object",
+      "description": "A change an event made to a value for a number of days; the value includes it until it ends.",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "endsOnDay"
+      ],
+      "properties": {
+        "amount": {
+          "type": "integer",
+          "description": "What the change adds to the value; negative for a reduction.",
+          "format": "int32"
+        },
+        "endsOnDay": {
+          "type": "integer",
+          "description": "The last day the change applies, on the scale of daysPassed; the game reverts it as the next day starts.",
+          "format": "int32"
+        }
+      }
+    },
+    "WorkQueueEntry": {
+      "type": "object",
+      "description": "An entry of the timeline: what the company is waiting for.",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "finishesOnDay",
+        "target"
+      ],
+      "properties": {
+        "type": {
+          "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
+          "$ref": "#/definitions/WorkOrderType"
+        },
+        "finishesOnDay": {
+          "type": "integer",
+          "description": "The day it finishes, on the scale of daysPassed.",
+          "format": "int32"
+        },
+        "target": {
+          "description": "What the entry is about, by its type: the mech the mech lab works on, the pilot the med bay heals, the star system the ship travels to or the ship upgrade being installed, as in upgrades. null for the financial report, and where the game can't resolve it.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/Reference"
+            }
+          ]
+        }
+      }
+    },
+    "WorkOrderType": {
+      "type": "string",
+      "x-enumNames": [
+        "NotificationGeneric",
+        "NotificationEvent",
+        "NotificationResoration",
+        "NotificationArgo",
+        "NotificationCmdCenter",
+        "NotificationBarracks",
+        "NotificationEngineering",
+        "NotificationNavigation",
+        "NotificationMechBay",
+        "NotificationCptQuarters",
+        "MedLabGeneric",
+        "MedLabHeal",
+        "ArgoUpgradeGeneric",
+        "TravelGeneric",
+        "TravelToJumpPoint",
+        "TravelJumping",
+        "TravelToSystem",
+        "FinancialReport",
+        "MechLabGeneric",
+        "MechLabComponentRepair",
+        "MechLabMechRepair",
+        "MechLabComponentInstall",
+        "MechLabModifyArmor",
+        "MechLabReadyMech"
+      ],
+      "enum": [
+        "NotificationGeneric",
+        "NotificationEvent",
+        "NotificationResoration",
+        "NotificationArgo",
+        "NotificationCmdCenter",
+        "NotificationBarracks",
+        "NotificationEngineering",
+        "NotificationNavigation",
+        "NotificationMechBay",
+        "NotificationCptQuarters",
+        "MedLabGeneric",
+        "MedLabHeal",
+        "ArgoUpgradeGeneric",
+        "TravelGeneric",
+        "TravelToJumpPoint",
+        "TravelJumping",
+        "TravelToSystem",
+        "FinancialReport",
+        "MechLabGeneric",
+        "MechLabComponentRepair",
+        "MechLabMechRepair",
+        "MechLabComponentInstall",
+        "MechLabModifyArmor",
+        "MechLabReadyMech"
+      ]
+    },
+    "Reference": {
+      "description": "Something the export refers to by its id instead of repeating it, with the name the UI shows. References compare by name, with the id breaking ties, so every list of entries that refer to a definition, which the game keeps in no meaningful order, is ordered the same way.",
+      "x-abstract": true,
+      "anyOf": [
+        {
+          "$ref": "#/definitions/ComponentReference"
+        },
+        {
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        {
+          "$ref": "#/definitions/MechReference"
+        },
+        {
+          "$ref": "#/definitions/PilotReference"
+        }
+      ]
+    },
+    "ComponentReference": {
+      "type": "object",
+      "description": "A component's definition, like DefinitionReference, with the type that tells which group of componentDefinitions holds it. Components compare by type first, then as every reference.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "type"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name the UI shows."
+        },
+        "type": {
+          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in componentDefinitions.",
+          "$ref": "#/definitions/ComponentType"
+        }
+      }
+    },
+    "ComponentType": {
+      "type": "string",
+      "x-enumNames": [
+        "NotSet",
+        "Weapon",
+        "AmmunitionBox",
+        "HeatSink",
+        "JumpJet",
+        "Upgrade",
+        "Special",
+        "MechPart"
+      ],
+      "enum": [
+        "NotSet",
+        "Weapon",
+        "AmmunitionBox",
+        "HeatSink",
+        "JumpJet",
+        "Upgrade",
+        "Special",
+        "MechPart"
+      ]
+    },
+    "MechReference": {
+      "type": "object",
+      "description": "A mech in the mech bay: its own id, as in id, and its chassis name with the variant.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name the UI shows."
+        }
+      }
+    },
+    "PilotReference": {
+      "type": "object",
+      "description": "A pilot: their id, full name without callsign, and callsign.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "callsign"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name the UI shows."
+        },
+        "callsign": {
+          "type": "string",
+          "description": "The pilot's callsign, which isn't part of name."
+        }
+      }
+    },
+    "Ship": {
+      "type": "object",
+      "description": "The Argo and its upgrades, as the engineering screen shows them.",
+      "additionalProperties": false,
+      "required": [
+        "upgrades"
+      ],
+      "properties": {
+        "upgrades": {
+          "type": "array",
+          "description": "The upgrades the engineering screen shows: installed, installing or available ones, and the locked ones they lead to.",
+          "items": {
+            "$ref": "#/definitions/ShipUpgrade"
+          }
+        }
+      }
+    },
+    "ShipUpgrade": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "upgrade",
+        "status",
+        "category",
+        "location",
+        "details",
+        "requiredUpgrades",
+        "purchaseCost",
+        "upkeep",
+        "installDays",
+        "effects"
+      ],
+      "properties": {
+        "upgrade": {
+          "description": "The ship upgrade's id and name.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "status": {
+          "description": "Where the upgrade stands, as the engineering screen shows it.",
+          "$ref": "#/definitions/ShipUpgradeStatus"
+        },
+        "category": {
+          "description": "The engineering screen's group, e.g. \"Mech Bay\".",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "location": {
+          "description": "The room of the ship the upgrade's details name, e.g. MECH_BAY.",
+          "$ref": "#/definitions/DropshipLocation"
+        },
+        "details": {
+          "type": "string",
+          "description": "The upgrade's description, which also names effects the stats don't, e.g. training."
+        },
+        "requiredUpgrades": {
+          "type": "array",
+          "description": "The upgrades that must be installed before this one can be bought.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
+          }
+        },
+        "purchaseCost": {
+          "type": "integer",
+          "description": "The one-time C-Bills to buy the upgrade.",
+          "format": "int32"
+        },
+        "upkeep": {
+          "type": "integer",
+          "description": "What the upgrade adds to the expenses of each report once installed; an installed upgrade's line in shipUpgrades is the same.",
+          "format": "int32"
+        },
+        "installDays": {
+          "type": "integer",
+          "description": "The days the upgrade takes to install.",
+          "format": "int32"
+        },
+        "effects": {
+          "type": "array",
+          "description": "The changes the upgrade makes to company statistics once installed, as the engineering screen lists them.",
+          "items": {
+            "$ref": "#/definitions/ShipUpgradeEffect"
+          }
+        }
+      }
+    },
+    "ShipUpgradeStatus": {
+      "type": "string",
+      "description": "Where a ship upgrade stands, as the Argo's engineering screen shows it.",
+      "x-enumNames": [
+        "Installed",
+        "Installing",
+        "Available",
+        "Locked"
+      ],
+      "enum": [
+        "installed",
+        "installing",
+        "available",
+        "locked"
+      ]
+    },
+    "DropshipLocation": {
+      "type": "string",
+      "x-enumFlags": true,
+      "x-enumNames": [
+        "UNKNOWN",
+        "SHIP",
+        "CMD_CENTER",
+        "BARRACKS",
+        "ENGINEERING",
+        "NAVIGATION",
+        "MECH_BAY",
+        "CPT_QUARTER",
+        "DS_LEOPARD",
+        "DS_ARGO",
+        "CONFERENCE",
+        "NONE",
+        "HIRING",
+        "SHOP"
+      ],
+      "enum": [
+        "UNKNOWN",
+        "SHIP",
+        "CMD_CENTER",
+        "BARRACKS",
+        "ENGINEERING",
+        "NAVIGATION",
+        "MECH_BAY",
+        "CPT_QUARTER",
+        "DS_LEOPARD",
+        "DS_ARGO",
+        "CONFERENCE",
+        "NONE",
+        "HIRING",
+        "SHOP"
+      ]
+    },
+    "ShipUpgradeEffect": {
+      "type": "object",
+      "description": "A change the upgrade makes to a company statistic once installed.",
+      "additionalProperties": false,
+      "required": [
+        "statistic",
+        "value",
+        "isSet",
+        "description"
+      ],
+      "properties": {
+        "statistic": {
+          "type": "string",
+          "description": "The game's name of the company statistic, e.g. \"MechTechSkill\"."
+        },
+        "value": {
+          "type": "number",
+          "description": "The amount added to the statistic, or the value it is set to when isSet.",
+          "format": "float"
+        },
+        "isSet": {
+          "type": "boolean",
+          "description": "Whether the upgrade sets the statistic to value instead of adding it."
+        },
+        "description": {
+          "type": "string",
+          "description": "The effect in the game's words, e.g. \"+2 Morale\"."
+        }
+      }
+    },
+    "BarracksPilot": {
+      "type": "object",
+      "description": "A pilot in the barracks: the commander or a roster member.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "callsign",
+        "type",
+        "age",
+        "gender",
+        "expertise",
+        "skills",
+        "abilities",
+        "health",
+        "experience",
+        "injuries",
+        "status",
+        "readyOnDay",
+        "spirits",
+        "serviceRecord"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The game's pilot id, as in PilotReference."
+        },
+        "name": {
+          "type": "string",
+          "description": "The full name without callsign, as in PilotReference."
+        },
+        "callsign": {
+          "type": "string",
+          "description": "The callsign, which generated pilots can share."
+        },
+        "type": {
+          "description": "The kind of pilot, which the barracks tells apart by color.",
+          "$ref": "#/definitions/PilotType"
+        },
+        "age": {
+          "type": "integer",
+          "description": "The age in years.",
+          "format": "int32"
+        },
+        "gender": {
+          "description": "The game's gender value, e.g. Female.",
+          "$ref": "#/definitions/Gender"
+        },
+        "expertise": {
+          "type": "string",
+          "description": "The barracks title derived from the primary abilities, e.g. \"Recruit\" or \"Lancer\"."
+        },
+        "skills": {
+          "description": "The skill levels, whose effects skills lists per level.",
+          "$ref": "#/definitions/Skills"
+        },
+        "abilities": {
+          "type": "array",
+          "description": "The primary abilities only, described in skills; the passive traits follow from the skill levels.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
+          }
+        },
+        "health": {
+          "type": "integer",
+          "description": "The injuries the pilot can take before being incapacitated.",
+          "format": "int32"
+        },
+        "experience": {
+          "description": "The pilot's experience points, spent and unspent.",
+          "$ref": "#/definitions/Experience"
+        },
+        "injuries": {
+          "type": "integer",
+          "description": "The injuries the pilot has, out of health; 0 when uninjured.",
+          "format": "int32"
+        },
+        "status": {
+          "description": "Whether the pilot is ready, injured or out of action because of an event.",
+          "$ref": "#/definitions/PilotStatus"
+        },
+        "readyOnDay": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The day the pilot is ready again, on the scale of daysPassed; null when ready.",
+          "format": "int32"
+        },
+        "spirits": {
+          "description": "The pilot's spirits, high, normal or low.",
+          "$ref": "#/definitions/Spirits"
+        },
+        "serviceRecord": {
+          "description": "The pilot's missions, kills and injuries so far, and the day of hire.",
+          "$ref": "#/definitions/ServiceRecord"
+        }
+      }
+    },
+    "PilotType": {
+      "type": "string",
+      "description": "The game's pilot types, as SimGameState.GetPilotTypeColor tells them apart.",
+      "x-enumNames": [
+        "Commander",
+        "Vanguard",
+        "Ronin",
+        "Regular"
+      ],
+      "enum": [
+        "commander",
+        "vanguard",
+        "ronin",
+        "regular"
+      ]
+    },
+    "Gender": {
+      "type": "string",
+      "x-enumNames": [
+        "INVALID_UNSET",
+        "None",
+        "Female",
+        "Male",
+        "NonBinary"
+      ],
+      "enum": [
+        "INVALID_UNSET",
+        "None",
+        "Female",
+        "Male",
+        "NonBinary"
+      ]
+    },
+    "Skills": {
+      "type": "object",
+      "description": "A pilot's skill levels, each from 1 to 10.",
+      "additionalProperties": false,
+      "required": [
+        "gunnery",
+        "piloting",
+        "guts",
+        "tactics"
+      ],
+      "properties": {
+        "gunnery": {
+          "type": "integer",
+          "description": "The gunnery level, a level of gunnery.",
+          "format": "int32"
+        },
+        "piloting": {
+          "type": "integer",
+          "description": "The piloting level, a level of piloting.",
+          "format": "int32"
+        },
+        "guts": {
+          "type": "integer",
+          "description": "The guts level, a level of guts.",
+          "format": "int32"
+        },
+        "tactics": {
+          "type": "integer",
+          "description": "The tactics level, a level of tactics.",
+          "format": "int32"
+        }
+      }
+    },
+    "Experience": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unspent",
+        "spent"
+      ],
+      "properties": {
+        "unspent": {
+          "type": "integer",
+          "description": "The experience points available to spend on skills.",
+          "format": "int32"
+        },
+        "spent": {
+          "type": "integer",
+          "description": "The experience points already spent on skills.",
+          "format": "int32"
+        }
+      }
+    },
+    "PilotStatus": {
+      "type": "string",
+      "description": "Whether a pilot can be deployed, as the barracks shows it.",
+      "x-enumNames": [
+        "Ready",
+        "Injured",
+        "Unavailable"
+      ],
+      "enum": [
+        "ready",
+        "injured",
+        "unavailable"
+      ]
+    },
+    "Spirits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "endsOnDay"
+      ],
+      "properties": {
+        "level": {
+          "description": "The spirits level, whose effects are in spiritsLevels.",
+          "$ref": "#/definitions/SpiritsLevel"
+        },
+        "endsOnDay": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The day high or low spirits end, on the scale of daysPassed; null for normal spirits and when the game sets no end.",
+          "format": "int32"
+        }
+      }
+    },
+    "SpiritsLevel": {
+      "type": "string",
+      "description": "A pilot's spirits: normal, or temporarily high or low from an event.",
+      "x-enumNames": [
+        "Normal",
+        "High",
+        "Low"
+      ],
+      "enum": [
+        "normal",
+        "high",
+        "low"
+      ]
+    },
+    "ServiceRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "missions",
+        "mechKills",
+        "otherKills",
+        "ejections",
+        "lifetimeInjuries",
+        "hiredOnDay"
+      ],
+      "properties": {
+        "missions": {
+          "type": "integer",
+          "description": "The missions the pilot has fought.",
+          "format": "int32"
+        },
+        "mechKills": {
+          "type": "integer",
+          "description": "The mechs the pilot has destroyed.",
+          "format": "int32"
+        },
+        "otherKills": {
+          "type": "integer",
+          "description": "The other units the pilot has destroyed: vehicles and turrets.",
+          "format": "int32"
+        },
+        "ejections": {
+          "type": "integer",
+          "description": "The missions the pilot ejected in.",
+          "format": "int32"
+        },
+        "lifetimeInjuries": {
+          "type": "integer",
+          "description": "The injuries the pilot has taken in missions, healed ones included.",
+          "format": "int32"
+        },
+        "hiredOnDay": {
+          "type": "integer",
+          "description": "On the scale of daysPassed.",
+          "format": "int32"
+        }
+      }
+    },
+    "Mech": {
+      "type": "object",
+      "description": "A mech in the mech bay, with its current loadout; the changes still queued in the mech lab are in refit.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "chassis",
+        "bay",
+        "position",
+        "status",
+        "readyOnDay",
+        "repair",
+        "refit",
+        "isFieldable",
+        "problems",
+        "loadout",
+        "afterRefit"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The mech's own id, unique among the company's mechs."
+        },
+        "name": {
+          "type": "string",
+          "description": "The mech's name, which the player can change in the mech lab."
+        },
+        "chassis": {
+          "description": "The mech's chassis, described in chassisDefinitions.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "bay": {
+          "type": "integer",
+          "description": "The mech bay row, counted from 1, as the mech bay shows it.",
+          "format": "int32"
+        },
+        "position": {
+          "type": "integer",
+          "description": "The position in the bay row, counted from 1.",
+          "format": "int32"
+        },
+        "status": {
+          "description": "Whether the mech is free for use or held by the mech lab.",
+          "$ref": "#/definitions/MechStatus"
+        },
+        "readyOnDay": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The day the mech lab finishes its work order, as in workQueue; null when ready.",
+          "format": "int32"
+        },
+        "repair": {
+          "description": "What repairing the mech's damage in the mech bay would take; null without damage and unless ready.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/RepairEstimate"
+            }
+          ]
+        },
+        "refit": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "The steps of the mech's mech lab work order, in order; finished steps are already part of the loadout. null without a work order and while readying.",
+          "items": {
+            "$ref": "#/definitions/RefitChange"
+          }
+        },
+        "isFieldable": {
+          "type": "boolean",
+          "description": "Whether the mech can be taken on a mission, as the lance configuration decides."
+        },
+        "problems": {
+          "type": "array",
+          "description": "The loadout problems the mech lab warns about, e.g. missing ammo, in the game's words.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "loadout": {
+          "description": "The current loadout, as the mech bay shows it.",
+          "$ref": "#/definitions/MechLoadout"
+        },
+        "afterRefit": {
+          "description": "The loadout once every step of refit is finished, as the mech lab shows it. null without a work order and while readying.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/MechLoadout"
+            }
+          ]
+        }
+      }
+    },
+    "MechStatus": {
+      "type": "string",
+      "description": "Whether a mech in the mech bay is free for use or held by the mech lab.",
+      "x-enumNames": [
+        "Ready",
+        "Readying",
+        "InMaintenance"
+      ],
+      "enum": [
+        "ready",
+        "readying",
+        "inMaintenance"
+      ]
+    },
+    "RepairEstimate": {
+      "type": "object",
+      "description": "What the mech bay's Repair would take if ordered now, as its confirmation shows it.",
+      "additionalProperties": false,
+      "required": [
+        "days",
+        "cost"
+      ],
+      "properties": {
+        "days": {
+          "type": "integer",
+          "description": "The days the mech lab needs for the repair alone; it works on one order at a time, so an order queued behind others finishes later.",
+          "format": "int32"
+        },
+        "cost": {
+          "type": "integer",
+          "description": "The C-Bills the repair costs.",
+          "format": "int32"
+        }
+      }
+    },
+    "RefitChange": {
+      "description": "One step of a mech's queued refit; each type has a record with the fields of its own.",
+      "x-abstract": true,
+      "anyOf": [
+        {
+          "$ref": "#/definitions/InstallComponentChange"
+        },
+        {
+          "$ref": "#/definitions/ModifyArmorChange"
+        },
+        {
+          "$ref": "#/definitions/RemoveComponentChange"
+        },
+        {
+          "$ref": "#/definitions/RepairComponentChange"
+        },
+        {
+          "$ref": "#/definitions/RepairStructureChange"
+        }
+      ]
+    },
+    "RefitChangeType": {
+      "type": "string",
+      "description": "The kind of a refit step.",
+      "x-enumNames": [
+        "InstallComponent",
+        "RemoveComponent",
+        "RepairComponent",
+        "ModifyArmor",
+        "RepairStructure"
+      ],
+      "enum": [
+        "installComponent",
+        "removeComponent",
+        "repairComponent",
+        "modifyArmor",
+        "repairStructure"
+      ]
+    },
+    "InstallComponentChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "isDone",
+        "component",
+        "damageLevel",
+        "location"
+      ],
+      "properties": {
+        "component": {
+          "description": "The component the step installs, removes or repairs.",
+          "$ref": "#/definitions/ComponentReference"
+        },
+        "damageLevel": {
+          "description": "The component's damage level when the step was ordered.",
+          "$ref": "#/definitions/ComponentDamageLevel"
+        },
+        "type": {
+          "description": "The kind of step, which decides the step's other fields.",
+          "$ref": "#/definitions/RefitChangeType"
+        },
+        "isDone": {
+          "type": "boolean",
+          "description": "Whether the mech techs have finished the step; its change is then part of the mech."
+        },
+        "location": {
+          "description": "Where the component goes.",
+          "$ref": "#/definitions/ChassisLocations"
+        }
+      }
+    },
+    "ComponentDamageLevel": {
+      "type": "string",
+      "x-enumNames": [
+        "Functional",
+        "Misaligned",
+        "Penalized",
+        "NonFunctional",
+        "Destroyed",
+        "Installing",
+        "InstallingNonFunctional"
+      ],
+      "enum": [
+        "Functional",
+        "Misaligned",
+        "Penalized",
+        "NonFunctional",
+        "Destroyed",
+        "Installing",
+        "InstallingNonFunctional"
+      ]
+    },
+    "ChassisLocations": {
+      "type": "string",
+      "x-enumFlags": true,
+      "x-enumNames": [
+        "None",
+        "Head",
+        "LeftArm",
+        "LeftTorso",
+        "CenterTorso",
+        "RightTorso",
+        "Torso",
+        "RightArm",
+        "Arms",
+        "MainBody",
+        "LeftLeg",
+        "RightLeg",
+        "Legs",
+        "All"
+      ],
+      "enum": [
+        "None",
+        "Head",
+        "LeftArm",
+        "LeftTorso",
+        "CenterTorso",
+        "RightTorso",
+        "Torso",
+        "RightArm",
+        "Arms",
+        "MainBody",
+        "LeftLeg",
+        "RightLeg",
+        "Legs",
+        "All"
+      ]
+    },
+    "ModifyArmorChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "isDone",
+        "location",
+        "frontArmor",
+        "rearArmor"
+      ],
+      "properties": {
+        "location": {
+          "description": "The mech location whose armor or structure the step changes.",
+          "$ref": "#/definitions/ChassisLocations"
+        },
+        "type": {
+          "description": "The kind of step, which decides the step's other fields.",
+          "$ref": "#/definitions/RefitChangeType"
+        },
+        "isDone": {
+          "type": "boolean",
+          "description": "Whether the mech techs have finished the step; its change is then part of the mech."
+        },
+        "frontArmor": {
+          "type": "integer",
+          "description": "The location's front armor after the change.",
+          "format": "int32"
+        },
+        "rearArmor": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The location's rear armor after the change; null outside the torso.",
+          "format": "int32"
+        }
+      }
+    },
+    "RemoveComponentChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "isDone",
+        "component",
+        "damageLevel",
+        "location"
+      ],
+      "properties": {
+        "component": {
+          "description": "The component the step installs, removes or repairs.",
+          "$ref": "#/definitions/ComponentReference"
+        },
+        "damageLevel": {
+          "description": "The component's damage level when the step was ordered.",
+          "$ref": "#/definitions/ComponentDamageLevel"
+        },
+        "type": {
+          "description": "The kind of step, which decides the step's other fields.",
+          "$ref": "#/definitions/RefitChangeType"
+        },
+        "isDone": {
+          "type": "boolean",
+          "description": "Whether the mech techs have finished the step; its change is then part of the mech."
+        },
+        "location": {
+          "description": "Where the component comes from.",
+          "$ref": "#/definitions/ChassisLocations"
+        }
+      }
+    },
+    "RepairComponentChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "isDone",
+        "component",
+        "damageLevel",
+        "location"
+      ],
+      "properties": {
+        "component": {
+          "description": "The component the step installs, removes or repairs.",
+          "$ref": "#/definitions/ComponentReference"
+        },
+        "damageLevel": {
+          "description": "The component's damage level when the step was ordered.",
+          "$ref": "#/definitions/ComponentDamageLevel"
+        },
+        "type": {
+          "description": "The kind of step, which decides the step's other fields.",
+          "$ref": "#/definitions/RefitChangeType"
+        },
+        "isDone": {
+          "type": "boolean",
+          "description": "Whether the mech techs have finished the step; its change is then part of the mech."
+        },
+        "location": {
+          "description": "Where the component is mounted; null for one in storage.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/ChassisLocations"
+            }
+          ]
+        }
+      }
+    },
+    "RepairStructureChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "isDone",
+        "location",
+        "structure"
+      ],
+      "properties": {
+        "location": {
+          "description": "The mech location whose armor or structure the step changes.",
+          "$ref": "#/definitions/ChassisLocations"
+        },
+        "type": {
+          "description": "The kind of step, which decides the step's other fields.",
+          "$ref": "#/definitions/RefitChangeType"
+        },
+        "isDone": {
+          "type": "boolean",
+          "description": "Whether the mech techs have finished the step; its change is then part of the mech."
+        },
+        "structure": {
+          "type": "integer",
+          "description": "The structure points restored.",
+          "format": "int32"
+        }
+      }
+    },
+    "MechLoadout": {
+      "type": "object",
+      "description": "A mech's loadout with the tonnage, value and stats that follow from it; the chassis' limits are in the catalog's ChassisDefinition.",
+      "additionalProperties": false,
+      "required": [
+        "usedTonnage",
+        "value",
+        "stats",
+        "locations"
+      ],
+      "properties": {
+        "usedTonnage": {
+          "type": "number",
+          "description": "The tonnage of the chassis, armor and components.",
+          "format": "float"
+        },
+        "value": {
+          "type": "integer",
+          "description": "The C-Bill value the game computes from the chassis, armor and components.",
+          "format": "int32"
+        },
+        "stats": {
+          "description": "The mech lab's stat bars and the numbers behind them, for this loadout.",
+          "$ref": "#/definitions/MechStats"
+        },
+        "locations": {
+          "type": "array",
+          "description": "The body locations with their armor, structure and components, from head to legs.",
+          "items": {
+            "$ref": "#/definitions/MechLocation"
+          }
+        }
+      }
+    },
+    "MechStats": {
+      "type": "object",
+      "description": "The performance summary of the mech lab and mech bay: the ratings of the stat bars and the numbers behind them. Only working components count.",
+      "additionalProperties": false,
+      "required": [
+        "ratings",
+        "movement",
+        "heat",
+        "firepower",
+        "range",
+        "durability",
+        "melee"
+      ],
+      "properties": {
+        "ratings": {
+          "description": "The ratings of the stat bars.",
+          "$ref": "#/definitions/StatRatings"
+        },
+        "movement": {
+          "description": "The walk, sprint and jump distances.",
+          "$ref": "#/definitions/MovementStats"
+        },
+        "heat": {
+          "description": "The heat dissipated, generated and tolerated.",
+          "$ref": "#/definitions/HeatStats"
+        },
+        "firepower": {
+          "description": "The damage of firing every weapon at once.",
+          "$ref": "#/definitions/FirepowerStats"
+        },
+        "range": {
+          "description": "The weapons' maximum and average medium range.",
+          "$ref": "#/definitions/RangeStats"
+        },
+        "durability": {
+          "description": "The armor and structure, and the damage taken from the mech's own jump attack.",
+          "$ref": "#/definitions/DurabilityStats"
+        },
+        "melee": {
+          "description": "The damage of melee and jump attacks.",
+          "$ref": "#/definitions/MeleeStats"
+        }
+      }
+    },
+    "StatRatings": {
+      "type": "object",
+      "description": "The stat bars, each rated from 0 against the game's stock mechs; a bar is full at 10, which a rating can exceed.",
+      "additionalProperties": false,
+      "required": [
+        "firepower",
+        "movement",
+        "range",
+        "heatEfficiency",
+        "durability",
+        "melee"
+      ],
+      "properties": {
+        "firepower": {
+          "type": "integer",
+          "description": "Rated from the weapons' damage and stability damage.",
+          "format": "int32"
+        },
+        "movement": {
+          "type": "integer",
+          "description": "Rated from the sprint distance and the number of jump jets.",
+          "format": "int32"
+        },
+        "range": {
+          "type": "integer",
+          "description": "Rated from the weapons' average medium range.",
+          "format": "int32"
+        },
+        "heatEfficiency": {
+          "type": "integer",
+          "description": "Rated from the heat dissipation against the heat of firing every weapon and jumping, and from bonuses to the shutdown heat.",
+          "format": "int32"
+        },
+        "durability": {
+          "type": "integer",
+          "description": "Rated from the armor, the structure and upgrades reducing stability damage taken.",
+          "format": "int32"
+        },
+        "melee": {
+          "type": "integer",
+          "description": "Rated from the melee attack's damage and stability damage.",
+          "format": "int32"
+        }
+      }
+    },
+    "MovementStats": {
+      "type": "object",
+      "description": "The distances in meters.",
+      "additionalProperties": false,
+      "required": [
+        "walk",
+        "sprint",
+        "jump"
+      ],
+      "properties": {
+        "walk": {
+          "type": "number",
+          "description": "The chassis' walk distance (walk).",
+          "format": "float"
+        },
+        "sprint": {
+          "type": "number",
+          "description": "The chassis' sprint distance (sprint).",
+          "format": "float"
+        },
+        "jump": {
+          "type": "number",
+          "description": "The jump distance with the working jump jets and their bonuses; 0 without any.",
+          "format": "float"
+        }
+      }
+    },
+    "HeatStats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dissipation",
+        "alphaStrike",
+        "averageJump",
+        "shutdown"
+      ],
+      "properties": {
+        "dissipation": {
+          "type": "number",
+          "description": "The heat removed per round by the built-in and mounted heat sinks.",
+          "format": "float"
+        },
+        "alphaStrike": {
+          "type": "number",
+          "description": "The heat generated by firing every weapon at once.",
+          "format": "float"
+        },
+        "averageJump": {
+          "type": "number",
+          "description": "The heat generated by an average jump.",
+          "format": "float"
+        },
+        "shutdown": {
+          "type": "number",
+          "description": "The heat at which the mech shuts down.",
+          "format": "float"
+        }
+      }
+    },
+    "FirepowerStats": {
+      "type": "object",
+      "description": "The damage of firing every weapon at once.",
+      "additionalProperties": false,
+      "required": [
+        "damage",
+        "stabilityDamage"
+      ],
+      "properties": {
+        "damage": {
+          "type": "number",
+          "description": "The damage of all the weapons' shots; COIL weapons count with three evasion pips, as the game's stats assume.",
+          "format": "float"
+        },
+        "stabilityDamage": {
+          "type": "number",
+          "description": "The stability damage of all the weapons' shots.",
+          "format": "float"
+        }
+      }
+    },
+    "RangeStats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max",
+        "optimal"
+      ],
+      "properties": {
+        "max": {
+          "type": "number",
+          "description": "The longest maximum range of the weapons, in meters.",
+          "format": "float"
+        },
+        "optimal": {
+          "type": "number",
+          "description": "The weapons' average medium range, in meters.",
+          "format": "float"
+        }
+      }
+    },
+    "DurabilityStats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "armor",
+        "structure",
+        "deathFromAboveSelfDamage"
+      ],
+      "properties": {
+        "armor": {
+          "type": "number",
+          "description": "The armor left on all locations.",
+          "format": "float"
+        },
+        "structure": {
+          "type": "number",
+          "description": "The structure left on all locations.",
+          "format": "float"
+        },
+        "deathFromAboveSelfDamage": {
+          "type": "number",
+          "description": "The damage the mech takes from its own jump attack.",
+          "format": "float"
+        }
+      }
+    },
+    "MeleeStats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "damage",
+        "stabilityDamage",
+        "deathFromAboveDamage"
+      ],
+      "properties": {
+        "damage": {
+          "type": "number",
+          "description": "The damage of a melee attack, the chassis' plus upgrades' bonuses.",
+          "format": "float"
+        },
+        "stabilityDamage": {
+          "type": "number",
+          "description": "The stability damage of a melee attack, the chassis' plus upgrades' bonuses.",
+          "format": "float"
+        },
+        "deathFromAboveDamage": {
+          "type": "number",
+          "description": "The damage of a jump attack onto a target.",
+          "format": "float"
+        }
+      }
+    },
+    "MechLocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "location",
+        "armor",
+        "rearArmor",
+        "structure",
+        "components"
+      ],
+      "properties": {
+        "location": {
+          "description": "The mech's body location.",
+          "$ref": "#/definitions/ChassisLocations"
+        },
+        "armor": {
+          "description": "The front armor, or the only armor outside the torso.",
+          "$ref": "#/definitions/Armor"
+        },
+        "rearArmor": {
+          "description": "null outside the torso, which alone has rear armor.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/Armor"
+            }
+          ]
+        },
+        "structure": {
+          "type": "number",
+          "description": "The structure left: below the chassis' when damaged, zero when destroyed.",
+          "format": "float"
+        },
+        "components": {
+          "type": "array",
+          "description": "The components mounted in the location, including the chassis' fixed ones.",
+          "items": {
+            "$ref": "#/definitions/MountedComponent"
+          }
+        }
+      }
+    },
+    "Armor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "current",
+        "assigned"
+      ],
+      "properties": {
+        "current": {
+          "type": "number",
+          "description": "What is left after combat damage; refilled to assigned after a mission unless the location was destroyed.",
+          "format": "float"
+        },
+        "assigned": {
+          "type": "number",
+          "description": "The armor fitted in the mech lab.",
+          "format": "float"
+        }
+      }
+    },
+    "MountedComponent": {
+      "type": "object",
+      "description": "A component mounted on a mech in the mech bay.",
+      "additionalProperties": false,
+      "required": [
+        "component",
+        "damageLevel",
+        "isFixed"
+      ],
+      "properties": {
+        "component": {
+          "description": "The component, by the id its definition is keyed by.",
+          "$ref": "#/definitions/ComponentReference"
+        },
+        "damageLevel": {
+          "description": "The component's damage, e.g. Functional or Destroyed.",
+          "$ref": "#/definitions/ComponentDamageLevel"
+        },
+        "isFixed": {
+          "type": "boolean",
+          "description": "Whether it's part of the chassis: every mech of the chassis has it, and it can't be removed."
+        }
+      }
+    },
+    "MechAwaitingPlacement": {
+      "type": "object",
+      "description": "A new mech the game asks the player to place, store or scrap because every mech bay is full; it is in neither the mech bay nor storage until then.",
+      "additionalProperties": false,
+      "required": [
+        "chassis",
+        "loadout"
+      ],
+      "properties": {
+        "chassis": {
+          "description": "The mech's chassis, described in chassisDefinitions.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "loadout": {
+          "description": "The loadout it comes with: the stock one for a mech assembled from parts or bought, none but the fixed components for a salvaged chassis.",
+          "$ref": "#/definitions/MechLoadout"
+        }
+      }
+    },
+    "LastLanceUnit": {
+      "type": "object",
+      "description": "A mech and its pilot from the lance last sent on a mission. The lance configuration pre-fills from it the mechs that can be fielded and the pilots who can pilot, in the slots the contract leaves open.",
+      "additionalProperties": false,
+      "required": [
+        "mech",
+        "pilot"
+      ],
+      "properties": {
+        "mech": {
+          "description": "The mech; null when it has left the mech bay since, e.g. sold.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/MechReference"
+            }
+          ]
+        },
+        "pilot": {
+          "description": "The pilot; null when they have left the company since, e.g. dismissed or killed.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/PilotReference"
+            }
+          ]
+        }
+      }
+    },
+    "Storage": {
+      "type": "object",
+      "description": "What the company keeps in storage, outside its mechs.",
+      "additionalProperties": false,
+      "required": [
+        "components",
+        "chassis",
+        "mechParts"
+      ],
+      "properties": {
+        "components": {
+          "type": "array",
+          "description": "The stored components.",
+          "items": {
+            "$ref": "#/definitions/StoredComponent"
+          }
+        },
+        "chassis": {
+          "type": "array",
+          "description": "The stored chassis, which come without weapons or other removable components.",
+          "items": {
+            "$ref": "#/definitions/StoredChassis"
+          }
+        },
+        "mechParts": {
+          "type": "array",
+          "description": "The stored mech parts.",
+          "items": {
+            "$ref": "#/definitions/StoredMechParts"
+          }
+        }
+      }
+    },
+    "StoredComponent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "component",
+        "count",
+        "damagedCount"
+      ],
+      "properties": {
+        "component": {
+          "description": "The component, by the id its definition is keyed by.",
+          "$ref": "#/definitions/ComponentReference"
+        },
+        "count": {
+          "type": "integer",
+          "description": "The working copies; the damaged ones are in damagedCount.",
+          "format": "int32"
+        },
+        "damagedCount": {
+          "type": "integer",
+          "description": "The damaged copies, which need a repair once mounted.",
+          "format": "int32"
+        }
+      }
+    },
+    "StoredChassis": {
+      "type": "object",
+      "description": "A stored chassis, described in the catalog. Readying it gives a mech with the stock armor and the chassis' fixed components, but no weapons or other components.",
+      "additionalProperties": false,
+      "required": [
+        "chassis",
+        "count"
+      ],
+      "properties": {
+        "chassis": {
+          "description": "The chassis, described in the catalog's chassisDefinitions.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "count": {
+          "type": "integer",
+          "description": "The copies kept; for components, the working ones.",
+          "format": "int32"
+        }
+      }
+    },
+    "StoredMechParts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mech",
+        "count"
+      ],
+      "properties": {
+        "mech": {
+          "description": "The mech the parts assemble into, described in mechDefinitions.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "count": {
+          "type": "integer",
+          "description": "The parts kept.",
+          "format": "int32"
+        }
+      }
+    },
+    "Stores": {
+      "type": "object",
+      "description": "The current system's stores; each is null if the system has none or the company can't use it. Their stock changes only on arrival in a system.",
+      "additionalProperties": false,
+      "required": [
+        "system",
+        "faction",
+        "blackMarket"
+      ],
+      "properties": {
+        "system": {
+          "description": "The system store, usable unless the reputation with the system's owner is LOATHED.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/Store"
+            }
+          ]
+        },
+        "faction": {
+          "description": "The faction store, usable only while allied with its owner.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/Store"
+            }
+          ]
+        },
+        "blackMarket": {
+          "description": "The black market, usable once the company has gained access to black markets.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/Store"
+            }
+          ]
+        }
+      }
+    },
+    "Store": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "faction",
+        "components",
+        "mechs",
+        "mechParts"
+      ],
+      "properties": {
+        "faction": {
+          "description": "The faction whose reputation sets the prices, by the price change in reputationLevels: for the system store the system's owner, for the faction store its owner (usually the system's owner too, and the faction the company must be allied with to use it), for the black market the pirates.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "components": {
+          "type": "array",
+          "description": "The components in stock.",
+          "items": {
+            "$ref": "#/definitions/ComponentForSale"
+          }
+        },
+        "mechs": {
+          "type": "array",
+          "description": "The whole mechs in stock.",
+          "items": {
+            "$ref": "#/definitions/MechForSale"
+          }
+        },
+        "mechParts": {
+          "type": "array",
+          "description": "The mech parts in stock.",
+          "items": {
+            "$ref": "#/definitions/MechPartsForSale"
+          }
+        }
+      }
+    },
+    "ComponentForSale": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "component",
+        "count",
+        "price"
+      ],
+      "properties": {
+        "component": {
+          "description": "The component, by the id its definition is keyed by.",
+          "$ref": "#/definitions/ComponentReference"
+        },
+        "count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The copies in stock; null: unlimited.",
+          "format": "int32"
+        },
+        "price": {
+          "type": "integer",
+          "description": "The C-Bills for one copy, after the system's discount and the reputation's price change.",
+          "format": "int32"
+        }
+      }
+    },
+    "MechForSale": {
+      "type": "object",
+      "description": "A whole mech, rarely in stock, described in the catalog. Buying it puts the mech with its stock loadout into the mech bay.",
+      "additionalProperties": false,
+      "required": [
+        "mech",
+        "count",
+        "price"
+      ],
+      "properties": {
+        "mech": {
+          "description": "The mech, described in the catalog's mechDefinitions.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The copies in stock; null: unlimited.",
+          "format": "int32"
+        },
+        "price": {
+          "type": "integer",
+          "description": "The C-Bills for one copy, after the system's discount and the reputation's price change.",
+          "format": "int32"
+        }
+      }
+    },
+    "MechPartsForSale": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mech",
+        "count",
+        "price"
+      ],
+      "properties": {
+        "mech": {
+          "description": "The mech the parts assemble into, described in mechDefinitions.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The parts in stock; null for unlimited.",
+          "format": "int32"
+        },
+        "price": {
+          "type": "integer",
+          "description": "The C-Bills for one part, after the system's discount and the reputation's price change.",
+          "format": "int32"
+        }
+      }
+    },
+    "HiringHallPilot": {
+      "type": "object",
+      "description": "A pilot for hire in the current system's hiring hall.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "callsign",
+        "type",
+        "age",
+        "gender",
+        "expertise",
+        "skills",
+        "abilities",
+        "health",
+        "hireCost",
+        "salary",
+        "canHire"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The game's pilot id, as in PilotReference."
+        },
+        "name": {
+          "type": "string",
+          "description": "The full name without callsign, as in PilotReference."
+        },
+        "callsign": {
+          "type": "string",
+          "description": "The callsign, which generated pilots can share."
+        },
+        "type": {
+          "description": "The kind of pilot, which the barracks tells apart by color.",
+          "$ref": "#/definitions/PilotType"
+        },
+        "age": {
+          "type": "integer",
+          "description": "The age in years.",
+          "format": "int32"
+        },
+        "gender": {
+          "description": "The game's gender value, e.g. Female.",
+          "$ref": "#/definitions/Gender"
+        },
+        "expertise": {
+          "type": "string",
+          "description": "The barracks title derived from the primary abilities, e.g. \"Recruit\" or \"Lancer\"."
+        },
+        "skills": {
+          "description": "The skill levels, whose effects skills lists per level.",
+          "$ref": "#/definitions/Skills"
+        },
+        "abilities": {
+          "type": "array",
+          "description": "The primary abilities only, described in skills; the passive traits follow from the skill levels.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
+          }
+        },
+        "health": {
+          "type": "integer",
+          "description": "The injuries the pilot can take before being incapacitated.",
+          "format": "int32"
+        },
+        "hireCost": {
+          "type": "integer",
+          "description": "The one-time C-Bills to hire the pilot.",
+          "format": "int32"
+        },
+        "salary": {
+          "type": "integer",
+          "description": "What the pilot would add to the expenses of each report, as a crew member's line does.",
+          "format": "int32"
+        },
+        "canHire": {
+          "type": "boolean",
+          "description": "Whether the company's Mercenary Review Board rating and morale allow hiring the pilot; full barracks (maxPilots), travel and funds can block it as well."
+        }
+      }
+    },
+    "ActiveContract": {
+      "type": "object",
+      "description": "The accepted travel contract, until the company proceeds with it on arrival or breaks it.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "type",
+        "displayStyle",
+        "employer",
+        "target",
+        "difficulty",
+        "starSystem",
+        "description",
+        "lanceLimits",
+        "biome",
+        "terms",
+        "arrivesOnDay"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "The contract's description, as the contract details show it."
+        },
+        "lanceLimits": {
+          "description": "The limits on the lance the company can deploy on the mission.",
+          "$ref": "#/definitions/LanceLimits"
+        },
+        "biome": {
+          "description": "null where the game has no biome for the contract.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/DefinitionReference"
+            }
+          ]
+        },
+        "id": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "The contract's data file; null where the game keeps no reference to it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The contract's name, as the contract list shows it."
+        },
+        "type": {
+          "description": "The mission type, described in contractTypes.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "displayStyle": {
+          "description": "Whether it's a regular, story, restoration or flashpoint contract.",
+          "$ref": "#/definitions/ContractDisplayStyle"
+        },
+        "employer": {
+          "description": "The faction that hires the company.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "target": {
+          "description": "The faction the mission is fought against.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "difficulty": {
+          "type": "integer",
+          "description": "On the scale of maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
+          "format": "int32"
+        },
+        "starSystem": {
+          "description": "The star system the mission is fought in.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "terms": {
+          "description": "The terms the contract was accepted with.",
+          "$ref": "#/definitions/NegotiationOption"
+        },
+        "arrivesOnDay": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "While travelling to the star system, the day of arrival, as in arrivesOnDay; null otherwise.",
+          "format": "int32"
+        }
+      }
+    },
+    "LanceLimits": {
+      "type": "object",
+      "description": "The lance the contract allows; every limit is null when there is none.",
+      "additionalProperties": false,
+      "required": [
+        "maxMechs",
+        "minTonnage",
+        "maxTonnage",
+        "mechs"
+      ],
+      "properties": {
+        "maxMechs": {
+          "type": "integer",
+          "description": "The most mechs the lance can deploy.",
+          "format": "int32"
+        },
+        "minTonnage": {
+          "type": [
+            "null",
+            "number"
+          ],
+          "description": "The least total tonnage of the lance's mechs.",
+          "format": "float"
+        },
+        "maxTonnage": {
+          "type": [
+            "null",
+            "number"
+          ],
+          "description": "The most total tonnage of the lance's mechs.",
+          "format": "float"
+        },
+        "mechs": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "The tonnage limits of each mech slot, one per mech allowed; null when no slot has any.",
+          "items": {
+            "$ref": "#/definitions/MechSlotLimits"
+          }
+        }
+      }
+    },
+    "MechSlotLimits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minTonnage",
+        "maxTonnage"
+      ],
+      "properties": {
+        "minTonnage": {
+          "type": [
+            "null",
+            "number"
+          ],
+          "description": "The least tonnage of the mech in the slot; null without a limit.",
+          "format": "float"
+        },
+        "maxTonnage": {
+          "type": [
+            "null",
+            "number"
+          ],
+          "description": "The most tonnage of the mech in the slot; null without a limit.",
+          "format": "float"
+        }
+      }
+    },
+    "ContractDisplayStyle": {
+      "type": "string",
+      "x-enumNames": [
+        "INVALID_UNSET",
+        "BaseCampaignNormal",
+        "BaseCampaignStory",
+        "BaseCampaignRestoration",
+        "BaseFlashpoint",
+        "HeavyMetalFlashpointCampaign"
+      ],
+      "enum": [
+        "INVALID_UNSET",
+        "BaseCampaignNormal",
+        "BaseCampaignStory",
+        "BaseCampaignRestoration",
+        "BaseFlashpoint",
+        "HeavyMetalFlashpointCampaign"
+      ]
+    },
+    "NegotiationOption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "payShare",
+        "salvageShare",
+        "pay",
+        "salvage",
+        "reputation"
+      ],
+      "properties": {
+        "payShare": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The pay slider's position in percent; null for fixed terms.",
+          "format": "int32"
+        },
+        "salvageShare": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The salvage slider's position in percent; null for fixed terms.",
+          "format": "int32"
+        },
+        "pay": {
+          "type": "integer",
+          "description": "The pay in C-Bills.",
+          "format": "int32"
+        },
+        "salvage": {
+          "description": "The salvage the company gets.",
+          "$ref": "#/definitions/Salvage"
+        },
+        "reputation": {
+          "description": "The reputation changes when the contract succeeds.",
+          "$ref": "#/definitions/ReputationChange"
+        }
+      }
+    },
+    "Salvage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total",
+        "priority"
+      ],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "description": "The salvage the company gets, including the priority salvage.",
+          "format": "int32"
+        },
+        "priority": {
+          "type": "integer",
+          "description": "The part of the salvage the company picks itself; the rest is assigned to it.",
+          "format": "int32"
+        }
+      }
+    },
+    "ReputationChange": {
+      "type": "object",
+      "description": "The reputation changes of a contract: of its success, as the negotiation shows them, or of a mission's outcome.",
+      "additionalProperties": false,
+      "required": [
+        "employer",
+        "target"
+      ],
+      "properties": {
+        "employer": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The change, usually a gain, with the employer; null when the employer doesn't gain reputation.",
+          "format": "int32"
+        },
+        "target": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The change, usually a loss, with the target; null when the target doesn't gain reputation.",
+          "format": "int32"
+        }
+      }
+    },
+    "Contract": {
+      "type": "object",
+      "description": "A contract the Command Center offers, as its contract list and details show it.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "type",
+        "displayStyle",
+        "employer",
+        "target",
+        "difficulty",
+        "starSystem",
+        "description",
+        "lanceLimits",
+        "biome",
+        "meetsReputation",
+        "negotiation"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "The contract's description, as the contract details show it."
+        },
+        "lanceLimits": {
+          "description": "The limits on the lance the company can deploy on the mission.",
+          "$ref": "#/definitions/LanceLimits"
+        },
+        "biome": {
+          "description": "null where the game has no biome for the contract.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/DefinitionReference"
+            }
+          ]
+        },
+        "id": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "The contract's data file; null where the game keeps no reference to it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The contract's name, as the contract list shows it."
+        },
+        "type": {
+          "description": "The mission type, described in contractTypes.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "displayStyle": {
+          "description": "Whether it's a regular, story, restoration or flashpoint contract.",
+          "$ref": "#/definitions/ContractDisplayStyle"
+        },
+        "employer": {
+          "description": "The faction that hires the company.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "target": {
+          "description": "The faction the mission is fought against.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "difficulty": {
+          "type": "integer",
+          "description": "On the scale of maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
+          "format": "int32"
+        },
+        "starSystem": {
+          "description": "The star system the mission is fought in; a contract elsewhere needs travelling there.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "meetsReputation": {
+          "type": "boolean",
+          "description": "Whether the reputation with the employer allows taking the contract; the list greys it out otherwise. Story, restoration and flashpoint contracts, and employers that don't gain reputation, are always allowed."
+        },
+        "negotiation": {
+          "description": "The terms the contract can be accepted with: negotiated or fixed.",
+          "$ref": "#/definitions/Negotiation"
+        }
+      }
+    },
+    "Negotiation": {
+      "type": "object",
+      "description": "The contract's terms.",
+      "additionalProperties": false,
+      "required": [
+        "canNegotiate",
+        "valuesByShare",
+        "fixedTerms"
+      ],
+      "properties": {
+        "canNegotiate": {
+          "type": "boolean",
+          "description": "Whether the terms are negotiated with the sliders (valuesByShare) or fixed (fixedTerms)."
+        },
+        "valuesByShare": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "The values at each slider position; null when the contract can't be negotiated. A row is not a deal: the pay comes from the row at the pay share, the salvage from the row at the salvage share and the reputation from the row at the share left over.",
+          "items": {
+            "$ref": "#/definitions/ValuesAtShare"
+          }
+        },
+        "fixedTerms": {
+          "description": "The terms of a contract that can't be negotiated; null otherwise.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/NegotiationOption"
+            }
+          ]
+        }
+      }
+    },
+    "ValuesAtShare": {
+      "type": "object",
+      "description": "What one slider position gives, each value for its own slider.",
+      "additionalProperties": false,
+      "required": [
+        "share",
+        "pay",
+        "salvage",
+        "reputation"
+      ],
+      "properties": {
+        "share": {
+          "type": "integer",
+          "description": "The slider's position in percent.",
+          "format": "int32"
+        },
+        "pay": {
+          "type": "integer",
+          "description": "The pay when the pay slider is at this share.",
+          "format": "int32"
+        },
+        "salvage": {
+          "description": "The salvage when the salvage slider is at this share.",
+          "$ref": "#/definitions/Salvage"
+        },
+        "reputation": {
+          "description": "The reputation changes when this share is left over for reputation.",
+          "$ref": "#/definitions/ReputationChange"
+        }
+      }
+    },
+    "Position": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "starSystem",
+        "travelStatus",
+        "travel"
+      ],
+      "properties": {
+        "starSystem": {
+          "description": "The star system the ship is in; while travelling, the one it left or, once it has jumped, the last it jumped to.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "travelStatus": {
+          "description": "Where the ship is on its way, e.g. IN_SYSTEM or TRANSIT_TO_JUMP.",
+          "$ref": "#/definitions/SimGameTravelStatus"
+        },
+        "travel": {
+          "description": "Where the ship is headed; null while it's in a star system.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/Travel"
+            }
+          ]
+        }
+      }
+    },
+    "SimGameTravelStatus": {
+      "type": "string",
+      "x-enumNames": [
+        "IN_SYSTEM",
+        "AT_JUMP_POINT",
+        "WARMING_ENGINES",
+        "TRANSIT_TO_JUMP",
+        "TRANSIT_FROM_JUMP",
+        "TRANSITION_ANIMATING",
+        "UNKNOWN"
+      ],
+      "enum": [
+        "IN_SYSTEM",
+        "AT_JUMP_POINT",
+        "WARMING_ENGINES",
+        "TRANSIT_TO_JUMP",
+        "TRANSIT_FROM_JUMP",
+        "TRANSITION_ANIMATING",
+        "UNKNOWN"
+      ]
+    },
+    "Travel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "destination",
+        "arrivesOnDay"
+      ],
+      "properties": {
+        "destination": {
+          "description": "The star system the ship travels to, at the end of its route.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "arrivesOnDay": {
+          "type": "integer",
+          "description": "The day the ship arrives, on the scale of daysPassed.",
+          "format": "int32"
+        }
+      }
+    }
+  }
+}

@@ -6,6 +6,8 @@ namespace BattleTechInfoExporter.Models;
 
 /// <summary>An objective in the HUD's objective list.</summary>
 /// <param name="Id">The game's id of the objective, which <see cref="ObjectiveZone.ObjectiveIds" /> refer to.</param>
+/// <param name="Title">The title the HUD shows, as plain text.</param>
+/// <param name="Status">The objective's game status, e.g. <c>Active</c>, <c>Succeeded</c> or <c>Failed</c>.</param>
 /// <param name="IsPrimary">Whether the HUD lists it as a primary objective.</param>
 /// <param name="Progress">
 ///     The progress line the HUD shows under the title, e.g. a count of units destroyed; <c>null</c>
@@ -25,7 +27,9 @@ internal sealed record CombatObjective(
     IReadOnlyList<string> TargetUnitIds);
 
 /// <summary>A zone drawn on the map, e.g. a capture or evacuation zone.</summary>
+/// <param name="Id">The game's id of the zone.</param>
 /// <param name="Type">The game's id of the zone type, e.g. <c>regionDef_EvacZone</c>.</param>
+/// <param name="Center">The zone's center on the map.</param>
 /// <param name="Radius">
 ///     The radius of the hexagon the HUD draws; whether a unit is inside is decided per map cell, which this only
 ///     approximates.

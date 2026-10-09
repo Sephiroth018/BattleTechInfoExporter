@@ -4,11 +4,13 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>One step of a mech's queued refit; each <see cref="Type" /> has a record with the fields of its own.</summary>
+/// <param name="Type">The kind of step, which decides the step's other fields.</param>
 /// <param name="IsDone">Whether the mech techs have finished the step; its change is then part of the mech.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal abstract record RefitChange(RefitChangeType Type, bool IsDone);
 
 /// <summary>A step that installs, removes or repairs a component.</summary>
+/// <param name="Component">The component the step installs, removes or repairs.</param>
 /// <param name="DamageLevel">The component's damage level when the step was ordered.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal abstract record ComponentRefitChange(
@@ -45,6 +47,7 @@ internal sealed record RepairComponentChange(
     : ComponentRefitChange(RefitChangeType.RepairComponent, IsDone, Component, DamageLevel);
 
 /// <summary>A step that changes a location's armor or structure.</summary>
+/// <param name="Location">The mech location whose armor or structure the step changes.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal abstract record LocationRefitChange(RefitChangeType Type, bool IsDone, ChassisLocations Location)
     : RefitChange(Type, IsDone);
