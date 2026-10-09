@@ -19,6 +19,18 @@ internal static class BuildingReader
             .OrderBy(building => building.GUID, StringComparer.Ordinal)
             .ToList();
 
+    // Filtered before they're ordered: urban maps have hundreds of buildings, and few are damaged.
+    internal static IReadOnlyList<DamagedBuilding> ReadDamagedBuildings(CombatGameState combat) =>
+        combat.GetAllMiscCombatants()
+            .OfType<BattleTech.Building>()
+            .Where(building => building.CurrentStructure < building.StartingStructure)
+            .OrderBy(building => building.GUID, StringComparer.Ordinal)
+            .Select(building => new DamagedBuilding(
+                building.GUID,
+                Math.Max(0f, building.CurrentStructure),
+                building.IsDead ? ReadDestroyedHexes(combat, building) : null))
+            .ToList();
+
     internal static CombatBuilding ReadBuilding(BattleTech.Building building) =>
         new(
             building.GUID,
@@ -37,31 +49,13 @@ internal static class BuildingReader
     internal static string ObstructionIdOf(BattleTech.Building building) =>
         ObstructionGameLogic.GetObstructionGuid(building.GUID);
 
-    internal static IReadOnlyList<DamagedBuilding> ReadDamagedBuildings(CombatGameState combat)
-    {
-        return ReadAll(combat)
-            .Where(building => building.CurrentStructure < building.StartingStructure)
-            .Select(building => new DamagedBuilding(
-                building.GUID,
-                Math.Max(0f, building.CurrentStructure),
-                building.IsDead ? ReadDestroyedHexes(combat, building) : null))
-            .ToList();
-    }
-
     // The game updates the cells a building occupied when it falls (ObstructionGameLogic.BuildingDestroyedUpdateCells),
     // but knows no hexes of a building: a hex is the building's when its center cell is one of them. They are searched
     // within the cells' bounds, which the corners of its line of sight targets mark at the cells' centers
-    // (ObstructionGameLogic.CalculateLOSTargets).
+    // (ObstructionGameLogic.CalculateLOSTargets); every obstruction with a building has them.
     private static List<MapHex> ReadDestroyedHexes(CombatGameState combat, BattleTech.Building building)
     {
         var corners = building.LOSTargetPositions;
-        if (corners is not { Length: > 0 })
-        {
-            // Only obstructions without a representation, which have no building, lack them.
-            ModLog.Logger.LogWarning($"Left out the hexes of destroyed building {building.GUID}: it has no bounds");
-            return [];
-        }
-
         var occupiedCells = new HashSet<MapEncounterLayerDataCell>(ObstructionOf(combat, building).occupiedCells);
         var halfCell = MapMetaDataExporter.cellSize / 2f;
         return MapHexReader.ReadPlayableHexesWithin(
@@ -70,13 +64,8 @@ internal static class BuildingReader
                 corners.Max(corner => corner.x) + halfCell,
                 corners.Min(corner => corner.z) - halfCell,
                 corners.Max(corner => corner.z) + halfCell)
-            .Select(hex => (Hex: hex, Cell: MapHexReader.CenterCell(combat, hex)))
-            .Where(hex => occupiedCells.Contains(hex.Cell.MapEncounterLayerDataCell))
-            .Select(hex => new MapHex(
-                hex.Hex.q,
-                hex.Hex.r,
-                MapHexReader.ReadElevation(hex.Cell),
-                MapHexReader.ReadTerrainId(combat, hex.Cell)))
+            .Where(hex => occupiedCells.Contains(MapHexReader.CenterCell(combat, hex).MapEncounterLayerDataCell))
+            .Select(hex => MapHexReader.ReadHex(combat, hex))
             .ToList();
     }
 

@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using BattleTech;
-using BattleTech.Data;
 using BattleTechInfoExporter.Models;
 using HBS.Math;
-using Contract = BattleTech.Contract;
 
 namespace BattleTechInfoExporter.Export;
 
@@ -28,51 +26,31 @@ internal static class CombatMapReader
             .Select((building, index) => (ObstructionId: BuildingReader.ObstructionIdOf(building), Index: index))
             .ToDictionary(building => building.ObstructionId, building => building.Index, StringComparer.Ordinal);
         var pathingGroups = HexStepReader.ReadPathingGroups(combat);
-        var stepCheckers = pathingGroups
-            .Select(pathingGroup => HexStepReader.CreateStepChecker(combat, pathingGroup[0]))
-            .ToList();
+        var stepReaders = pathingGroups.Select(pathingGroup => new HexStepReader(combat, pathingGroup[0])).ToList();
         var playableHexes = MapHexReader.ReadPlayableHexes(combat).ToList();
-        var isPlayable = new HashSet<HexPoint3>(playableHexes);
+        var playableHexSet = new HashSet<HexPoint3>(playableHexes);
         var hexes = playableHexes
-            .Select(hex =>
-            {
-                var cell = MapHexReader.CenterCell(combat, hex);
-                return new Hex(
-                    hex,
-                    MapHexReader.ReadTerrainId(combat, cell),
-                    MapHexReader.ReadElevation(cell),
-                    BuildingReader.ReadObstructionId(cell) is { } obstructionId
-                    && buildingIndices.TryGetValue(obstructionId, out var index)
-                        ? index
-                        : null,
-                    stepCheckers
-                        .Select(stepChecker => HexStepReader.ReadBlockedSteps(combat, stepChecker, hex, isPlayable))
-                        .ToList());
-            })
+            .Select(hex => new RowHex(
+                MapHexReader.ReadHex(combat, hex),
+                BuildingReader.ReadObstructionId(MapHexReader.CenterCell(combat, hex)) is { } obstructionId
+                && buildingIndices.TryGetValue(obstructionId, out var index)
+                    ? index
+                    : null,
+                stepReaders.Select(stepReader => stepReader.ReadBlockedSteps(hex, playableHexSet)).ToList()))
             .ToList();
         var terrainCharacters = AssignTerrainCharacters(hexes);
 
-        var terrains = new SortedDictionary<string, string?>(StringComparer.Ordinal) { [OpenGroundCharacter] = null };
-        foreach (var terrain in terrainCharacters)
-        {
-            terrains.Add(terrain.Value, terrain.Key);
-        }
-
         return new CombatMap(
-            ReadMapId(combat.ActiveContract),
+            MapReader.ReadMapId(combat.ActiveContract),
             ReadHexGridLayout(combat),
-            terrains,
-            pathingGroups
-                .Select(pathingGroup =>
-                    (IReadOnlyList<string>)pathingGroup.Select(pathing => pathing.Description.Id).ToList())
+            new SortedDictionary<string, string?>(
+                terrainCharacters.ToDictionary(terrain => terrain.Value, string? (terrain) => terrain.Key),
+                StringComparer.Ordinal) { [OpenGroundCharacter] = null },
+            pathingGroups.Select(pathingGroup => pathingGroup.Select(pathing => pathing.Description.Id).ToList())
                 .ToList(),
             buildings.Select(BuildingReader.ReadBuilding).ToList(),
             ReadRows(hexes, terrainCharacters));
     }
-
-    /// <summary>The map's id in the catalog, which keys maps by their MapID; the contract knows a map only by its path.</summary>
-    internal static string? ReadMapId(Contract contract) =>
-        MetadataDatabase.Instance.GetMapByPath(contract.mapPath)?.MapID;
 
     // HexGrid.HexAxialToCartesian.
     private static HexGridLayout ReadHexGridLayout(CombatGameState combat)
@@ -89,10 +67,10 @@ internal static class CombatMapReader
             + "neighbor at directions[i] is blocked; a step to a hex not listed is blocked too");
     }
 
-    private static Dictionary<string, string> AssignTerrainCharacters(IEnumerable<Hex> hexes)
+    private static Dictionary<string, string> AssignTerrainCharacters(IEnumerable<RowHex> hexes)
     {
         var terrainIds = hexes
-            .Select(hex => hex.TerrainId)
+            .Select(hex => hex.Hex.Terrain)
             .OfType<string>()
             .Distinct(StringComparer.Ordinal)
             .OrderBy(terrainId => terrainId, StringComparer.Ordinal)
@@ -109,15 +87,15 @@ internal static class CombatMapReader
     }
 
     // The hexes come row by row (MapHexReader.ReadPlayableHexes); a row continues while they are neighbors.
-    private static List<HexRow> ReadRows(List<Hex> hexes, Dictionary<string, string> terrainCharacters)
+    private static List<HexRow> ReadRows(List<RowHex> hexes, Dictionary<string, string> terrainCharacters)
     {
         var rows = new List<HexRow>();
         var start = 0;
         for (var end = 1; end <= hexes.Count; end++)
         {
             if (end < hexes.Count
-                && hexes[end].Point.r == hexes[end - 1].Point.r
-                && hexes[end].Point.q == hexes[end - 1].Point.q + 1)
+                && hexes[end].Hex.R == hexes[end - 1].Hex.R
+                && hexes[end].Hex.Q == hexes[end - 1].Hex.Q + 1)
             {
                 continue;
             }
@@ -125,14 +103,14 @@ internal static class CombatMapReader
             var rowHexes = hexes.GetRange(start, end - start);
             rows.Add(
                 new HexRow(
-                    rowHexes[0].Point.r,
-                    rowHexes[0].Point.q,
+                    rowHexes[0].Hex.R,
+                    rowHexes[0].Hex.Q,
                     string.Concat(rowHexes.Select(hex =>
-                        hex.TerrainId is { } terrainId ? terrainCharacters[terrainId] : OpenGroundCharacter)),
-                    rowHexes.Select(hex => hex.Elevation).ToList(),
+                        hex.Hex.Terrain is { } terrainId ? terrainCharacters[terrainId] : OpenGroundCharacter)),
+                    rowHexes.Select(hex => hex.Hex.Elevation).ToList(),
                     rowHexes.Select(hex => hex.BuildingIndex).ToList(),
-                    rowHexes[0].BlockedSteps
-                        .Select((_, group) => string.Concat(rowHexes.Select(hex =>
+                    Enumerable.Range(0, rowHexes[0].BlockedSteps.Count)
+                        .Select(group => string.Concat(rowHexes.Select(hex =>
                             MaskCharacters[hex.BlockedSteps[group]])))
                         .ToList()));
             start = end;
@@ -141,11 +119,6 @@ internal static class CombatMapReader
         return rows;
     }
 
-    // BlockedSteps holds a mask per pathing group (HexStepReader.ReadBlockedSteps).
-    private sealed record Hex(
-        HexPoint3 Point,
-        string? TerrainId,
-        double Elevation,
-        int? BuildingIndex,
-        IReadOnlyList<int> BlockedSteps);
+    // A hex as it goes into its row; BlockedSteps holds a mask per pathing group (HexStepReader.ReadBlockedSteps).
+    private sealed record RowHex(MapHex Hex, int? BuildingIndex, IReadOnlyList<int> BlockedSteps);
 }

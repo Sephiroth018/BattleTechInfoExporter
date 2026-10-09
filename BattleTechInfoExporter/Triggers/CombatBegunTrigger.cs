@@ -19,14 +19,12 @@ internal static class CombatBegunTrigger
     private static void OnCombatBegun([HarmonyArgument("__instance")] TurnDirector turnDirector)
     {
         var combat = turnDirector.Combat;
+        CombatExporter.ExportMap(
+            combat,
+            combat.WasFromSave ? ExportTrigger.CombatLoaded : ExportTrigger.CombatStarted);
         if (combat.WasFromSave)
         {
-            CombatExporter.ExportMap(combat, ExportTrigger.CombatLoaded);
             CombatExporter.Export(combat, ExportTrigger.CombatLoaded);
-        }
-        else
-        {
-            CombatExporter.ExportMap(combat, ExportTrigger.CombatStarted);
         }
     }
 }

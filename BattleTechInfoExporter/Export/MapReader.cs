@@ -6,6 +6,7 @@ using BattleTech;
 using BattleTech.Data;
 using BattleTechInfoExporter.Models;
 using HBS.Util;
+using Contract = BattleTech.Contract;
 
 namespace BattleTechInfoExporter.Export;
 
@@ -68,6 +69,10 @@ internal static class MapReader
 
         return maps;
     }
+
+    /// <summary>The id the catalog keys the contract's map by, its MapID; the contract knows a map only by its path.</summary>
+    internal static string? ReadMapId(Contract contract) =>
+        MetadataDatabase.Instance.GetMapByPath(contract.mapPath)?.MapID;
 
     // The maps the contract generator draws a star system's contracts from
     // (SimGameState.GetSinglePlayerProceduralPlayableMaps): the released maps with a procedural encounter whose

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using BattleTech;
+using BattleTechInfoExporter.Models;
 using HBS.Math;
 
 namespace BattleTechInfoExporter.Export;
@@ -49,17 +50,18 @@ internal static class MapHexReader
         combat.MapMetaData.GetCellAt(combat.HexGrid.HexPoint3ToCartesianWorld(hex));
 
     /// <summary>
-    ///     The height a unit standing on the hex is at (PathNodeGrid.GetPathNode): a building's roof where one stands,
-    ///     rounded to 0.1 m.
+    ///     The hex as it is now: the height a unit standing on it is at (PathNodeGrid.GetPathNode), a building's roof
+    ///     where one stands, rounded to 0.1 m, and the terrain it is in (AbstractActor.OnPositionUpdate).
     /// </summary>
-    internal static double ReadElevation(MapTerrainDataCell cell) => Math.Round(cell.cachedHeight, 1);
-
-    /// <summary>
-    ///     The terrain a unit standing on the hex is in (AbstractActor.OnPositionUpdate), keyed as in the catalog's
-    ///     terrains; <c>null</c> on open ground.
-    /// </summary>
-    internal static string? ReadTerrainId(CombatGameState combat, MapTerrainDataCell cell) =>
-        combat.MapMetaData.GetPriorityDesignMask(cell)?.Id;
+    internal static MapHex ReadHex(CombatGameState combat, HexPoint3 hex)
+    {
+        var cell = CenterCell(combat, hex);
+        return new MapHex(
+            hex.q,
+            hex.r,
+            Math.Round(cell.cachedHeight, 1),
+            combat.MapMetaData.GetPriorityDesignMask(cell)?.Id);
+    }
 
     // A unit can stand on a hex inside the contract's encounter bounds (PathNode.IsLegalWorldPathLocationForActor).
     // The bounds of a contract without any are the whole map, so the cells the game doesn't read

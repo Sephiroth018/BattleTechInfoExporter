@@ -13,7 +13,7 @@ internal static class CombatStateReader
         var units = CombatUnitReader.ReadUnits(combat);
         return new CombatState(
             ContractReader.ReadMissionContract(simGame, contract),
-            CombatMapReader.ReadMapId(contract),
+            MapReader.ReadMapId(contract),
             turnDirector.CurrentRound,
             HudInitiative.FromGamePhase(turnDirector.CurrentPhase),
             combat.LocalPlayerTeam.Morale,
