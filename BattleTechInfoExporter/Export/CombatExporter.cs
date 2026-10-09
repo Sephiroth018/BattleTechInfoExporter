@@ -22,8 +22,8 @@ internal static class CombatExporter
             trigger,
             () =>
             {
-                // Read on the game's main thread while the battle begins; its time and the pathing groups, which
-                // only hold the pathing capabilities loaded by then, are logged to check them in the game.
+                // Read on the game's main thread while the battle begins, so its time is logged, as are the pathing
+                // groups, which hold only the pathing capabilities loaded by then.
                 var stopwatch = Stopwatch.StartNew();
                 var map = CombatMapReader.Read(combat);
                 ModLog.Logger.Log(

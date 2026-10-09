@@ -19,11 +19,12 @@ internal static class BuildingReader
             .OrderBy(building => building.GUID, StringComparer.Ordinal)
             .ToList();
 
-    // Filtered before they're ordered: urban maps have hundreds of buildings, and few are damaged.
+    // Filtered before they're ordered: urban maps have hundreds of buildings, and few are damaged. A building can
+    // also be destroyed without damage (Building.IsDead), e.g. with the one it stands on.
     internal static IReadOnlyList<DamagedBuilding> ReadDamagedBuildings(CombatGameState combat) =>
         combat.GetAllMiscCombatants()
             .OfType<BattleTech.Building>()
-            .Where(building => building.CurrentStructure < building.StartingStructure)
+            .Where(building => building.IsDead || building.CurrentStructure < building.StartingStructure)
             .OrderBy(building => building.GUID, StringComparer.Ordinal)
             .Select(building => new DamagedBuilding(
                 building.GUID,
@@ -52,18 +53,22 @@ internal static class BuildingReader
     // The game updates the cells a building occupied when it falls (ObstructionGameLogic.BuildingDestroyedUpdateCells),
     // but knows no hexes of a building: a hex is the building's when its center cell is one of them. They are searched
     // within the cells' bounds, which the corners of its line of sight targets mark at the cells' centers
-    // (ObstructionGameLogic.CalculateLOSTargets); every obstruction with a building has them.
+    // (ObstructionGameLogic.CalculateLOSTargets); a building of a solid obstruction or foundation has none, so its
+    // hexes are searched on the whole map.
     private static List<MapHex> ReadDestroyedHexes(CombatGameState combat, BattleTech.Building building)
     {
         var corners = building.LOSTargetPositions;
         var occupiedCells = new HashSet<MapEncounterLayerDataCell>(ObstructionOf(combat, building).occupiedCells);
         var halfCell = MapMetaDataExporter.cellSize / 2f;
-        return MapHexReader.ReadPlayableHexesWithin(
+        var candidateHexes = corners is { Length: > 0 }
+            ? MapHexReader.ReadPlayableHexesWithin(
                 combat,
                 corners.Min(corner => corner.x) - halfCell,
                 corners.Max(corner => corner.x) + halfCell,
                 corners.Min(corner => corner.z) - halfCell,
                 corners.Max(corner => corner.z) + halfCell)
+            : MapHexReader.ReadPlayableHexes(combat);
+        return candidateHexes
             .Where(hex => occupiedCells.Contains(MapHexReader.CenterCell(combat, hex).MapEncounterLayerDataCell))
             .Select(hex => MapHexReader.ReadHex(combat, hex))
             .ToList();

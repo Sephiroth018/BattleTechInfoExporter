@@ -212,7 +212,8 @@ Damaged buildings are listed by their id in the combat map, with the structure l
 full structure are left out. The HUD shows a building's structure when it is targeted. A destroyed
 building also carries the hexes it stood on as they are now, with their elevation and terrain:
 the combat map isn't rewritten, but units on its roof drop to the ground, which its rubble covers.
-A building that explodes also changes the terrain around it, which isn't exported.
+The blocked steps onto and off those hexes aren't read again, so they still follow the roof. A
+building that explodes also changes the terrain around it, which isn't exported.
 
 ## Combat map
 

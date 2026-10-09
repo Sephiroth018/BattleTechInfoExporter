@@ -451,8 +451,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   and after every unit's activation, and deleted when the game tears the battle down or a career is loaded, so it exists
   only while its battle runs. It shows what the player's HUD shows and no more: enemies by their
   visibility (`CombatUnitReader`), from full detail down to a blip's position or the position they
-  were last detected at. Every read is a cached lookup or a statistic; it never reads the career
-  files or the catalog.
+  were last detected at. Every read is a cached lookup or a statistic, apart from the map cells of
+  destroyed buildings; it never reads the career files or the catalog.
 - **The battle's ground is a file of its own,** `combat-map.json`, written once when the battle
   begins and deleted with the combat state: the map doesn't change, and the combat state lists what
   does (damaged buildings, a destroyed building's hexes). It isn't in the catalog, because buildings

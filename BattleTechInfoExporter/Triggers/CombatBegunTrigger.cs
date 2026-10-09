@@ -15,16 +15,24 @@ namespace BattleTechInfoExporter.Triggers;
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal static class CombatBegunTrigger
 {
-    [HarmonyPostfix]
-    private static void OnCombatBegun([HarmonyArgument("__instance")] TurnDirector turnDirector)
+    // A prefix: without an intro, the method starts the first round (CheckCameraIntroAndDropshipComplete), whose
+    // combat state refers to the map.
+    [HarmonyPrefix]
+    private static void OnCombatBegin([HarmonyArgument("__instance")] TurnDirector turnDirector)
     {
         var combat = turnDirector.Combat;
         CombatExporter.ExportMap(
             combat,
             combat.WasFromSave ? ExportTrigger.CombatLoaded : ExportTrigger.CombatStarted);
-        if (combat.WasFromSave)
+    }
+
+    // A postfix: the method restores the loaded battle's visibility.
+    [HarmonyPostfix]
+    private static void OnCombatBegun([HarmonyArgument("__instance")] TurnDirector turnDirector)
+    {
+        if (turnDirector.Combat.WasFromSave)
         {
-            CombatExporter.Export(combat, ExportTrigger.CombatLoaded);
+            CombatExporter.Export(turnDirector.Combat, ExportTrigger.CombatLoaded);
         }
     }
 }
