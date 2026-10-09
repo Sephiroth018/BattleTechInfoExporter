@@ -14,7 +14,10 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="ComponentRepair">Per slot of the component; a chassis' fixed components are repaired for free.</param>
 /// <param name="Install">Per slot of the component, by its category.</param>
 /// <param name="ArmorChange">Per point of armor added or removed.</param>
-/// <param name="UninstallTechPointsPerSlot">Removing a component costs no C-Bills.</param>
+/// <param name="UninstallTechPointsPerSlot">
+///     Removing a component takes these instead of its category's <see cref="Install" /> tech points; its C-Bills are
+///     still the category's, none for a destroyed component.
+/// </param>
 /// <param name="ReadyMechTechPoints">For readying a stored chassis.</param>
 /// <param name="CancelRefundShare">The share of the unpaid work refunded when a started order is cancelled.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

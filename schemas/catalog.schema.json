@@ -535,7 +535,7 @@
     },
     "StatRatings": {
       "type": "object",
-      "description": "The stat bars, each rated up to 10 against the game's stock mechs.",
+      "description": "The stat bars, each rated from 0 against the game's stock mechs; a bar is full at 10, which a rating can exceed.",
       "additionalProperties": false,
       "required": [
         "firepower",
@@ -1577,7 +1577,7 @@
     },
     "WeaponRanges": {
       "type": "object",
-      "description": "The range brackets in meters: the weapon is less accurate below short range and beyond long range.",
+      "description": "The range brackets in meters, each with its to-hit modifier in RangeBandModifiers.",
       "additionalProperties": false,
       "required": [
         "min",
@@ -1589,7 +1589,7 @@
       "properties": {
         "min": {
           "type": "number",
-          "description": "Below it the weapon can't fire.",
+          "description": "The minimum range; closer, the weapon still fires, with withinMinimumRange.",
           "format": "float"
         },
         "short": {

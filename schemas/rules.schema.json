@@ -1277,7 +1277,7 @@
     },
     "ElevationModifier": {
       "type": "object",
-      "description": "The modifier for the height difference: modifierPerLevel per full levelHeight the attacker stands above the target.",
+      "description": "The modifier for the height difference: modifierPerLevel per full levelHeight the attacker stands below the target, a bonus of as much per level above it.",
       "additionalProperties": false,
       "required": [
         "levelHeight",
@@ -2376,7 +2376,7 @@
     },
     "ResolveFromEvents": {
       "type": "object",
-      "description": "The resolve the lance gains from what its attacks do to enemies, each once per attack.",
+      "description": "The resolve the lance gains from what its attacks do to enemies, each once per attack except kills and major armor damage, which count per enemy, and from failed objectives.",
       "additionalProperties": false,
       "required": [
         "enemyDestroyed",
@@ -2648,7 +2648,7 @@
         },
         "uninstallTechPointsPerSlot": {
           "type": "integer",
-          "description": "Removing a component costs no C-Bills.",
+          "description": "Removing a component takes these instead of its category's install tech points; its C-Bills are still the category's, none for a destroyed component.",
           "format": "int32"
         },
         "readyMechTechPoints": {
@@ -3344,12 +3344,12 @@
         },
         "renewedPerRefresh": {
           "type": "number",
-          "description": "Added to a system's open contract slots every refreshDays.",
+          "description": "Added to a system's open contract slots at each renewal.",
           "format": "float"
         },
         "refreshDays": {
           "type": "integer",
-          "description": "A system's open contract slots are renewed once more than this many days passed since their last renewal.",
+          "description": "A system's open contract slots are renewed once more than this many days passed since their last renewal, so every refreshDays + 1 days.",
           "format": "int32"
         },
         "removedPerCompleted": {

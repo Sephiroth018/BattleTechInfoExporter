@@ -87,7 +87,7 @@ internal sealed record TargetWeightClassModifiers(
 
 /// <summary>
 ///     The modifier for the height difference: <see cref="ModifierPerLevel" /> per full <see cref="LevelHeight" />
-///     the attacker stands above the target.
+///     the attacker stands below the target, a bonus of as much per level above it.
 /// </summary>
 /// <param name="LevelHeight">In meters.</param>
 /// <param name="ModifierPerLevel">

@@ -9,8 +9,8 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Allegiance">Whose side the unit is on, seen from the player.</param>
 /// <param name="Visibility">How much of the unit the HUD shows, deciding which of its other fields are set.</param>
 /// <param name="Kind">
-///     The kind of unit; <c>null</c> where the HUD doesn't tell (<see cref="UnitVisibility.BlipMinimum" />
-///     ).
+///     The kind of unit; <c>null</c> where the HUD doesn't tell: at <see cref="UnitVisibility.BlipMinimum" /> and
+///     <see cref="UnitVisibility.LastSeen" />.
 /// </param>
 /// <param name="Tonnage">
 ///     A blip's tonnage, which the HUD shows at <see cref="UnitVisibility.BlipMaximum" /> for mechs and vehicles;
@@ -19,7 +19,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="WeightClass">A blip's weight class, which the HUD shows instead of the tonnage for turrets.</param>
 /// <param name="Definition">
 ///     The mech, vehicle or turret in the catalog, which holds its armor and loadout; <c>null</c> for the player's
-///     mechs, which have <see cref="BayMech" /> instead, and for blips.
+///     mechs, which have <see cref="BayMech" /> instead, and for units out of full view.
 /// </param>
 /// <param name="BayMech">The player's mech in <c>game-state.json</c>, whose loadout holds its assigned armor.</param>
 /// <param name="Position">Where the unit is, or was last detected at for <see cref="UnitVisibility.LastSeen" />.</param>

@@ -71,7 +71,10 @@ internal sealed record ResolveEventThresholds(
     float MinorArmorDamage,
     float MajorArmorDamage);
 
-/// <summary>The resolve the lance gains from what its attacks do to enemies, each once per attack.</summary>
+/// <summary>
+///     The resolve the lance gains from what its attacks do to enemies, each once per attack except kills and major
+///     armor damage, which count per enemy, and from failed objectives.
+/// </summary>
 /// <param name="EnemyDestroyed">By the enemy's weight class; a turret counts as light.</param>
 /// <param name="EnemyDestroyedInMelee">Added to <see cref="EnemyDestroyed" /> for a melee kill.</param>
 /// <param name="EnemyCriticalHit">For a critical hit on an enemy.</param>

@@ -1547,7 +1547,7 @@
     },
     "StatRatings": {
       "type": "object",
-      "description": "The stat bars, each rated up to 10 against the game's stock mechs.",
+      "description": "The stat bars, each rated from 0 against the game's stock mechs; a bar is full at 10, which a rating can exceed.",
       "additionalProperties": false,
       "required": [
         "firepower",

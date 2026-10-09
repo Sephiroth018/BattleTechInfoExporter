@@ -23,7 +23,9 @@ internal sealed record MechStats(
     DurabilityStats Durability,
     MeleeStats Melee);
 
-/// <summary>The stat bars, each rated up to 10 against the game's stock mechs.</summary>
+/// <summary>
+///     The stat bars, each rated from 0 against the game's stock mechs; a bar is full at 10, which a rating can exceed.
+/// </summary>
 /// <param name="Firepower">Rated from the weapons' damage and stability damage.</param>
 /// <param name="Movement">Rated from the sprint distance and the number of jump jets.</param>
 /// <param name="Range">Rated from the weapons' average medium range.</param>

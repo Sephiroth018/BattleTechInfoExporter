@@ -115,8 +115,10 @@ internal sealed record WeaponDefinition : ComponentDefinition
     public bool IsIndirectFireCapable { get; }
 }
 
-/// <summary>The range brackets in meters: the weapon is less accurate below short range and beyond long range.</summary>
-/// <param name="Min">Below it the weapon can't fire.</param>
+/// <summary>The range brackets in meters, each with its to-hit modifier in <see cref="RangeBandModifiers" />.</summary>
+/// <param name="Min">
+///     The minimum range; closer, the weapon still fires, with <see cref="RangeBandModifiers.WithinMinimumRange" />.
+/// </param>
 /// <param name="Short">
 ///     The end of the short bracket, from <see cref="Min" />, where <c>rules.json</c>'s
 ///     <see cref="RangeBandModifiers.Short" /> applies.

@@ -261,7 +261,7 @@
           "$ref": "#/definitions/UnitVisibility"
         },
         "kind": {
-          "description": "The kind of unit; null where the HUD doesn't tell (blipMinimum ).",
+          "description": "The kind of unit; null where the HUD doesn't tell: at blipMinimum and lastSeen.",
           "oneOf": [
             {
               "type": "null"
@@ -291,7 +291,7 @@
           ]
         },
         "definition": {
-          "description": "The mech, vehicle or turret in the catalog, which holds its armor and loadout; null for the player's mechs, which have bayMech instead, and for blips.",
+          "description": "The mech, vehicle or turret in the catalog, which holds its armor and loadout; null for the player's mechs, which have bayMech instead, and for units out of full view.",
           "oneOf": [
             {
               "type": "null"

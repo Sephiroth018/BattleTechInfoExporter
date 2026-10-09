@@ -20,9 +20,10 @@ namespace BattleTechInfoExporter.Models;
 ///     A contract's difficulty is the system's plus the global one, varied by up to this either way.
 /// </param>
 /// <param name="MaxPerSystem">The most contracts a system offers at once, unless it sets its own.</param>
-/// <param name="RenewedPerRefresh">Added to a system's open contract slots every <see cref="RefreshDays" />.</param>
+/// <param name="RenewedPerRefresh">Added to a system's open contract slots at each renewal.</param>
 /// <param name="RefreshDays">
-///     A system's open contract slots are renewed once more than this many days passed since their last renewal.
+///     A system's open contract slots are renewed once more than this many days passed since their last renewal, so
+///     every <see cref="RefreshDays" /> + 1 days.
 /// </param>
 /// <param name="RemovedPerCompleted">Taken off a system's open contract slots for each contract completed there.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
