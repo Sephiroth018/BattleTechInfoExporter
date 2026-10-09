@@ -30,7 +30,10 @@ internal sealed record CombatMap(
     IReadOnlyDictionary<string, string?> Terrains,
     IReadOnlyList<IReadOnlyList<string>> PathingGroups,
     IReadOnlyList<CombatBuilding> Buildings,
-    IReadOnlyList<HexRow> Rows) : ExportFile;
+    IReadOnlyList<HexRow> Rows) : ExportFile
+{
+    internal const string FileName = "combat-map.json";
+}
 
 /// <summary>How the hexes lie on the map, spelled out so the file explains itself.</summary>
 /// <param name="Size">The distance between neighboring hex centers in meters.</param>

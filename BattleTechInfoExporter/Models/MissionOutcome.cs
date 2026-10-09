@@ -31,7 +31,10 @@ internal sealed record MissionOutcome(
     int MercenaryReviewBoardReputation,
     int ExperiencePerPilot,
     IReadOnlyList<LanceUnitOutcome> Lance,
-    MissionSalvage Salvage) : ExportFile;
+    MissionSalvage Salvage) : ExportFile
+{
+    internal const string FileName = "mission-outcome.json";
+}
 
 /// <summary>The contract a mission was for.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

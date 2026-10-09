@@ -7,8 +7,6 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>The single entry point the triggers of the catalog export call.</summary>
 internal static class CatalogExporter
 {
-    private const string CatalogFileName = "catalog.json";
-
     /// <summary>
     ///     Rebuilds the catalog only when it's missing or stale: written by another mod version or from other
     ///     sources (<see cref="CatalogSourceFingerprint" />). Deleting the file forces a rebuild. The rebuild loads
@@ -23,9 +21,9 @@ internal static class CatalogExporter
             () =>
             {
                 var sourceFingerprint = CatalogSourceFingerprint.Compute(simGame.DataManager);
-                if (Catalog.IsCurrent(CatalogFileName, sourceFingerprint))
+                if (Catalog.IsCurrent(sourceFingerprint))
                 {
-                    ModLog.Logger.Log($"Left {CatalogFileName} unchanged ({trigger}): same mod version and sources");
+                    ModLog.Logger.Log($"Left {Catalog.FileName} unchanged ({trigger}): same mod version and sources");
                     return;
                 }
 
@@ -52,6 +50,6 @@ internal static class CatalogExporter
             ModLog.Logger.LogWarning($"Failed to load {entry.Type} {entry.Id} for the catalog");
         }
 
-        CatalogReader.Read(simGame, sourceFingerprint).Write(CatalogFileName, trigger);
+        CatalogReader.Read(simGame, sourceFingerprint).Write(Catalog.FileName, trigger);
     }
 }

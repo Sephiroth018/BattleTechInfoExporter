@@ -35,7 +35,10 @@ internal sealed record CombatState(
     IReadOnlyDictionary<string, CombatUnit> Units,
     IReadOnlyList<CombatObjective> Objectives,
     IReadOnlyList<ObjectiveZone> Zones,
-    IReadOnlyList<DamagedBuilding> DamagedBuildings) : ExportFile;
+    IReadOnlyList<DamagedBuilding> DamagedBuildings) : ExportFile
+{
+    internal const string FileName = "combat-state.json";
+}
 
 /// <param name="Id">The building's id in <see cref="CombatMap.Buildings" />.</param>
 /// <param name="Structure">The structure left; its max is in <see cref="CombatBuilding.MaxStructure" />.</param>

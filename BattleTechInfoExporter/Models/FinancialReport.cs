@@ -10,4 +10,7 @@ namespace BattleTechInfoExporter.Models;
 internal sealed record FinancialReport(
     int DueOnDay,
     Spending Spending,
-    ExpectedExpenses ExpectedExpenses) : ExportFile;
+    ExpectedExpenses ExpectedExpenses) : ExportFile
+{
+    internal const string FileName = "financial-report.json";
+}

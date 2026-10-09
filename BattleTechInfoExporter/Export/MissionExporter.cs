@@ -7,8 +7,6 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>The entry points of the mission file, written when the mission ends and again once its salvage is final.</summary>
 internal static class MissionExporter
 {
-    private const string MissionOutcomeFileName = "mission-outcome.json";
-
     /// <summary>Exports the outcome of a contract the game has just completed, before the salvage is chosen.</summary>
     internal static void ExportOutcome(SimGameState simGame, Contract contract) =>
         CampaignExport.Run(
@@ -19,7 +17,7 @@ internal static class MissionExporter
                     contract,
                     new SalvageOffer(contract.GetPotentialSalvage(), contract.SalvageResults),
                     null)
-                .Write(MissionOutcomeFileName, ExportTrigger.MissionCompleted));
+                .Write(MissionOutcome.FileName, ExportTrigger.MissionCompleted));
 
     /// <summary>
     ///     Exports the outcome again, with the salvage received, once the game has finalized the contract's salvage.
@@ -29,5 +27,5 @@ internal static class MissionExporter
             simGame,
             ExportTrigger.SalvageChosen,
             () => MissionReader.ReadOutcome(simGame, contract, offer, contract.SalvageResults)
-                .Write(MissionOutcomeFileName, ExportTrigger.SalvageChosen));
+                .Write(MissionOutcome.FileName, ExportTrigger.SalvageChosen));
 }
