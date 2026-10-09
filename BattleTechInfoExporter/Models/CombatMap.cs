@@ -9,6 +9,7 @@ namespace BattleTechInfoExporter.Models;
 ///     and numbers instead of an object per hex, so the file stays small enough for an AI chat to read whole.
 /// </summary>
 /// <param name="MapId">The map, keyed as in the catalog's <see cref="Catalog.MapDefinitions" />.</param>
+/// <param name="HexGrid">How the hexes' axial coordinates map to positions in meters, and their neighbors.</param>
 /// <param name="Terrains">
 ///     The legend of <see cref="HexRow.Terrains" />: each character's terrain, keyed as in the catalog's
 ///     <see cref="Catalog.TerrainDefinitions" />; <c>.</c> is open ground (<c>null</c>).
@@ -49,17 +50,22 @@ internal sealed record HexGridLayout(
     IReadOnlyList<HexOffset> Directions,
     string BlockedStepsFormula);
 
+/// <summary>The step from a hex to one of its neighbors, in axial coordinates.</summary>
+/// <param name="Q">The change of <c>q</c>.</param>
+/// <param name="R">The change of <c>r</c>.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record HexOffset(int Q, int R);
 
 /// <summary>A building, which units can be fired at, stand on and be blocked by.</summary>
 /// <param name="Id">The game's building id, as in <see cref="CombatState.DamagedBuildings" />.</param>
+/// <param name="Name">The building's name as the game shows it.</param>
 /// <param name="Position">The point the building is placed at, not necessarily its center.</param>
 /// <param name="MaxStructure">The structure of the undamaged building.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatBuilding(string Id, string Name, MapPosition Position, float MaxStructure);
 
 /// <summary>Consecutive hexes of one row, from (<see cref="Q" />, <see cref="R" />) on, one entry per hex in each list.</summary>
+/// <param name="R">The axial <c>r</c> of every hex in the row.</param>
 /// <param name="Q">The <c>q</c> of the first hex.</param>
 /// <param name="Terrains">Each hex's terrain as a character of <see cref="CombatMap.Terrains" />.</param>
 /// <param name="Elevations">

@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>A faction reputation level and its effects.</summary>
+/// <param name="Level">The level as the game names it, e.g. <c>LIKED</c>.</param>
 /// <param name="StartsAt">The lowest reputation value in the level.</param>
 /// <param name="MaxContractDifficulty">
 ///     The highest difficulty of the faction's contracts offered at this level, including the career's current

@@ -9,16 +9,19 @@ namespace BattleTechInfoExporter.Models;
 ///     The root of <c>mission-outcome.json</c>: the latest mission as it ended, written again once its salvage is
 ///     final.
 /// </summary>
+/// <param name="Contract">The contract the mission was for.</param>
 /// <param name="State">Whether the contract was completed, retreated from or failed.</param>
 /// <param name="IsGoodFaithEffort">
 ///     Whether a retreated or failed contract still counts as a good faith effort, which softens its penalties.
 /// </param>
 /// <param name="Rounds">The combat rounds the mission took, counted from 1.</param>
+/// <param name="Objectives">The objectives as the after-action report lists them.</param>
 /// <param name="Payment">The C-Bills paid, with the good faith modifier and the bonuses applied.</param>
 /// <param name="Reputation">The final reputation changes with the employer and the target.</param>
 /// <param name="MercenaryReviewBoardReputation">The change of the Mercenary Review Board rating.</param>
 /// <param name="ExperiencePerPilot">The experience every pilot of <see cref="Lance" /> gets.</param>
 /// <param name="Lance">The company's mechs and pilots on the mission, in lance order.</param>
+/// <param name="Salvage">The salvage offer, and what the company got once it is final.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MissionOutcome(
     MissionContract Contract,
@@ -50,12 +53,22 @@ internal sealed record MissionContract(
     : ContractIdentity(Id, Name, Type, DisplayStyle, Employer, Target, Difficulty, StarSystem);
 
 /// <summary>An objective as the after-action report lists it.</summary>
+/// <param name="Title">The objective's title as plain text.</param>
+/// <param name="IsPrimary">Whether the after-action report lists it as a primary objective.</param>
+/// <param name="Status">
+///     The objective's game status, e.g. <c>Succeeded</c>, <c>Failed</c>, or <c>Active</c> for one left unresolved.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ObjectiveResult(string Title, bool IsPrimary, ObjectiveStatus Status);
 
 /// <summary>A mech and its pilot after the mission.</summary>
+/// <param name="Pilot">The pilot who fought in the mech.</param>
 /// <param name="Injuries">The pilot's injuries, including those from before the mission.</param>
 /// <param name="Health">The injuries the pilot can take before being incapacitated.</param>
+/// <param name="IsIncapacitated">
+///     Whether the pilot was incapacitated: <see cref="Injuries" /> reached <see cref="Health" />, or a lethal
+///     injury such as the mech's head destroyed.
+/// </param>
 /// <param name="IsKilled">Whether the pilot died; an incapacitated pilot may survive.</param>
 /// <param name="PilotReadyOnDay">
 ///     The day the pilot is out of the med bay, as the barracks counts it once the contract is resolved; <c>null</c>
@@ -98,6 +111,8 @@ internal sealed record LanceUnitOutcome(
 internal sealed record DamagedLocation(ChassisLocations Location, Armor Armor, Armor? RearArmor, float Structure)
     : MechLocationCondition(Location, Armor, RearArmor, Structure);
 
+/// <param name="Location">The location it is mounted in.</param>
+/// <param name="DamageLevel">The game's damage level, e.g. <c>Penalized</c> or <c>Destroyed</c>.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record DamagedComponent(
     ComponentReference Component,
@@ -105,6 +120,7 @@ internal sealed record DamagedComponent(
     ComponentDamageLevel DamageLevel) : ComponentEntry(Component), IDamageable;
 
 /// <summary>The shots a mech fired from an ammo box, or from a weapon that carries its own ammo.</summary>
+/// <param name="Location">The location the box or weapon is mounted in.</param>
 /// <param name="Used">
 ///     The shots fired, also from a box destroyed since; the capacity is the catalog's
 ///     <see cref="AmmunitionBoxDefinition.Capacity" /> or <see cref="WeaponDefinition.InternalAmmoCapacity" />.

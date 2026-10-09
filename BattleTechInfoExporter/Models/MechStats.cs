@@ -6,6 +6,13 @@ namespace BattleTechInfoExporter.Models;
 ///     The performance summary of the mech lab and mech bay: the ratings of the stat bars and the numbers behind
 ///     them. Only working components count.
 /// </summary>
+/// <param name="Ratings">The ratings of the stat bars.</param>
+/// <param name="Movement">The walk, sprint and jump distances.</param>
+/// <param name="Heat">The heat dissipated, generated and tolerated.</param>
+/// <param name="Firepower">The damage of firing every weapon at once.</param>
+/// <param name="Range">The weapons' maximum and average medium range.</param>
+/// <param name="Durability">The armor and structure, and the damage taken from the mech's own jump attack.</param>
+/// <param name="Melee">The damage of melee and jump attacks.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechStats(
     StatRatings Ratings,
@@ -17,6 +24,15 @@ internal sealed record MechStats(
     MeleeStats Melee);
 
 /// <summary>The stat bars, each rated up to 10 against the game's stock mechs.</summary>
+/// <param name="Firepower">Rated from the weapons' damage and stability damage.</param>
+/// <param name="Movement">Rated from the sprint distance and the number of jump jets.</param>
+/// <param name="Range">Rated from the weapons' average medium range.</param>
+/// <param name="HeatEfficiency">
+///     Rated from the heat dissipation against the heat of firing every weapon and jumping, and from bonuses to
+///     the shutdown heat.
+/// </param>
+/// <param name="Durability">Rated from the armor, the structure and upgrades reducing stability damage taken.</param>
+/// <param name="Melee">Rated from the melee attack's damage and stability damage.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record StatRatings(
     int Firepower,
@@ -27,6 +43,9 @@ internal sealed record StatRatings(
     int Melee);
 
 /// <summary>The distances in meters.</summary>
+/// <param name="Walk">The chassis' walk distance (<see cref="ChassisMovement.Walk" />).</param>
+/// <param name="Sprint">The chassis' sprint distance (<see cref="ChassisMovement.Sprint" />).</param>
+/// <param name="Jump">The jump distance with the working jump jets and their bonuses; 0 without any.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MovementStats(float Walk, float Sprint, float Jump);
 
@@ -38,6 +57,10 @@ internal sealed record MovementStats(float Walk, float Sprint, float Jump);
 internal sealed record HeatStats(float Dissipation, float AlphaStrike, float AverageJump, float Shutdown);
 
 /// <summary>The damage of firing every weapon at once.</summary>
+/// <param name="Damage">
+///     The damage of all the weapons' shots; COIL weapons count with three evasion pips, as the game's stats assume.
+/// </param>
+/// <param name="StabilityDamage">The stability damage of all the weapons' shots.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record FirepowerStats(float Damage, float StabilityDamage);
 
@@ -52,6 +75,8 @@ internal sealed record RangeStats(float Max, float Optimal);
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record DurabilityStats(float Armor, float Structure, float DeathFromAboveSelfDamage);
 
+/// <param name="Damage">The damage of a melee attack, the chassis' plus upgrades' bonuses.</param>
+/// <param name="StabilityDamage">The stability damage of a melee attack, the chassis' plus upgrades' bonuses.</param>
 /// <param name="DeathFromAboveDamage">The damage of a jump attack onto a target.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MeleeStats(float Damage, float StabilityDamage, float DeathFromAboveDamage);

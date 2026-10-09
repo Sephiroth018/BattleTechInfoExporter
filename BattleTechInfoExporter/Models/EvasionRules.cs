@@ -17,6 +17,7 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="WeaponTypesAffected">The weapon types the pips apply to, by the game's names.</param>
 /// <param name="VehiclePipMultiplier">A vehicle's pips are multiplied by this and rounded down.</param>
+/// <param name="CanVehiclesBeEvasive">Whether vehicles get evasive pips at all.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record EvasionRules(
     IReadOnlyList<EvasivePips> PipsByDistanceMoved,
@@ -26,5 +27,6 @@ internal sealed record EvasionRules(
     bool CanVehiclesBeEvasive);
 
 /// <param name="MoreThan">The distance in meters the unit has to exceed.</param>
+/// <param name="Pips">The pips the unit gets for it.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record EvasivePips(float MoreThan, int Pips);

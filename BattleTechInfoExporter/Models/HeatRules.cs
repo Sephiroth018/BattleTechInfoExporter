@@ -11,10 +11,20 @@ namespace BattleTechInfoExporter.Models;
 ///     Above this heat the mech is overheated: it takes <see cref="OverheatStructureDamageByWeightClass" /> in every
 ///     location but the head whenever its heat is reconciled, and its attacks and movement are penalized.
 /// </param>
+/// <param name="WalkHeat">The heat a mech gains from a move other than a sprint or a jump.</param>
+/// <param name="SprintHeat">The heat a mech gains from a sprint.</param>
+/// <param name="JumpHeat">The heat a mech gains from a jump.</param>
+/// <param name="EngineDamageHeat">
+///     The heat a mech gains at the end of each activation while its center torso is damaged beyond use.
+/// </param>
 /// <param name="EngineHeatSinks">The heat sinks every mech has built in, on top of the chassis' dissipation.</param>
+/// <param name="EngineHeatSinkDissipation">The heat each of the <see cref="EngineHeatSinks" /> dissipates.</param>
 /// <param name="MaxHeatAfterRestart">A mech restarting from shutdown is cooled to at most this heat.</param>
 /// <param name="HeatGeneratedMultiplier">Multiplies all heat a mech generates itself.</param>
 /// <param name="HeatSinkMultiplier">Multiplies a mech's heat sink capacity, together with the terrain's and biome's.</param>
+/// <param name="OverheatStructureDamageByWeightClass">
+///     The structure damage per location an overheated mech takes, by its weight class.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record HeatRules(
     int MaxHeat,
@@ -34,5 +44,8 @@ internal sealed record HeatRules(
 ///     A jump's heat: <see cref="PerUnit" /> for each started <see cref="UnitSize" /> meters of the distance, at
 ///     least <see cref="Minimum" />.
 /// </summary>
+/// <param name="UnitSize">In meters.</param>
+/// <param name="PerUnit">The heat per unit of distance.</param>
+/// <param name="Minimum">The least heat a jump generates.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record JumpHeat(float UnitSize, int PerUnit, int Minimum);

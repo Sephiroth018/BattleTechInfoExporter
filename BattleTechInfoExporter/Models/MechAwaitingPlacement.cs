@@ -6,6 +6,7 @@ namespace BattleTechInfoExporter.Models;
 ///     A new mech the game asks the player to place, store or scrap because every mech bay is full; it is in
 ///     neither the mech bay nor storage until then.
 /// </summary>
+/// <param name="Chassis">The mech's chassis, described in <see cref="Catalog.ChassisDefinitions" />.</param>
 /// <param name="Loadout">
 ///     The loadout it comes with: the stock one for a mech assembled from parts or bought, none but the fixed
 ///     components for a salvaged chassis.

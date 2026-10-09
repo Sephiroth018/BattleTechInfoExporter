@@ -8,6 +8,11 @@ namespace BattleTechInfoExporter.Models;
 ///     compare by name, with the id breaking ties, so every list of entries that refer to a definition, which the game
 ///     keeps in no meaningful order, is ordered the same way.
 /// </summary>
+/// <param name="Id">
+///     The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay
+///     or a pilot the game's own id of it.
+/// </param>
+/// <param name="Name">The name the UI shows.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal abstract record Reference(string Id, string Name) : IComparable<Reference>
 {

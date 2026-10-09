@@ -15,6 +15,15 @@ namespace BattleTechInfoExporter.Models;
 ///     A hash of the game's data the catalog was built from (<see cref="Export.CatalogSourceFingerprint" />); the
 ///     catalog is rebuilt when it differs from the game's current data.
 /// </param>
+/// <param name="ChassisDefinitions">The chassis, keyed by chassis id.</param>
+/// <param name="MechDefinitions">The mechs, keyed by mech id.</param>
+/// <param name="VehicleDefinitions">The vehicles, keyed by vehicle id.</param>
+/// <param name="TurretDefinitions">The turrets, keyed by turret id.</param>
+/// <param name="ComponentDefinitions">The components, grouped by type and keyed by component id.</param>
+/// <param name="TerrainDefinitions">The terrains, keyed by design mask id.</param>
+/// <param name="BiomeDefinitions">The biomes, keyed by the biome id the star systems and maps refer to.</param>
+/// <param name="MapDefinitions">The maps a star system's contracts can be fought on, keyed by map id.</param>
+/// <param name="StarSystemDefinitions">Every star system definition, keyed by its id.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Catalog(
     string SourceFingerprint,

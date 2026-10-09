@@ -32,6 +32,7 @@ internal sealed record HiringRules(
     int MaxPilotsPerBarracksPod,
     int MaxMechsPerMechBayPod);
 
+/// <param name="Level">The rating level, from 0, which <see cref="MercenaryReviewBoard.Level" /> refers to.</param>
 /// <param name="StartsAt">The lowest rating value in the level.</param>
 /// <param name="MaxHireableSkillTotal">The highest skill total of a pilot the company can hire at this level.</param>
 /// <param name="ContractReputationMultiplier">
@@ -45,5 +46,7 @@ internal sealed record MercenaryReviewBoardLevel(
     float ContractReputationMultiplier);
 
 /// <summary>Below a company morale, only pilots up to a skill total can be hired; the first matching limit applies.</summary>
+/// <param name="BelowMorale">The company morale below which the limit applies.</param>
+/// <param name="MaxHireableSkillTotal">The highest skill total of a pilot the company can hire under the limit.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MoraleHiringLimit(int BelowMorale, int MaxHireableSkillTotal);
