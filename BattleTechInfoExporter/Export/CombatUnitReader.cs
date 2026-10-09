@@ -124,7 +124,8 @@ internal static class CombatUnitReader
             isLastSeen ? null : actor.occupiedDesignMask?.Id,
             isSighted && actor.GetPilot() is { } pilot ? PilotReader.ReferenceTo(pilot) : null,
             isSighted ? ReadState(actor) : null,
-            targets is null ? null : ReadLinesOfFire(actor, targets));
+            targets is null ? null : ReadLinesOfFire(actor, targets),
+            allegiance == UnitAllegiance.Player && targets is not null ? MovementReader.Read(actor, targets) : null);
     }
 
     private static ArgumentException NoUnitKind(AbstractActor actor) =>
@@ -272,8 +273,7 @@ internal static class CombatUnitReader
     // fire is the one the unit's VisibilityCache keeps from where it stands, as ToHit.GetToHitChance reads it.
     private static List<LineOfFire> ReadLinesOfFire(AbstractActor attacker, IReadOnlyList<AbstractActor> targets)
     {
-        var maxRange = attacker.GetLongestRangeWeapon(false)?.MaxRange ?? 0f;
-        var maxIndirectRange = attacker.GetLongestRangeWeapon(false, true)?.MaxRange ?? 0f;
+        var maxRanges = ReadMaxRanges(attacker);
         return targets
             .Select(target =>
             {
@@ -282,23 +282,43 @@ internal static class CombatUnitReader
                 var level = cachedLevel == LineOfFireLevel.NotSet
                     ? attacker.Combat.LOS.GetLineOfFire(attacker, target, out _)
                     : cachedLevel;
-                var distance = Vector3.Distance(attacker.CurrentPosition, target.CurrentPosition);
-                var fire = level > LineOfFireLevel.LOFBlocked
-                    ? distance < maxRange ? FireAvailability.Direct : FireAvailability.OutOfRange
-                    : distance < maxIndirectRange && !target.HasIndirectFireImmunity
-                        ? FireAvailability.Indirect
-                        : FireAvailability.None;
+                var (blocking, fire) = ReadFire(level, attacker.CurrentPosition, target, maxRanges);
                 return new LineOfFire(
                     target.GUID,
-                    level switch
-                    {
-                        LineOfFireLevel.LOFClear => LineOfFireBlocking.Clear,
-                        LineOfFireLevel.LOFObstructed => LineOfFireBlocking.PartiallyBlocked,
-                        _ => LineOfFireBlocking.Blocked
-                    },
+                    blocking,
                     fire,
                     attacker.IsInFiringArc(target, attacker.CurrentPosition, attacker.CurrentRotation));
             })
             .ToList();
+    }
+
+    /// <summary>The ranges of the attacker's longest range weapon and longest range indirect fire weapon.</summary>
+    internal static (float Direct, float Indirect) ReadMaxRanges(AbstractActor attacker) =>
+        (attacker.GetLongestRangeWeapon(false)?.MaxRange ?? 0f,
+            attacker.GetLongestRangeWeapon(false, true)?.MaxRange ?? 0f);
+
+    /// <summary>
+    ///     How much the line of fire from the attacker's position to the target is blocked, and how the attacker could
+    ///     fire at the target from there.
+    /// </summary>
+    internal static (LineOfFireBlocking Blocking, FireAvailability Fire) ReadFire(
+        LineOfFireLevel level,
+        Vector3 attackerPosition,
+        AbstractActor target,
+        (float Direct, float Indirect) maxRanges)
+    {
+        var distance = Vector3.Distance(attackerPosition, target.CurrentPosition);
+        return (
+            level switch
+            {
+                LineOfFireLevel.LOFClear => LineOfFireBlocking.Clear,
+                LineOfFireLevel.LOFObstructed => LineOfFireBlocking.PartiallyBlocked,
+                _ => LineOfFireBlocking.Blocked
+            },
+            level > LineOfFireLevel.LOFBlocked
+                ? distance < maxRanges.Direct ? FireAvailability.Direct : FireAvailability.OutOfRange
+                : distance < maxRanges.Indirect && !target.HasIndirectFireImmunity
+                    ? FireAvailability.Indirect
+                    : FireAvailability.None);
     }
 }
