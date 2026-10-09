@@ -1,5 +1,4 @@
 using BattleTech;
-using BattleTech.Data;
 using BattleTechInfoExporter.Models;
 
 namespace BattleTechInfoExporter.Export;
@@ -14,13 +13,13 @@ internal static class CombatStateReader
         var units = CombatUnitReader.ReadUnits(combat);
         return new CombatState(
             ContractReader.ReadMissionContract(simGame, contract),
-            // The catalog keys maps by their MapID, which the contract knows only by its path.
-            MetadataDatabase.Instance.GetMapByPath(contract.mapPath)?.MapID,
+            MapReader.ReadMapId(contract),
             turnDirector.CurrentRound,
             HudInitiative.FromGamePhase(turnDirector.CurrentPhase),
             combat.LocalPlayerTeam.Morale,
             units,
             ObjectiveReader.ReadObjectives(combat, units),
-            ObjectiveReader.ReadZones(combat));
+            ObjectiveReader.ReadZones(combat),
+            BuildingReader.ReadDamagedBuildings(combat));
     }
 }

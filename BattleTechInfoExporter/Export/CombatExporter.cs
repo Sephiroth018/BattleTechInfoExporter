@@ -1,42 +1,65 @@
 using System;
+using System.Diagnostics;
+using System.Linq;
 using BattleTech;
 using BattleTechInfoExporter.Models;
 
 namespace BattleTechInfoExporter.Export;
 
 /// <summary>
-///     The entry points of the combat state file, written during a career's battle and deleted once it is over.
+///     The entry points of the combat files, the map once the battle begins and its state while it runs, which
+///     exist only during a career's battle and are deleted once it is over.
 /// </summary>
 internal static class CombatExporter
 {
+    private const string CombatMapFileName = "combat-map.json";
     private const string CombatStateFileName = "combat-state.json";
 
-    /// <summary>Exports the running battle; a skirmish's, which belongs to no career, is skipped.</summary>
-    internal static void Export(CombatGameState combat, ExportTrigger trigger)
-    {
-        if (!combat.ActiveContract.SimGameContract)
-        {
-            return;
-        }
-
-        var simGame = combat.BattleTechGame.Simulation;
-        CampaignExport.Run(
-            simGame,
+    /// <summary>Exports the battle's map; a skirmish's, which belongs to no career, is skipped.</summary>
+    internal static void ExportMap(CombatGameState combat, ExportTrigger trigger) =>
+        Run(
+            combat,
             trigger,
-            () => CombatStateReader.Read(simGame, combat).Write(CombatStateFileName, trigger));
-    }
+            () =>
+            {
+                // Read on the game's main thread while the battle begins, so its time is logged, as are the pathing
+                // groups, which hold only the pathing capabilities loaded by then.
+                var stopwatch = Stopwatch.StartNew();
+                var map = CombatMapReader.Read(combat);
+                ModLog.Logger.Log(
+                    $"Read {CombatMapFileName} in {stopwatch.ElapsedMilliseconds} ms, pathing groups "
+                    + string.Join("; ", map.PathingGroups.Select(pathingIds => string.Join(", ", pathingIds))));
+                map.Write(CombatMapFileName, trigger);
+            });
 
-    /// <summary>Deletes the file once no battle is running, so an existing file always describes the running one.</summary>
+    /// <summary>Exports the running battle; a skirmish's, which belongs to no career, is skipped.</summary>
+    internal static void Export(CombatGameState combat, ExportTrigger trigger) =>
+        Run(
+            combat,
+            trigger,
+            () => CombatStateReader.Read(combat.BattleTechGame.Simulation, combat)
+                .Write(CombatStateFileName, trigger));
+
+    /// <summary>Deletes the files once no battle is running, so existing files always describe the running one.</summary>
     internal static void Delete()
     {
         // Runs inside the game's own code, like every export (CampaignExport.Run).
         try
         {
+            ExportFile.Delete(CombatMapFileName);
             ExportFile.Delete(CombatStateFileName);
         }
         catch (Exception exception)
         {
             ModLog.Logger.LogException(exception);
+        }
+    }
+
+    private static void Run(CombatGameState combat, ExportTrigger trigger, Action export)
+    {
+        if (combat.ActiveContract.SimGameContract)
+        {
+            CampaignExport.Run(combat.BattleTechGame.Simulation, trigger, export);
         }
     }
 }

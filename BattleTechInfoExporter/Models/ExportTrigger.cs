@@ -20,6 +20,7 @@ internal enum ExportTrigger
     SalvageChosen,
     ShipUpgradeStarted,
     PhaseStarted,
+    CombatStarted,
     CombatLoaded,
     ActivationCompleted
 }

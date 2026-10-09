@@ -25,9 +25,13 @@ internal sealed record ChassisDefinition(
     DefinitionReference? StockMech,
     IReadOnlyList<ChassisLocationDefinition> Locations) : UnitDefinition(Name, WeightClass, Tonnage);
 
-/// <summary>The distances in meters; a chassis' speed doesn't depend on its loadout.</summary>
+/// <summary>How the unit moves, with the distances in meters; a chassis' speed doesn't depend on its loadout.</summary>
+/// <param name="PathingId">
+///     The game's pathing capabilities the unit moves with, which decide the slopes it can climb, as in
+///     <c>combat-map.json</c>'s <see cref="CombatMap.PathingGroups" />.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record ChassisMovement(float Walk, float Sprint);
+internal sealed record ChassisMovement(float Walk, float Sprint, string PathingId);
 
 /// <summary>The chassis' melee values, before upgrades add to them.</summary>
 /// <param name="DeathFromAboveDamage">The damage of a jump attack onto a target.</param>

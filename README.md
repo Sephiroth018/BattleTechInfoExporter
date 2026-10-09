@@ -37,14 +37,18 @@ One more holds the latest mission:
   choose from, how many items the company gets and picks, the components it recovers from its own
   lost mechs, and everything it received, which is `null` until the salvage is final.
 
-One more holds the running battle, and exists only while one runs:
+Two more hold the running battle, and exist only while one runs:
 
+- `combat-map.json`: the battle's ground on the game's movement hex grid, written once when the
+  battle begins, new or loaded from a save: every hex a unit can stand on with its terrain,
+  elevation and building, the steps to its neighbors that slopes block, and the map's buildings.
+  See "Combat map" below.
 - `combat-state.json`: the battle as the player's HUD shows it, written when it is loaded
   from a save, when every phase begins and after every unit's activation, and deleted when the battle ends: when the
   after-action report is left, or when it is quit or restarted. It holds the contract, the map's id in the catalog, the round, the current phase,
   the lance's resolve, the units keyed by the game's unit id, the objectives the HUD lists with
-  their status, progress line and target units in full view, and the zones drawn on the map with their type, center, radius
-  and objectives. See "Combat state" below.
+  their status, progress line and target units in full view, the zones drawn on the map with their type, center, radius
+  and objectives, and the damaged buildings. See "Combat state" below.
 
 The last one describes the game rather than the career:
 
@@ -52,14 +56,16 @@ The last one describes the game rather than the career:
   system the game has loaded, DLC included, keyed by id, so tools can judge what else exists beyond
   what the career refers to, what a mission's enemies can do and what its ground does to them.
   - **Chassis:** the frame: weight class, tonnage and bare tonnage, max jump jets, built-in heat
-    dissipation, walk and sprint distance, melee values before upgrades, and per location max
+    dissipation, walk and sprint distance, the pathing capabilities it moves with (see "Combat
+    map"), melee values before upgrades, and per location max
     armor, structure, hardpoints and component slots; plus the stock mech, the mech the game treats as the chassis'
     stock loadout.
   - **Mechs:** a loadout on a chassis: value, tonnage, performance summary, whether it can come as
     salvage (hero variants can't), and per location armor and components, the chassis' fixed ones
     marked. A mech assembled from parts or bought comes with this loadout; a stored chassis is
     readied with only its fixed components.
-  - **Vehicles:** weight class, tonnage, movement type, walk and sprint distance, and per location
+  - **Vehicles:** weight class, tonnage, movement type, walk and sprint distance, pathing
+    capabilities, and per location
     armor, structure and components. Armor and structure are as in combat, where the game cuts the
     values in a vehicle's definition to three quarters.
   - **Turrets:** weight class, tonnage, firing arc, and armor, structure and components as in
@@ -202,6 +208,42 @@ to 1. A zone's radius is that of the hexagon the HUD draws; whether a
 unit is inside is decided per map cell. The hit chance isn't exported: it follows from the combat
 rules and changes as soon as a unit moves.
 
+Damaged buildings are listed by their id in the combat map, with the structure left; buildings at
+full structure are left out. The HUD shows a building's structure when it is targeted. A destroyed
+building also carries the hexes it stood on as they are now, with their elevation and terrain:
+the combat map isn't rewritten, but units on its roof drop to the ground, which its rubble covers.
+The blocked steps onto and off those hexes aren't read again, so they still follow the roof. A
+building that explodes also changes the terrain around it, which isn't exported.
+
+## Combat map
+
+The map is laid out in rows of characters and numbers instead of an object per hex, so it stays
+small enough for an AI chat to read whole. Its `hexGrid` spells out the grid: pointy-top hexes of
+24 m in axial coordinates (`q`, `r`), hex (0, 0) at the map's center, hex (q, r) centered at
+x = 24 · (q + r / 2), z = 24 · √3/2 · r, the same meters as the units' positions.
+
+Each row lists consecutive hexes of one `r` from its first `q` on: their terrain as one character
+of the `terrains` legend each (`.` is open ground), their elevations and the index of the building
+on each in `buildings` (or `null`). Only the hexes a unit can stand on are listed, inside the
+contract's encounter bounds; a row with a gap is split in two. A hex is what a unit standing on it
+gets from the single map cell at its center: its height, a building's roof where one stands, and
+its terrain. A cell has one terrain, the first of: map boundary, impassable, destroyed building,
+deep water, water, the terrain of the building on it, road, the map's custom terrain, forest, rough
+ground; otherwise it's open ground.
+
+`blockedSteps` holds, per entry of `pathingGroups`, one character per hex: a base64 digit whose
+bit i is set when the step to the neighbor at `hexGrid.directions[i]` is blocked. A unit moves with
+its chassis' or vehicle's pathing capabilities (`movement.pathingId` in the catalog), and the
+groups gather those that block the same steps; mechs and vehicles differ. A step is blocked as the
+game's pathing blocks it on slopes: too steep a grade between path nodes, too steep ground or a
+ledge in between. The game moves units over path nodes half a hex apart, so the step counts as
+blocked only when every two-node route to the neighbor is. Terrain move costs and units in the way
+aren't part of it; impassable terrain has its own legend character. A step to a hex that isn't
+listed is blocked too.
+
+Each building has its id, name, position and max structure; the combat state lists the damaged
+ones.
+
 ## Triggers
 
 The game state is exported when:
@@ -244,9 +286,12 @@ The combat state is exported when:
 - **A unit's activation is done**, its attacks resolved; out of contact, once the player's units
   have all moved. Reserving a unit doesn't count.
 
-It is deleted when the game ends the battle (when the after-action report is left after the salvage, or when the battle is quit,
+The combat map is exported once when a battle begins: a new one when the briefing is dismissed,
+or one loaded from a save.
+
+Both are deleted when the game ends the battle (when the after-action report is left after the salvage, or when the battle is quit,
 restarted or left by loading a save) and when a career is loaded, in case the game crashed during
-one, so it never outlives its battle.
+one, so they never outlive their battle.
 
 ## Planned
 

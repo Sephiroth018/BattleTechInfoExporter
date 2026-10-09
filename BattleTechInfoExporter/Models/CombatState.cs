@@ -21,6 +21,10 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="Objectives">The objectives the HUD lists, finished ones included, in the HUD's order.</param>
 /// <param name="Zones">The zones drawn on the map.</param>
+/// <param name="DamagedBuildings">
+///     The buildings of <see cref="CombatMap.Buildings" /> below their max structure, destroyed ones included, in
+///     the order of their ids; the others are undamaged.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatState(
     MissionContract Contract,
@@ -30,7 +34,25 @@ internal sealed record CombatState(
     int Resolve,
     IReadOnlyDictionary<string, CombatUnit> Units,
     IReadOnlyList<CombatObjective> Objectives,
-    IReadOnlyList<ObjectiveZone> Zones) : ExportFile;
+    IReadOnlyList<ObjectiveZone> Zones,
+    IReadOnlyList<DamagedBuilding> DamagedBuildings) : ExportFile;
+
+/// <param name="Id">The building's id in <see cref="CombatMap.Buildings" />.</param>
+/// <param name="Structure">The structure left; its max is in <see cref="CombatBuilding.MaxStructure" />.</param>
+/// <param name="DestroyedHexes">
+///     The hexes the building stood on as they are now, since <c>combat-map.json</c> isn't rewritten when it falls:
+///     units on its roof drop to the ground, which the rubble's terrain covers. <c>null</c> while it stands.
+/// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record DamagedBuilding(string Id, float Structure, IReadOnlyList<MapHex>? DestroyedHexes);
+
+/// <summary>A hex of <see cref="CombatMap.Rows" /> as it is now.</summary>
+/// <param name="Elevation">As in <see cref="HexRow.Elevations" />.</param>
+/// <param name="Terrain">
+///     Keyed as in the catalog's <see cref="Catalog.TerrainDefinitions" />; <c>null</c> on open ground.
+/// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record MapHex(int Q, int R, double Elevation, string? Terrain);
 
 /// <summary>A point on the map in meters: <see cref="Y" /> is the elevation.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
