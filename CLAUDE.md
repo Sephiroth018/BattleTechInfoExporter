@@ -526,6 +526,10 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   the terrain.
 - **Map:** a combat map with fixed terrain (`Map_MDD`, `MapMetaData`); a star system's contracts pick
   among the maps its biomes and map tags allow.
+- **Hex:** a cell of the game's 24 m movement grid (`HexGrid`) in axial coordinates (`q`, `r`). A unit
+  stands on a hex's center, and gets its height and terrain from the map cell there.
+- **Building:** a destructible structure on a combat map, the game's combatant `Building`; units
+  can fire at it, stand on its roof and be blocked by it. Crates, trees and fences aren't buildings.
 - **Activation:** one unit's turn within a phase: it moves, attacks or braces, and is done for the
   round. Reserving a unit postpones its activation to a later phase.
 - **Blip:** an enemy known only from sensors (the game's `VisibilityLevel` from `Blip0Minimum` to
