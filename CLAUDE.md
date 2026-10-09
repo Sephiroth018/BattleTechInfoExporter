@@ -387,8 +387,8 @@ name, version and folder, `ModLog` its logger. Folders:
   `RouteReader` reading the route to a system as the starmap plans it; `FinancialReportReader` builds
   the financial report file; `MissionReader` builds the
   mission file's models from the completed contract; `CombatStateReader` builds the combat state
-  file from the running battle, with `CombatUnitReader` reading each unit as the HUD shows it and
-  `ObjectiveReader` the objectives and zones; `CombatMapReader` builds the combat map file from the
+  file from the running battle, with `CombatUnitReader` reading each unit as the HUD shows it,
+  `MovementReader` where each player unit can move, and `ObjectiveReader` the objectives and zones; `CombatMapReader` builds the combat map file from the
   battle's map, with `MapHexReader` reading the playable hexes, `HexStepReader` the steps slopes
   block through the game's own path checks, and `BuildingReader` the buildings, also the damaged
   ones for the combat state; `CatalogReader` builds the catalog from the
@@ -464,7 +464,11 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   only while its battle runs. It shows what the player's HUD shows and no more: enemies by their
   visibility (`CombatUnitReader`), from full detail down to a blip's position or the position they
   were last detected at. Every read is a cached lookup or a statistic, apart from the map cells of
-  destroyed buildings; it never reads the career files or the catalog.
+  destroyed buildings and the player's units' movement (`MovementReader`): the hexes each can reach
+  from the path grids the game keeps for every unit, finishing a grid still being built, and from
+  the game's jump landing check per hex in jump range, with the
+  path's length and a line of fire to every enemy in full view per hex. It never reads the career
+  files or the catalog.
 - **The battle's ground is a file of its own,** `combat-map.json`, written once when the battle
   begins and deleted with the combat state: the map doesn't change, and the combat state lists what
   does (damaged buildings, a destroyed building's hexes). It isn't in the catalog, because buildings

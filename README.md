@@ -210,7 +210,22 @@ of fire (`clear`, `partiallyBlocked`, the game's obstructed, which still allows 
 the penalties of the rules' `lineOfFire`, or `blocked`), whether a weapon could fire at the target directly, only
 indirectly or not at all, or it is out of range, and whether it is in the firing arc without
 turning. Phase and initiative are numbered as on the HUD, as in the rules: units act from 5 down
-to 1. A zone's radius is that of the hexagon the HUD draws; whether a
+to 1.
+
+Every player unit that can move also carries its `movement`, so a tool can plan a whole phase:
+the hexes it can end a walk, sprint, reverse or jump on, read from the game's own pathing, so
+terrain costs, slopes and other units count. A unit that has activated gets those of its next
+activation, from where it stands; prone and shut down mechs and turrets get none. A move the unit
+can't make is `null`: sprint for a legged or unsteady mech, jump for vehicles and mechs without
+a working jump jet. It's laid out in
+rows like the combat map's, explained by `movementLegend` at the file's root: per move, the
+evasion pips a move ending on each hex gives (from the length of the path the unit would walk),
+and per enemy in full view, whether the unit could fire at it from that hex (with the line of fire
+from there and the longest weapons' ranges) and which side of it an attack would hit. Elevation
+and terrain of each hex are in the combat map. The facing after the move isn't, as the unit can
+turn at its end.
+
+A zone's radius is that of the hexagon the HUD draws; whether a
 unit is inside is decided per map cell. The hit chance isn't exported: it follows from the combat
 rules and changes as soon as a unit moves.
 

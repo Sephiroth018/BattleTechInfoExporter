@@ -13,6 +13,7 @@
     "round",
     "phase",
     "resolve",
+    "movementLegend",
     "units",
     "objectives",
     "zones",
@@ -57,6 +58,10 @@
       "type": "integer",
       "description": "The lance's resolve now; its limits are in rules.json's ResolveRules.",
       "format": "int32"
+    },
+    "movementLegend": {
+      "description": "How to read the units' movement.",
+      "$ref": "#/definitions/MovementLegend"
     },
     "units": {
       "type": "object",
@@ -227,6 +232,36 @@
         "HeavyMetalFlashpointCampaign"
       ]
     },
+    "MovementLegend": {
+      "type": "object",
+      "description": "How to read UnitMovement's rows, spelled out so the file explains itself.",
+      "additionalProperties": false,
+      "required": [
+        "moves",
+        "fire",
+        "side"
+      ],
+      "properties": {
+        "moves": {
+          "type": "string",
+          "description": "How to read the characters of the moves."
+        },
+        "fire": {
+          "type": "object",
+          "description": "The first character of an attack: how the unit could fire at the target from the hex.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "side": {
+          "type": "object",
+          "description": "The second character of an attack: the side of the target an attack from the hex hits.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "CombatUnit": {
       "type": "object",
       "description": "A unit in combat, with as much of it as the HUD shows at its visibility.",
@@ -245,7 +280,8 @@
         "terrain",
         "pilot",
         "state",
-        "linesOfFire"
+        "linesOfFire",
+        "movement"
       ],
       "properties": {
         "faction": {
@@ -362,6 +398,17 @@
           "items": {
             "$ref": "#/definitions/LineOfFire"
           }
+        },
+        "movement": {
+          "description": "Where the player's unit can move and what it gets there; null for the others, and for a unit that can't move (a turret, a prone or shut down mech).",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/UnitMovement"
+            }
+          ]
         }
       }
     },
@@ -896,6 +943,86 @@
         "outOfRange",
         "none"
       ]
+    },
+    "UnitMovement": {
+      "type": "object",
+      "description": "The hexes a player's unit can end its move on, read from the game's own pathing, with the evasion it gets and the attacks it has there. A unit that has activated gets those of its next activation, from where it stands. Laid out in rows of characters, as MovementLegend explains, like rows, whose hexes give each hex's terrain and elevation.",
+      "additionalProperties": false,
+      "required": [
+        "targets",
+        "rows"
+      ],
+      "properties": {
+        "targets": {
+          "type": "array",
+          "description": "The enemies at full by unit id, in the order of attacks.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rows": {
+          "type": "array",
+          "description": "The rows with a hex the unit can reach, by r.",
+          "items": {
+            "$ref": "#/definitions/MovementRow"
+          }
+        }
+      }
+    },
+    "MovementRow": {
+      "type": "object",
+      "description": "Consecutive hexes of one row, from (q, r) to the last one the unit can reach, one character per hex in each move and two per hex in each attack.",
+      "additionalProperties": false,
+      "required": [
+        "r",
+        "q",
+        "walk",
+        "sprint",
+        "reverse",
+        "jump",
+        "attacks"
+      ],
+      "properties": {
+        "r": {
+          "type": "integer",
+          "description": "The axial r of every hex in the row.",
+          "format": "int32"
+        },
+        "q": {
+          "type": "integer",
+          "description": "The axial q of the row's first hex, the first character of each move and attack.",
+          "format": "int32"
+        },
+        "walk": {
+          "type": "string",
+          "description": "The evasion pips per hex as moves says."
+        },
+        "sprint": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "null for a legged or unsteady mech, which can't sprint."
+        },
+        "reverse": {
+          "type": "string",
+          "description": "Moving backward."
+        },
+        "jump": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "null for a vehicle and a mech without a working jump jet."
+        },
+        "attacks": {
+          "type": "array",
+          "description": "Per entry of targets, the fire and side as fire and side say.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     },
     "CombatObjective": {
       "type": "object",
