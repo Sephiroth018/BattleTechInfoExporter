@@ -34,6 +34,10 @@ namespace BattleTechInfoExporter.Models;
 ///     The lines of fire to the units it could attack: from the player's units to every enemy at
 ///     <see cref="UnitVisibility.Full" />, and from those enemies to the player's units. <c>null</c> for the others.
 /// </param>
+/// <param name="Movement">
+///     Where the player's unit can move and what it gets there; <c>null</c> for the others, and for a unit that can't
+///     move (a turret, a prone or shut down mech).
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatUnit(
     DefinitionReference Faction,
@@ -49,7 +53,8 @@ internal sealed record CombatUnit(
     string? Terrain,
     PilotReference? Pilot,
     CombatUnitState? State,
-    IReadOnlyList<LineOfFire>? LinesOfFire);
+    IReadOnlyList<LineOfFire>? LinesOfFire,
+    UnitMovement? Movement);
 
 /// <param name="Locations">
 ///     The armor and structure left per location, in the game's order: a mech's from head to legs, a vehicle's from

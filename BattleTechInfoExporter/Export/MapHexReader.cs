@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BattleTech;
 using BattleTechInfoExporter.Models;
 using HBS.Math;
+using UnityEngine;
 
 namespace BattleTechInfoExporter.Export;
 
@@ -48,6 +49,14 @@ internal static class MapHexReader
 
     internal static MapTerrainDataCell CenterCell(CombatGameState combat, HexPoint3 hex) =>
         combat.MapMetaData.GetCellAt(combat.HexGrid.HexPoint3ToCartesianWorld(hex));
+
+    /// <summary>Where a unit standing on the hex is, at the height of <see cref="ReadHex" />.</summary>
+    internal static Vector3 StandingPosition(CombatGameState combat, HexPoint3 hex)
+    {
+        var position = combat.HexGrid.HexPoint3ToCartesianWorld(hex);
+        position.y = CenterCell(combat, hex).cachedHeight;
+        return position;
+    }
 
     /// <summary>
     ///     The hex as it is now: the height a unit standing on it is at (PathNodeGrid.GetPathNode), a building's roof

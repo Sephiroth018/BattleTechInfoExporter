@@ -17,6 +17,7 @@ internal static class CombatStateReader
             turnDirector.CurrentRound,
             HudInitiative.FromGamePhase(turnDirector.CurrentPhase),
             combat.LocalPlayerTeam.Morale,
+            MovementReader.Legend,
             units,
             ObjectiveReader.ReadObjectives(combat, units),
             ObjectiveReader.ReadZones(combat),

@@ -37,8 +37,15 @@ internal static class CombatExporter
         Run(
             combat,
             trigger,
-            () => CombatStateReader.Read(combat.BattleTechGame.Simulation, combat)
-                .Write(CombatStateFileName, trigger));
+            () =>
+            {
+                // Read on the game's main thread, so its time is logged: the units' movement runs path and line of
+                // fire checks per hex.
+                var stopwatch = Stopwatch.StartNew();
+                var state = CombatStateReader.Read(combat.BattleTechGame.Simulation, combat);
+                ModLog.Logger.Log($"Read {CombatStateFileName} in {stopwatch.ElapsedMilliseconds} ms");
+                state.Write(CombatStateFileName, trigger);
+            });
 
     /// <summary>Deletes the files once no battle is running, so existing files always describe the running one.</summary>
     internal static void Delete()
