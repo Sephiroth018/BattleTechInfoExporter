@@ -20,7 +20,8 @@ namespace BattleTechInfoExporter.Models;
 ///     has an entry per group.
 /// </param>
 /// <param name="Buildings">
-///     Every building on the map when the battle began, in the order of their ids; a dropship only if it had landed.
+///     Every building on the map when the file was written, in the order of their ids; a dropship only if it had
+///     landed by then.
 /// </param>
 /// <param name="Rows">
 ///     The hexes a unit can stand on, by <c>r</c>, then <c>q</c>; a row of hexes with a gap in the playable area is

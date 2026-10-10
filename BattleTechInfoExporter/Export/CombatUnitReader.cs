@@ -45,7 +45,6 @@ internal static class CombatUnitReader
         return units;
     }
 
-    /// <summary>Whose side a team is on, seen from the player.</summary>
     internal static UnitAllegiance ReadAllegiance(CombatGameState combat, Team team) =>
         team == combat.LocalPlayerTeam
             ? UnitAllegiance.Player
