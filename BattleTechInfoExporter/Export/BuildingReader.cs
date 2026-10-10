@@ -8,22 +8,23 @@ namespace BattleTechInfoExporter.Export;
 
 /// <summary>
 ///     Reads the battle's buildings: the game's combatant <see cref="BattleTech.Building" /> of every obstruction with a
-///     representation, which stays a combatant once destroyed. Crates, trees and fences aren't buildings.
+///     representation whose building is enabled, which stays a combatant once destroyed. Crates, trees and fences
+///     aren't buildings. A dropship's building is enabled only while it is landed
+///     (DropshipGameLogic.ShowDropshipBasedOnAnimationState): off the map or hovering, it occupies no cell and can't
+///     be targeted.
 /// </summary>
 internal static class BuildingReader
 {
     /// <summary>Every building, in the order of their ids.</summary>
     internal static IReadOnlyList<BattleTech.Building> ReadAll(CombatGameState combat) =>
-        combat.GetAllMiscCombatants()
-            .OfType<BattleTech.Building>()
+        ReadEnabled(combat)
             .OrderBy(building => building.GUID, StringComparer.Ordinal)
             .ToList();
 
     // Filtered before they're ordered: urban maps have hundreds of buildings, and few are damaged. A building can
     // also be destroyed without damage (Building.IsDead), e.g. with the one it stands on.
     internal static IReadOnlyList<DamagedBuilding> ReadDamagedBuildings(CombatGameState combat) =>
-        combat.GetAllMiscCombatants()
-            .OfType<BattleTech.Building>()
+        ReadEnabled(combat)
             .Where(building => building.IsDead || building.CurrentStructure < building.StartingStructure)
             .OrderBy(building => building.GUID, StringComparer.Ordinal)
             .Select(building => new DamagedBuilding(
@@ -31,6 +32,15 @@ internal static class BuildingReader
                 Math.Max(0f, building.CurrentStructure),
                 building.IsDead ? ReadDestroyedHexes(combat, building) : null))
             .ToList();
+
+    /// <summary>Whether the building is enabled, so it is in the map and can be targeted.</summary>
+    internal static bool IsEnabled(CombatGameState combat, BattleTech.Building building) =>
+        ObstructionOf(combat, building).IsBuildingEnabled;
+
+    private static IEnumerable<BattleTech.Building> ReadEnabled(CombatGameState combat) =>
+        combat.GetAllMiscCombatants()
+            .OfType<BattleTech.Building>()
+            .Where(building => IsEnabled(combat, building));
 
     internal static CombatBuilding ReadBuilding(BattleTech.Building building) =>
         new(

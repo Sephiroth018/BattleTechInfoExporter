@@ -1122,7 +1122,7 @@
         },
         "objectiveIds": {
           "type": "array",
-          "description": "The objectives the zone belongs to, as id.",
+          "description": "The objectives the zone belongs to among objectives, as id; empty where it belongs only to objectives the HUD doesn't list.",
           "items": {
             "type": "string"
           }

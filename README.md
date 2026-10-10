@@ -272,7 +272,10 @@ aren't part of it; impassable terrain has its own legend character. A step to a 
 listed is blocked too.
 
 Each building has its id, name, position and max structure; the combat state lists the damaged
-ones.
+ones. A dropship is a building only while it is landed: one that hovers to drop off units or
+hasn't arrived yet isn't listed and occupies no hex. The map isn't rewritten when one lands later,
+e.g. the Leopard an evacuation calls in, so it stands on hexes the map shows as free, and it can
+appear in the combat state's building lists without being in the map.
 
 ## Triggers
 

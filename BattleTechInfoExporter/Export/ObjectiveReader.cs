@@ -31,8 +31,10 @@ internal static class ObjectiveReader
     }
 
     // Shown as RegionRenderer draws them: a region whose display isn't hidden, active or as a preview.
-    internal static List<ObjectiveZone> ReadZones(CombatGameState combat) =>
-        combat.RegionsList
+    internal static List<ObjectiveZone> ReadZones(CombatGameState combat, IReadOnlyList<CombatObjective> objectives)
+    {
+        var listedObjectiveIds = new HashSet<string>(objectives.Select(objective => objective.Id));
+        return combat.RegionsList
             .Where(region => region.IsRegionDisplayVisible)
             .Select(region => new ObjectiveZone(
                 region.GUID,
@@ -40,9 +42,16 @@ internal static class ObjectiveReader
                 CombatUnitReader.ReadPosition(region.Position),
                 region.radius,
                 region.IsShowingPreviewOfRegion,
+                // A region can also belong to an objective the HUD doesn't list, e.g. the evac chunk's hidden
+                // objective that calls the dropship (DropshipExtractionChunkGameLogic.callDropshipObjectiveRef).
                 // RegionGameLogic.AttachRegionToObjective adds an objective once per call.
-                region.objectiveRefList.Select(objective => objective.EncounterObjectGuid).Distinct().ToList()))
+                region.objectiveRefList
+                    .Select(objective => objective.EncounterObjectGuid)
+                    .Where(listedObjectiveIds.Contains)
+                    .Distinct()
+                    .ToList()))
             .ToList();
+    }
 
     // The progress line as CombatHUDObjectiveItem shows it.
     private static CombatObjective ReadObjective(

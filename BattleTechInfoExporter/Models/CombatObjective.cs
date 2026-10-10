@@ -35,7 +35,10 @@ internal sealed record CombatObjective(
 ///     approximates.
 /// </param>
 /// <param name="IsPreview">Drawn as a zone that becomes active later.</param>
-/// <param name="ObjectiveIds">The objectives the zone belongs to, as <see cref="CombatObjective.Id" />.</param>
+/// <param name="ObjectiveIds">
+///     The objectives the zone belongs to among <see cref="CombatState.Objectives" />, as
+///     <see cref="CombatObjective.Id" />; empty where it belongs only to objectives the HUD doesn't list.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ObjectiveZone(
     string Id,
