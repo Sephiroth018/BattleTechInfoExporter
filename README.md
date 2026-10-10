@@ -24,7 +24,8 @@ kept current. Three of them hold the career and are written together on every ca
   are met, and the route from the current system: the days and C-Bills the trip takes as the
   starmap shows them while the ship is in the system (0 for the current system, `null` where there
   is no route). During a trip the days stay those from the current system's planet, including the
-  part already travelled; the trip's own day of arrival is in the position. The story swaps
+  part already travelled; the position's travel has that leg's length and the day the leg under way
+  ends, to correct them. The story swaps
   some systems' definitions, e.g. when a system's owner changes; the entry is always the active
   one's. The game state repeats the entry of the current system, the travel destination, the
   accepted and every offered travel contract's system; a contract offered in the current system
@@ -126,8 +127,10 @@ The game state holds:
   is due, the spending level and its options with their expected expenses (their cost multiplier
   and morale change are in the rules), and the expected expense lines for the ship, its upgrades,
   each mech and each pilot.
-- **Position:** the current system in full, as in `star-systems.json`, and, when travelling, the
-  destination, also in full, and day of arrival.
+- **Position:** the current system in full, as in `star-systems.json`, the travel status, and,
+  when travelling, the destination, also in full, the day of arrival, the days between the current
+  system's planet and its jump point, and the day the leg under way ends (reaching the jump point,
+  a jump, or reaching the planet after the last jump).
 - **Pilots:** the commander and the roster with all their relevant stats.
 - **Mechs:** the mech bay's mechs with their status, the day they're ready, loadout, armor and
   performance summary; a mech in a refit also carries the refit's steps, each with only the fields

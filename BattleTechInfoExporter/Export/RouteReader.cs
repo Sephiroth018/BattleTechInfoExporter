@@ -10,8 +10,8 @@ namespace BattleTechInfoExporter.Export;
 internal static class RouteReader
 {
     /// <summary>
-    ///     The trip to another system, as the starmap shows it while the ship is in the current system; <c>null</c>
-    ///     where the game finds no route, always for a system whose travel requirements aren't met.
+    ///     The trip to another system (see <see cref="Route.Days" />); <c>null</c> where the game finds no route, always
+    ///     for a system whose travel requirements aren't met.
     /// </summary>
     internal static Route? ReadRoute(SimGameState simGame, StarSystem system)
     {
@@ -44,9 +44,8 @@ internal static class RouteReader
             return null;
         }
 
-        // Mirrors Starmap.OnPathfindingComplete, but always with the whole leg to the jump point, as
-        // Starmap.DistanceToJumpship counts it in the system: during a trip it counts down what's left, which would
-        // change every route each day.
+        // Mirrors Starmap.OnPathfindingComplete, but with the whole leg to the jump point, as
+        // Starmap.DistanceToJumpship counts it in the system, so routes don't count down during a trip.
         var nodes = route.path.Cast<StarSystemNode>().ToList();
         var jumps = nodes.Count - 1;
         return new Route(

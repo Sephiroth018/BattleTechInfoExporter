@@ -463,8 +463,9 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   where the game finds no route, always for a system whose travel requirements aren't met. The
   current system's is 0 days and 0 C-Bills. Its days always include the whole leg from the current
   system's planet to its jump point, as the starmap shows them in the system: during a trip the
-  starmap counts down what's left, which would change every route each day; the trip under way has
-  its `arrivesOnDay` instead.
+  starmap counts down what's left, which would change every route each day. The trip under way has
+  that leg's length (`jumpPointDays`) and the day the leg under way ends (`legEndsOnDay`, from the
+  travel order's legs) instead, so a tool can correct a route mid-trip.
 - **The latest mission is a file of its own,** `mission-outcome.json`, written in combat when the
   mission ends, before the salvage is chosen, and again in the after-action report once the
   salvage is final, with `salvage.received` filled in; the offer stays as it was. One file, because

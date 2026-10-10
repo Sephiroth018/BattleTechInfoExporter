@@ -76,6 +76,25 @@ internal static class WorkQueueReader
     internal static int ReadArrivalDay(SimGameState simGame, WorkOrderEntry_TravelGeneric travelOrder) =>
         simGame.DaysPassed + DaysUntilFinished(travelOrder, 1);
 
+    /// <summary>
+    ///     The day the leg under way ends: the travel order's legs are its sub-entries (to the jump point, each jump, to
+    ///     the planet; Starmap.OnPathfindingComplete), paid in order one cost per day (WorkOrderEntry.PayCost).
+    /// </summary>
+    internal static int ReadLegEndDay(SimGameState simGame, WorkOrderEntry_TravelGeneric travelOrder)
+    {
+        var remainingCost = 0;
+        foreach (var leg in travelOrder.SubEntries)
+        {
+            remainingCost += leg.GetRemainingCost();
+            if (!leg.IsCostPaid())
+            {
+                break;
+            }
+        }
+
+        return simGame.DaysPassed + DaysFor(remainingCost, 1);
+    }
+
     // Mirrors TaskManagementElement.UpdateItem for a single entry: a paid entry is done. The daily progress is the
     // entry type's, e.g. SimGameState.DailyUpgradeValue for a ship upgrade.
     private static int DaysUntilFinished(WorkOrderEntry entry, int dailyProgress) =>

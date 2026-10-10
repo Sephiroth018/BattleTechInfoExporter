@@ -85,8 +85,12 @@ internal static class GameStateReader
         new(
             starmap.StarSystems[simGame.CurSystem.Def.Description.Id],
             simGame.TravelState,
-            travelInProgress is ({ } destination, var arrivesOnDay)
-                ? new Travel(starmap.StarSystems[destination.Def.Description.Id], arrivesOnDay)
+            travelInProgress is ({ } destination, var arrivesOnDay) && simGame.TravelOrder is { } travelOrder
+                ? new Travel(
+                    starmap.StarSystems[destination.Def.Description.Id],
+                    arrivesOnDay,
+                    simGame.CurSystem.JumpDistance,
+                    WorkQueueReader.ReadLegEndDay(simGame, travelOrder))
                 : null);
 
     // TravelTime only counts the current leg (e.g. to the jump point); the travel order counts the whole trip.

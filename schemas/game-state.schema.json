@@ -907,7 +907,7 @@
       "properties": {
         "days": {
           "type": "integer",
-          "description": "The days the trip takes from the current star system's planet, as the starmap shows them while the ship is there; during a trip, also the part already travelled (see arrivesOnDay). 0 for the current star system.",
+          "description": "The days the trip takes from the current star system's planet, as the starmap shows them while the ship is there, with the whole leg to its jump point (jumpPointDays), also the part already travelled during a trip (see legEndsOnDay). 0 for the current star system.",
           "format": "int32"
         },
         "cost": {
@@ -3102,7 +3102,9 @@
       "additionalProperties": false,
       "required": [
         "destination",
-        "arrivesOnDay"
+        "arrivesOnDay",
+        "jumpPointDays",
+        "legEndsOnDay"
       ],
       "properties": {
         "destination": {
@@ -3112,6 +3114,16 @@
         "arrivesOnDay": {
           "type": "integer",
           "description": "The day the ship arrives, on the scale of daysPassed.",
+          "format": "int32"
+        },
+        "jumpPointDays": {
+          "type": "integer",
+          "description": "The days between the current star system's planet and its jump point, which every days from the current star system includes in full.",
+          "format": "int32"
+        },
+        "legEndsOnDay": {
+          "type": "integer",
+          "description": "The day the leg under way ends, on the scale of daysPassed: by travelStatus, the jump point is reached, a jump is done or, after the last jump, the planet is reached.",
           "format": "int32"
         }
       }
