@@ -10,37 +10,29 @@ using StarSystem = BattleTech.StarSystem;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Builds the star systems file's model from the game's star systems, and the current star system alone.</summary>
+/// <summary>Builds the star systems file's model from the game's starmap.</summary>
 internal static class StarSystemReader
 {
-    internal static Starmap Read(SimGameState simGame) => new(ReadStarSystems(simGame, simGame.StarSystems));
-
-    /// <summary>The current star system in full, as the star systems file has it; also in combat.</summary>
-    internal static Models.StarSystem ReadCurrentStarSystem(SimGameState simGame) =>
-        ReadStarSystems(simGame, [simGame.CurSystem]).Values.Single();
-
-    private static SortedDictionary<string, Models.StarSystem> ReadStarSystems(
-        SimGameState simGame,
-        IReadOnlyCollection<StarSystem> systems)
+    internal static Starmap Read(SimGameState simGame)
     {
         var visibleTags = ReadVisibleTagsByName();
         // The few biomes are resolved once instead of per star system: each lookup builds the game's biome table
         // anew (DataManagerExtensions.GetBaseDescriptionDef).
-        var biomes = systems
+        var biomes = simGame.StarSystems
             .SelectMany(system => system.Def.SupportedBiomes)
             .Distinct()
             .ToDictionary(biome => biome, biome => DefinitionReferences.ReferenceTo(simGame.DataManager, biome));
         // The map query depends only on its inputs, which many star systems share, so it runs once per distinct input.
         var playableMaps = new Dictionary<string, List<DefinitionReference>>(StringComparer.Ordinal);
         var starSystems = new SortedDictionary<string, Models.StarSystem>(StringComparer.Ordinal);
-        foreach (var system in systems)
+        foreach (var system in simGame.StarSystems)
         {
             starSystems.Add(
                 system.Def.Description.Id,
                 ReadStarSystem(simGame, system, visibleTags, biomes, playableMaps));
         }
 
-        return starSystems;
+        return new Starmap(starSystems);
     }
 
     // A star system's tags are its active definition's, also after a swap (StarSystem.SetNewStarSystemDef).
@@ -54,8 +46,7 @@ internal static class StarSystemReader
         Dictionary<string, List<DefinitionReference>> playableMaps)
     {
         var definition = system.Def;
-        // Mirrors Starmap.CanTravelToNode, without the starmap, which the game drops during combat.
-        var canTravelTo = definition.TravelRequirements.All(requirement => simGame.MeetsRequirements(requirement));
+        var canTravelTo = simGame.Starmap.CanTravelToNode(system.ID);
         // The starmap offers no trip to the current system (SGNavigationScreen.OnSystemRouted).
         var route = system.ID == simGame.CurSystem.ID ? new Route(0, 0)
             : canTravelTo ? RouteReader.ReadRoute(simGame, system)

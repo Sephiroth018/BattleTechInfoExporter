@@ -152,7 +152,7 @@ internal static class ContractReader
             DefinitionReferences.ReferenceTo(employer),
             DefinitionReferences.ReferenceTo(target),
             ReadDifficulty(simGame, contractOverride),
-            StarSystemReader.ReadCurrentStarSystem(simGame));
+            DefinitionReferences.ReferenceTo(simGame.CurSystem.Def.Description));
     }
 
     internal static (FactionValue Employer, FactionValue Target) ReadFactions(Contract contract) =>

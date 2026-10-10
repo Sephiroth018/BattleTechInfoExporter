@@ -40,9 +40,7 @@ internal sealed record MissionOutcome(
 }
 
 /// <summary>The contract a mission was for.</summary>
-/// <param name="StarSystem">
-///     The star system the mission is fought in, the current one, in full, as in <c>star-systems.json</c>.
-/// </param>
+/// <param name="StarSystem">The star system the mission is fought in.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MissionContract(
     string? Id,
@@ -52,7 +50,7 @@ internal sealed record MissionContract(
     DefinitionReference Employer,
     DefinitionReference Target,
     int Difficulty,
-    StarSystem StarSystem)
+    DefinitionReference StarSystem)
     : ContractIdentity(Id, Name, Type, DisplayStyle, Employer, Target, Difficulty);
 
 /// <summary>An objective as the after-action report lists it.</summary>

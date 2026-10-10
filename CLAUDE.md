@@ -456,9 +456,9 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   story swaps a system's definition (`StarSystem_SetActiveDef`, e.g. when its owner changes); the
   inactive definitions give a consumer nothing and aren't exported. The full entry is repeated
   wherever a step needs it: in the game state `position.starSystem`, `position.travel.destination`,
-  the active contract's and each offered travel contract's (`TravelContract`) star system, and the
-  mission's contract in the mission outcome and the combat state; an offered contract in the current
-  star system (`LocalContract`) refers to it by its reference alone.
+  the active contract's and each offered travel contract's (`TravelContract`) star system; an
+  offered contract in the current star system (`LocalContract`) and the other files refer to a star
+  system by its reference alone.
 - **A route is the starmap's** (`RouteReader`) from the current system, its days and cost: `null`
   where the game finds no route, always for a system whose travel requirements aren't met. The
   current system's is 0 days and 0 C-Bills.
@@ -471,8 +471,7 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   and after every unit's activation, and deleted when the game tears the battle down or a career is loaded, so it exists
   only while its battle runs. It shows what the player's HUD shows and no more: enemies by their
   visibility (`CombatUnitReader`), from full detail down to a blip's position or the position they
-  were last detected at. Every read is a cached lookup or a statistic, apart from the contract's star
-  system (`StarSystemReader`, a tag and a map query in the metadata database), the map cells of
+  were last detected at. Every read is a cached lookup or a statistic, apart from the map cells of
   destroyed buildings and the player's units' movement (`MovementReader`): the hexes each can reach
   from the path grids the game keeps for every unit, finishing a grid still being built, and from
   the game's jump landing check per hex in jump range, with the

@@ -25,9 +25,8 @@ kept current. Three of them hold the career and are written together on every ca
   starmap shows them (0 for the current system, `null` where there is no route). The story swaps
   some systems' definitions, e.g. when a system's owner changes; the entry is always the active
   one's. The game state repeats the entry of the current system, the travel destination, the
-  accepted and every offered travel contract's system, and the mission outcome and combat state
-  that of the mission's system; a contract offered in the current system refers to it only by its
-  id and name.
+  accepted and every offered travel contract's system; a contract offered in the current system
+  and the other files refer to a star system only by its id and name.
 
 One more holds the latest mission:
 
