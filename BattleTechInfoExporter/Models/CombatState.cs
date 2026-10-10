@@ -50,10 +50,9 @@ internal sealed record CombatState(
 
 /// <summary>A building on a side, highlighted in its team's color on the map.</summary>
 /// <param name="Id">The building's id in <see cref="CombatMap.Buildings" />.</param>
-/// <param name="Faction">The faction of the building's team.</param>
-/// <param name="Allegiance">Whose side the building is on, seen from the player.</param>
+/// <param name="Side">Whose side the building is on, as a unit has it.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record BuildingSide(string Id, DefinitionReference Faction, UnitAllegiance Allegiance);
+internal sealed record BuildingSide(string Id, TeamSide Side);
 
 /// <param name="Id">The building's id in <see cref="CombatMap.Buildings" />.</param>
 /// <param name="Structure">The structure left; its max is in <see cref="CombatBuilding.MaxStructure" />.</param>

@@ -192,7 +192,7 @@ shapes, such as a refit step, is any of them, without tying its `type` to a shap
 
 ## Combat state
 
-Every unit has its faction, allegiance (player, ally, enemy or neutral), visibility, position in
+Every unit has its side (its team's faction and its allegiance: player, ally, enemy or neutral), visibility, position in
 meters (`y` is the elevation), facing in degrees clockwise from the map's +Z axis and the terrain
 it stands in by its catalog id (`null` on open ground). What else it carries follows the HUD:
 
@@ -200,9 +200,10 @@ it stands in by its catalog id (`null` on open ground). What else it carries fol
   catalog id, or, for the player's own mechs, by their mech bay id in the game state, which holds
   their assigned armor; the pilot; and the state: armor front and rear and structure left per
   location in whole points as the paper doll shows them (cut off, a remainder below 1 shown as 1), evasion pips, the guard level with its sources (braced, cover, Bulwark), entrenched,
-  prone, shut down, unsteady, a mech's heat (the heat now, what it sheds at the end of its
-  activation after the terrain it stands in, the biome and effects, and the levels it overheats
-  above and shuts down at, after the pilot's Guts, heat banks and effects) and stability, whether the unit has activated this round, its
+  prone, shut down, unsteady, what only a mech has under `mech` (`null` for vehicles and turrets):
+  its heat (the heat now, what it sheds at the end of its activation after the terrain it stands
+  in, the biome and effects, and the levels it overheats above and shuts down at, after the pilot's
+  Guts, heat banks and effects) and its stability, whether the unit has activated this round, its
   initiative, every component's damage level with the rounds left in each ammo box and in weapons
   that carry their own, the pilot's injuries, health and bonus health left (which takes hits before they
   become injuries) and skills as the game computes with them now, effects included, together under
@@ -242,7 +243,7 @@ unit is inside is decided per map cell. The hit chance isn't exported: it follow
 rules and changes as soon as a unit moves.
 
 Buildings on a side, e.g. a base to destroy or defend, are listed by their id in the combat map
-with their team's faction and allegiance, as the map highlights them in the team's color; the other
+with their side as units have it, as the map highlights them in the team's color; the other
 buildings are on none. An objective lists its target buildings next to its target units. The
 mission's script can move buildings to a side during the battle.
 

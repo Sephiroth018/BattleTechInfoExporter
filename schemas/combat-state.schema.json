@@ -275,8 +275,7 @@
       "description": "A unit in combat, with as much of it as the HUD shows at its visibility.",
       "additionalProperties": false,
       "required": [
-        "faction",
-        "allegiance",
+        "side",
         "visibility",
         "kind",
         "tonnage",
@@ -292,13 +291,9 @@
         "movement"
       ],
       "properties": {
-        "faction": {
-          "description": "The faction of the unit's team.",
-          "$ref": "#/definitions/DefinitionReference"
-        },
-        "allegiance": {
-          "description": "Whose side the unit is on, seen from the player.",
-          "$ref": "#/definitions/UnitAllegiance"
+        "side": {
+          "description": "Whose side the unit is on.",
+          "$ref": "#/definitions/TeamSide"
         },
         "visibility": {
           "description": "How much of the unit the HUD shows, deciding which of its other fields are set.",
@@ -420,9 +415,28 @@
         }
       }
     },
+    "TeamSide": {
+      "type": "object",
+      "description": "A team's side, seen from the player: a unit's or a building's.",
+      "additionalProperties": false,
+      "required": [
+        "faction",
+        "allegiance"
+      ],
+      "properties": {
+        "faction": {
+          "description": "The faction of the team.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "allegiance": {
+          "description": "Whose side the team is on, seen from the player.",
+          "$ref": "#/definitions/UnitAllegiance"
+        }
+      }
+    },
     "UnitAllegiance": {
       "type": "string",
-      "description": "Whose side a unit in combat is on, seen from the player.",
+      "description": "Whose side a team in combat is on, seen from the player: its units' and its buildings'.",
       "x-enumNames": [
         "Player",
         "Ally",
@@ -565,8 +579,7 @@
         "isProne",
         "isShutDown",
         "isUnsteady",
-        "heat",
-        "stability",
+        "mech",
         "hasActivated",
         "initiative",
         "components",
@@ -612,24 +625,16 @@
           "type": "boolean",
           "description": "Whether the mech is unsteady, which it becomes at unsteadyThresholdPercent of its stability; only mechs can be."
         },
-        "heat": {
-          "description": "The mech's heat; null for vehicles and turrets, which have none.",
+        "mech": {
+          "description": "What only a mech has; null for vehicles and turrets.",
           "oneOf": [
             {
               "type": "null"
             },
             {
-              "$ref": "#/definitions/MechHeat"
+              "$ref": "#/definitions/MechState"
             }
           ]
-        },
-        "stability": {
-          "type": [
-            "null",
-            "number"
-          ],
-          "description": "null for vehicles and turrets, which have none.",
-          "format": "float"
         },
         "hasActivated": {
           "type": "boolean",
@@ -739,6 +744,25 @@
         "hasBulwark": {
           "type": "boolean",
           "description": "The pilot has Bulwark."
+        }
+      }
+    },
+    "MechState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "heat",
+        "stability"
+      ],
+      "properties": {
+        "heat": {
+          "description": "The mech's heat.",
+          "$ref": "#/definitions/MechHeat"
+        },
+        "stability": {
+          "type": "number",
+          "description": "The instability taken, from 0 up, as the stability bar fills: the mech is unsteady at unsteadyThresholdPercent of its max and knocked down when the bar is full.",
+          "format": "float"
         }
       }
     },
@@ -1225,21 +1249,16 @@
       "additionalProperties": false,
       "required": [
         "id",
-        "faction",
-        "allegiance"
+        "side"
       ],
       "properties": {
         "id": {
           "type": "string",
           "description": "The building's id in buildings."
         },
-        "faction": {
-          "description": "The faction of the building's team.",
-          "$ref": "#/definitions/DefinitionReference"
-        },
-        "allegiance": {
-          "description": "Whose side the building is on, seen from the player.",
-          "$ref": "#/definitions/UnitAllegiance"
+        "side": {
+          "description": "Whose side the building is on, as a unit has it.",
+          "$ref": "#/definitions/TeamSide"
         }
       }
     },

@@ -43,10 +43,7 @@ internal static class BuildingReader
         IReadOnlyList<BattleTech.Building> buildings) =>
         buildings
             .Where(building => building.team.GUID != TeamDefinition.WorldTeamDefinitionGuid)
-            .Select(building => new BuildingSide(
-                building.GUID,
-                DefinitionReferences.ReferenceTo(building.team.FactionValue),
-                CombatUnitReader.ReadAllegiance(combat, building.team)))
+            .Select(building => new BuildingSide(building.GUID, CombatUnitReader.ReadSide(combat, building.team)))
             .ToList();
 
     internal static CombatBuilding ReadBuilding(BattleTech.Building building) =>
