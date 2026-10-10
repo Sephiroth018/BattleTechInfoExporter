@@ -6,6 +6,6 @@ internal enum LandingZoneKind
     /// <summary>A dropship, which marks its whole footprint.</summary>
     Dropship,
 
-    /// <summary>A lance's drop pods, which mark a square around each spawn point.</summary>
+    /// <summary>A lance's drop pods, one per unit, each marking the hex it lands on.</summary>
     DropPod
 }

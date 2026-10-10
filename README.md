@@ -245,8 +245,8 @@ rules and changes as soon as a unit moves.
 Landing zones are where a dropship or a lance's drop pods are about to land, the hexes the HUD's
 movement reticle marks as dangerous: a unit standing there is crushed when the landing happens. Each
 has the game's id of the dropship or lance spawner, its kind and the hexes whose center cell the
-game marks, the cell it checks for a unit standing there; a drop pod's square is half a hex wide,
-so it covers one hex or none. The zones appear when the mission readies a landing and vanish when
+game marks, the cell it checks for a unit standing there: a dropship's whole footprint, or the hex
+each drop pod lands on, one per unit of the lance. The zones appear when the mission readies a landing and vanish when
 it happens. The game doesn't tie them to the objective announcing them, e.g. "reinforcements in 5
 rounds"; the objective carries the beacon the HUD draws at its place instead, so a tool can match
 the two by position as the player does. The band along the encounter boundary, which the HUD

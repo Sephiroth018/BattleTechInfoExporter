@@ -1283,7 +1283,7 @@
         },
         "hexes": {
           "type": "array",
-          "description": "The hexes a unit standing on is crushed: those whose center cell the game marks, in the order of rows. A drop pod's square is half a hex wide, so it covers one hex or none.",
+          "description": "The hexes a unit standing on is crushed: those whose center cell the game marks, in the order of rows: a dropship's whole footprint, or the hex each drop pod lands on, one per unit of the lance.",
           "items": {
             "$ref": "#/definitions/HexCoordinates"
           }

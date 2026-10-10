@@ -58,7 +58,8 @@ internal sealed record CombatState(
 /// <param name="Kind">What is about to land.</param>
 /// <param name="Hexes">
 ///     The hexes a unit standing on is crushed: those whose center cell the game marks, in the order of
-///     <see cref="CombatMap.Rows" />. A drop pod's square is half a hex wide, so it covers one hex or none.
+///     <see cref="CombatMap.Rows" />: a dropship's whole footprint, or the hex each drop pod lands on, one per
+///     unit of the lance.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record LandingZone(string Id, LandingZoneKind Kind, IReadOnlyList<HexCoordinates> Hexes);

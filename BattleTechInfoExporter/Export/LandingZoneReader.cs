@@ -88,7 +88,8 @@ internal static class LandingZoneReader
                 bounds.maxZ + MapMetaDataExporter.cellSize);
     }
 
-    // The pods mark the cell at the spawn point and the ring of cells around it.
+    // A pod marks the cell at its spawn point, which is snapped to the hex grid (WorldPointGameLogic), and the
+    // ring of cells around it: the hex it lands on.
     private static IEnumerable<HexPoint3> ReadPodHexes(CombatGameState combat, UnitSpawnPointGameLogic spawnPoint)
     {
         var reach = 2f * MapMetaDataExporter.cellSize;
