@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using BattleTech;
@@ -14,8 +13,10 @@ internal static class ObjectiveReader
     // objectives that are another player's. An objective stays listed once finished, which the HUD fades out.
     internal static List<CombatObjective> ReadObjectives(
         CombatGameState combat,
-        IReadOnlyDictionary<string, CombatUnit> units)
+        IReadOnlyDictionary<string, CombatUnit> units,
+        IReadOnlyList<BattleTech.Building> buildings)
     {
+        var buildingIds = new HashSet<string>(buildings.Select(building => building.GUID));
         var otherPlayersObjectiveIds = new HashSet<string>(
             combat.ItemRegistry
                 .GetObjectsOfType<ContractObjectiveGameLogic>(TaggedObjectType.ContractObjective)
@@ -27,7 +28,7 @@ internal static class ObjectiveReader
             .Where(objective => objective.DisplayInObjectiveList
                                 && !otherPlayersObjectiveIds.Contains(objective.encounterObjectGuid))
             .OrderByDescending(objective => objective.priority)
-            .Select(objective => ReadObjective(combat, objective, units))
+            .Select(objective => ReadObjective(objective, units, buildingIds))
             .ToList();
     }
 
@@ -57,9 +58,9 @@ internal static class ObjectiveReader
     // The progress line as CombatHUDObjectiveItem shows it. The targets are the units and buildings carrying the
     // objective's tags (ObjectiveGameLogic.GetTaggedCombatants).
     private static CombatObjective ReadObjective(
-        CombatGameState combat,
         ObjectiveGameLogic objective,
-        IReadOnlyDictionary<string, CombatUnit> units)
+        IReadOnlyDictionary<string, CombatUnit> units,
+        HashSet<string> buildingIds)
     {
         var progress = objective.showProgress ? GameText.ToPlainText(objective.GetProgressText().ToString()) : null;
         var targets = objective.GetTargetUnits();
@@ -77,9 +78,8 @@ internal static class ObjectiveReader
                 .ToList(),
             targets
                 .OfType<BattleTech.Building>()
-                .Where(building => BuildingReader.IsEnabled(combat, building))
                 .Select(building => building.GUID)
-                .OrderBy(id => id, StringComparer.Ordinal)
+                .Where(buildingIds.Contains)
                 .ToList());
     }
 }

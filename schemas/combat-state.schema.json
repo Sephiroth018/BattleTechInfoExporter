@@ -613,7 +613,7 @@
           "description": "Whether the mech is unsteady, which it becomes at unsteadyThresholdPercent of its stability; only mechs can be."
         },
         "heat": {
-          "description": "The mech's heat and what it does with it; null for vehicles and turrets, which have none.",
+          "description": "The mech's heat; null for vehicles and turrets, which have none.",
           "oneOf": [
             {
               "type": "null"

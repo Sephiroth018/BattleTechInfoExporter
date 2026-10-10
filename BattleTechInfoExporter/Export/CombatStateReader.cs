@@ -11,7 +11,8 @@ internal static class CombatStateReader
         var contract = combat.ActiveContract;
         var turnDirector = combat.TurnDirector;
         var units = CombatUnitReader.ReadUnits(combat);
-        var objectives = ObjectiveReader.ReadObjectives(combat, units);
+        var buildings = BuildingReader.ReadAll(combat);
+        var objectives = ObjectiveReader.ReadObjectives(combat, units, buildings);
         return new CombatState(
             ContractReader.ReadMissionContract(simGame, contract),
             MapReader.ReadMapId(contract),
@@ -22,7 +23,7 @@ internal static class CombatStateReader
             units,
             objectives,
             ObjectiveReader.ReadZones(combat, objectives),
-            BuildingReader.ReadSides(combat),
-            BuildingReader.ReadDamagedBuildings(combat));
+            BuildingReader.ReadSides(combat, buildings),
+            BuildingReader.ReadDamagedBuildings(combat, buildings));
     }
 }

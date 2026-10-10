@@ -78,7 +78,7 @@ internal sealed record CombatUnit(
 ///     Whether the mech is unsteady, which it becomes at <see cref="StabilityRules.UnsteadyThresholdPercent" /> of
 ///     its stability; only mechs can be.
 /// </param>
-/// <param name="Heat">The mech's heat and what it does with it; <c>null</c> for vehicles and turrets, which have none.</param>
+/// <param name="Heat">The mech's heat; <c>null</c> for vehicles and turrets, which have none.</param>
 /// <param name="Stability"><c>null</c> for vehicles and turrets, which have none.</param>
 /// <param name="HasActivated">Whether the unit has finished its activation this round.</param>
 /// <param name="Initiative">The phase the unit acts in, on the scale of <see cref="CombatState.Phase" />.</param>
