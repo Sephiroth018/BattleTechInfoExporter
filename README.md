@@ -200,7 +200,9 @@ it stands in by its catalog id (`null` on open ground). What else it carries fol
   catalog id, or, for the player's own mechs, by their mech bay id in the game state, which holds
   their assigned armor; the pilot; and the state: armor front and rear and structure left per
   location in whole points as the paper doll shows them (cut off, a remainder below 1 shown as 1), evasion pips, the guard level with its sources (braced, cover, Bulwark), entrenched,
-  prone, shut down, unsteady, heat and stability, whether the unit has activated this round, its
+  prone, shut down, unsteady, a mech's heat (the heat now, what it sheds at the end of its
+  activation after the terrain it stands in, the biome and effects, and the levels it overheats
+  above and shuts down at, after the pilot's Guts, heat banks and effects) and stability, whether the unit has activated this round, its
   initiative, every component's damage level with the rounds left in each ammo box and in weapons
   that carry their own, the pilot's injuries, health and bonus health left (which takes hits before they
   become injuries) and skills as the game computes with them now, effects included, together under

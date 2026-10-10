@@ -613,12 +613,15 @@
           "description": "Whether the mech is unsteady, which it becomes at unsteadyThresholdPercent of its stability; only mechs can be."
         },
         "heat": {
-          "type": [
-            "integer",
-            "null"
-          ],
-          "description": "null for vehicles and turrets, which have none.",
-          "format": "int32"
+          "description": "The mech's heat and what it does with it; null for vehicles and turrets, which have none.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/MechHeat"
+            }
+          ]
         },
         "stability": {
           "type": [
@@ -736,6 +739,39 @@
         "hasBulwark": {
           "type": "boolean",
           "description": "The pilot has Bulwark."
+        }
+      }
+    },
+    "MechHeat": {
+      "type": "object",
+      "description": "A mech's heat as the HUD's heat bar shows it, with the thresholds it draws and the sinking it predicts.",
+      "additionalProperties": false,
+      "required": [
+        "current",
+        "dissipationPerRound",
+        "overheatsAbove",
+        "maxHeat"
+      ],
+      "properties": {
+        "current": {
+          "type": "integer",
+          "description": "The heat now.",
+          "format": "int32"
+        },
+        "dissipationPerRound": {
+          "type": "integer",
+          "description": "The heat the mech sheds at the end of its activation now: its heat sinks after the terrain it stands in, the biome and effects; standing in water or on a cold map changes it.",
+          "format": "int32"
+        },
+        "overheatsAbove": {
+          "type": "integer",
+          "description": "The heat above which the mech overheats, after the pilot's Guts and effects; the base is in overheatsAbove.",
+          "format": "int32"
+        },
+        "maxHeat": {
+          "type": "integer",
+          "description": "The heat at which the mech shuts down, after heat banks and effects; the base is in maxHeat.",
+          "format": "int32"
         }
       }
     },

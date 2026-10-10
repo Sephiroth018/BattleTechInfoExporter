@@ -78,7 +78,7 @@ internal sealed record CombatUnit(
 ///     Whether the mech is unsteady, which it becomes at <see cref="StabilityRules.UnsteadyThresholdPercent" /> of
 ///     its stability; only mechs can be.
 /// </param>
-/// <param name="Heat"><c>null</c> for vehicles and turrets, which have none.</param>
+/// <param name="Heat">The mech's heat and what it does with it; <c>null</c> for vehicles and turrets, which have none.</param>
 /// <param name="Stability"><c>null</c> for vehicles and turrets, which have none.</param>
 /// <param name="HasActivated">Whether the unit has finished its activation this round.</param>
 /// <param name="Initiative">The phase the unit acts in, on the scale of <see cref="CombatState.Phase" />.</param>
@@ -97,7 +97,7 @@ internal sealed record CombatUnitState(
     bool IsProne,
     bool IsShutDown,
     bool IsUnsteady,
-    int? Heat,
+    MechHeat? Heat,
     float? Stability,
     bool HasActivated,
     int Initiative,
@@ -106,6 +106,23 @@ internal sealed record CombatUnitState(
     IReadOnlyList<CombatAbility> Abilities,
     int PrecisionStrikeCost,
     int VigilanceCost);
+
+/// <summary>A mech's heat as the HUD's heat bar shows it, with the thresholds it draws and the sinking it predicts.</summary>
+/// <param name="Current">The heat now.</param>
+/// <param name="DissipationPerRound">
+///     The heat the mech sheds at the end of its activation now: its heat sinks after the terrain it stands in, the
+///     biome and effects; standing in water or on a cold map changes it.
+/// </param>
+/// <param name="OverheatsAbove">
+///     The heat above which the mech overheats, after the pilot's Guts and effects; the base is in
+///     <see cref="HeatRules.OverheatsAbove" />.
+/// </param>
+/// <param name="MaxHeat">
+///     The heat at which the mech shuts down, after heat banks and effects; the base is in
+///     <see cref="HeatRules.MaxHeat" />.
+/// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record MechHeat(int Current, int DissipationPerRound, int OverheatsAbove, int MaxHeat);
 
 /// <param name="Injuries">The injuries, including those from before the mission.</param>
 /// <param name="Health">

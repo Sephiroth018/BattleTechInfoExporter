@@ -174,7 +174,7 @@ internal static class CombatUnitReader
             actor.IsProne,
             actor.IsShutDown,
             actor.IsUnsteady,
-            mech?.CurrentHeat,
+            mech is null ? null : ReadHeat(mech),
             mech?.CurrentStability,
             actor.HasActivatedThisRound,
             HudInitiative.FromGamePhase(actor.Initiative),
@@ -187,6 +187,12 @@ internal static class CombatUnitReader
             actor.OffensivePushCost,
             actor.DefensivePushCost);
     }
+
+    // What the heat bar (CombatHUDHeatDisplay) draws, and the dissipation Mech.ApplyHeatSinks subtracts: the heat
+    // sinks times the terrain's, biome's and global multipliers. The thresholds are the statistics MechHeatSequence
+    // checks, which Guts' traits and heat banks raise.
+    private static MechHeat ReadHeat(Mech mech) =>
+        new(mech.CurrentHeat, mech.AdjustedHeatsinkCapacity, mech.OverheatLevel, mech.MaxHeat);
 
     // Whole points, as the paper doll shows them (HUDMechArmorReadout.FormatForSummary, which the vehicle and turret
     // readouts share): cut off, except that a remainder below 1 shows as 1.
