@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BattleTech;
 using BattleTechInfoExporter.Models;
+using HBS.Math;
 
 namespace BattleTechInfoExporter.Export;
 
@@ -15,65 +16,88 @@ internal static class LandingZoneReader
 {
     // A dropship marks its footprint while it is active and has neither landed nor left
     // (DropshipGameLogic.MarkDropshipLandingZone); a lance spawner the cells around each spawn point until its
-    // drop pods have landed (LanceSpawnerGameLogic.PaintDangerousLocationForDroppods). A hex is in a zone when its
-    // center cell is marked, the cell the game checks when it crushes a unit standing there
-    // (UnitSpawnPointGameLogic.ApplyDropPodDamageToSquashedUnits).
+    // drop pods have landed (LanceSpawnerGameLogic.PaintDangerousLocationForDroppods).
     internal static List<LandingZone> Read(CombatGameState combat)
     {
-        var zonesByCell = new Dictionary<MapTerrainDataCell, Zone>();
-        foreach (var dropship in combat.ItemRegistry
-                     .GetObjectsOfType(TaggedObjectType.ObstructionGameLogic)
-                     .OfType<DropshipGameLogic>())
-        {
-            var zone = new Zone(dropship.encounterObjectGuid, LandingZoneKind.Dropship);
-            foreach (var cell in dropship.occupiedCells
-                         .Select(cell => cell.relatedTerrainCell)
-                         .Where(cell => SplatMapInfo.IsDropshipLandingZone(cell.terrainMask)))
-            {
-                zonesByCell[cell] = zone;
-            }
-        }
-
-        foreach (var spawner in combat.ItemRegistry
-                     .GetObjectsOfType<LanceSpawnerGameLogic>(TaggedObjectType.LanceSpawner)
-                     .Where(spawner => spawner.spawnMethod == SpawnUnitMethodType.DropPod))
-        {
-            var zone = new Zone(spawner.encounterObjectGuid, LandingZoneKind.DropPod);
-            foreach (var cell in spawner.unitSpawnPointGameLogicList
-                         .SelectMany(spawnPoint => spawnPoint.DangerousLocationCellsList)
-                         .Where(cell => SplatMapInfo.IsDropPodLandingZone(cell.terrainMask)))
-            {
-                zonesByCell[cell] = zone;
-            }
-        }
-
-        if (zonesByCell.Count == 0)
-        {
-            return [];
-        }
-
-        var hexesByZone = new Dictionary<Zone, List<HexCoordinates>>();
-        foreach (var hex in MapHexReader.ReadPlayableHexes(combat))
-        {
-            if (!zonesByCell.TryGetValue(MapHexReader.CenterCell(combat, hex), out var zone))
-            {
-                continue;
-            }
-
-            if (!hexesByZone.TryGetValue(zone, out var hexes))
-            {
-                hexes = [];
-                hexesByZone.Add(zone, hexes);
-            }
-
-            hexes.Add(new HexCoordinates(hex.q, hex.r));
-        }
-
-        return hexesByZone
-            .OrderBy(zone => zone.Key.Id, StringComparer.Ordinal)
-            .Select(zone => new LandingZone(zone.Key.Id, zone.Key.Kind, zone.Value))
+        var dropshipZones = combat.ItemRegistry
+            .GetObjectsOfType(TaggedObjectType.ObstructionGameLogic)
+            .OfType<DropshipGameLogic>()
+            .Select(dropship => ReadZone(
+                combat,
+                dropship.GUID,
+                LandingZoneKind.Dropship,
+                dropship.occupiedCells
+                    .Select(cell => cell.relatedTerrainCell)
+                    .Where(cell => SplatMapInfo.IsDropshipLandingZone(cell.terrainMask)),
+                ReadFootprintHexes(combat, dropship)));
+        var dropPodZones = combat.ItemRegistry
+            .GetObjectsOfType<LanceSpawnerGameLogic>(TaggedObjectType.LanceSpawner)
+            .Where(spawner => spawner.spawnMethod == SpawnUnitMethodType.DropPod)
+            .Select(spawner => ReadZone(
+                combat,
+                spawner.GUID,
+                LandingZoneKind.DropPod,
+                spawner.unitSpawnPointGameLogicList
+                    .SelectMany(spawnPoint => spawnPoint.DangerousLocationCellsList)
+                    .Where(cell => SplatMapInfo.IsDropPodLandingZone(cell.terrainMask)),
+                spawner.unitSpawnPointGameLogicList.SelectMany(spawnPoint => ReadPodHexes(combat, spawnPoint))));
+        return dropshipZones
+            .Concat(dropPodZones)
+            .OfType<LandingZone>()
+            .OrderBy(zone => zone.Id, StringComparer.Ordinal)
             .ToList();
     }
 
-    private sealed record Zone(string Id, LandingZoneKind Kind);
+    // A hex is in a zone when its center cell is marked, the cell the game checks when it crushes a unit standing
+    // there (UnitSpawnPointGameLogic.ApplyDropPodDamageToSquashedUnits); a zone without such a hex is left out.
+    private static LandingZone? ReadZone(
+        CombatGameState combat,
+        string id,
+        LandingZoneKind kind,
+        IEnumerable<MapTerrainDataCell> markedCells,
+        IEnumerable<HexPoint3> candidateHexes)
+    {
+        var markedCellSet = new HashSet<MapTerrainDataCell>(markedCells);
+        if (markedCellSet.Count == 0)
+        {
+            return null;
+        }
+
+        var hexes = candidateHexes
+            .Distinct()
+            .Where(hex => markedCellSet.Contains(MapHexReader.CenterCell(combat, hex)))
+            .OrderBy(hex => hex.r)
+            .ThenBy(hex => hex.q)
+            .Select(hex => new HexCoordinates(hex.q, hex.r))
+            .ToList();
+        return hexes.Count == 0 ? null : new LandingZone(id, kind, hexes);
+    }
+
+    // The footprint's cells span the bounds the game keeps for its line of sight targets, measured at the cells'
+    // low corners (ObstructionGameLogic.AddMapEncounterLayerDataCell), so a cell's width is added at the far ends.
+    private static IEnumerable<HexPoint3> ReadFootprintHexes(CombatGameState combat, DropshipGameLogic dropship)
+    {
+        var bounds = dropship.losTargetCalcs;
+        return bounds.minX > bounds.maxX
+            ? []
+            : MapHexReader.ReadPlayableHexesWithin(
+                combat,
+                bounds.minX,
+                bounds.maxX + MapMetaDataExporter.cellSize,
+                bounds.minZ,
+                bounds.maxZ + MapMetaDataExporter.cellSize);
+    }
+
+    // The pods mark the cell at the spawn point and the ring of cells around it.
+    private static IEnumerable<HexPoint3> ReadPodHexes(CombatGameState combat, UnitSpawnPointGameLogic spawnPoint)
+    {
+        var reach = 2f * MapMetaDataExporter.cellSize;
+        var center = spawnPoint.hexPosition;
+        return MapHexReader.ReadPlayableHexesWithin(
+            combat,
+            center.x - reach,
+            center.x + reach,
+            center.z - reach,
+            center.z + reach);
+    }
 }
