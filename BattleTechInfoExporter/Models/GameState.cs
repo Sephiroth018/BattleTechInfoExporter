@@ -25,6 +25,9 @@ namespace BattleTechInfoExporter.Models;
 ///     after a contract.
 /// </param>
 /// <param name="Position">Where the ship is: the star system, and the travel under way.</param>
+/// <param name="Events">
+///     The events scheduled, drawn lately or used up, and the company's tags and statistics their requirements check.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record GameState(
     Company Company,
@@ -40,7 +43,8 @@ internal sealed record GameState(
     IReadOnlyList<HiringHallPilot> HiringHall,
     ActiveContract? ActiveContract,
     IReadOnlyList<OfferedContract>? Contracts,
-    Position Position) : ExportFile
+    Position Position,
+    EventState Events) : ExportFile
 {
     internal const string FileName = "game-state.json";
 }

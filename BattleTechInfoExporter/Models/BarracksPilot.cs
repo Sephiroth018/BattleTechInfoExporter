@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
@@ -13,7 +14,9 @@ internal sealed record BarracksPilot : Pilot
         PilotStatus status,
         int? readyOnDay,
         Spirits spirits,
-        ServiceRecord serviceRecord) : base(pilot)
+        ServiceRecord serviceRecord,
+        IReadOnlyList<string> tags,
+        IReadOnlyDictionary<string, float> statistics) : base(pilot)
     {
         Experience = experience;
         Injuries = injuries;
@@ -21,6 +24,8 @@ internal sealed record BarracksPilot : Pilot
         ReadyOnDay = readyOnDay;
         Spirits = spirits;
         ServiceRecord = serviceRecord;
+        Tags = tags;
+        Statistics = statistics;
     }
 
     /// <summary>The pilot's experience points, spent and unspent.</summary>
@@ -43,6 +48,15 @@ internal sealed record BarracksPilot : Pilot
 
     /// <summary>The pilot's missions, kills and injuries so far, and the day of hire.</summary>
     public ServiceRecord ServiceRecord { get; }
+
+    /// <summary>The pilot's tags, which the events' requirements check.</summary>
+    public IReadOnlyList<string> Tags { get; }
+
+    /// <summary>
+    ///     The pilot's statistics some event's requirements compare, keyed by the game's name, as they compare them; a
+    ///     statistic the pilot doesn't have is 0.
+    /// </summary>
+    public IReadOnlyDictionary<string, float> Statistics { get; }
 }
 
 /// <param name="Unspent">The experience points available to spend on skills.</param>

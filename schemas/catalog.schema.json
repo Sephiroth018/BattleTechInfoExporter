@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Catalog",
   "type": "object",
-  "description": "The root of catalog.json: every chassis, mech, vehicle, turret, component, terrain, biome and map definition the game has loaded, keyed by id. It describes the game, not the career, so it only changes with the game's data.",
+  "description": "The root of catalog.json: every chassis, mech, vehicle, turret, component, terrain, biome, map and event definition the game has loaded, keyed by id. It describes the game, not the career, so it only changes with the game's data.",
   "additionalProperties": false,
   "required": [
     "modVersion",
@@ -16,7 +16,8 @@
     "componentDefinitions",
     "terrainDefinitions",
     "biomeDefinitions",
-    "mapDefinitions"
+    "mapDefinitions",
+    "eventDefinitions"
   ],
   "properties": {
     "modVersion": {
@@ -87,6 +88,13 @@
       "description": "The maps a star system's contracts can be fought on, keyed by map id.",
       "additionalProperties": {
         "$ref": "#/definitions/MapDefinition"
+      }
+    },
+    "eventDefinitions": {
+      "type": "object",
+      "description": "The events, keyed by event id.",
+      "additionalProperties": {
+        "$ref": "#/definitions/EventDefinition"
       }
     }
   },
@@ -2124,6 +2132,561 @@
             "type": "number",
             "format": "double"
           }
+        }
+      }
+    },
+    "EventDefinition": {
+      "type": "object",
+      "description": "An event the game can show between missions: when it can come, and the options it offers.",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "scope",
+        "weight",
+        "isOneTime",
+        "canBeDrawn",
+        "requirements",
+        "additionalRequirements",
+        "additionalTargets",
+        "options"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The event's title; placeholders such as {TGT_MW.Callsign} stand for the pilots the game picks."
+        },
+        "scope": {
+          "description": "What the event is about: the company, or a pilot it picks among those meeting requirements and without an event timeout.",
+          "$ref": "#/definitions/EventScope"
+        },
+        "weight": {
+          "type": "integer",
+          "description": "The event's draw weight among the events that can come.",
+          "format": "int32"
+        },
+        "isOneTime": {
+          "type": "boolean",
+          "description": "Whether the event comes at most once per career."
+        },
+        "canBeDrawn": {
+          "type": "boolean",
+          "description": "Whether the daily event roll can draw the event; when false, only a ForcedEvent brings it."
+        },
+        "requirements": {
+          "description": "What the event's company or pilot (scope) must meet; null when nothing.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/EventRequirement"
+            }
+          ]
+        },
+        "additionalRequirements": {
+          "type": "array",
+          "description": "What the other scopes must meet, all of them.",
+          "items": {
+            "$ref": "#/definitions/EventRequirement"
+          }
+        },
+        "additionalTargets": {
+          "type": "array",
+          "description": "The other pilots or the mech the event involves, each one the game finds meeting its requirements; without one, the event can't come.",
+          "items": {
+            "$ref": "#/definitions/EventTarget"
+          }
+        },
+        "options": {
+          "type": "array",
+          "description": "The options the event offers, in the order it shows them.",
+          "items": {
+            "$ref": "#/definitions/EventOption"
+          }
+        }
+      }
+    },
+    "EventScope": {
+      "type": "string",
+      "x-enumNames": [
+        "Company",
+        "MechWarrior",
+        "Mech",
+        "Commander",
+        "StarSystem",
+        "SecondaryMechWarrior",
+        "SecondaryMech",
+        "AllMechWarriors",
+        "AllMechs",
+        "TertiaryMechWarrior",
+        "RandomMech",
+        "DeadMechWarrior",
+        "Map",
+        "Flashpoint",
+        "None"
+      ],
+      "enum": [
+        "Company",
+        "MechWarrior",
+        "Mech",
+        "Commander",
+        "StarSystem",
+        "SecondaryMechWarrior",
+        "SecondaryMech",
+        "AllMechWarriors",
+        "AllMechs",
+        "TertiaryMechWarrior",
+        "RandomMech",
+        "DeadMechWarrior",
+        "Map",
+        "Flashpoint",
+        "None"
+      ]
+    },
+    "EventRequirement": {
+      "type": "object",
+      "description": "What one scope's tags and statistics must be for an event to come, an option to be open or a result to apply.",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "requiredTags",
+        "excludedTags",
+        "comparisons"
+      ],
+      "properties": {
+        "scope": {
+          "description": "Whose tags and statistics are checked: the company's or a pilot's, the commander included (both in game-state.json), or the current star system's (in star-systems.json).",
+          "$ref": "#/definitions/EventScope"
+        },
+        "requiredTags": {
+          "type": "array",
+          "description": "The tags that must all be present.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "excludedTags": {
+          "type": "array",
+          "description": "The tags none of which may be present.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "comparisons": {
+          "type": "array",
+          "description": "The statistic values that must all hold.",
+          "items": {
+            "$ref": "#/definitions/StatisticComparison"
+          }
+        }
+      }
+    },
+    "StatisticComparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statistic",
+        "operator",
+        "value"
+      ],
+      "properties": {
+        "statistic": {
+          "type": "string",
+          "description": "The statistic's name, as the game names it; a statistic the scope doesn't have counts as 0."
+        },
+        "operator": {
+          "description": "How the statistic's value compares to value.",
+          "$ref": "#/definitions/Operator"
+        },
+        "value": {
+          "type": "number",
+          "description": "The value the statistic is compared to.",
+          "format": "float"
+        }
+      }
+    },
+    "Operator": {
+      "type": "string",
+      "x-enumNames": [
+        "Equal",
+        "NotEqual",
+        "LessThan",
+        "GreaterThan",
+        "LessThanOrEqual",
+        "GreaterThanOrEqual"
+      ],
+      "enum": [
+        "Equal",
+        "NotEqual",
+        "LessThan",
+        "GreaterThan",
+        "LessThanOrEqual",
+        "GreaterThanOrEqual"
+      ]
+    },
+    "EventTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "requirements"
+      ],
+      "properties": {
+        "scope": {
+          "description": "The second pilot, the third pilot or a mech in the mech bay.",
+          "$ref": "#/definitions/EventScope"
+        },
+        "requirements": {
+          "description": "What the pilot or mech must meet; null when any will do.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/EventRequirement"
+            }
+          ]
+        }
+      }
+    },
+    "EventOption": {
+      "type": "object",
+      "description": "An option the event offers; every option is shown, and one whose requirements aren't met can't be picked.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "requirements",
+        "outcomes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The option's id from the game's data files."
+        },
+        "name": {
+          "type": "string",
+          "description": "The option's text, with placeholders as in name."
+        },
+        "requirements": {
+          "type": "array",
+          "description": "What must be met to pick the option, all of them.",
+          "items": {
+            "$ref": "#/definitions/EventRequirement"
+          }
+        },
+        "outcomes": {
+          "type": "array",
+          "description": "What picking the option can lead to; the game draws one by weight.",
+          "items": {
+            "$ref": "#/definitions/EventOutcome"
+          }
+        }
+      }
+    },
+    "EventOutcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "weight",
+        "results"
+      ],
+      "properties": {
+        "weight": {
+          "type": "integer",
+          "description": "The outcome's draw weight among the option's outcomes.",
+          "format": "int32"
+        },
+        "results": {
+          "type": "array",
+          "description": "The changes the outcome makes, in order.",
+          "items": {
+            "$ref": "#/definitions/EventResult"
+          }
+        }
+      }
+    },
+    "EventResult": {
+      "type": "object",
+      "description": "One change an outcome makes to one scope.",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "requirements",
+        "addedTags",
+        "removedTags",
+        "statisticChanges",
+        "durationDays",
+        "actions",
+        "forcedEvents"
+      ],
+      "properties": {
+        "scope": {
+          "description": "Whose tags and statistics change, or whom the actions concern.",
+          "$ref": "#/definitions/EventScope"
+        },
+        "requirements": {
+          "description": "What must be met for the result to apply; null when it always applies.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/EventRequirement"
+            }
+          ]
+        },
+        "addedTags": {
+          "type": "array",
+          "description": "The tags added.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "removedTags": {
+          "type": "array",
+          "description": "The tags removed.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "statisticChanges": {
+          "type": "array",
+          "description": "The statistics changed; a boolean statistic's value as 1 or 0, as the requirements compare it.",
+          "items": {
+            "$ref": "#/definitions/CareerStatisticChange"
+          }
+        },
+        "durationDays": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "How many days the tag and statistic changes last before the game reverts them; null when they last.",
+          "format": "int32"
+        },
+        "actions": {
+          "type": "array",
+          "description": "What else the result does, e.g. kill or dismiss the pilot.",
+          "items": {
+            "$ref": "#/definitions/ResultAction"
+          }
+        },
+        "forcedEvents": {
+          "type": "array",
+          "description": "The events the result schedules.",
+          "items": {
+            "$ref": "#/definitions/ForcedEvent"
+          }
+        }
+      }
+    },
+    "CareerStatisticChange": {
+      "type": "object",
+      "description": "A change the career makes to a statistic of the company or a pilot, e.g. by a ship upgrade or an event.",
+      "additionalProperties": false,
+      "required": [
+        "statistic",
+        "value",
+        "isSet"
+      ],
+      "properties": {
+        "statistic": {
+          "type": "string",
+          "description": "The game's name of the statistic, e.g. \"MechTechSkill\"."
+        },
+        "value": {
+          "type": "number",
+          "description": "The amount added to the statistic, or the value it is set to when isSet.",
+          "format": "float"
+        },
+        "isSet": {
+          "type": "boolean",
+          "description": "Whether the change sets the statistic to value instead of adding it."
+        }
+      }
+    },
+    "ResultAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "value"
+      ],
+      "properties": {
+        "type": {
+          "description": "What the action does, e.g. MechWarrior_SetTimeout or MechWarrior_Kill.",
+          "$ref": "#/definitions/ActionType"
+        },
+        "value": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "What the action needs, as the game's data gives it, e.g. the timeout's days or the hired pilot's id; null when it needs nothing."
+        }
+      }
+    },
+    "ActionType": {
+      "type": "string",
+      "x-enumNames": [
+        "MechWarrior_AddRoster",
+        "MechWarrior_AddHiring",
+        "MechWarrior_Kill",
+        "MechWarrior_Fire",
+        "MechWarrior_Callsign",
+        "MechWarrior_HealAll",
+        "MechWarrior_SetTimeout",
+        "Mech_RepairAll",
+        "Mech_Damage_Location",
+        "Mech_AddRoster",
+        "Contract_IgnoreMissionResults",
+        "Company_TravelTime",
+        "Company_TravelTo",
+        "Equipment_AddRandom_POSTLAUNCH",
+        "Ship_SetRepairState",
+        "StarSystem_SetActiveDef",
+        "System_PlayVideo",
+        "System_StartContract",
+        "System_AddContract",
+        "System_StartNonProceduralContract",
+        "System_CreateCommander",
+        "System_SimGameCharacterVisible",
+        "System_UpdateMilestones",
+        "System_SetContractScope",
+        "System_SetDropship",
+        "System_SetTargetBreadcrumbSystem",
+        "System_SetObjective",
+        "System_StartConversation",
+        "System_AddStartingRoster",
+        "System_PauseNotification",
+        "System_StartCredits",
+        "System_ResetContracts",
+        "System_ShowCampaignResults",
+        "System_ShowTitleCard",
+        "StarSystem_SetCurBreadcrumbOverride",
+        "Ship_AddUpgrade",
+        "System_ToggleIgnoredContractTargets",
+        "System_ToggleIgnoredContractEmployers",
+        "System_AddDisplayedFaction",
+        "System_RemoveDisplayedFaction",
+        "System_ShowSummaryOverlay",
+        "Flashpoint_SetNextMilestone",
+        "Flashpoint_StartContract",
+        "Flashpoint_AddContract",
+        "Flashpoint_FailFlashpoint",
+        "Flashpoint_CompleteFlashpoint",
+        "System_WhitelistRonin",
+        "System_CmdCenter_HoldForNewContract",
+        "System_ShowRewards",
+        "System_SetFactionAlly",
+        "System_ForceDropshipRoom",
+        "MechWarrior_Heal",
+        "MechWarrior_AddInjuries",
+        "MechWarrior_SubtractInjuries",
+        "MechWarrior_AddInjury",
+        "MechWarrior_SubtractInjury",
+        "System_AddFlashpoint"
+      ],
+      "enum": [
+        "MechWarrior_AddRoster",
+        "MechWarrior_AddHiring",
+        "MechWarrior_Kill",
+        "MechWarrior_Fire",
+        "MechWarrior_Callsign",
+        "MechWarrior_HealAll",
+        "MechWarrior_SetTimeout",
+        "Mech_RepairAll",
+        "Mech_Damage_Location",
+        "Mech_AddRoster",
+        "Contract_IgnoreMissionResults",
+        "Company_TravelTime",
+        "Company_TravelTo",
+        "Equipment_AddRandom_POSTLAUNCH",
+        "Ship_SetRepairState",
+        "StarSystem_SetActiveDef",
+        "System_PlayVideo",
+        "System_StartContract",
+        "System_AddContract",
+        "System_StartNonProceduralContract",
+        "System_CreateCommander",
+        "System_SimGameCharacterVisible",
+        "System_UpdateMilestones",
+        "System_SetContractScope",
+        "System_SetDropship",
+        "System_SetTargetBreadcrumbSystem",
+        "System_SetObjective",
+        "System_StartConversation",
+        "System_AddStartingRoster",
+        "System_PauseNotification",
+        "System_StartCredits",
+        "System_ResetContracts",
+        "System_ShowCampaignResults",
+        "System_ShowTitleCard",
+        "StarSystem_SetCurBreadcrumbOverride",
+        "Ship_AddUpgrade",
+        "System_ToggleIgnoredContractTargets",
+        "System_ToggleIgnoredContractEmployers",
+        "System_AddDisplayedFaction",
+        "System_RemoveDisplayedFaction",
+        "System_ShowSummaryOverlay",
+        "Flashpoint_SetNextMilestone",
+        "Flashpoint_StartContract",
+        "Flashpoint_AddContract",
+        "Flashpoint_FailFlashpoint",
+        "Flashpoint_CompleteFlashpoint",
+        "System_WhitelistRonin",
+        "System_CmdCenter_HoldForNewContract",
+        "System_ShowRewards",
+        "System_SetFactionAlly",
+        "System_ForceDropshipRoom",
+        "MechWarrior_Heal",
+        "MechWarrior_AddInjuries",
+        "MechWarrior_SubtractInjuries",
+        "MechWarrior_AddInjury",
+        "MechWarrior_SubtractInjury",
+        "System_AddFlashpoint"
+      ]
+    },
+    "ForcedEvent": {
+      "type": "object",
+      "description": "An event a result schedules: from the daily roll minDaysWait on, each roll brings it with chance, and roll maxDaysWait always does.",
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "scope",
+        "minDaysWait",
+        "maxDaysWait",
+        "chance",
+        "keepsPilot"
+      ],
+      "properties": {
+        "event": {
+          "description": "The event scheduled.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "scope": {
+          "description": "What the scheduled event is about.",
+          "$ref": "#/definitions/EventScope"
+        },
+        "minDaysWait": {
+          "type": "integer",
+          "description": "The first daily roll, counted from the next, that can bring the event.",
+          "format": "int32"
+        },
+        "maxDaysWait": {
+          "type": "integer",
+          "description": "The daily roll, counted from the next, that brings the event for sure.",
+          "format": "int32"
+        },
+        "chance": {
+          "type": "integer",
+          "description": "The chance per daily roll, in percent.",
+          "format": "int32"
+        },
+        "keepsPilot": {
+          "type": "boolean",
+          "description": "Whether the scheduled event is about the same pilot as the result."
         }
       }
     }

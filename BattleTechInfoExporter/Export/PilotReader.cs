@@ -10,10 +10,10 @@ namespace BattleTechInfoExporter.Export;
 internal static class PilotReader
 {
     // The commander is kept apart from the roster; the barracks lists them first (SGBarracksWidget.Reset).
-    internal static List<BarracksPilot> ReadPilots(SimGameState simGame) =>
+    internal static List<BarracksPilot> ReadPilots(SimGameState simGame, IReadOnlyList<string> comparedStatistics) =>
         new[] { simGame.Commander }
             .Concat(simGame.PilotRoster)
-            .Select(pilot => ReadPilot(simGame, pilot))
+            .Select(pilot => ReadPilot(simGame, pilot, comparedStatistics))
             .ToList();
 
     // Wrapped in a Pilot as SG_HiringHall_Screen.AddPeople does, which gives the skills, abilities and health.
@@ -60,7 +60,10 @@ internal static class PilotReader
     internal static int? ReadReadyOnDayAfterMission(SimGameState simGame, Pilot pilot) =>
         pilot.Injuries == 0 ? null : ReadReadyOnDay(simGame, pilot);
 
-    private static BarracksPilot ReadPilot(SimGameState simGame, Pilot pilot)
+    private static BarracksPilot ReadPilot(
+        SimGameState simGame,
+        Pilot pilot,
+        IReadOnlyList<string> comparedStatistics)
     {
         var definition = pilot.pilotDef;
         var status = ReadPilotStatus(pilot);
@@ -77,7 +80,9 @@ internal static class PilotReader
                 definition.OtherKills,
                 definition.MissionsEjected,
                 definition.LifetimeInjuries,
-                definition.DateOfHire));
+                definition.DateOfHire),
+            definition.PilotTags.ToList(),
+            EventStatisticReader.ReadStatistics(pilot.StatCollection, comparedStatistics));
     }
 
     private static Models.Pilot ReadPilotCommon(SimGameState simGame, Pilot pilot)

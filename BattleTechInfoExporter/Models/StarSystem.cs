@@ -10,7 +10,10 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Id">The active definition's id, as in the references to the star system.</param>
 /// <param name="Name">The name, as in the references to the star system.</param>
 /// <param name="Owner">The faction that owns the star system.</param>
-/// <param name="Tags">The star system's tags, as its starmap panel shows them.</param>
+/// <param name="Tags">
+///     The star system's tags, which the events' requirements check, also those its starmap panel doesn't show; named
+///     as the panel names them, by their id where the game has no name.
+/// </param>
 /// <param name="Biomes">The biomes the star system's missions can be on.</param>
 /// <param name="Maps">
 ///     The maps the star system's contracts can be fought on, as the contract generator selects them from its biomes

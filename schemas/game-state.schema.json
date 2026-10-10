@@ -21,7 +21,8 @@
     "hiringHall",
     "activeContract",
     "contracts",
-    "position"
+    "position",
+    "events"
   ],
   "properties": {
     "modVersion": {
@@ -130,6 +131,10 @@
     "position": {
       "description": "Where the ship is: the star system, and the travel under way.",
       "$ref": "#/definitions/Position"
+    },
+    "events": {
+      "description": "The events scheduled, drawn lately or used up, and the company's tags and statistics their requirements check.",
+      "$ref": "#/definitions/EventState"
     }
   },
   "definitions": {
@@ -197,7 +202,9 @@
         "temporaryMechTechChanges",
         "medTech",
         "temporaryMedTechChanges",
-        "maxPilots"
+        "maxPilots",
+        "tags",
+        "statistics"
       ],
       "properties": {
         "name": {
@@ -265,6 +272,21 @@
           "type": "integer",
           "description": "The pilots the barracks hold, not counting the commander; no more can be hired.",
           "format": "int32"
+        },
+        "tags": {
+          "type": "array",
+          "description": "The company's tags, which the events' requirements check.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "statistics": {
+          "type": "object",
+          "description": "The company's statistics some event's requirements compare, keyed by the game's name, as they compare them; a statistic the company doesn't have is 0.",
+          "additionalProperties": {
+            "type": "number",
+            "format": "float"
+          }
         }
       }
     },
@@ -855,7 +877,7 @@
         },
         "tags": {
           "type": "array",
-          "description": "The star system's tags, as its starmap panel shows them.",
+          "description": "The star system's tags, which the events' requirements check, also those its starmap panel doesn't show; named as the panel names them, by their id where the game has no name.",
           "items": {
             "$ref": "#/definitions/DefinitionReference"
           }
@@ -1066,7 +1088,7 @@
       "properties": {
         "statistic": {
           "type": "string",
-          "description": "The game's name of the company statistic, e.g. \"MechTechSkill\"."
+          "description": "The game's name of the statistic, e.g. \"MechTechSkill\"."
         },
         "value": {
           "type": "number",
@@ -1075,7 +1097,7 @@
         },
         "isSet": {
           "type": "boolean",
-          "description": "Whether the upgrade sets the statistic to value instead of adding it."
+          "description": "Whether the change sets the statistic to value instead of adding it."
         },
         "description": {
           "type": "string",
@@ -1103,7 +1125,9 @@
         "status",
         "readyOnDay",
         "spirits",
-        "serviceRecord"
+        "serviceRecord",
+        "tags",
+        "statistics"
       ],
       "properties": {
         "id": {
@@ -1179,6 +1203,21 @@
         "serviceRecord": {
           "description": "The pilot's missions, kills and injuries so far, and the day of hire.",
           "$ref": "#/definitions/ServiceRecord"
+        },
+        "tags": {
+          "type": "array",
+          "description": "The pilot's tags, which the events' requirements check.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "statistics": {
+          "type": "object",
+          "description": "The pilot's statistics some event's requirements compare, keyed by the game's name, as they compare them; a statistic the pilot doesn't have is 0.",
+          "additionalProperties": {
+            "type": "number",
+            "format": "float"
+          }
         }
       }
     },
@@ -3124,6 +3163,83 @@
         "legEndsOnDay": {
           "type": "integer",
           "description": "The day the leg under way ends, on the scale of daysPassed: by travelStatus, the jump point is reached, a jump is done or, after the last jump, the planet is reached.",
+          "format": "int32"
+        }
+      }
+    },
+    "EventState": {
+      "type": "object",
+      "description": "The career's state of the events: those scheduled, drawn lately and used up.",
+      "additionalProperties": false,
+      "required": [
+        "recentlyDrawnEvents",
+        "usedOneTimeEvents",
+        "scheduledEvents"
+      ],
+      "properties": {
+        "recentlyDrawnEvents": {
+          "type": "array",
+          "description": "The events the daily roll drew lately; it draws none of them again until no other event can come.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
+          }
+        },
+        "usedOneTimeEvents": {
+          "type": "array",
+          "description": "The one-time events the daily roll has drawn, which it never draws again.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
+          }
+        },
+        "scheduledEvents": {
+          "type": "array",
+          "description": "The events results have scheduled, in the order the game rolls them.",
+          "items": {
+            "$ref": "#/definitions/ScheduledEvent"
+          }
+        }
+      }
+    },
+    "ScheduledEvent": {
+      "type": "object",
+      "description": "An event a result has scheduled. The days assume a daily roll on every day from the next on; the game skips the roll on the day the ship arrives at a star system and on the days the story moves on, and on a day one scheduled event comes, the ones after it in the list don't roll.",
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "pilot",
+        "earliestOnDay",
+        "latestOnDay",
+        "chance"
+      ],
+      "properties": {
+        "event": {
+          "description": "The event scheduled.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "pilot": {
+          "description": "The pilot the event is about; null when the game picks one when it comes.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/PilotReference"
+            }
+          ]
+        },
+        "earliestOnDay": {
+          "type": "integer",
+          "description": "The first day the event can come, on the scale of daysPassed.",
+          "format": "int32"
+        },
+        "latestOnDay": {
+          "type": "integer",
+          "description": "The day the event comes for sure, on the scale of daysPassed.",
+          "format": "int32"
+        },
+        "chance": {
+          "type": "integer",
+          "description": "The chance per daily roll from earliestOnDay on, in percent.",
           "format": "int32"
         }
       }

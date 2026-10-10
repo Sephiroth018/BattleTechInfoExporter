@@ -394,7 +394,10 @@ name, version and folder, `ModLog` its logger. Folders:
   block through the game's own path checks, and `BuildingReader` the buildings, also the damaged
   ones for the combat state; `CatalogReader` builds the catalog from the
   definitions the game has loaded, with `TerrainReader` reading the terrains and biomes from the
-  design masks, and `MapReader` the maps from the metadata database and their terrain data files.
+  design masks, `MapReader` the maps from the metadata database and their terrain data files, and
+  `EventDefinitionReader` the events, which also makes the references to them; `EventStateReader`
+  builds the game state's events section, and `EventStatisticReader` the company's and the pilots'
+  statistics the events compare.
   `DefinitionReferences` makes the
   references that need only a description, a faction, a biome or a data-driven enum value, and
   `ComponentReferences` every reference to a component; a reference
@@ -489,7 +492,7 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   (`hexGrid`). A hex is what a unit standing on it gets from the cell at its center (`MapHexReader`);
   blocked steps follow the game's path node steps (`HexStepReader`).
 - **The catalog is a file of its own that doesn't depend on the career:** `catalog.json`, with
-  every chassis, mech, vehicle, turret, component, terrain, biome and map definition
+  every chassis, mech, vehicle, turret, component, terrain, biome, map and event definition
   the game has loaded, rebuilt on a career load only when it's missing or stale: written by another mod version or with
   another `sourceFingerprint`, the hash of the game's manifest entries for everything it reads (id,
   file and last write time). A change touching no file it reads (a DLL mod patching definitions in
@@ -502,6 +505,15 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   input (required and excluded map tags, biomes) rather than per star system. The catalog's
   `mapDefinitions` hold each map's draw weight and terrain coverage, the share of its playable cells
   per terrain id, read from the map's terrain data file only on a rebuild.
+- **An event is its definition in the catalog plus the career's event state in the game state**
+  (`events`): the catalog's `eventDefinitions` hold the requirements, options, outcomes and results
+  as the game's data has them, statistic names included, each requirement with the scope the game
+  checks it against; the scope's own entry in the career files holds what the requirements check:
+  the company's tags and statistics on `company`, each pilot's on the pilot, the star systems' tags
+  in `star-systems.json`. Only the statistics some requirement compares are
+  exported, as the game compares them (a number, 0 for one the scope doesn't have). What the game
+  doesn't show and only its random rolls use, such as the daily event chance, is left out; the
+  events scheduled and drawn lately are known to the player, so they're in.
 - **The rules export only constants the game's code reads** (`combat` and `campaign` in
   `rules.json`): a constant the game never reads, reads only in code nothing calls, or reads only
   for presentation or the AI is left out, so a consumer never plans around a number that does
@@ -543,8 +555,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **Vehicle:** a ground unit with fixed armor and loadout (`VehicleDef`), only met as an enemy or
   ally in combat.
 - **Turret:** a fixed emplacement with a single location (`TurretDef`).
-- **Catalog:** the export of every chassis, mech, vehicle, turret, component, terrain, biome and map
-  definition the game has loaded (`catalog.json`).
+- **Catalog:** the export of every chassis, mech, vehicle, turret, component, terrain, biome, map
+  and event definition the game has loaded (`catalog.json`).
 - **Star system:** a system on the starmap (`StarSystem`). Never "location" (a mech's body
   location) or "planet".
 - **Star system definition:** a version of a star system (`StarSystemDef`) with its name, owner,
@@ -568,7 +580,14 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   `Blip4Maximum`), shown with as much detail as the player's side's sensors reveal. An enemy in
   sight but hidden by ECM (`BlipGhost`) isn't a blip: the export treats it as in full view.
 - **Statistic change:** a change an ability or component makes to a statistic (the game's
-  `EffectData` of type `StatisticEffect`).
+  `EffectData` of type `StatisticEffect`), or an event's result makes (`SimGameStat`).
+- **Event:** something the game shows between missions, about the company or a pilot, offering
+  options (`SimGameEventDef`). A daily roll draws it, or another event's result schedules it.
+- **Option:** what the player can pick in an event (`SimGameEventOption`). Never "choice".
+- **Outcome:** one of an option's weighted sets of results, one of which picking it leads to
+  (`SimGameEventResultSet`).
+- **Result:** one change an outcome makes to one scope: tags, statistics, actions or scheduled
+  events (`SimGameEventResult`).
 - **Reference:** what the export refers to by its id instead of repeating it, with the name the UI
   shows (`Reference`): a definition, a mech in the mech bay, a component or a pilot.
 - **Entry:** a thing in one of its states, a member of a list: a component stored, for sale,

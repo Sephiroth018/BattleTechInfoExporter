@@ -41,9 +41,14 @@ internal sealed record ShipUpgrade(
     IReadOnlyList<ShipUpgradeEffect> Effects);
 
 /// <summary>A change the upgrade makes to a company statistic once installed.</summary>
-/// <param name="Statistic">The game's name of the company statistic, e.g. "MechTechSkill".</param>
-/// <param name="Value">The amount added to the statistic, or the value it is set to when <see cref="IsSet" />.</param>
-/// <param name="IsSet">Whether the upgrade sets the statistic to <see cref="Value" /> instead of adding it.</param>
-/// <param name="Description">The effect in the game's words, e.g. "+2 Morale".</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record ShipUpgradeEffect(string Statistic, float Value, bool IsSet, string Description);
+internal sealed record ShipUpgradeEffect : CareerStatisticChange
+{
+    internal ShipUpgradeEffect(CareerStatisticChange change, string description) : base(change)
+    {
+        Description = description;
+    }
+
+    /// <summary>The effect in the game's words, e.g. "+2 Morale".</summary>
+    public string Description { get; }
+}
