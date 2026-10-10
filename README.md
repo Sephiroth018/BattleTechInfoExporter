@@ -111,7 +111,8 @@ The last one describes the game rather than the career:
     statistic comparisons that must hold; a statistic the scope doesn't have counts as 0. The game
     state holds the company's and every pilot's tags and the statistics events compare, and
     `star-systems.json` every star system's tags. Titles and option texts keep the game's placeholders
-    for the pilots it picks, e.g. `{TGT_MW.Callsign}`; the events' story texts are left out.
+    for the pilots it picks, e.g. `{TGT_MW.Callsign}`, and its formatting; the events' story texts
+    are left out.
 
     Once a day the game rolls for an event, except on the day the ship arrives at a star system and
     on days the story moves on. The chance rises with every roll that brings none and falls back once
@@ -139,7 +140,8 @@ with the company's `daysPassed`, so they don't count down from day to day.
 The game state holds:
 
 - **Company:** name, date, funds, morale, rating, MechTech and MedTech with the changes events made
-  to them for a time and the day each ends, and the reputation with every faction.
+  to them for a time and the day each ends, the reputation with every faction, and the tags and
+  statistics events check.
 - **Work queue:** the timeline's entries in order, each with the day it finishes and its `target`:
   the mech, pilot, destination or ship upgrade it applies to, by the entry's type.
 - **Ship:** the Argo's upgrades the engineering screen shows, each installed, installing,
@@ -176,9 +178,9 @@ The game state holds:
   the day of arrival while travelling to it. The game generates a system's contracts only when the contract screen first
   opens; until then `contracts` is `null`.
 - **Events:** the events other events' results scheduled, with the pilot they're about and the
-  first and the last day they can come (assuming a roll every day), the events drawn lately, the
-  one-time events that have come, and the company's tags and the statistics events compare. The
-  chance of the next event isn't shown in the game and isn't exported.
+  first and the last day they can come (assuming a roll every day), the events drawn lately and
+  the one-time events that have come. The chance of the next event isn't shown in the game and
+  isn't exported.
 
 The rules' skill training tables hold, per level, the experience it costs, the base hit chance it
 gives (Gunnery for ranged attacks, Piloting for melee, before an attack's modifiers) and the

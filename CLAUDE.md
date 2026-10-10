@@ -396,8 +396,8 @@ name, version and folder, `ModLog` its logger. Folders:
   definitions the game has loaded, with `TerrainReader` reading the terrains and biomes from the
   design masks, `MapReader` the maps from the metadata database and their terrain data files, and
   `EventDefinitionReader` the events, which also makes the references to them; `EventStateReader`
-  builds the game state's events section and the pilots' and the company's statistics the events
-  compare.
+  builds the game state's events section, and `EventStatisticReader` the company's and the pilots'
+  statistics the events compare.
   `DefinitionReferences` makes the
   references that need only a description, a faction, a biome or a data-driven enum value, and
   `ComponentReferences` every reference to a component; a reference
@@ -507,9 +507,10 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   per terrain id, read from the map's terrain data file only on a rebuild.
 - **An event is its definition in the catalog plus the career's event state in the game state**
   (`events`): the catalog's `eventDefinitions` hold the requirements, options, outcomes and results
-  as the game's data has them, scopes and statistic names included; the career files hold what the
-  requirements check: the company's tags and statistics in `events`, each pilot's in the pilot, the
-  star systems' tags in `star-systems.json`. Only the statistics some requirement compares are
+  as the game's data has them, statistic names included, each requirement with the scope the game
+  checks it against; the scope's own entry in the career files holds what the requirements check:
+  the company's tags and statistics on `company`, each pilot's on the pilot, the star systems' tags
+  in `star-systems.json`. Only the statistics some requirement compares are
   exported, as the game compares them (a number, 0 for one the scope doesn't have). What the game
   doesn't show and only its random rolls use, such as the daily event chance, is left out; the
   events scheduled and drawn lately are known to the player, so they're in.

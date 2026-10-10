@@ -1,4 +1,3 @@
-using System;
 using BattleTech;
 using BattleTechInfoExporter.Export;
 using BattleTechInfoExporter.Models;
@@ -18,13 +17,6 @@ internal static class EventResolvedTrigger
     [HarmonyPostfix]
     private static void OnEventDismissed([HarmonyArgument("__instance")] SimGameState simGame)
     {
-        try
-        {
-            GameStateExporter.Export(simGame, ExportTrigger.EventResolved);
-        }
-        catch (Exception exception)
-        {
-            ModLog.Logger.LogException(exception);
-        }
+        GameStateExporter.Export(simGame, ExportTrigger.EventResolved);
     }
 }

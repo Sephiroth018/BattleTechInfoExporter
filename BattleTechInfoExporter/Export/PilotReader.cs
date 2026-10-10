@@ -82,7 +82,7 @@ internal static class PilotReader
                 definition.LifetimeInjuries,
                 definition.DateOfHire),
             definition.PilotTags.ToList(),
-            EventStateReader.ReadStatistics(pilot.StatCollection, comparedStatistics));
+            EventStatisticReader.ReadStatistics(pilot.StatCollection, comparedStatistics));
     }
 
     private static Models.Pilot ReadPilotCommon(SimGameState simGame, Pilot pilot)

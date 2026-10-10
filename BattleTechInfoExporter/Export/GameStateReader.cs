@@ -16,9 +16,9 @@ internal static class GameStateReader
     {
         var travelInProgress = ReadTravelInProgress(simGame);
         var mechLabFinishingDays = WorkQueueReader.ReadMechLabFinishingDays(simGame);
-        var comparedStatistics = EventStateReader.ReadComparedStatistics(simGame);
+        var comparedStatistics = EventStatisticReader.ReadComparedStatisticNames(simGame.DataManager);
         return new GameState(
-            ReadCompany(simGame),
+            ReadCompany(simGame, comparedStatistics.Company),
             FinancialReportReader.Read(simGame),
             WorkQueueReader.ReadWorkQueue(simGame, mechLabFinishingDays),
             ShipReader.ReadShip(simGame),
@@ -32,10 +32,10 @@ internal static class GameStateReader
             ContractReader.ReadActiveContract(simGame, starmap, travelInProgress),
             ContractReader.ReadContracts(simGame, starmap),
             ReadPosition(simGame, starmap, travelInProgress),
-            EventStateReader.ReadEventState(simGame, comparedStatistics));
+            EventStateReader.ReadEventState(simGame));
     }
 
-    private static Company ReadCompany(SimGameState simGame) =>
+    private static Company ReadCompany(SimGameState simGame, IReadOnlyList<string> comparedStatistics) =>
         new(
             simGame.CompanyName,
             simGame.CurDropship,
@@ -55,7 +55,9 @@ internal static class GameStateReader
             ReadTemporaryChanges(simGame, SimGameState.COMPANYSTAT_MECHTECH),
             simGame.MedTechSkill,
             ReadTemporaryChanges(simGame, SimGameState.COMPANYSTAT_MEDTECH),
-            simGame.GetMaxMechWarriors());
+            simGame.GetMaxMechWarriors(),
+            simGame.CompanyTags.ToList(),
+            EventStatisticReader.ReadStatistics(simGame.CompanyStats, comparedStatistics));
 
     // SimGameState.UpdateTempResults reverts a temporary result as the day after its last day starts, adding the
     // negated amount of every stat it doesn't set.

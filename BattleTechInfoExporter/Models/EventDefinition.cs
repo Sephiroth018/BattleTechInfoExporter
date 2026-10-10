@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using BattleTech;
 using JetBrains.Annotations;
 
@@ -36,7 +37,20 @@ internal sealed record EventDefinition(
     EventRequirement? Requirements,
     IReadOnlyList<EventRequirement> AdditionalRequirements,
     IReadOnlyList<EventTarget> AdditionalTargets,
-    IReadOnlyList<EventOption> Options);
+    IReadOnlyList<EventOption> Options)
+{
+    /// <summary>Every requirement of the event, its targets, its options and their results.</summary>
+    internal IEnumerable<EventRequirement> EnumerateRequirements() =>
+        new[] { Requirements }
+            .Concat(AdditionalTargets.Select(target => target.Requirements))
+            .Concat(Options
+                .SelectMany(option => option.Outcomes)
+                .SelectMany(outcome => outcome.Results)
+                .Select(result => result.Requirements))
+            .OfType<EventRequirement>()
+            .Concat(AdditionalRequirements)
+            .Concat(Options.SelectMany(option => option.Requirements));
+}
 
 /// <param name="Scope">The second pilot, the third pilot or a mech in the mech bay.</param>
 /// <param name="Requirements">What the pilot or mech must meet; <c>null</c> when any will do.</param>
@@ -81,19 +95,10 @@ internal sealed record EventResult(
     EventRequirement? Requirements,
     IReadOnlyList<string> AddedTags,
     IReadOnlyList<string> RemovedTags,
-    IReadOnlyList<ResultStatisticChange> StatisticChanges,
+    IReadOnlyList<CareerStatisticChange> StatisticChanges,
     int? DurationDays,
     IReadOnlyList<ResultAction> Actions,
     IReadOnlyList<ForcedEvent> ForcedEvents);
-
-/// <param name="Statistic">The statistic's name, as the game names it.</param>
-/// <param name="Value">
-///     A number, boolean or text, as the statistic's type requires: added to the statistic, or replacing it when
-///     <paramref name="ReplacesValue" />.
-/// </param>
-/// <param name="ReplacesValue">Whether <paramref name="Value" /> replaces the statistic's value instead of adding to it.</param>
-[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record ResultStatisticChange(string Statistic, object Value, bool ReplacesValue);
 
 /// <param name="Type">What the action does, e.g. <c>MechWarrior_SetTimeout</c> or <c>MechWarrior_Kill</c>.</param>
 /// <param name="Value">

@@ -204,7 +204,9 @@
         "temporaryMechTechChanges",
         "medTech",
         "temporaryMedTechChanges",
-        "maxPilots"
+        "maxPilots",
+        "tags",
+        "statistics"
       ],
       "properties": {
         "name": {
@@ -272,6 +274,21 @@
           "type": "integer",
           "description": "The pilots the barracks hold, not counting the commander; no more can be hired.",
           "format": "int32"
+        },
+        "tags": {
+          "type": "array",
+          "description": "The company's tags, which the events' requirements check.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "statistics": {
+          "type": "object",
+          "description": "The company's statistics some event's requirements compare, keyed by the game's name, as they compare them; a statistic the company doesn't have is 0.",
+          "additionalProperties": {
+            "type": "number",
+            "format": "float"
+          }
         }
       }
     },
@@ -1073,7 +1090,7 @@
       "properties": {
         "statistic": {
           "type": "string",
-          "description": "The game's name of the company statistic, e.g. \"MechTechSkill\"."
+          "description": "The game's name of the statistic, e.g. \"MechTechSkill\"."
         },
         "value": {
           "type": "number",
@@ -1082,7 +1099,7 @@
         },
         "isSet": {
           "type": "boolean",
-          "description": "Whether the upgrade sets the statistic to value instead of adding it."
+          "description": "Whether the change sets the statistic to value instead of adding it."
         },
         "description": {
           "type": "string",
@@ -3154,14 +3171,12 @@
     },
     "EventState": {
       "type": "object",
-      "description": "The career's state of the events, and the company's tags and statistics their requirements check; each pilot's are on the pilot.",
+      "description": "The career's state of the events: those scheduled, drawn lately and used up.",
       "additionalProperties": false,
       "required": [
         "recentlyDrawnEvents",
         "usedOneTimeEvents",
-        "scheduledEvents",
-        "companyTags",
-        "companyStatistics"
+        "scheduledEvents"
       ],
       "properties": {
         "recentlyDrawnEvents": {
@@ -3183,21 +3198,6 @@
           "description": "The events results have scheduled, in the order the game rolls them.",
           "items": {
             "$ref": "#/definitions/ScheduledEvent"
-          }
-        },
-        "companyTags": {
-          "type": "array",
-          "description": "The company's tags.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "companyStatistics": {
-          "type": "object",
-          "description": "The company's statistics some event's requirements compare, keyed by the game's name, as they compare them; a statistic the company doesn't have is 0.",
-          "additionalProperties": {
-            "type": "number",
-            "format": "float"
           }
         }
       }

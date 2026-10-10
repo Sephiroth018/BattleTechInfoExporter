@@ -84,6 +84,8 @@ internal static class ShipReader
             .SingleOrDefault();
         return description is null
             ? null
-            : new ShipUpgradeEffect(stat.name, stat.ToSingle(), stat.set, GameText.ToPlainText(description));
+            : new ShipUpgradeEffect(
+                new CareerStatisticChange(stat.name, stat.ToSingle(), stat.set),
+                GameText.ToPlainText(description));
     }
 }

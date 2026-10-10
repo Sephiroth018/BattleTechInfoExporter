@@ -29,38 +29,14 @@ internal static class EventDefinitionReader
     // An event a forced event or the career names may be missing from the loaded events; its id stands in for the name.
     internal static DefinitionReference ReferenceTo(DataManager dataManager, string eventId) =>
         dataManager.SimGameEventDefs.TryGet(eventId, out var definition)
-            ? new DefinitionReference(eventId, GameText.ToPlainText(definition.Description.Name))
+            ? DefinitionReferences.ReferenceTo(definition.Description)
             : new DefinitionReference(eventId, eventId);
 
-    /// <summary>
-    ///     Every event's requirements with the scope the game checks them against: an event's own requirements are
-    ///     checked against the event's company or pilot (SimGameEventTracker.IsEventValid), the others against their
-    ///     own scope.
-    /// </summary>
-    internal static IEnumerable<(EventScope Scope, RequirementDef Requirement)> ReadAllRequirements(
-        DataManager dataManager) =>
-        dataManager.SimGameEventDefs.SelectMany(definition => ReadRequirements(definition.Value));
-
-    private static IEnumerable<(EventScope Scope, RequirementDef Requirement)> ReadRequirements(
-        SimGameEventDef definition)
-    {
-        var otherRequirements = (definition.AdditionalRequirements ?? [])
-            .Concat((definition.AdditionalObjects ?? []).Select(target => target.Requirements))
-            .Concat(definition.Options.SelectMany(option => option.RequirementList ?? []))
-            .Concat(definition.Options
-                .SelectMany(option => option.ResultSets ?? [])
-                .SelectMany(outcome => outcome.Results ?? [])
-                .Select(result => result.Requirements))
-            .Where(requirement => requirement is not null)
-            .Select(requirement => (requirement.Scope, requirement));
-        return definition.Requirements is { } requirements
-            ? otherRequirements.Prepend((definition.Scope, requirements))
-            : otherRequirements;
-    }
-
+    // SimGameEventTracker.IsEventValid checks an event's own requirements against the event's company or pilot, and a
+    // target's against each candidate; every other requirement is checked against its own scope.
     private static EventDefinition ReadEventDefinition(DataManager dataManager, SimGameEventDef definition) =>
         new(
-            GameText.ToPlainText(definition.Description.Name),
+            definition.Description.Name,
             definition.Scope,
             definition.Weight,
             definition.OneTimeEvent,
@@ -69,17 +45,17 @@ internal static class EventDefinitionReader
             definition.PublishState == SimGameEventDef.EventPublishState.PUBLISHED
             && definition.EventType == SimGameEventDef.SimEventType.NORMAL
             && DrawnScopes.Contains(definition.Scope),
-            ReadRequirement(definition.Requirements),
+            ReadRequirement(definition.Requirements, definition.Scope),
             ReadRequirementList(definition.AdditionalRequirements),
             (definition.AdditionalObjects ?? [])
-            .Select(target => new EventTarget(target.Scope, ReadRequirement(target.Requirements)))
+            .Select(target => new EventTarget(target.Scope, ReadRequirement(target.Requirements, target.Scope)))
             .ToList(),
             definition.Options.Select(option => ReadOption(dataManager, option)).ToList());
 
     private static EventOption ReadOption(DataManager dataManager, SimGameEventOption option) =>
         new(
             option.Description.Id,
-            GameText.ToPlainText(option.Description.Name),
+            option.Description.Name,
             ReadRequirementList(option.RequirementList),
             (option.ResultSets ?? [])
             .Select(outcome => new EventOutcome(
@@ -90,10 +66,12 @@ internal static class EventDefinitionReader
     private static EventResult ReadResult(DataManager dataManager, SimGameEventResult result) =>
         new(
             result.Scope,
-            ReadRequirement(result.Requirements),
+            result.Requirements is { } requirement ? ReadRequirement(requirement, requirement.Scope) : null,
             ReadTags(result.AddedTags),
             ReadTags(result.RemovedTags),
-            (result.Stats ?? []).Select(ReadStatisticChange).ToList(),
+            // The value is already resolved from its constant, e.g. [rep_gain_small].
+            (result.Stats ?? []).Select(stat => new CareerStatisticChange(stat.name, stat.ToSingle(), stat.set))
+            .ToList(),
             // SimGameState.ApplySimGameEventResult tracks a result as temporary only with a duration.
             result.TemporaryResult && result.ResultDuration > 0 ? result.ResultDuration : null,
             (result.Actions ?? [])
@@ -111,34 +89,24 @@ internal static class EventDefinitionReader
                 forcedEvent.RetainPilot))
             .ToList());
 
-    // The value is already resolved from its constant, e.g. [rep_gain_small]; SimGameState.SetSimGameStat parses it
-    // by the statistic's type.
-    private static ResultStatisticChange ReadStatisticChange(SimGameStat stat) =>
-        new(
-            stat.name,
-            stat.Type switch
-            {
-                { } type when type == typeof(int) => stat.ToInt(),
-                { } type when type == typeof(float) => stat.ToSingle(),
-                { } type when type == typeof(bool) => stat.ToBool(),
-                _ => stat.value
-            },
-            stat.set);
-
     // An empty requirement is met by anything (RequirementDef.HasRequirement), so it's left out.
-    private static EventRequirement? ReadRequirement(RequirementDef? requirement) =>
+    private static EventRequirement? ReadRequirement(RequirementDef? requirement, EventScope scope) =>
         requirement is null || !requirement.HasRequirement()
             ? null
             : new EventRequirement(
-                requirement.Scope,
+                scope,
                 ReadTags(requirement.RequirementTags),
                 ReadTags(requirement.ExclusionTags),
                 (requirement.RequirementComparisons ?? [])
                 .Select(comparison => new StatisticComparison(comparison.obj, comparison.op, comparison.val))
                 .ToList());
 
-    private static List<EventRequirement> ReadRequirementList(IEnumerable<RequirementDef?>? requirements) =>
-        (requirements ?? []).Select(ReadRequirement).OfType<EventRequirement>().ToList();
+    private static List<EventRequirement> ReadRequirementList(IEnumerable<RequirementDef>? requirements) =>
+        (requirements ?? [])
+        .Where(requirement => requirement is not null)
+        .Select(requirement => ReadRequirement(requirement, requirement.Scope))
+        .OfType<EventRequirement>()
+        .ToList();
 
     private static List<string> ReadTags(TagSet? tags) => tags?.ToList() ?? [];
 }

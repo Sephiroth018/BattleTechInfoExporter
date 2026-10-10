@@ -8,8 +8,8 @@ namespace BattleTechInfoExporter.Models;
 ///     What one scope's tags and statistics must be for an event to come, an option to be open or a result to apply.
 /// </summary>
 /// <param name="Scope">
-///     Whose tags and statistics are checked: the company's (in <c>game-state.json</c>'s <c>events</c>), the current
-///     star system's (in <c>star-systems.json</c>), the commander's or another pilot's (each pilot's in the game state).
+///     Whose tags and statistics are checked: the company's or a pilot's, the commander included (both in
+///     <c>game-state.json</c>), or the current star system's (in <c>star-systems.json</c>).
 /// </param>
 /// <param name="RequiredTags">The tags that must all be present.</param>
 /// <param name="ExcludedTags">The tags none of which may be present.</param>

@@ -2257,7 +2257,7 @@
       ],
       "properties": {
         "scope": {
-          "description": "Whose tags and statistics are checked: the company's (in game-state.json's events), the current star system's (in star-systems.json), the commander's or another pilot's (each pilot's in the game state).",
+          "description": "Whose tags and statistics are checked: the company's or a pilot's, the commander included (both in game-state.json), or the current star system's (in star-systems.json).",
           "$ref": "#/definitions/EventScope"
         },
         "requiredTags": {
@@ -2456,7 +2456,7 @@
           "type": "array",
           "description": "The statistics changed.",
           "items": {
-            "$ref": "#/definitions/ResultStatisticChange"
+            "$ref": "#/definitions/CareerStatisticChange"
           }
         },
         "durationDays": {
@@ -2483,25 +2483,28 @@
         }
       }
     },
-    "ResultStatisticChange": {
+    "CareerStatisticChange": {
       "type": "object",
+      "description": "A change the career makes to a statistic of the company or a pilot, e.g. by a ship upgrade or an event.",
       "additionalProperties": false,
       "required": [
         "statistic",
         "value",
-        "replacesValue"
+        "isSet"
       ],
       "properties": {
         "statistic": {
           "type": "string",
-          "description": "The statistic's name, as the game names it."
+          "description": "The game's name of the statistic, e.g. \"MechTechSkill\"."
         },
         "value": {
-          "description": "A number, boolean or text, as the statistic's type requires: added to the statistic, or replacing it when replacesValue."
+          "type": "number",
+          "description": "The amount added to the statistic, or the value it is set to when isSet.",
+          "format": "float"
         },
-        "replacesValue": {
+        "isSet": {
           "type": "boolean",
-          "description": "Whether value replaces the statistic's value instead of adding to it."
+          "description": "Whether the change sets the statistic to value instead of adding it."
         }
       }
     },

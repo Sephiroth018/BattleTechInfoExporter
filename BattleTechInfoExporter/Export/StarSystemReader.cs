@@ -69,11 +69,12 @@ internal static class StarSystemReader
     // Ordinal does.
     private static Dictionary<string, string> ReadTagNames() =>
         MetadataDatabase.Instance.GetAllTags()
+            .Where(tag => !string.IsNullOrEmpty(tag.FriendlyName))
             .ToDictionary(tag => tag.Name, tag => tag.FriendlyName, StringComparer.Ordinal);
 
     // A tag without a friendly name, which the game never shows, is named by its id.
     private static DefinitionReference ReadTag(Dictionary<string, string> tagNames, string tag) =>
-        new(tag, tagNames.TryGetValue(tag, out var name) && !string.IsNullOrEmpty(name) ? name : tag);
+        new(tag, tagNames.TryGetValue(tag, out var name) ? name : tag);
 
     // The query takes the tag sets and biomes as sets (SQL IN), so their order doesn't change its result.
     private static List<DefinitionReference> ReadPlayableMaps(

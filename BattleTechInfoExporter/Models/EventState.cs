@@ -3,27 +3,17 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
-/// <summary>
-///     The career's state of the events, and the company's tags and statistics their requirements check; each
-///     pilot's are on the pilot.
-/// </summary>
+/// <summary>The career's state of the events: those scheduled, drawn lately and used up.</summary>
 /// <param name="RecentlyDrawnEvents">
 ///     The events the daily roll drew lately; it draws none of them again until no other event can come.
 /// </param>
 /// <param name="UsedOneTimeEvents">The one-time events that have come, which never come again.</param>
 /// <param name="ScheduledEvents">The events results have scheduled, in the order the game rolls them.</param>
-/// <param name="CompanyTags">The company's tags.</param>
-/// <param name="CompanyStatistics">
-///     The company's statistics some event's requirements compare, keyed by the game's name, as they compare them;
-///     a statistic the company doesn't have is 0.
-/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record EventState(
     IReadOnlyList<DefinitionReference> RecentlyDrawnEvents,
     IReadOnlyList<DefinitionReference> UsedOneTimeEvents,
-    IReadOnlyList<ScheduledEvent> ScheduledEvents,
-    IReadOnlyList<string> CompanyTags,
-    IReadOnlyDictionary<string, float> CompanyStatistics);
+    IReadOnlyList<ScheduledEvent> ScheduledEvents);
 
 /// <summary>
 ///     An event a result has scheduled. The days assume a daily roll on every day from the next on; the game skips
