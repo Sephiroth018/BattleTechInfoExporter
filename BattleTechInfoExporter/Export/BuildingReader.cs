@@ -33,6 +33,19 @@ internal static class BuildingReader
                 building.IsDead ? ReadDestroyedHexes(combat, building) : null))
             .ToList();
 
+    // Every building is on a team from its creation (ObstructionGameLogic.ContractInitialize), the world team unless
+    // the obstruction or the mission's AssignBuildingsToTeamResult puts it on one with a side, which highlights it
+    // in the team's color (Building.AddToTeam). Only those are listed: urban maps have hundreds of buildings.
+    internal static IReadOnlyList<BuildingSide> ReadSides(CombatGameState combat) =>
+        ReadEnabled(combat)
+            .Where(building => building.team is { } team && team.GUID != TeamDefinition.WorldTeamDefinitionGuid)
+            .OrderBy(building => building.GUID, StringComparer.Ordinal)
+            .Select(building => new BuildingSide(
+                building.GUID,
+                DefinitionReferences.ReferenceTo(building.team.FactionValue),
+                CombatUnitReader.ReadAllegiance(combat, building.team)))
+            .ToList();
+
     /// <summary>Whether the building is enabled, so it is in the map and can be targeted.</summary>
     internal static bool IsEnabled(CombatGameState combat, BattleTech.Building building) =>
         ObstructionOf(combat, building).IsBuildingEnabled;

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BattleTech;
@@ -26,7 +27,7 @@ internal static class ObjectiveReader
             .Where(objective => objective.DisplayInObjectiveList
                                 && !otherPlayersObjectiveIds.Contains(objective.encounterObjectGuid))
             .OrderByDescending(objective => objective.priority)
-            .Select(objective => ReadObjective(objective, units))
+            .Select(objective => ReadObjective(combat, objective, units))
             .ToList();
     }
 
@@ -53,23 +54,32 @@ internal static class ObjectiveReader
             .ToList();
     }
 
-    // The progress line as CombatHUDObjectiveItem shows it.
+    // The progress line as CombatHUDObjectiveItem shows it. The targets are the units and buildings carrying the
+    // objective's tags (ObjectiveGameLogic.GetTaggedCombatants).
     private static CombatObjective ReadObjective(
+        CombatGameState combat,
         ObjectiveGameLogic objective,
         IReadOnlyDictionary<string, CombatUnit> units)
     {
         var progress = objective.showProgress ? GameText.ToPlainText(objective.GetProgressText().ToString()) : null;
+        var targets = objective.GetTargetUnits();
         return new CombatObjective(
             objective.GUID,
             GameText.ToPlainText(objective.title),
             objective.CurrentObjectiveStatus,
             objective.IsRequiredForPrimaryContractObjective,
             string.IsNullOrEmpty(progress) ? null : progress,
-            objective.GetTargetUnits()
+            targets
                 .OfType<AbstractActor>()
                 .Select(unit => unit.GUID)
                 // A blip's side isn't something the HUD shows.
                 .Where(id => units.TryGetValue(id, out var unit) && unit.Visibility == UnitVisibility.Full)
+                .ToList(),
+            targets
+                .OfType<BattleTech.Building>()
+                .Where(building => BuildingReader.IsEnabled(combat, building))
+                .Select(building => building.GUID)
+                .OrderBy(id => id, StringComparer.Ordinal)
                 .ToList());
     }
 }

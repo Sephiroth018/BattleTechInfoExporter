@@ -17,6 +17,7 @@
     "units",
     "objectives",
     "zones",
+    "buildingSides",
     "damagedBuildings"
   ],
   "properties": {
@@ -82,6 +83,13 @@
       "description": "The zones drawn on the map.",
       "items": {
         "$ref": "#/definitions/ObjectiveZone"
+      }
+    },
+    "buildingSides": {
+      "type": "array",
+      "description": "The buildings on a side, e.g. a base to destroy or defend, by their id in buildings and in the order of their ids; the others are on none. The mission's script can change a building's side during the battle.",
+      "items": {
+        "$ref": "#/definitions/BuildingSide"
       }
     },
     "damagedBuildings": {
@@ -1034,7 +1042,8 @@
         "status",
         "isPrimary",
         "progress",
-        "targetUnitIds"
+        "targetUnitIds",
+        "targetBuildingIds"
       ],
       "properties": {
         "id": {
@@ -1062,7 +1071,14 @@
         },
         "targetUnitIds": {
           "type": "array",
-          "description": "The units it is about (to destroy, protect or escort), as keys of units, while they are in full view: neither blips nor destroyed enemies. Buildings are left out.",
+          "description": "The units it is about (to destroy, protect or escort), as keys of units, while they are in full view: neither blips nor destroyed enemies.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "targetBuildingIds": {
+          "type": "array",
+          "description": "The buildings it is about (to destroy or defend), as id in buildings.",
           "items": {
             "type": "string"
           }
@@ -1126,6 +1142,30 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "BuildingSide": {
+      "type": "object",
+      "description": "A building on a side, highlighted in its team's color on the map.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "faction",
+        "allegiance"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The building's id in buildings."
+        },
+        "faction": {
+          "description": "The faction of the building's team.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "allegiance": {
+          "description": "Whose side the building is on, seen from the player.",
+          "$ref": "#/definitions/UnitAllegiance"
         }
       }
     },

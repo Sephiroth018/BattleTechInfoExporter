@@ -17,7 +17,7 @@ internal static class CombatUnitReader
         var knownUnits = new List<(AbstractActor Actor, UnitAllegiance Allegiance, UnitVisibility Visibility)>();
         foreach (var actor in combat.AllActors)
         {
-            var allegiance = ReadAllegiance(combat, actor);
+            var allegiance = ReadAllegiance(combat, actor.team);
             if (ReadVisibility(combat, actor, allegiance) is { } visibility)
             {
                 knownUnits.Add((actor, allegiance, visibility));
@@ -45,10 +45,11 @@ internal static class CombatUnitReader
         return units;
     }
 
-    private static UnitAllegiance ReadAllegiance(CombatGameState combat, AbstractActor actor) =>
-        actor.team == combat.LocalPlayerTeam
+    /// <summary>Whose side a team is on, seen from the player.</summary>
+    internal static UnitAllegiance ReadAllegiance(CombatGameState combat, Team team) =>
+        team == combat.LocalPlayerTeam
             ? UnitAllegiance.Player
-            : combat.HostilityMatrix.GetHostilityOfLocalPlayer(actor.team) switch
+            : combat.HostilityMatrix.GetHostilityOfLocalPlayer(team) switch
             {
                 Hostility.FRIENDLY => UnitAllegiance.Ally,
                 Hostility.ENEMY => UnitAllegiance.Enemy,

@@ -52,8 +52,8 @@ Two more hold the running battle, and exist only while one runs:
   from a save, when every phase begins and after every unit's activation, and deleted when the battle ends: when the
   after-action report is left, or when it is quit or restarted. It holds the contract, the map's id in the catalog, the round, the current phase,
   the lance's resolve, the units keyed by the game's unit id, the objectives the HUD lists with
-  their status, progress line and target units in full view, the zones drawn on the map with their type, center, radius
-  and objectives, and the damaged buildings. See "Combat state" below.
+  their status, progress line, target units in full view and target buildings, the zones drawn on the map with their type, center, radius
+  and objectives, the buildings on a side, and the damaged buildings. See "Combat state" below.
 
 The last one describes the game rather than the career:
 
@@ -237,6 +237,11 @@ turn at its end.
 A zone's radius is that of the hexagon the HUD draws; whether a
 unit is inside is decided per map cell. The hit chance isn't exported: it follows from the combat
 rules and changes as soon as a unit moves.
+
+Buildings on a side, e.g. a base to destroy or defend, are listed by their id in the combat map
+with their team's faction and allegiance, as the map highlights them in the team's color; the other
+buildings are on none. An objective lists its target buildings next to its target units. The
+mission's script can move buildings to a side during the battle.
 
 Damaged buildings are listed by their id in the combat map, with the structure left; buildings at
 full structure are left out. The HUD shows a building's structure when it is targeted. A destroyed

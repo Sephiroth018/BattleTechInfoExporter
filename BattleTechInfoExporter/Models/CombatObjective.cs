@@ -15,7 +15,11 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="TargetUnitIds">
 ///     The units it is about (to destroy, protect or escort), as keys of <see cref="CombatState.Units" />, while
-///     they are in full view: neither blips nor destroyed enemies. Buildings are left out.
+///     they are in full view: neither blips nor destroyed enemies.
+/// </param>
+/// <param name="TargetBuildingIds">
+///     The buildings it is about (to destroy or defend), as <see cref="CombatBuilding.Id" /> in
+///     <see cref="CombatMap.Buildings" />.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatObjective(
@@ -24,7 +28,8 @@ internal sealed record CombatObjective(
     ObjectiveStatus Status,
     bool IsPrimary,
     string? Progress,
-    IReadOnlyList<string> TargetUnitIds);
+    IReadOnlyList<string> TargetUnitIds,
+    IReadOnlyList<string> TargetBuildingIds);
 
 /// <summary>A zone drawn on the map, e.g. a capture or evacuation zone.</summary>
 /// <param name="Id">The game's id of the zone.</param>

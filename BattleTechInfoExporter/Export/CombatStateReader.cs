@@ -22,6 +22,7 @@ internal static class CombatStateReader
             units,
             objectives,
             ObjectiveReader.ReadZones(combat, objectives),
+            BuildingReader.ReadSides(combat),
             BuildingReader.ReadDamagedBuildings(combat));
     }
 }
