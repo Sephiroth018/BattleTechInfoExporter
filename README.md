@@ -53,8 +53,8 @@ Two more hold the running battle, and exist only while one runs:
   from a save, when every phase begins and after every unit's activation, and deleted when the battle ends: when the
   after-action report is left, or when it is quit or restarted. It holds the contract, the map's id in the catalog, the round, the current phase,
   the lance's resolve, the units keyed by the game's unit id, the objectives the HUD lists with
-  their status, progress line and target units in full view, the zones drawn on the map with their type, center, radius
-  and objectives, and the damaged buildings. See "Combat state" below.
+  their status, progress line, target units in full view, target buildings and beacon, the zones drawn on the map with their type, center, radius
+  and objectives, the landing zones, the buildings on a side, and the damaged buildings. See "Combat state" below.
 
 The last one describes the game rather than the career:
 
@@ -221,7 +221,7 @@ shapes, such as a refit step, is any of them, without tying its `type` to a shap
 
 ## Combat state
 
-Every unit has its faction, allegiance (player, ally, enemy or neutral), visibility, position in
+Every unit has its side (its team's faction and its allegiance: player, ally, enemy or neutral), visibility, position in
 meters (`y` is the elevation), facing in degrees clockwise from the map's +Z axis and the terrain
 it stands in by its catalog id (`null` on open ground). What else it carries follows the HUD:
 
@@ -229,10 +229,14 @@ it stands in by its catalog id (`null` on open ground). What else it carries fol
   catalog id, or, for the player's own mechs, by their mech bay id in the game state, which holds
   their assigned armor; the pilot; and the state: armor front and rear and structure left per
   location in whole points as the paper doll shows them (cut off, a remainder below 1 shown as 1), evasion pips, the guard level with its sources (braced, cover, Bulwark), entrenched,
-  prone, shut down, unsteady, heat and stability, whether the unit has activated this round, its
+  prone, shut down, unsteady, what only a mech has under `mech` (`null` for vehicles and turrets):
+  its heat (the heat now, what it sheds at the end of its activation after the terrain it stands
+  in, the biome and effects, and the levels it overheats above and shuts down at, after the pilot's
+  Guts, heat banks and effects) and its stability, whether the unit has activated this round, its
   initiative, every component's damage level with the rounds left in each ammo box and in weapons
   that carry their own, the pilot's injuries, health and bonus health left (which takes hits before they
-  become injuries), together under `pilot`, which is `null` for a unit without one, the abilities that can be activated with their cooldowns and uses left,
+  become injuries) and skills as the game computes with them now, effects included, together under
+  `pilot`, which is `null` for a unit without one, the abilities that can be activated with their cooldowns and uses left,
   and what Precision Strike and Vigilance cost it now. A Sensor Lock brings an enemy into full view
   for the player's whole side, and allied units' sensors count for the player. An enemy in sight
   but hidden by ECM counts as in full view, although the HUD hides its pilot, heat, stability and
@@ -266,6 +270,21 @@ turn at its end.
 A zone's radius is that of the hexagon the HUD draws; whether a
 unit is inside is decided per map cell. The hit chance isn't exported: it follows from the combat
 rules and changes as soon as a unit moves.
+
+Landing zones are where a dropship or a lance's drop pods are about to land, the hexes the HUD's
+movement reticle marks as dangerous: a unit standing there is crushed when the landing happens. Each
+has the game's id of the dropship or lance spawner, its kind and the hexes whose center cell the
+game marks, the cell it checks for a unit standing there: a dropship's whole footprint, or the hex
+each drop pod lands on, one per unit of the lance. The zones appear when the mission readies a landing and vanish when
+it happens. The game doesn't tie them to the objective announcing them, e.g. "reinforcements in 5
+rounds"; the objective carries the beacon the HUD draws at its place instead, so a tool can match
+the two by position as the player does. The band along the encounter boundary, which the HUD
+marks the same way, isn't exported.
+
+Buildings on a side, e.g. a base to destroy or defend, are listed by their id in the combat map
+with their side as units have it, as the map highlights them in the team's color; the other
+buildings are on none. An objective lists its target buildings next to its target units. The
+mission's script can move buildings to a side during the battle.
 
 Damaged buildings are listed by their id in the combat map, with the structure left; buildings at
 full structure are left out. The HUD shows a building's structure when it is targeted. A destroyed
@@ -301,7 +320,10 @@ aren't part of it; impassable terrain has its own legend character. A step to a 
 listed is blocked too.
 
 Each building has its id, name, position and max structure; the combat state lists the damaged
-ones.
+ones. A dropship is a building only while it is landed: one that hovers to drop off units or
+hasn't arrived yet isn't listed and occupies no hex. The map isn't rewritten when one lands later,
+e.g. the Leopard an evacuation calls in, so it stands on hexes the map shows as free, and it can
+appear in the combat state's building lists without being in the map.
 
 ## Triggers
 

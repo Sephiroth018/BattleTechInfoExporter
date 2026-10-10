@@ -62,7 +62,7 @@
     },
     "buildings": {
       "type": "array",
-      "description": "Every building on the map, in the order of their ids.",
+      "description": "Every building on the map when the file was written, in the order of their ids; a dropship only if it had landed by then.",
       "items": {
         "$ref": "#/definitions/CombatBuilding"
       }

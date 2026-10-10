@@ -17,6 +17,8 @@
     "units",
     "objectives",
     "zones",
+    "landingZones",
+    "buildingSides",
     "damagedBuildings"
   ],
   "properties": {
@@ -82,6 +84,20 @@
       "description": "The zones drawn on the map.",
       "items": {
         "$ref": "#/definitions/ObjectiveZone"
+      }
+    },
+    "landingZones": {
+      "type": "array",
+      "description": "Where a dropship or drop pods are about to land, which the HUD marks as dangerous: a unit standing there is crushed when they do. Entries come and go as the mission readies landings and they happen.",
+      "items": {
+        "$ref": "#/definitions/LandingZone"
+      }
+    },
+    "buildingSides": {
+      "type": "array",
+      "description": "The buildings on a side, e.g. a base to destroy or defend, by their id in buildings and in the order of their ids; the others are on none. The mission's script can change a building's side during the battle.",
+      "items": {
+        "$ref": "#/definitions/BuildingSide"
       }
     },
     "damagedBuildings": {
@@ -267,8 +283,7 @@
       "description": "A unit in combat, with as much of it as the HUD shows at its visibility.",
       "additionalProperties": false,
       "required": [
-        "faction",
-        "allegiance",
+        "side",
         "visibility",
         "kind",
         "tonnage",
@@ -284,13 +299,9 @@
         "movement"
       ],
       "properties": {
-        "faction": {
-          "description": "The faction of the unit's team.",
-          "$ref": "#/definitions/DefinitionReference"
-        },
-        "allegiance": {
-          "description": "Whose side the unit is on, seen from the player.",
-          "$ref": "#/definitions/UnitAllegiance"
+        "side": {
+          "description": "Whose side the unit is on.",
+          "$ref": "#/definitions/TeamSide"
         },
         "visibility": {
           "description": "How much of the unit the HUD shows, deciding which of its other fields are set.",
@@ -412,9 +423,28 @@
         }
       }
     },
+    "TeamSide": {
+      "type": "object",
+      "description": "A team's side, seen from the player: a unit's or a building's.",
+      "additionalProperties": false,
+      "required": [
+        "faction",
+        "allegiance"
+      ],
+      "properties": {
+        "faction": {
+          "description": "The faction of the team.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "allegiance": {
+          "description": "Whose side the team is on, seen from the player.",
+          "$ref": "#/definitions/UnitAllegiance"
+        }
+      }
+    },
     "UnitAllegiance": {
       "type": "string",
-      "description": "Whose side a unit in combat is on, seen from the player.",
+      "description": "Whose side a team in combat is on, seen from the player: its units' and its buildings'.",
       "x-enumNames": [
         "Player",
         "Ally",
@@ -557,8 +587,7 @@
         "isProne",
         "isShutDown",
         "isUnsteady",
-        "heat",
-        "stability",
+        "mech",
         "hasActivated",
         "initiative",
         "components",
@@ -604,21 +633,16 @@
           "type": "boolean",
           "description": "Whether the mech is unsteady, which it becomes at unsteadyThresholdPercent of its stability; only mechs can be."
         },
-        "heat": {
-          "type": [
-            "integer",
-            "null"
-          ],
-          "description": "null for vehicles and turrets, which have none.",
-          "format": "int32"
-        },
-        "stability": {
-          "type": [
-            "null",
-            "number"
-          ],
-          "description": "null for vehicles and turrets, which have none.",
-          "format": "float"
+        "mech": {
+          "description": "What only a mech has; null for vehicles and turrets.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/MechState"
+            }
+          ]
         },
         "hasActivated": {
           "type": "boolean",
@@ -731,6 +755,58 @@
         }
       }
     },
+    "MechState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "heat",
+        "stability"
+      ],
+      "properties": {
+        "heat": {
+          "description": "The mech's heat.",
+          "$ref": "#/definitions/MechHeat"
+        },
+        "stability": {
+          "type": "number",
+          "description": "The instability taken, from 0 up, as the stability bar fills: the mech is unsteady at unsteadyThresholdPercent of its max and knocked down when the bar is full.",
+          "format": "float"
+        }
+      }
+    },
+    "MechHeat": {
+      "type": "object",
+      "description": "A mech's heat as the HUD's heat bar shows it, with the thresholds it draws and the sinking it predicts.",
+      "additionalProperties": false,
+      "required": [
+        "current",
+        "dissipationPerRound",
+        "overheatsAbove",
+        "maxHeat"
+      ],
+      "properties": {
+        "current": {
+          "type": "integer",
+          "description": "The heat now.",
+          "format": "int32"
+        },
+        "dissipationPerRound": {
+          "type": "integer",
+          "description": "The heat the mech sheds at the end of its activation now: its heat sinks after the terrain it stands in, the biome and effects; standing in water or on a cold map changes it.",
+          "format": "int32"
+        },
+        "overheatsAbove": {
+          "type": "integer",
+          "description": "The heat above which the mech overheats, after the pilot's Guts and effects; the base is in overheatsAbove.",
+          "format": "int32"
+        },
+        "maxHeat": {
+          "type": "integer",
+          "description": "The heat at which the mech shuts down, after heat banks and effects; the base is in maxHeat.",
+          "format": "int32"
+        }
+      }
+    },
     "CombatComponent": {
       "type": "object",
       "additionalProperties": false,
@@ -837,7 +913,8 @@
       "required": [
         "injuries",
         "health",
-        "bonusHealth"
+        "bonusHealth",
+        "skills"
       ],
       "properties": {
         "injuries": {
@@ -853,6 +930,43 @@
         "bonusHealth": {
           "type": "integer",
           "description": "The bonus health left, which takes hits before they become injuries and is used up by them; the portrait shows it on top of health.",
+          "format": "int32"
+        },
+        "skills": {
+          "description": "The skill levels the game computes with now, temporary changes from effects included; exported for every pilot in full view, though the HUD shows only the player's.",
+          "$ref": "#/definitions/Skills"
+        }
+      }
+    },
+    "Skills": {
+      "type": "object",
+      "description": "A pilot's skill levels, each from 1 to 10.",
+      "additionalProperties": false,
+      "required": [
+        "gunnery",
+        "piloting",
+        "guts",
+        "tactics"
+      ],
+      "properties": {
+        "gunnery": {
+          "type": "integer",
+          "description": "The gunnery level, a level of gunnery.",
+          "format": "int32"
+        },
+        "piloting": {
+          "type": "integer",
+          "description": "The piloting level, a level of piloting.",
+          "format": "int32"
+        },
+        "guts": {
+          "type": "integer",
+          "description": "The guts level, a level of guts.",
+          "format": "int32"
+        },
+        "tactics": {
+          "type": "integer",
+          "description": "The tactics level, a level of tactics.",
           "format": "int32"
         }
       }
@@ -1034,7 +1148,9 @@
         "status",
         "isPrimary",
         "progress",
-        "targetUnitIds"
+        "targetUnitIds",
+        "targetBuildingIds",
+        "beacon"
       ],
       "properties": {
         "id": {
@@ -1062,10 +1178,28 @@
         },
         "targetUnitIds": {
           "type": "array",
-          "description": "The units it is about (to destroy, protect or escort), as keys of units, while they are in full view: neither blips nor destroyed enemies. Buildings are left out.",
+          "description": "The units it is about (to destroy, protect or escort), as keys of units, while they are in full view: neither blips nor destroyed enemies.",
           "items": {
             "type": "string"
           }
+        },
+        "targetBuildingIds": {
+          "type": "array",
+          "description": "The buildings it is about (to destroy or defend), as id in buildings.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "beacon": {
+          "description": "Where the HUD draws the objective's beacon, 2 m above the ground, e.g. where the reinforcements it announces will land; null where it draws none: an objective that marks its target units instead, or a finished one.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/MapPosition"
+            }
+          ]
         }
       }
     },
@@ -1122,10 +1256,89 @@
         },
         "objectiveIds": {
           "type": "array",
-          "description": "The objectives the zone belongs to, as id.",
+          "description": "The objectives the zone belongs to among objectives, as id; empty where it belongs only to objectives the HUD doesn't list.",
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "LandingZone": {
+      "type": "object",
+      "description": "A landing zone the HUD marks as dangerous.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "hexes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The game's id of the dropship, or of the lance spawner whose drop pods land there."
+        },
+        "kind": {
+          "description": "What is about to land.",
+          "$ref": "#/definitions/LandingZoneKind"
+        },
+        "hexes": {
+          "type": "array",
+          "description": "The hexes a unit standing on is crushed: those whose center cell the game marks, in the order of rows: a dropship's whole footprint, or the hex each drop pod lands on, one per unit of the lance.",
+          "items": {
+            "$ref": "#/definitions/HexCoordinates"
+          }
+        }
+      }
+    },
+    "LandingZoneKind": {
+      "type": "string",
+      "description": "What is about to land on a landing zone.",
+      "x-enumNames": [
+        "Dropship",
+        "DropPod"
+      ],
+      "enum": [
+        "dropship",
+        "dropPod"
+      ]
+    },
+    "HexCoordinates": {
+      "type": "object",
+      "description": "A hex of rows by its axial coordinates.",
+      "additionalProperties": false,
+      "required": [
+        "q",
+        "r"
+      ],
+      "properties": {
+        "q": {
+          "type": "integer",
+          "description": "The hex's axial q, as in hexGrid.",
+          "format": "int32"
+        },
+        "r": {
+          "type": "integer",
+          "description": "The hex's axial r, as in hexGrid.",
+          "format": "int32"
+        }
+      }
+    },
+    "BuildingSide": {
+      "type": "object",
+      "description": "A building on a side, highlighted in its team's color on the map.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "side"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The building's id in buildings."
+        },
+        "side": {
+          "description": "Whose side the building is on, as a unit has it.",
+          "$ref": "#/definitions/TeamSide"
         }
       }
     },

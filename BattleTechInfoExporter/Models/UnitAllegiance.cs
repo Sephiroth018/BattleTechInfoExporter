@@ -1,6 +1,6 @@
 namespace BattleTechInfoExporter.Models;
 
-/// <summary>Whose side a unit in combat is on, seen from the player.</summary>
+/// <summary>Whose side a team in combat is on, seen from the player: its units' and its buildings'.</summary>
 internal enum UnitAllegiance
 {
     /// <summary>The player's own lance.</summary>

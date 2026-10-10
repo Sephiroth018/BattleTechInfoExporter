@@ -8,28 +8,42 @@ namespace BattleTechInfoExporter.Export;
 
 /// <summary>
 ///     Reads the battle's buildings: the game's combatant <see cref="BattleTech.Building" /> of every obstruction with a
-///     representation, which stays a combatant once destroyed. Crates, trees and fences aren't buildings.
+///     representation whose building is enabled, which stays a combatant once destroyed. Crates, trees and fences
+///     aren't buildings.
 /// </summary>
 internal static class BuildingReader
 {
-    /// <summary>Every building, in the order of their ids.</summary>
+    /// <summary>Every building, in the order of their ids; the combat state's lists are drawn from it.</summary>
+    // A dropship's building is enabled only while it is landed (DropshipGameLogic.ShowDropshipBasedOnAnimationState):
+    // off the map or hovering, it occupies no cell and can't be targeted.
     internal static IReadOnlyList<BattleTech.Building> ReadAll(CombatGameState combat) =>
         combat.GetAllMiscCombatants()
             .OfType<BattleTech.Building>()
+            .Where(building => ObstructionOf(combat, building).IsBuildingEnabled)
             .OrderBy(building => building.GUID, StringComparer.Ordinal)
             .ToList();
 
-    // Filtered before they're ordered: urban maps have hundreds of buildings, and few are damaged. A building can
-    // also be destroyed without damage (Building.IsDead), e.g. with the one it stands on.
-    internal static IReadOnlyList<DamagedBuilding> ReadDamagedBuildings(CombatGameState combat) =>
-        combat.GetAllMiscCombatants()
-            .OfType<BattleTech.Building>()
+    // A building can also be destroyed without damage (Building.IsDead), e.g. with the one it stands on.
+    internal static IReadOnlyList<DamagedBuilding> ReadDamagedBuildings(
+        CombatGameState combat,
+        IReadOnlyList<BattleTech.Building> buildings) =>
+        buildings
             .Where(building => building.IsDead || building.CurrentStructure < building.StartingStructure)
-            .OrderBy(building => building.GUID, StringComparer.Ordinal)
             .Select(building => new DamagedBuilding(
                 building.GUID,
                 Math.Max(0f, building.CurrentStructure),
                 building.IsDead ? ReadDestroyedHexes(combat, building) : null))
+            .ToList();
+
+    // Every building is on a team from its creation (ObstructionGameLogic.ContractInitialize), the world team unless
+    // the obstruction or the mission's AssignBuildingsToTeamResult puts it on one with a side, which highlights it
+    // in the team's color (Building.AddToTeam). Only those are listed: urban maps have hundreds of buildings.
+    internal static IReadOnlyList<BuildingSide> ReadSides(
+        CombatGameState combat,
+        IReadOnlyList<BattleTech.Building> buildings) =>
+        buildings
+            .Where(building => building.team.GUID != TeamDefinition.WorldTeamDefinitionGuid)
+            .Select(building => new BuildingSide(building.GUID, CombatUnitReader.ReadSide(combat, building.team)))
             .ToList();
 
     internal static CombatBuilding ReadBuilding(BattleTech.Building building) =>

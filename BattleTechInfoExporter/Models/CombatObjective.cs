@@ -15,7 +15,16 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="TargetUnitIds">
 ///     The units it is about (to destroy, protect or escort), as keys of <see cref="CombatState.Units" />, while
-///     they are in full view: neither blips nor destroyed enemies. Buildings are left out.
+///     they are in full view: neither blips nor destroyed enemies.
+/// </param>
+/// <param name="TargetBuildingIds">
+///     The buildings it is about (to destroy or defend), as <see cref="CombatBuilding.Id" /> in
+///     <see cref="CombatMap.Buildings" />.
+/// </param>
+/// <param name="Beacon">
+///     Where the HUD draws the objective's beacon, 2 m above the ground, e.g. where the reinforcements it announces
+///     will land; <c>null</c> where it draws none: an objective that marks its target units instead, or a
+///     finished one.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatObjective(
@@ -24,7 +33,9 @@ internal sealed record CombatObjective(
     ObjectiveStatus Status,
     bool IsPrimary,
     string? Progress,
-    IReadOnlyList<string> TargetUnitIds);
+    IReadOnlyList<string> TargetUnitIds,
+    IReadOnlyList<string> TargetBuildingIds,
+    MapPosition? Beacon);
 
 /// <summary>A zone drawn on the map, e.g. a capture or evacuation zone.</summary>
 /// <param name="Id">The game's id of the zone.</param>
@@ -35,7 +46,10 @@ internal sealed record CombatObjective(
 ///     approximates.
 /// </param>
 /// <param name="IsPreview">Drawn as a zone that becomes active later.</param>
-/// <param name="ObjectiveIds">The objectives the zone belongs to, as <see cref="CombatObjective.Id" />.</param>
+/// <param name="ObjectiveIds">
+///     The objectives the zone belongs to among <see cref="CombatState.Objectives" />, as
+///     <see cref="CombatObjective.Id" />; empty where it belongs only to objectives the HUD doesn't list.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ObjectiveZone(
     string Id,
