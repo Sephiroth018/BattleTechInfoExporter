@@ -363,29 +363,30 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
 Two projects in `BattleTechInfoExporter.slnx`: the mod, `BattleTechInfoExporter/`, and the schema
 generator, `BattleTechInfoExporter.SchemaGenerator/` (net9.0, never shipped). The mod's build builds
 and runs the generator on the built mod; it writes a JSON Schema per export file into `schemas/`
-(`ExportFileModels` lists the files, `ExportSchemaGenerator` generates them with the mod's own
+(`ExportFileModels` checks the mod's `ExportFiles` lists every file, `ExportSchemaGenerator` generates them with the mod's own
 serializer settings, `ModelDocumentation` turns the models' doc comments into their descriptions),
 and fails the build when an exported property has no description. The mod grants it
 `InternalsVisibleTo` for the serializer settings, the one exception to "its own test project only".
 
 In the mod, `ModEntryPoint` is the
-only public type; it applies all Harmony patches in the assembly. `ModAssembly` holds the mod's
+only public type; it deletes the files in `exports/` that aren't in `ExportFiles` (e.g. an earlier
+version's) and applies all Harmony patches in the assembly. `ModAssembly` holds the mod's
 name, version and folder, `ModLog` its logger. Folders:
 
 - `Triggers/`: the patches that decide when to export, and the recorder patches they share.
 - `Export/`: the exporters, the single entry points the triggers call: `GameStateExporter` for the
-  career state, the star systems and the financial report, `MissionExporter` for the mission file,
+  career state, the rules and the star systems, `MissionExporter` for the mission file,
   one method per write, `CombatExporter` for the combat map and the combat state, which it also deletes, and `CatalogExporter`
   for the catalog, which rebuilds it only when it's missing or stale (another mod version or
   another `CatalogSourceFingerprint`, the hash of the game's manifest entries it reads), first
   loading the vehicles, turrets and design masks the career doesn't and exporting once they are
   loaded. All run their export inside `CampaignExport`. `GameStateReader` builds the game
-  state file's models from the game, one reader per section of the file; `RulesReader` builds the
+  state file's models from the game, one reader per section of the file (`FinancialReportReader` the
+  financial report), taking the star systems it shows in full from the star systems file's model; `RulesReader` builds the
   rules file's tables, with `AbilityReader` reading each ability, `CombatRulesReader` the combat
   constants and `CampaignRulesReader` the campaign constants; `EffectReader` reads the statistic
   changes of abilities, components, terrains and rules; `StarSystemReader` builds the star systems file from the starmap, with
-  `RouteReader` reading the route to a system as the starmap plans it; `FinancialReportReader` builds
-  the financial report file; `MissionReader` builds the
+  `RouteReader` reading the route to a system as the starmap plans it; `MissionReader` builds the
   mission file's models from the completed contract; `CombatStateReader` builds the combat state
   file from the running battle, with `CombatUnitReader` reading each unit as the HUD shows it,
   `MovementReader` where each player unit can move, and `ObjectiveReader` the objectives and zones; `CombatMapReader` builds the combat map file from the
@@ -393,8 +394,7 @@ name, version and folder, `ModLog` its logger. Folders:
   block through the game's own path checks, and `BuildingReader` the buildings, also the damaged
   ones for the combat state; `CatalogReader` builds the catalog from the
   definitions the game has loaded, with `TerrainReader` reading the terrains and biomes from the
-  design masks, `MapReader` the maps from the metadata database and their terrain data files, and
-  `StarSystemDefinitionReader` every star system definition.
+  design masks, and `MapReader` the maps from the metadata database and their terrain data files.
   `DefinitionReferences` makes the
   references that need only a description, a faction, a biome or a data-driven enum value, and
   `ComponentReferences` every reference to a component; a reference
@@ -434,26 +434,33 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   refer to them by id and match the catalog through `modVersion`; their entries carry the reference
   and their own state, instead of repeating the definition's stats or limits (e.g. a location's max
   armor or slots). A reference whose definition is missing has no entry. Keys keep the game's ids as they are.
+  Star systems are the exception, by decision: see below.
 - **Lists of entries that refer to a definition, which the game keeps in no meaningful order**
   (storage, stores, salvage), are ordered the same way everywhere, by their references' own comparison (`Reference`, `ComponentReference`): by component
   type for components, then by name, with the id breaking ties. A mech's components keep the game's
   order.
-- **The career state is four files, read together on every career export:** `game-state.json`,
-  `rules.json` for the game tables (e.g. `moraleLevels`, `reputationLevels` at its root): how the
-  game works for this career, which doesn't change between exports, `star-systems.json` with
-  every star system's career state, and `financial-report.json` with the next financial report; the
-  game state keeps only the company's funds and the report's work queue entry. Values in the game
-  state refer to the rules by name, instead of repeating thresholds and effects per entry.
-- **A star system is its definition in the catalog plus its state in `star-systems.json`:** the
-  catalog's `starSystemDefinitions` hold what's fixed per definition (name, owner, tags, biomes) for
-  every definition the game has loaded, because the story swaps a system's definition
-  (`StarSystem_SetActiveDef`, e.g. when its owner changes). `star-systems.json` is keyed by the id
-  of each system's active definition, with the name and what changes during a career (difficulty,
-  travel requirements, route). The other files refer to a star system by its reference alone
+- **Files are cut for round trips, not size:** the consumer, a Claude chat, copies each changed file
+  whole into its workspace and parses it with code, so a file's size costs it nothing and every
+  file it has to copy again costs a round trip. Data that changes together shares a file, static
+  data stays apart, and what a step needs (a combat round, choosing a contract) is in the file that
+  step reads.
+- **The career state is three files, read together on every career export:** `game-state.json`,
+  with the next financial report as a section of its own (`financialReport`, next to the company,
+  which keeps only its funds), `rules.json` for the game tables (e.g. `moraleLevels`,
+  `reputationLevels` at its root): how the game works for this career, which doesn't change
+  between exports, and `star-systems.json` with every star system. Values in the game state refer
+  to the rules by name, instead of repeating thresholds and effects per entry.
+- **Star systems live in `star-systems.json`, not the catalog, by decision:** keyed by the id of
+  each system's active definition, each entry holds its active definition's name, owner, tags and
+  biomes next to what changes during a career (difficulty, travel requirements, route). The story
+  swaps a system's definition (`StarSystem_SetActiveDef`, e.g. when its owner changes); the inactive
+  definitions give a consumer nothing and aren't exported. The game state repeats the full entry
+  for the current star system (`position.starSystem`) and each travel contract's star system
+  (`contracts.travel`); the other files refer to a star system by its reference alone
   (`starSystem`, `destination`), next to their own state such as the day of arrival.
-- **Travel days and cost are the starmap's route** (`RouteReader`) from the current system: `null`
-  where the game finds no route, always for a system whose travel requirements aren't met. In
-  `star-systems.json` the current system has 0 for both.
+- **A route is the starmap's** (`RouteReader`) from the current system, its days and cost: `null`
+  where the game finds no route, always for a system whose travel requirements aren't met. The
+  current system's is 0 days and 0 C-Bills.
 - **The latest mission is a file of its own,** `mission-outcome.json`, written in combat when the
   mission ends, before the salvage is chosen, and again in the after-action report once the
   salvage is final, with `salvage.received` filled in; the offer stays as it was. One file, because
@@ -477,7 +484,7 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   (`hexGrid`). A hex is what a unit standing on it gets from the cell at its center (`MapHexReader`);
   blocked steps follow the game's path node steps (`HexStepReader`).
 - **The catalog is a file of its own that doesn't depend on the career:** `catalog.json`, with
-  every chassis, mech, vehicle, turret, component, terrain, biome, map and star system definition
+  every chassis, mech, vehicle, turret, component, terrain, biome and map definition
   the game has loaded, rebuilt on a career load only when it's missing or stale: written by another mod version or with
   another `sourceFingerprint`, the hash of the game's manifest entries for everything it reads (id,
   file and last write time). A change touching no file it reads (a DLL mod patching definitions in
@@ -485,8 +492,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   armor and structure are their combat values, after the game's vehicle multipliers. Terrains are
   keyed by design mask id, biomes by the biome id the star systems refer to.
 - **Maps are selected by the game, not derived by the consumer:** each map in the catalog's
-  `mapDefinitions` lists the star systems whose contracts can be fought on it, through the contract
-  generator's own query per star system definition (`MapReader`), next to its draw weight and terrain
+  `mapDefinitions` lists the star system definitions whose contracts can be fought on it, inactive
+  ones included, through the contract generator's own query per definition (`MapReader`), next to its draw weight and terrain
   coverage, the share of its playable cells per terrain id, read from the map's terrain data file.
   All of it is game data, so it lives in the catalog and is read only on a rebuild, never per
   career export.
@@ -531,8 +538,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **Vehicle:** a ground unit with fixed armor and loadout (`VehicleDef`), only met as an enemy or
   ally in combat.
 - **Turret:** a fixed emplacement with a single location (`TurretDef`).
-- **Catalog:** the export of every chassis, mech, vehicle, turret, component, terrain, biome, map
-  and star system definition the game has loaded (`catalog.json`).
+- **Catalog:** the export of every chassis, mech, vehicle, turret, component, terrain, biome and map
+  definition the game has loaded (`catalog.json`).
 - **Star system:** a system on the starmap (`StarSystem`). Never "location" (a mech's body
   location) or "planet".
 - **Star system definition:** a version of a star system (`StarSystemDef`) with its name, owner,

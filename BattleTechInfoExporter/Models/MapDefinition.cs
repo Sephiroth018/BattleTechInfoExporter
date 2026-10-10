@@ -11,8 +11,8 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Biome">The map's biome, as the star systems refer to it.</param>
 /// <param name="Tags">The map tags the star systems' required and excluded map tags select the map by.</param>
 /// <param name="StarSystems">
-///     The star systems whose contracts can be fought on the map, as the contract generator selects them from the
-///     system's biomes and map tags.
+///     The star system definitions whose contracts can be fought on the map, as the contract generator selects them
+///     from the definition's biomes and map tags; the active ones are the keys of <c>star-systems.json</c>.
 /// </param>
 /// <param name="Weight">The contract generator's draw weight among a star system's maps.</param>
 /// <param name="TerrainCoverage">

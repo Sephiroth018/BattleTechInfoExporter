@@ -8,23 +8,23 @@ The mod is a work in progress; see [Planned](#planned) for what's still missing.
 
 ## Export files
 
-The files are in `Mods/BattleTechInfoExporter/exports/`. Four of them hold the career and are
-written together on every career export:
+The files are in `Mods/BattleTechInfoExporter/exports/`. On every game start the mod deletes any
+other file there, e.g. one an earlier version wrote, so a tool never reads a file that's no longer
+kept current. Three of them hold the career and are written together on every career export:
 
-- `game-state.json`: the career state.
+- `game-state.json`: the career state, the next financial report included.
 - `rules.json`: the game's rules for this career (morale and reputation levels, skill training
   tables, spirits levels, mech parts per mech, mission types, jump distance per number of jump
   jets, and the combat and campaign rules), which the game state and the mission outcome refer to
   by name instead of repeating thresholds and effects per entry.
 - `star-systems.json`: every star system on the starmap, locked story systems included, keyed by
-  the id of its active definition in the catalog, with its name, difficulty, whether its travel
-  requirements are met, and the days and C-Bills the trip from the current system takes as the
-  starmap shows them (0 for the current system, `null` where there is no route). The game state
-  and the mission outcome refer to a star system only by its id and name.
-- `financial-report.json`: the next monthly financial report, as on the finance screen: the day it
-  is due, the spending level and its options with their expected expenses (their cost multiplier
-  and morale change are in the rules), and the expected expense lines for the ship, its upgrades,
-  each mech and each pilot.
+  the id of its active definition, with its name, owner, the tags the starmap shows, the biomes its
+  contracts can be fought in, its difficulty, whether its travel requirements are met, and the
+  route from the current system: the days and C-Bills the trip takes as the starmap shows them (0
+  for the current system, `null` where there is no route). The story swaps some systems'
+  definitions, e.g. when a system's owner changes; the entry is always the active one's. The game
+  state repeats the entry of the current system and of every travel contract's system; the other
+  files refer to a star system only by its id and name.
 
 One more holds the latest mission:
 
@@ -52,8 +52,8 @@ Two more hold the running battle, and exist only while one runs:
 
 The last one describes the game rather than the career:
 
-- `catalog.json`: every chassis, mech, vehicle, turret, component, terrain, biome, map and star
-  system the game has loaded, DLC included, keyed by id, so tools can judge what else exists beyond
+- `catalog.json`: every chassis, mech, vehicle, turret, component, terrain, biome and map the game
+  has loaded, DLC included, keyed by id, so tools can judge what else exists beyond
   what the career refers to, what a mission's enemies can do and what its ground does to them.
   - **Chassis:** the frame: weight class, tonnage and bare tonnage, max jump jets, built-in heat
     dissipation, walk and sprint distance, the pathing capabilities it moves with (see "Combat
@@ -83,13 +83,10 @@ The last one describes the game rather than the career:
   - **Biomes:** keyed by the biome id the star systems refer to, what a map's biome does to every
     unit on it on top of the terrain: heat sinking, heat per turn and damage dealt, the only
     values the game reads from a biome.
-  - **Star systems:** every star system definition: name, owner, the tags the starmap shows and
-    the biomes its contracts can be fought in. The story swaps some systems' definitions, e.g. when
-    a system's owner changes, so the catalog has every version and `star-systems.json` refers to
-    the active one, which the career currently uses.
   - **Maps:** every map some star system's contracts can be fought on: name, biome, map tags, the
-    star systems whose contracts the game can put on it (selected as the contract generator does,
-    from the system's biomes and map tags), the contract generator's draw weight and the terrain
+    star system definitions whose contracts the game can put on it (selected as the contract
+    generator does, from the definition's biomes and map tags; every definition counts, the active
+    ones are the keys of `star-systems.json`), the contract generator's draw weight and the terrain
     coverage: each terrain's share of the map's playable cells by terrain id, plus `none` for the
     cells with no terrain, the bare biome. Cells are all the same size, so a share is an area
     share; the shares sum to 1. The same kind of cell is a different terrain per map, e.g. water is
@@ -100,7 +97,7 @@ The last one describes the game rather than the career:
     system, drawn by weight. The contract type and the maps the game recently offered filter
     further and aren't exported.
 
-  The other files refer to the catalog's chassis, mechs, components and star systems by id instead
+  The other files refer to the catalog's chassis, mechs and components by id instead
   of repeating their stats or limits, e.g. a location's max armor; a file and the catalog belong
   together when their `modVersion` matches. The catalog also carries a `sourceFingerprint` of the game's data it
   was built from (see "Triggers").
@@ -124,7 +121,12 @@ The game state holds:
 - **Ship:** the Argo's upgrades the engineering screen shows, each installed, installing,
   available or locked, with its required upgrades, price, upkeep, installation days and effects in
   the game's words and as values; `null` while the company still flies the Leopard.
-- **Position:** the current system and, when travelling, the destination and day of arrival.
+- **Financial report:** the next monthly financial report, as on the finance screen: the day it
+  is due, the spending level and its options with their expected expenses (their cost multiplier
+  and morale change are in the rules), and the expected expense lines for the ship, its upgrades,
+  each mech and each pilot.
+- **Position:** the current system in full, as in `star-systems.json`, and, when travelling, the
+  destination and day of arrival.
 - **Pilots:** the commander and the roster with all their relevant stats.
 - **Mechs:** the mech bay's mechs with their status, the day they're ready, loadout, armor and
   performance summary; a mech in a refit also carries the refit's steps, each with only the fields
@@ -139,8 +141,9 @@ The game state holds:
   and prices.
 - **Hiring hall:** the current system's pilots for hire, like the roster's pilots plus hiring cost,
   salary and whether the company can hire them.
-- **Contracts:** the contracts the Command Center offers with their star system, description and
-  terms, and the negotiation as the values at each slider position (pay and salvage together take at most 100 %,
+- **Contracts:** the contracts the Command Center offers, those in the current system apart from
+  the travel contracts, whose star system is in full, as in `star-systems.json`, with the route
+  there; each with its description and terms, and the negotiation as the values at each slider position (pay and salvage together take at most 100 %,
   exactly 100 % when the employer gains no reputation); plus the accepted travel contract until
   it's proceeded with, with the day of arrival while travelling to it. The game generates a system's contracts only when the contract screen first
   opens; until then `contracts` is `null`.

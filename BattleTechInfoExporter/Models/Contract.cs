@@ -5,9 +5,10 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     What a contract is in every state: offered (<see cref="Contract" />), accepted (<see cref="ActiveContract" />)
-///     and fought (<see cref="MissionContract" />).
+///     What a contract is in every state: offered (<see cref="Contract{TStarSystem}" />), accepted
+///     (<see cref="ActiveContract" />) and fought (<see cref="MissionContract" />).
 /// </summary>
+/// <typeparam name="TStarSystem">How the contract's star system is exported: by reference or in full.</typeparam>
 /// <param name="Id">The contract's data file; <c>null</c> where the game keeps no reference to it.</param>
 /// <param name="Name">The contract's name, as the contract list shows it.</param>
 /// <param name="Type">The mission type, described in <see cref="Rules.ContractTypes" />.</param>
@@ -20,7 +21,7 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="StarSystem">The star system the mission is fought in.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal abstract record ContractIdentity(
+internal abstract record ContractIdentity<TStarSystem>(
     string? Id,
     string Name,
     DefinitionReference Type,
@@ -28,14 +29,16 @@ internal abstract record ContractIdentity(
     DefinitionReference Employer,
     DefinitionReference Target,
     int Difficulty,
-    DefinitionReference StarSystem);
+    TStarSystem StarSystem)
+    where TStarSystem : Reference;
 
 /// <summary>What the contract details show of a contract before its mission: offered or accepted.</summary>
+/// <typeparam name="TStarSystem">How the contract's star system is exported: by reference or in full.</typeparam>
 /// <param name="Description">The contract's description, as the contract details show it.</param>
 /// <param name="LanceLimits">The limits on the lance the company can deploy on the mission.</param>
 /// <param name="Biome"><c>null</c> where the game has no biome for the contract.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal abstract record ContractBriefing(
+internal abstract record ContractBriefing<TStarSystem>(
     string? Id,
     string Name,
     DefinitionReference Type,
@@ -43,21 +46,29 @@ internal abstract record ContractBriefing(
     DefinitionReference Employer,
     DefinitionReference Target,
     int Difficulty,
-    DefinitionReference StarSystem,
+    TStarSystem StarSystem,
     string Description,
     LanceLimits LanceLimits,
     DefinitionReference? Biome)
-    : ContractIdentity(Id, Name, Type, DisplayStyle, Employer, Target, Difficulty, StarSystem);
+    : ContractIdentity<TStarSystem>(Id, Name, Type, DisplayStyle, Employer, Target, Difficulty, StarSystem)
+    where TStarSystem : Reference;
 
 /// <summary>A contract the Command Center offers, as its contract list and details show it.</summary>
-/// <param name="StarSystem">The star system the mission is fought in; a contract elsewhere needs travelling there.</param>
+/// <typeparam name="TStarSystem">
+///     <see cref="DefinitionReference" /> for a contract in the current star system, <see cref="StarSystem" /> for a
+///     travel contract.
+/// </typeparam>
+/// <param name="StarSystem">
+///     The star system the mission is fought in: by reference in the current star system; in full for a travel
+///     contract, as in <c>star-systems.json</c>, with the trip there.
+/// </param>
 /// <param name="MeetsReputation">
 ///     Whether the reputation with the employer allows taking the contract; the list greys it out otherwise. Story,
 ///     restoration and flashpoint contracts, and employers that don't gain reputation, are always allowed.
 /// </param>
 /// <param name="Negotiation">The terms the contract can be accepted with: negotiated or fixed.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record Contract(
+internal sealed record Contract<TStarSystem>(
     string? Id,
     string Name,
     DefinitionReference Type,
@@ -65,13 +76,13 @@ internal sealed record Contract(
     DefinitionReference Employer,
     DefinitionReference Target,
     int Difficulty,
-    DefinitionReference StarSystem,
+    TStarSystem StarSystem,
     string Description,
     LanceLimits LanceLimits,
     DefinitionReference? Biome,
     bool MeetsReputation,
     Negotiation Negotiation)
-    : ContractBriefing(
+    : ContractBriefing<TStarSystem>(
         Id,
         Name,
         Type,
@@ -82,7 +93,8 @@ internal sealed record Contract(
         StarSystem,
         Description,
         LanceLimits,
-        Biome);
+        Biome)
+    where TStarSystem : Reference;
 
 /// <summary>The accepted travel contract, until the company proceeds with it on arrival or breaks it.</summary>
 /// <param name="Terms">The terms the contract was accepted with.</param>
@@ -105,7 +117,7 @@ internal sealed record ActiveContract(
     DefinitionReference? Biome,
     NegotiationOption Terms,
     int? ArrivesOnDay)
-    : ContractBriefing(
+    : ContractBriefing<DefinitionReference>(
         Id,
         Name,
         Type,

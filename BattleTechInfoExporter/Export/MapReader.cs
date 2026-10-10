@@ -27,8 +27,9 @@ internal static class MapReader
     private const string DestroyedBuildingMaskId = "DesignMaskDestroyedBuilding";
 
     /// <summary>
-    ///     Every map the contracts of some star system definition can be fought on, keyed by map id; the star systems
-    ///     are those of <see cref="StarSystemDefinitionReader" />.
+    ///     Every map the contracts of some star system definition can be fought on, keyed by map id; every star system
+    ///     definition counts, also those the career doesn't use and those the story swaps in
+    ///     (SimGameState.SetStarSystemDef), which the career loads all of (SimGameState.RequestDataManagerResources).
     /// </summary>
     internal static SortedDictionary<string, MapDefinition> ReadMapDefinitions(
         DataManager dataManager,

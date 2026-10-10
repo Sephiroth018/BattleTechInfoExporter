@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Starmap",
   "type": "object",
-  "description": "The root of star-systems.json: every star system on the starmap, keyed by the id of its active definition in the catalog (StarSystemDefinition).",
+  "description": "The root of star-systems.json: every star system on the starmap.",
   "additionalProperties": false,
   "required": [
     "modVersion",
@@ -26,7 +26,7 @@
     },
     "starSystems": {
       "type": "object",
-      "description": "Every star system's career state, keyed by the id of its active starSystemDefinitions entry.",
+      "description": "Every star system, keyed by the id of its active definition.",
       "additionalProperties": {
         "$ref": "#/definitions/StarSystem"
       }
@@ -83,18 +83,44 @@
     },
     "StarSystem": {
       "type": "object",
+      "description": "A star system with its active definition and its career state. The story swaps some star systems' definitions (e.g. to change their owner); the id and what the definition holds are the active one's.",
       "additionalProperties": false,
       "required": [
+        "id",
         "name",
+        "owner",
+        "tags",
+        "biomes",
         "difficulty",
         "canTravelTo",
-        "travelDays",
-        "travelCost"
+        "route"
       ],
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The active definition's id, as in the references to the star system."
+        },
         "name": {
           "type": "string",
           "description": "The name, as in the references to the star system."
+        },
+        "owner": {
+          "description": "The faction that owns the star system.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "tags": {
+          "type": "array",
+          "description": "The star system's tags, as its starmap panel shows them.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
+          }
+        },
+        "biomes": {
+          "type": "array",
+          "description": "The biomes the star system's missions can be on.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
+          }
         },
         "difficulty": {
           "type": "integer",
@@ -105,20 +131,55 @@
           "type": "boolean",
           "description": "Whether the star system's travel requirements are met; story systems stay locked until then."
         },
-        "travelDays": {
-          "type": [
-            "integer",
-            "null"
-          ],
-          "description": "The days the trip from the current star system takes, as the starmap shows them; 0 for the current star system and null where the game finds no route, always while canTravelTo is false.",
+        "route": {
+          "description": "The trip from the current star system; null where the game finds no route, always while canTravelTo is false.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/Route"
+            }
+          ]
+        }
+      }
+    },
+    "DefinitionReference": {
+      "type": "object",
+      "description": "A game definition: its id from the game's data files and the name shown in the UI.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name the UI shows."
+        }
+      }
+    },
+    "Route": {
+      "type": "object",
+      "description": "The trip from the current star system, as the starmap plans and shows it.",
+      "additionalProperties": false,
+      "required": [
+        "days",
+        "cost"
+      ],
+      "properties": {
+        "days": {
+          "type": "integer",
+          "description": "The days the trip takes; 0 for the current star system.",
           "format": "int32"
         },
-        "travelCost": {
-          "type": [
-            "integer",
-            "null"
-          ],
-          "description": "The C-Bills the trip costs, under the same rules as travelDays.",
+        "cost": {
+          "type": "integer",
+          "description": "The C-Bills the trip costs; 0 for the current star system.",
           "format": "int32"
         }
       }

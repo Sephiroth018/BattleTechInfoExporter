@@ -1,6 +1,8 @@
 using System.Linq;
 using BattleTech;
+using BattleTechInfoExporter.Models;
 using HBS.Nav;
+using StarSystem = BattleTech.StarSystem;
 
 namespace BattleTechInfoExporter.Export;
 
@@ -8,10 +10,10 @@ namespace BattleTechInfoExporter.Export;
 internal static class RouteReader
 {
     /// <summary>
-    ///     The days and C-Bills the trip to another system takes, as the starmap shows them; <c>null</c> where the
-    ///     game finds no route, always for a system whose travel requirements aren't met.
+    ///     The trip to another system, as the starmap shows it; <c>null</c> where the game finds no route, always for a
+    ///     system whose travel requirements aren't met.
     /// </summary>
-    internal static (int Days, int Cost)? ReadRoute(SimGameState simGame, StarSystem system)
+    internal static Route? ReadRoute(SimGameState simGame, StarSystem system)
     {
         // The path finder never enters a node whose travel requirements aren't met, the destination included
         // (StarSystemNode.GetConnectionAndCost), so the search would only fail.
@@ -45,9 +47,10 @@ internal static class RouteReader
         // Mirrors Starmap.OnPathfindingComplete.
         var nodes = route.path.Cast<StarSystemNode>().ToList();
         var jumps = nodes.Count - 1;
-        return (starmap.DistanceToJumpship()
-                + nodes.Take(jumps).Sum(node => node.Cost)
-                + nodes[jumps].System.JumpDistance,
+        return new Route(
+            starmap.DistanceToJumpship()
+            + nodes.Take(jumps).Sum(node => node.Cost)
+            + nodes[jumps].System.JumpDistance,
             jumps * simGame.Constants.Finances.JumpShipCost);
     }
 }

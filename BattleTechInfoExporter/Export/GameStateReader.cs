@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using BattleTech;
 using BattleTechInfoExporter.Models;
+using Starmap = BattleTechInfoExporter.Models.Starmap;
 using StarSystem = BattleTech.StarSystem;
 
 namespace BattleTechInfoExporter.Export;
@@ -10,12 +11,14 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>Builds the game state file's models from the game's career state.</summary>
 internal static class GameStateReader
 {
-    internal static GameState Read(SimGameState simGame)
+    // The star systems the game state shows in full are taken from the star systems file, as they are there.
+    internal static GameState Read(SimGameState simGame, Starmap starmap)
     {
         var travelInProgress = ReadTravelInProgress(simGame);
         var mechLabFinishingDays = WorkQueueReader.ReadMechLabFinishingDays(simGame);
         return new GameState(
             ReadCompany(simGame),
+            FinancialReportReader.Read(simGame),
             WorkQueueReader.ReadWorkQueue(simGame, mechLabFinishingDays),
             ShipReader.ReadShip(simGame),
             PilotReader.ReadPilots(simGame),
@@ -26,8 +29,8 @@ internal static class GameStateReader
             StoreReader.ReadStores(simGame),
             PilotReader.ReadHiringHall(simGame),
             ContractReader.ReadActiveContract(simGame, travelInProgress),
-            ContractReader.ReadContracts(simGame),
-            ReadPosition(simGame, travelInProgress));
+            ContractReader.ReadContracts(simGame, starmap),
+            ReadPosition(simGame, starmap, travelInProgress));
     }
 
     private static Company ReadCompany(SimGameState simGame) =>
@@ -77,9 +80,10 @@ internal static class GameStateReader
 
     private static Position ReadPosition(
         SimGameState simGame,
+        Starmap starmap,
         (StarSystem Destination, int ArrivesOnDay)? travelInProgress) =>
         new(
-            DefinitionReferences.ReferenceTo(simGame.CurSystem.Def.Description),
+            starmap.StarSystems[simGame.CurSystem.Def.Description.Id],
             simGame.TravelState,
             travelInProgress is ({ } destination, var arrivesOnDay)
                 ? new Travel(DefinitionReferences.ReferenceTo(destination.Def.Description), arrivesOnDay)

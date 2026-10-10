@@ -5,6 +5,7 @@ namespace BattleTechInfoExporter.Models;
 
 /// <summary>The root of <c>game-state.json</c>.</summary>
 /// <param name="Company">The company's day, funds, morale, reputation and techs.</param>
+/// <param name="FinancialReport">The next financial report, as the finance screen projects it.</param>
 /// <param name="Ship">The Argo; <c>null</c> while the company still flies the Leopard.</param>
 /// <param name="WorkQueue">
 ///     The timeline's entries, by the day they finish; entries finishing on the same day are in the order mech lab,
@@ -27,6 +28,7 @@ namespace BattleTechInfoExporter.Models;
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record GameState(
     Company Company,
+    FinancialReport FinancialReport,
     IReadOnlyList<WorkQueueEntry> WorkQueue,
     Ship? Ship,
     IReadOnlyList<BarracksPilot> Pilots,
@@ -37,7 +39,7 @@ internal sealed record GameState(
     Stores Stores,
     IReadOnlyList<HiringHallPilot> HiringHall,
     ActiveContract? ActiveContract,
-    IReadOnlyList<Contract>? Contracts,
+    OfferedContracts? Contracts,
     Position Position) : ExportFile
 {
     internal const string FileName = "game-state.json";

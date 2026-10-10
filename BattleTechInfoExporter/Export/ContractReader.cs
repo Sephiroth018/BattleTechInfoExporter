@@ -5,7 +5,7 @@ using BattleTech;
 using BattleTech.Framework;
 using BattleTechInfoExporter.Models;
 using UnityEngine;
-using Contract = BattleTechInfoExporter.Models.Contract;
+using Starmap = BattleTechInfoExporter.Models.Starmap;
 using StarSystem = BattleTech.StarSystem;
 
 namespace BattleTechInfoExporter.Export;
@@ -59,17 +59,30 @@ internal static class ContractReader
     // (SGRoomController_CmdCenter.StartContractScreen). The mod never generates them itself: that would change the
     // career. The active contract is left out: an accepted global contract stays in SimGameState.GlobalContracts
     // until arrival, and once arrived, GetAllCurrentlySelectableContracts adds it.
-    internal static List<Contract>? ReadContracts(SimGameState simGame)
+    internal static OfferedContracts? ReadContracts(SimGameState simGame, Starmap starmap)
     {
         if (!simGame.CurSystem.InitialContractsFetched)
         {
             return null;
         }
 
-        return simGame.GetAllCurrentlySelectableContracts()
+        var contractsByIsInCurrentStarSystem = simGame.GetAllCurrentlySelectableContracts()
             .Where(contract => contract != simGame.ActiveTravelContract)
-            .Select(contract => ReadContract(simGame, contract))
-            .ToList();
+            .Select(contract => (Contract: contract, StarSystem: ReadStarSystem(simGame, contract)))
+            .ToLookup(offered => offered.StarSystem.ID == simGame.CurSystem.ID);
+        return new OfferedContracts(
+            contractsByIsInCurrentStarSystem[true]
+                .Select(offered => ReadContract(
+                    simGame,
+                    offered.Contract,
+                    DefinitionReferences.ReferenceTo(offered.StarSystem.Def.Description)))
+                .ToList(),
+            contractsByIsInCurrentStarSystem[false]
+                .Select(offered => ReadContract(
+                    simGame,
+                    offered.Contract,
+                    starmap.StarSystems[offered.StarSystem.Def.Description.Id]))
+                .ToList());
     }
 
     // SimGameState.ContractTypeDescriptions has the procedural mission types; priority contracts share one entry.
@@ -89,11 +102,15 @@ internal static class ContractReader
         return contractTypes;
     }
 
-    private static Contract ReadContract(SimGameState simGame, BattleTech.Contract contract)
+    private static Contract<TStarSystem> ReadContract<TStarSystem>(
+        SimGameState simGame,
+        Contract contract,
+        TStarSystem starSystem)
+        where TStarSystem : Reference
     {
         var contractOverride = contract.Override;
         var (employer, target) = ReadFactions(contract);
-        return new Contract(
+        return new Contract<TStarSystem>(
             ReadId(contractOverride),
             // The contract list and details show the raw name; Contract.Name interpolates it, which the game's
             // contracts don't need.
@@ -103,7 +120,7 @@ internal static class ContractReader
             DefinitionReferences.ReferenceTo(employer),
             DefinitionReferences.ReferenceTo(target),
             ReadDifficulty(simGame, contractOverride),
-            DefinitionReferences.ReferenceTo(ReadStarSystem(simGame, contract).Def.Description),
+            starSystem,
             // The contract details show the interpolated description, unlike the name.
             GameText.ToPlainText(contract.ShortDescription),
             ReadLanceLimits(contractOverride),
@@ -113,7 +130,7 @@ internal static class ContractReader
     }
 
     // The mission is fought in the current star system: a contract elsewhere needs travelling there first.
-    internal static MissionContract ReadMissionContract(SimGameState simGame, BattleTech.Contract contract)
+    internal static MissionContract ReadMissionContract(SimGameState simGame, Contract contract)
     {
         var contractOverride = contract.Override;
         var (employer, target) = ReadFactions(contract);
@@ -128,12 +145,12 @@ internal static class ContractReader
             DefinitionReferences.ReferenceTo(simGame.CurSystem.Def.Description));
     }
 
-    internal static (FactionValue Employer, FactionValue Target) ReadFactions(BattleTech.Contract contract) =>
+    internal static (FactionValue Employer, FactionValue Target) ReadFactions(Contract contract) =>
         (contract.GetTeamFaction(contract.Override.employerTeam.teamGuid),
             contract.GetTeamFaction(contract.Override.targetTeam.teamGuid));
 
     // Mirrors Contract.GetContractTypeString and the type tooltip of SGContractsWidget.PopulateContract.
-    private static DefinitionReference ReadType(SimGameState simGame, BattleTech.Contract contract) =>
+    private static DefinitionReference ReadType(SimGameState simGame, Contract contract) =>
         contract.IsPriorityContract
             ? PriorityType(simGame)
             : DefinitionReferences.ReferenceTo(contract.Override.ContractTypeValue);
@@ -183,7 +200,7 @@ internal static class ContractReader
     // Accepting a contract that can't be negotiated sets its fixed shares (SGContractsWidget.OnContractAccepted).
     private static Negotiation ReadNegotiation(
         SimGameState simGame,
-        BattleTech.Contract contract,
+        Contract contract,
         FactionValue employer,
         FactionValue target)
     {
@@ -226,7 +243,7 @@ internal static class ContractReader
     // Accepting a contract stores the shares it was accepted with (SGContractsWidget.OnContractAccepted).
     private static NegotiationOption ReadTerms(
         SimGameState simGame,
-        BattleTech.Contract contract,
+        Contract contract,
         FactionValue employer,
         FactionValue target) =>
         ReadNegotiationOption(
@@ -241,7 +258,7 @@ internal static class ContractReader
 
     private static NegotiationOption ReadNegotiationOption(
         SimGameState simGame,
-        BattleTech.Contract contract,
+        Contract contract,
         FactionValue employer,
         FactionValue target,
         int? payPercent,
@@ -256,12 +273,12 @@ internal static class ContractReader
             ReadReputation(simGame, contract, employer, target, 1f - (payShare + salvageShare)));
 
     // Mirrors SimGameState.GetScaledCBillValue, as SGContractsWidget.UpdateCurrentValues shows the pay.
-    private static int ReadPay(SimGameState simGame, BattleTech.Contract contract, float share) =>
+    private static int ReadPay(SimGameState simGame, Contract contract, float share) =>
         simGame.GetScaledCBillValue(contract.InitialContractValue, share * contract.InitialContractValue);
 
     // Mirrors SGContractsWidget.UpdateCurrentValues. Its priority share is a hardcoded quarter; this takes the
     // constant the mission's outcome uses (Contract.FinalizeSalvage), 0.25 in the game's data.
-    private static Salvage ReadSalvage(SimGameState simGame, BattleTech.Contract contract, float share)
+    private static Salvage ReadSalvage(SimGameState simGame, Contract contract, float share)
     {
         var potential = contract.Override.salvagePotential > -1 ? contract.Override.salvagePotential
             : contract.SalvagePotential > -1 ? contract.SalvagePotential
@@ -278,7 +295,7 @@ internal static class ContractReader
     // the employer's and shows each only for a faction that gains reputation.
     private static ReputationChange ReadReputation(
         SimGameState simGame,
-        BattleTech.Contract contract,
+        Contract contract,
         FactionValue employer,
         FactionValue target,
         float share)
@@ -314,6 +331,6 @@ internal static class ContractReader
 
     // The contract list marks travel contracts by the target star system in the contract's context
     // (SGContractsListItem); without one, the contract is in the current star system.
-    private static StarSystem ReadStarSystem(SimGameState simGame, BattleTech.Contract contract) =>
+    private static StarSystem ReadStarSystem(SimGameState simGame, Contract contract) =>
         contract.GameContext.GetObject(GameContextObjectTagEnum.TargetStarSystem) as StarSystem ?? simGame.CurSystem;
 }

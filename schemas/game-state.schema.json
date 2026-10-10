@@ -9,6 +9,7 @@
     "exportedAt",
     "trigger",
     "company",
+    "financialReport",
     "workQueue",
     "ship",
     "pilots",
@@ -39,6 +40,10 @@
     "company": {
       "description": "The company's day, funds, morale, reputation and techs.",
       "$ref": "#/definitions/Company"
+    },
+    "financialReport": {
+      "description": "The next financial report, as the finance screen projects it.",
+      "$ref": "#/definitions/FinancialReport"
     },
     "workQueue": {
       "type": "array",
@@ -113,14 +118,15 @@
       ]
     },
     "contracts": {
-      "type": [
-        "array",
-        "null"
-      ],
       "description": "The contracts the Command Center offers, without the active contract; null until the game has generated the current system's contracts, which it does when the contract screen first opens in a system or after a contract.",
-      "items": {
-        "$ref": "#/definitions/Contract"
-      }
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/definitions/OfferedContracts"
+        }
+      ]
     },
     "position": {
       "description": "Where the ship is: the star system, and the travel under way.",
@@ -420,6 +426,251 @@
         }
       }
     },
+    "FinancialReport": {
+      "type": "object",
+      "description": "The next financial report, as the finance screen projects it.",
+      "additionalProperties": false,
+      "required": [
+        "dueOnDay",
+        "spending",
+        "expectedExpenses"
+      ],
+      "properties": {
+        "dueOnDay": {
+          "type": "integer",
+          "description": "The day the report is due, on the scale of daysPassed.",
+          "format": "int32"
+        },
+        "spending": {
+          "description": "The spending level, and what the report would deduct at each level.",
+          "$ref": "#/definitions/Spending"
+        },
+        "expectedExpenses": {
+          "description": "What the report deducts at the current spending level, line by line.",
+          "$ref": "#/definitions/ExpectedExpenses"
+        }
+      }
+    },
+    "Spending": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "options"
+      ],
+      "properties": {
+        "level": {
+          "description": "The spending level confirmed at the last report, applying until the next one.",
+          "$ref": "#/definitions/EconomyScale"
+        },
+        "options": {
+          "type": "array",
+          "description": "Every spending level, with what the next report deducts at it.",
+          "items": {
+            "$ref": "#/definitions/SpendingOption"
+          }
+        }
+      }
+    },
+    "EconomyScale": {
+      "type": "string",
+      "x-enumNames": [
+        "Normal",
+        "Generous",
+        "Extravagant",
+        "Spartan",
+        "Restrictive"
+      ],
+      "enum": [
+        "Normal",
+        "Generous",
+        "Extravagant",
+        "Spartan",
+        "Restrictive"
+      ]
+    },
+    "SpendingOption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "expectedExpenses"
+      ],
+      "properties": {
+        "level": {
+          "description": "The spending level, whose cost multiplier and morale change SpendingLevelRules has.",
+          "$ref": "#/definitions/EconomyScale"
+        },
+        "expectedExpenses": {
+          "type": "integer",
+          "description": "The C-Bills the next report deducts at this level, as total does at the current one.",
+          "format": "int32"
+        }
+      }
+    },
+    "ExpectedExpenses": {
+      "type": "object",
+      "description": "What the next report deducts if nothing changes until then. The lines are rounded one by one like on the game's finance screen, so they can differ from total by a few C-Bills.",
+      "additionalProperties": false,
+      "required": [
+        "total",
+        "ship",
+        "shipUpgrades",
+        "mechs",
+        "pilots"
+      ],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "description": "The C-Bills the report deducts at the current spending level.",
+          "format": "int32"
+        },
+        "ship": {
+          "description": "The ship's base upkeep, without its upgrades.",
+          "$ref": "#/definitions/ShipExpense"
+        },
+        "shipUpgrades": {
+          "type": "array",
+          "description": "The upkeep of each ship upgrade that has any; empty before the company has the Argo.",
+          "items": {
+            "$ref": "#/definitions/ShipUpgradeExpense"
+          }
+        },
+        "mechs": {
+          "type": "array",
+          "description": "The upkeep of each mech in the mech bay.",
+          "items": {
+            "$ref": "#/definitions/MechExpense"
+          }
+        },
+        "pilots": {
+          "type": "array",
+          "description": "The salary of each pilot in the barracks but the commander, who draws none.",
+          "items": {
+            "$ref": "#/definitions/PilotExpense"
+          }
+        }
+      }
+    },
+    "ShipExpense": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "amount"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The line's name on the finance screen: the Argo's operating costs, or the bank loan interest before the company has the Argo."
+        },
+        "amount": {
+          "type": "integer",
+          "description": "The C-Bills the line deducts, rounded like on the game's finance screen.",
+          "format": "int32"
+        }
+      }
+    },
+    "ShipUpgradeExpense": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "upgrade",
+        "amount"
+      ],
+      "properties": {
+        "upgrade": {
+          "description": "The ship upgrade whose upkeep the line is.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "amount": {
+          "type": "integer",
+          "description": "The C-Bills the line deducts, rounded like on the game's finance screen.",
+          "format": "int32"
+        }
+      }
+    },
+    "MechExpense": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mech",
+        "amount"
+      ],
+      "properties": {
+        "mech": {
+          "description": "The mech in the mech bay whose upkeep the line is.",
+          "$ref": "#/definitions/MechReference"
+        },
+        "amount": {
+          "type": "integer",
+          "description": "The C-Bills the line deducts, rounded like on the game's finance screen.",
+          "format": "int32"
+        }
+      }
+    },
+    "MechReference": {
+      "type": "object",
+      "description": "A mech in the mech bay: its own id, as in id, and its chassis name with the variant.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name the UI shows."
+        }
+      }
+    },
+    "PilotExpense": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pilot",
+        "amount"
+      ],
+      "properties": {
+        "pilot": {
+          "description": "The pilot whose salary the line is.",
+          "$ref": "#/definitions/PilotReference"
+        },
+        "amount": {
+          "type": "integer",
+          "description": "The C-Bills the line deducts, rounded like on the game's finance screen.",
+          "format": "int32"
+        }
+      }
+    },
+    "PilotReference": {
+      "type": "object",
+      "description": "A pilot: their id, full name without callsign, and callsign.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "callsign"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name the UI shows."
+        },
+        "callsign": {
+          "type": "string",
+          "description": "The pilot's callsign, which isn't part of name."
+        }
+      }
+    },
     "WorkQueueEntry": {
       "type": "object",
       "description": "An entry of the timeline: what the company is waiting for.",
@@ -522,6 +773,9 @@
         },
         {
           "$ref": "#/definitions/PilotReference"
+        },
+        {
+          "$ref": "#/definitions/StarSystem"
         }
       ]
     },
@@ -572,46 +826,87 @@
         "MechPart"
       ]
     },
-    "MechReference": {
+    "StarSystem": {
       "type": "object",
-      "description": "A mech in the mech bay: its own id, as in id, and its chassis name with the variant.",
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "name"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
-        },
-        "name": {
-          "type": "string",
-          "description": "The name the UI shows."
-        }
-      }
-    },
-    "PilotReference": {
-      "type": "object",
-      "description": "A pilot: their id, full name without callsign, and callsign.",
+      "description": "A star system with its active definition and its career state. The story swaps some star systems' definitions (e.g. to change their owner); the id and what the definition holds are the active one's.",
       "additionalProperties": false,
       "required": [
         "id",
         "name",
-        "callsign"
+        "owner",
+        "tags",
+        "biomes",
+        "difficulty",
+        "canTravelTo",
+        "route"
       ],
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The active definition's id, as in the references to the star system."
         },
         "name": {
           "type": "string",
-          "description": "The name the UI shows."
+          "description": "The name, as in the references to the star system."
         },
-        "callsign": {
-          "type": "string",
-          "description": "The pilot's callsign, which isn't part of name."
+        "owner": {
+          "description": "The faction that owns the star system.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "tags": {
+          "type": "array",
+          "description": "The star system's tags, as its starmap panel shows them.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
+          }
+        },
+        "biomes": {
+          "type": "array",
+          "description": "The biomes the star system's missions can be on.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
+          }
+        },
+        "difficulty": {
+          "type": "integer",
+          "description": "The star system's difficulty, as the starmap shows it.",
+          "format": "int32"
+        },
+        "canTravelTo": {
+          "type": "boolean",
+          "description": "Whether the star system's travel requirements are met; story systems stay locked until then."
+        },
+        "route": {
+          "description": "The trip from the current star system; null where the game finds no route, always while canTravelTo is false.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/Route"
+            }
+          ]
+        }
+      }
+    },
+    "Route": {
+      "type": "object",
+      "description": "The trip from the current star system, as the starmap plans and shows it.",
+      "additionalProperties": false,
+      "required": [
+        "days",
+        "cost"
+      ],
+      "properties": {
+        "days": {
+          "type": "integer",
+          "description": "The days the trip takes; 0 for the current star system.",
+          "format": "int32"
+        },
+        "cost": {
+          "type": "integer",
+          "description": "The C-Bills the trip costs; 0 for the current star system.",
+          "format": "int32"
         }
       }
     },
@@ -2494,7 +2789,32 @@
         }
       }
     },
-    "Contract": {
+    "OfferedContracts": {
+      "type": "object",
+      "description": "The contracts the Command Center offers, without the active contract.",
+      "additionalProperties": false,
+      "required": [
+        "inCurrentStarSystem",
+        "travel"
+      ],
+      "properties": {
+        "inCurrentStarSystem": {
+          "type": "array",
+          "description": "The contracts fought in the current star system.",
+          "items": {
+            "$ref": "#/definitions/ContractOfDefinitionReference"
+          }
+        },
+        "travel": {
+          "type": "array",
+          "description": "The travel contracts, fought in another star system the company has to travel to first.",
+          "items": {
+            "$ref": "#/definitions/ContractOfStarSystem"
+          }
+        }
+      }
+    },
+    "ContractOfDefinitionReference": {
       "type": "object",
       "description": "A contract the Command Center offers, as its contract list and details show it.",
       "additionalProperties": false,
@@ -2566,7 +2886,7 @@
           "format": "int32"
         },
         "starSystem": {
-          "description": "The star system the mission is fought in; a contract elsewhere needs travelling there.",
+          "description": "The star system the mission is fought in: by reference in the current star system; in full for a travel contract, as in star-systems.json, with the trip there.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "meetsReputation": {
@@ -2647,6 +2967,91 @@
         }
       }
     },
+    "ContractOfStarSystem": {
+      "type": "object",
+      "description": "A contract the Command Center offers, as its contract list and details show it.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "type",
+        "displayStyle",
+        "employer",
+        "target",
+        "difficulty",
+        "starSystem",
+        "description",
+        "lanceLimits",
+        "biome",
+        "meetsReputation",
+        "negotiation"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "The contract's description, as the contract details show it."
+        },
+        "lanceLimits": {
+          "description": "The limits on the lance the company can deploy on the mission.",
+          "$ref": "#/definitions/LanceLimits"
+        },
+        "biome": {
+          "description": "null where the game has no biome for the contract.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/DefinitionReference"
+            }
+          ]
+        },
+        "id": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "The contract's data file; null where the game keeps no reference to it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The contract's name, as the contract list shows it."
+        },
+        "type": {
+          "description": "The mission type, described in contractTypes.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "displayStyle": {
+          "description": "Whether it's a regular, story, restoration or flashpoint contract.",
+          "$ref": "#/definitions/ContractDisplayStyle"
+        },
+        "employer": {
+          "description": "The faction that hires the company.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "target": {
+          "description": "The faction the mission is fought against.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "difficulty": {
+          "type": "integer",
+          "description": "On the scale of maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
+          "format": "int32"
+        },
+        "starSystem": {
+          "description": "The star system the mission is fought in: by reference in the current star system; in full for a travel contract, as in star-systems.json, with the trip there.",
+          "$ref": "#/definitions/StarSystem"
+        },
+        "meetsReputation": {
+          "type": "boolean",
+          "description": "Whether the reputation with the employer allows taking the contract; the list greys it out otherwise. Story, restoration and flashpoint contracts, and employers that don't gain reputation, are always allowed."
+        },
+        "negotiation": {
+          "description": "The terms the contract can be accepted with: negotiated or fixed.",
+          "$ref": "#/definitions/Negotiation"
+        }
+      }
+    },
     "Position": {
       "type": "object",
       "additionalProperties": false,
@@ -2657,8 +3062,8 @@
       ],
       "properties": {
         "starSystem": {
-          "description": "The star system the ship is in; while travelling, the one it left or, once it has jumped, the last it jumped to.",
-          "$ref": "#/definitions/DefinitionReference"
+          "description": "The star system the ship is in, in full, as in star-systems.json; while travelling, the one it left or, once it has jumped, the last it jumped to.",
+          "$ref": "#/definitions/StarSystem"
         },
         "travelStatus": {
           "description": "Where the ship is on its way, e.g. IN_SYSTEM or TRANSIT_TO_JUMP.",
