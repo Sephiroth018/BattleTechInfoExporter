@@ -33,4 +33,6 @@ internal sealed record Rules(
     CampaignRules Campaign) : ExportFile
 {
     internal const string FileName = "rules.json";
+
+    protected override bool IsWrittenOnlyWhenChanged => true;
 }

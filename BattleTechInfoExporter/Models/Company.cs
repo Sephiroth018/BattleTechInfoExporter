@@ -40,8 +40,4 @@ internal sealed record Company(
     IReadOnlyList<TemporaryChange> TemporaryMechTechChanges,
     int MedTech,
     IReadOnlyList<TemporaryChange> TemporaryMedTechChanges,
-    int MaxPilots)
-{
-    /// <summary>The company without its current day and date, which change every day on their own.</summary>
-    internal Company WithoutDay() => this with { DaysPassed = default, CurrentDate = string.Empty };
-}
+    int MaxPilots);

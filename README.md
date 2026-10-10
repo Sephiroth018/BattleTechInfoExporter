@@ -108,11 +108,12 @@ The last one describes the game rather than the career:
   the backers' Shadow Hawk-UMBRA) and the game's internal melee and AI weapons are left out, as are
   the game's role and other advisory texts, which often don't match the best way to use a mech.
 
-Every file starts with `modVersion`, `exportedAt` and the `trigger` of the export that last changed
-it. A file is replaced in one step, never half-written, and only when its content apart from
-`exportedAt` and `trigger` (and the game state's day and date, see below) changed, plus once after every game start. Points in time are day numbers, comparable
-with the company's `daysPassed`, so a day passing with nothing else happening doesn't write the game state at all:
-its company's `daysPassed` and date are those of the export that last changed it, like `exportedAt`.
+Every file starts with `modVersion`, `exportedAt` and the `trigger` of the export that last wrote
+it. A file is replaced in one step, never half-written. The rules, star systems and catalog, which
+rarely change, are written only when their content apart from `exportedAt` and `trigger` changed,
+plus once after every game start, so a tool can skip copying them when their timestamp hasn't
+changed; the other files are written on every export. Points in time are day numbers, comparable
+with the company's `daysPassed`, so they don't count down from day to day.
 
 The game state holds:
 

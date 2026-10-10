@@ -43,7 +43,4 @@ internal sealed record GameState(
     Position Position) : ExportFile
 {
     internal const string FileName = "game-state.json";
-
-    protected override ExportFile ComparableContent() =>
-        (GameState)base.ComparableContent() with { Company = Company.WithoutDay() };
 }

@@ -10,4 +10,6 @@ internal sealed record Starmap(
     IReadOnlyDictionary<string, StarSystem> StarSystems) : ExportFile
 {
     internal const string FileName = "star-systems.json";
+
+    protected override bool IsWrittenOnlyWhenChanged => true;
 }
