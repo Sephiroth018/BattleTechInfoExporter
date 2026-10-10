@@ -39,7 +39,7 @@ internal sealed record GameState(
     Stores Stores,
     IReadOnlyList<HiringHallPilot> HiringHall,
     ActiveContract? ActiveContract,
-    OfferedContracts? Contracts,
+    IReadOnlyList<OfferedContract>? Contracts,
     Position Position) : ExportFile
 {
     internal const string FileName = "game-state.json";

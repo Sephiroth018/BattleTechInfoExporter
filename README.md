@@ -23,8 +23,8 @@ kept current. Three of them hold the career and are written together on every ca
   route from the current system: the days and C-Bills the trip takes as the starmap shows them (0
   for the current system, `null` where there is no route). The story swaps some systems'
   definitions, e.g. when a system's owner changes; the entry is always the active one's. The game
-  state repeats the entry of the current system and of every travel contract's system; the other
-  files refer to a star system only by its id and name.
+  state repeats the entry of the current system, the travel destination, and every travel
+  contract's system; the other files refer to a star system only by its id and name.
 
 One more holds the latest mission:
 
@@ -126,7 +126,7 @@ The game state holds:
   and morale change are in the rules), and the expected expense lines for the ship, its upgrades,
   each mech and each pilot.
 - **Position:** the current system in full, as in `star-systems.json`, and, when travelling, the
-  destination and day of arrival.
+  destination, also in full, and day of arrival.
 - **Pilots:** the commander and the roster with all their relevant stats.
 - **Mechs:** the mech bay's mechs with their status, the day they're ready, loadout, armor and
   performance summary; a mech in a refit also carries the refit's steps, each with only the fields
@@ -141,11 +141,12 @@ The game state holds:
   and prices.
 - **Hiring hall:** the current system's pilots for hire, like the roster's pilots plus hiring cost,
   salary and whether the company can hire them.
-- **Contracts:** the contracts the Command Center offers, those in the current system apart from
-  the travel contracts, whose star system is in full, as in `star-systems.json`, with the route
-  there; each with its description and terms, and the negotiation as the values at each slider position (pay and salvage together take at most 100 %,
-  exactly 100 % when the employer gains no reputation); plus the accepted travel contract until
-  it's proceeded with, with the day of arrival while travelling to it. The game generates a system's contracts only when the contract screen first
+- **Contracts:** the contracts the Command Center offers, each with its description and terms,
+  and the negotiation as the values at each slider position (pay and salvage together take at most 100 %,
+  exactly 100 % when the employer gains no reputation), and its star system: by reference in the
+  current system, in full, as in `star-systems.json`, with the route there for a travel contract;
+  plus the accepted travel contract until it's proceeded with, with its star system in full and
+  the day of arrival while travelling to it. The game generates a system's contracts only when the contract screen first
   opens; until then `contracts` is `null`.
 
 The rules' skill training tables hold, per level, the experience it costs, the base hit chance it

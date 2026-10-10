@@ -26,6 +26,7 @@ internal static class ContractReader
     // (SimGameState.FinishCompleteBreadcrumbProcess, FailBreadcrumb).
     internal static ActiveContract? ReadActiveContract(
         SimGameState simGame,
+        Starmap starmap,
         (StarSystem Destination, int ArrivesOnDay)? travelInProgress)
     {
         if (simGame.ActiveTravelContract is not { } contract)
@@ -44,7 +45,6 @@ internal static class ContractReader
             DefinitionReferences.ReferenceTo(employer),
             DefinitionReferences.ReferenceTo(target),
             ReadDifficulty(simGame, contractOverride),
-            DefinitionReferences.ReferenceTo(starSystem.Def.Description),
             GameText.ToPlainText(contract.ShortDescription),
             ReadLanceLimits(contractOverride),
             ReadBiome(simGame, contract.ContractBiome),
@@ -52,37 +52,25 @@ internal static class ContractReader
             // The arrival is the trip's as the position has it, also on the last leg from the jump point.
             travelInProgress is ({ } destination, var arrivesOnDay) && destination.ID == starSystem.ID
                 ? arrivesOnDay
-                : null);
+                : null,
+            starmap.StarSystems[starSystem.Def.Description.Id]);
     }
 
     // The game generates a system's contracts when the contract screen first opens there
     // (SGRoomController_CmdCenter.StartContractScreen). The mod never generates them itself: that would change the
     // career. The active contract is left out: an accepted global contract stays in SimGameState.GlobalContracts
     // until arrival, and once arrived, GetAllCurrentlySelectableContracts adds it.
-    internal static OfferedContracts? ReadContracts(SimGameState simGame, Starmap starmap)
+    internal static List<OfferedContract>? ReadContracts(SimGameState simGame, Starmap starmap)
     {
         if (!simGame.CurSystem.InitialContractsFetched)
         {
             return null;
         }
 
-        var contractsByIsInCurrentStarSystem = simGame.GetAllCurrentlySelectableContracts()
+        return simGame.GetAllCurrentlySelectableContracts()
             .Where(contract => contract != simGame.ActiveTravelContract)
-            .Select(contract => (Contract: contract, StarSystem: ReadStarSystem(simGame, contract)))
-            .ToLookup(offered => offered.StarSystem.ID == simGame.CurSystem.ID);
-        return new OfferedContracts(
-            contractsByIsInCurrentStarSystem[true]
-                .Select(offered => ReadContract(
-                    simGame,
-                    offered.Contract,
-                    DefinitionReferences.ReferenceTo(offered.StarSystem.Def.Description)))
-                .ToList(),
-            contractsByIsInCurrentStarSystem[false]
-                .Select(offered => ReadContract(
-                    simGame,
-                    offered.Contract,
-                    starmap.StarSystems[offered.StarSystem.Def.Description.Id]))
-                .ToList());
+            .Select(contract => ReadContract(simGame, starmap, contract))
+            .ToList();
     }
 
     // SimGameState.ContractTypeDescriptions has the procedural mission types; priority contracts share one entry.
@@ -102,31 +90,53 @@ internal static class ContractReader
         return contractTypes;
     }
 
-    private static Contract<TStarSystem> ReadContract<TStarSystem>(
-        SimGameState simGame,
-        Contract contract,
-        TStarSystem starSystem)
-        where TStarSystem : Reference
+    // A contract in the current star system refers to it; a travel contract's is in full.
+    private static OfferedContract ReadContract(SimGameState simGame, Starmap starmap, Contract contract)
     {
         var contractOverride = contract.Override;
         var (employer, target) = ReadFactions(contract);
-        return new Contract<TStarSystem>(
-            ReadId(contractOverride),
-            // The contract list and details show the raw name; Contract.Name interpolates it, which the game's
-            // contracts don't need.
-            contractOverride.contractName,
-            ReadType(simGame, contract),
-            contractOverride.contractDisplayStyle,
-            DefinitionReferences.ReferenceTo(employer),
-            DefinitionReferences.ReferenceTo(target),
-            ReadDifficulty(simGame, contractOverride),
-            starSystem,
-            // The contract details show the interpolated description, unlike the name.
-            GameText.ToPlainText(contract.ShortDescription),
-            ReadLanceLimits(contractOverride),
-            ReadBiome(simGame, contract.ContractBiome),
-            simGame.ContractUserMeetsReputation(contract),
-            ReadNegotiation(simGame, contract, employer, target));
+        var id = ReadId(contractOverride);
+        // The contract list and details show the raw name; Contract.Name interpolates it, which the game's
+        // contracts don't need.
+        var name = contractOverride.contractName;
+        var type = ReadType(simGame, contract);
+        var difficulty = ReadDifficulty(simGame, contractOverride);
+        // The contract details show the interpolated description, unlike the name.
+        var description = GameText.ToPlainText(contract.ShortDescription);
+        var lanceLimits = ReadLanceLimits(contractOverride);
+        var biome = ReadBiome(simGame, contract.ContractBiome);
+        var meetsReputation = simGame.ContractUserMeetsReputation(contract);
+        var negotiation = ReadNegotiation(simGame, contract, employer, target);
+        var starSystem = ReadStarSystem(simGame, contract);
+        return starSystem.ID == simGame.CurSystem.ID
+            ? new LocalContract(
+                id,
+                name,
+                type,
+                contractOverride.contractDisplayStyle,
+                DefinitionReferences.ReferenceTo(employer),
+                DefinitionReferences.ReferenceTo(target),
+                difficulty,
+                description,
+                lanceLimits,
+                biome,
+                meetsReputation,
+                negotiation,
+                DefinitionReferences.ReferenceTo(starSystem.Def.Description))
+            : new TravelContract(
+                id,
+                name,
+                type,
+                contractOverride.contractDisplayStyle,
+                DefinitionReferences.ReferenceTo(employer),
+                DefinitionReferences.ReferenceTo(target),
+                difficulty,
+                description,
+                lanceLimits,
+                biome,
+                meetsReputation,
+                negotiation,
+                starmap.StarSystems[starSystem.Def.Description.Id]);
     }
 
     // The mission is fought in the current star system: a contract elsewhere needs travelling there first.

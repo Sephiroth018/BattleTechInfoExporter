@@ -455,9 +455,10 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   biomes next to what changes during a career (difficulty, travel requirements, route). The story
   swaps a system's definition (`StarSystem_SetActiveDef`, e.g. when its owner changes); the inactive
   definitions give a consumer nothing and aren't exported. The game state repeats the full entry
-  for the current star system (`position.starSystem`) and each travel contract's star system
-  (`contracts.travel`); the other files refer to a star system by its reference alone
-  (`starSystem`, `destination`), next to their own state such as the day of arrival.
+  wherever a star system other than the current one matters, and for the current one:
+  `position.starSystem`, `position.travel.destination`, the active contract's and each offered
+  travel contract's (`TravelContract`) star system; an offered contract in the current star system
+  (`LocalContract`) and the other files refer to a star system by its reference alone.
 - **A route is the starmap's** (`RouteReader`) from the current system, its days and cost: `null`
   where the game finds no route, always for a system whose travel requirements aren't met. The
   current system's is 0 days and 0 C-Bills.

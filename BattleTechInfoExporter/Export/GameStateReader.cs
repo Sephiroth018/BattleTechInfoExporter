@@ -28,7 +28,7 @@ internal static class GameStateReader
             StorageReader.ReadStorage(simGame),
             StoreReader.ReadStores(simGame),
             PilotReader.ReadHiringHall(simGame),
-            ContractReader.ReadActiveContract(simGame, travelInProgress),
+            ContractReader.ReadActiveContract(simGame, starmap, travelInProgress),
             ContractReader.ReadContracts(simGame, starmap),
             ReadPosition(simGame, starmap, travelInProgress));
     }
@@ -86,7 +86,7 @@ internal static class GameStateReader
             starmap.StarSystems[simGame.CurSystem.Def.Description.Id],
             simGame.TravelState,
             travelInProgress is ({ } destination, var arrivesOnDay)
-                ? new Travel(DefinitionReferences.ReferenceTo(destination.Def.Description), arrivesOnDay)
+                ? new Travel(starmap.StarSystems[destination.Def.Description.Id], arrivesOnDay)
                 : null);
 
     // TravelTime only counts the current leg (e.g. to the jump point); the travel order counts the whole trip.

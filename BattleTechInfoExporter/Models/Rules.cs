@@ -12,7 +12,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Skills">The training table behind <see cref="Pilot.Skills" /> and <see cref="Pilot.Abilities" />.</param>
 /// <param name="SpiritsLevels">The effects of each spirits level, which <see cref="Spirits.Level" /> refers to.</param>
 /// <param name="MechPartsPerMech">The <see cref="StoredMechParts" /> needed to assemble a mech.</param>
-/// <param name="ContractTypes">The mission types, which <see cref="ContractIdentity{TStarSystem}.Type" /> refers to.</param>
+/// <param name="ContractTypes">The mission types, which <see cref="ContractIdentity.Type" /> refers to.</param>
 /// <param name="JumpDistances">
 ///     The jump distance by number of working jump jets, from one up; the last entry applies to any higher number.
 /// </param>
