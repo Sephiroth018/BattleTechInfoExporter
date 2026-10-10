@@ -52,8 +52,8 @@ Two more hold the running battle, and exist only while one runs:
   from a save, when every phase begins and after every unit's activation, and deleted when the battle ends: when the
   after-action report is left, or when it is quit or restarted. It holds the contract, the map's id in the catalog, the round, the current phase,
   the lance's resolve, the units keyed by the game's unit id, the objectives the HUD lists with
-  their status, progress line, target units in full view and target buildings, the zones drawn on the map with their type, center, radius
-  and objectives, the buildings on a side, and the damaged buildings. See "Combat state" below.
+  their status, progress line, target units in full view, target buildings and beacon, the zones drawn on the map with their type, center, radius
+  and objectives, the landing zones, the buildings on a side, and the damaged buildings. See "Combat state" below.
 
 The last one describes the game rather than the career:
 
@@ -241,6 +241,16 @@ turn at its end.
 A zone's radius is that of the hexagon the HUD draws; whether a
 unit is inside is decided per map cell. The hit chance isn't exported: it follows from the combat
 rules and changes as soon as a unit moves.
+
+Landing zones are where a dropship or a lance's drop pods are about to land, the hexes the HUD's
+movement reticle marks as dangerous: a unit standing there is crushed when the landing happens. Each
+has the game's id of the dropship or lance spawner, its kind and the hexes whose center cell the
+game marks, the cell it checks for a unit standing there; a drop pod's square is half a hex wide,
+so it covers one hex or none. The zones appear when the mission readies a landing and vanish when
+it happens. The game doesn't tie them to the objective announcing them, e.g. "reinforcements in 5
+rounds"; the objective carries the beacon the HUD draws at its place instead, so a tool can match
+the two by position as the player does. The band along the encounter boundary, which the HUD
+marks the same way, isn't exported.
 
 Buildings on a side, e.g. a base to destroy or defend, are listed by their id in the combat map
 with their side as units have it, as the map highlights them in the team's color; the other

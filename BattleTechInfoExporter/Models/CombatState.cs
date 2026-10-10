@@ -22,6 +22,10 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="Objectives">The objectives the HUD lists, finished ones included, in the HUD's order.</param>
 /// <param name="Zones">The zones drawn on the map.</param>
+/// <param name="LandingZones">
+///     Where a dropship or drop pods are about to land, which the HUD marks as dangerous: a unit standing there is
+///     crushed when they do. Entries come and go as the mission readies landings and they happen.
+/// </param>
 /// <param name="BuildingSides">
 ///     The buildings on a side, e.g. a base to destroy or defend, by their id in <see cref="CombatMap.Buildings" />
 ///     and in the order of their ids; the others are on none. The mission's script can change a building's side
@@ -42,11 +46,28 @@ internal sealed record CombatState(
     IReadOnlyDictionary<string, CombatUnit> Units,
     IReadOnlyList<CombatObjective> Objectives,
     IReadOnlyList<ObjectiveZone> Zones,
+    IReadOnlyList<LandingZone> LandingZones,
     IReadOnlyList<BuildingSide> BuildingSides,
     IReadOnlyList<DamagedBuilding> DamagedBuildings) : ExportFile
 {
     internal const string FileName = "combat-state.json";
 }
+
+/// <summary>A landing zone the HUD marks as dangerous.</summary>
+/// <param name="Id">The game's id of the dropship, or of the lance spawner whose drop pods land there.</param>
+/// <param name="Kind">What is about to land.</param>
+/// <param name="Hexes">
+///     The hexes a unit standing on is crushed: those whose center cell the game marks, in the order of
+///     <see cref="CombatMap.Rows" />. A drop pod's square is half a hex wide, so it covers one hex or none.
+/// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record LandingZone(string Id, LandingZoneKind Kind, IReadOnlyList<HexCoordinates> Hexes);
+
+/// <summary>A hex of <see cref="CombatMap.Rows" /> by its axial coordinates.</summary>
+/// <param name="Q">The hex's axial <c>q</c>, as in <see cref="CombatMap.HexGrid" />.</param>
+/// <param name="R">The hex's axial <c>r</c>, as in <see cref="CombatMap.HexGrid" />.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record HexCoordinates(int Q, int R);
 
 /// <summary>A building on a side, highlighted in its team's color on the map.</summary>
 /// <param name="Id">The building's id in <see cref="CombatMap.Buildings" />.</param>

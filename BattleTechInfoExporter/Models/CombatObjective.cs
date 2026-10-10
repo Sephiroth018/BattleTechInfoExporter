@@ -21,6 +21,11 @@ namespace BattleTechInfoExporter.Models;
 ///     The buildings it is about (to destroy or defend), as <see cref="CombatBuilding.Id" /> in
 ///     <see cref="CombatMap.Buildings" />.
 /// </param>
+/// <param name="Beacon">
+///     Where the HUD draws the objective's beacon, 2 m above the ground, e.g. where the reinforcements it announces
+///     will land; <c>null</c> where it draws none: an objective that marks its target units instead, or a
+///     finished one.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatObjective(
     string Id,
@@ -29,7 +34,8 @@ internal sealed record CombatObjective(
     bool IsPrimary,
     string? Progress,
     IReadOnlyList<string> TargetUnitIds,
-    IReadOnlyList<string> TargetBuildingIds);
+    IReadOnlyList<string> TargetBuildingIds,
+    MapPosition? Beacon);
 
 /// <summary>A zone drawn on the map, e.g. a capture or evacuation zone.</summary>
 /// <param name="Id">The game's id of the zone.</param>

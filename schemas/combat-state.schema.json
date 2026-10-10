@@ -17,6 +17,7 @@
     "units",
     "objectives",
     "zones",
+    "landingZones",
     "buildingSides",
     "damagedBuildings"
   ],
@@ -83,6 +84,13 @@
       "description": "The zones drawn on the map.",
       "items": {
         "$ref": "#/definitions/ObjectiveZone"
+      }
+    },
+    "landingZones": {
+      "type": "array",
+      "description": "Where a dropship or drop pods are about to land, which the HUD marks as dangerous: a unit standing there is crushed when they do. Entries come and go as the mission readies landings and they happen.",
+      "items": {
+        "$ref": "#/definitions/LandingZone"
       }
     },
     "buildingSides": {
@@ -1141,7 +1149,8 @@
         "isPrimary",
         "progress",
         "targetUnitIds",
-        "targetBuildingIds"
+        "targetBuildingIds",
+        "beacon"
       ],
       "properties": {
         "id": {
@@ -1180,6 +1189,17 @@
           "items": {
             "type": "string"
           }
+        },
+        "beacon": {
+          "description": "Where the HUD draws the objective's beacon, 2 m above the ground, e.g. where the reinforcements it announces will land; null where it draws none: an objective that marks its target units instead, or a finished one.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/MapPosition"
+            }
+          ]
         }
       }
     },
@@ -1240,6 +1260,66 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "LandingZone": {
+      "type": "object",
+      "description": "A landing zone the HUD marks as dangerous.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "hexes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The game's id of the dropship, or of the lance spawner whose drop pods land there."
+        },
+        "kind": {
+          "description": "What is about to land.",
+          "$ref": "#/definitions/LandingZoneKind"
+        },
+        "hexes": {
+          "type": "array",
+          "description": "The hexes a unit standing on is crushed: those whose center cell the game marks, in the order of rows. A drop pod's square is half a hex wide, so it covers one hex or none.",
+          "items": {
+            "$ref": "#/definitions/HexCoordinates"
+          }
+        }
+      }
+    },
+    "LandingZoneKind": {
+      "type": "string",
+      "description": "What is about to land on a landing zone.",
+      "x-enumNames": [
+        "Dropship",
+        "DropPod"
+      ],
+      "enum": [
+        "dropship",
+        "dropPod"
+      ]
+    },
+    "HexCoordinates": {
+      "type": "object",
+      "description": "A hex of rows by its axial coordinates.",
+      "additionalProperties": false,
+      "required": [
+        "q",
+        "r"
+      ],
+      "properties": {
+        "q": {
+          "type": "integer",
+          "description": "The hex's axial q, as in hexGrid.",
+          "format": "int32"
+        },
+        "r": {
+          "type": "integer",
+          "description": "The hex's axial r, as in hexGrid.",
+          "format": "int32"
         }
       }
     },

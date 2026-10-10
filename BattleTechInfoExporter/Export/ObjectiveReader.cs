@@ -80,6 +80,11 @@ internal static class ObjectiveReader
                 .OfType<BattleTech.Building>()
                 .Select(building => building.GUID)
                 .Where(buildingIds.Contains)
-                .ToList());
+                .ToList(),
+            // CombatHUDObjectiveItem.InitBeaconAndMarkers places the beacon, ObjectiveBeacon hides it with the
+            // objective's map elements.
+            objective.useBeacon && objective.ShouldDisplayMapElements
+                ? CombatUnitReader.ReadPosition(objective.GetBeaconPosition())
+                : null);
     }
 }
