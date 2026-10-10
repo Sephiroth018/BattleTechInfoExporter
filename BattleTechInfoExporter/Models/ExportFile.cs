@@ -30,8 +30,8 @@ internal abstract record ExportFile
         Converters = { new OwnEnumConverter(), new StringEnumConverter() }
     };
 
-    // The comparable JSON (ComparableContent) last written per file written only when changed; empty after every
-    // game start, so each such file is written once per session.
+    // The comparable JSON (ComparableContent) last written per file name; empty after every game start, so each
+    // file is written once per session.
     private static readonly Dictionary<string, string> LastWrittenContents = new();
 
     /// <summary>
@@ -47,23 +47,14 @@ internal abstract record ExportFile
     public ExportTrigger Trigger { get; private init; }
 
     /// <summary>
-    ///     Whether <see cref="Write" /> leaves the file untouched when its content is the same as the last one written
-    ///     this session, so a tool copying files that changed skips it: for files that rarely change. The others are
-    ///     written on every export, so their header always describes the latest one.
-    /// </summary>
-    protected virtual bool IsWrittenOnlyWhenChanged => false;
-
-    /// <summary>
-    ///     Replaces the file in one step (<see cref="ExportFileWriter.Replace" />), stamped with the header, unless it is
-    ///     <see cref="IsWrittenOnlyWhenChanged" /> and its <see cref="ComparableContent" /> is unchanged.
+    ///     Replaces the file in one step (<see cref="ExportFileWriter.Replace" />), stamped with the header. Leaves it
+    ///     untouched when its <see cref="ComparableContent" /> is the same as the last one written this session, so a
+    ///     tool copying the files that changed skips it.
     /// </summary>
     internal void Write(string fileName, ExportTrigger trigger)
     {
-        var comparableContent = IsWrittenOnlyWhenChanged
-            ? JsonConvert.SerializeObject(ComparableContent(), SerializerSettings)
-            : null;
-        if (comparableContent is not null
-            && ExportFileWriter.Exists(fileName)
+        var comparableContent = JsonConvert.SerializeObject(ComparableContent(), SerializerSettings);
+        if (ExportFileWriter.Exists(fileName)
             && LastWrittenContents.TryGetValue(fileName, out var lastWrittenContent)
             && lastWrittenContent == comparableContent)
         {
@@ -77,11 +68,7 @@ internal abstract record ExportFile
                 this with { ModVersion = ModAssembly.Version, ExportedAt = DateTimeOffset.Now, Trigger = trigger },
                 SerializerSettings));
         // Only once the file is written, so a failed write is retried on the next export.
-        if (comparableContent is not null)
-        {
-            LastWrittenContents[fileName] = comparableContent;
-        }
-
+        LastWrittenContents[fileName] = comparableContent;
         ModLog.Logger.Log($"Exported {fileName} ({trigger}) to {ExportFileWriter.ExportDirectory}");
     }
 

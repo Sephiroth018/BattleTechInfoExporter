@@ -354,8 +354,7 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
   every exception (`CampaignExport`), so a patch that only calls one needs no handling of its own;
   a patch doing anything else catches its own.
 - **Mutable static state** is allowed in patches, limited to what a patch needs, and in
-  `ExportFile`'s cache of the content it last wrote per file written only when changed, which lives as
-  long as the game runs.
+  `ExportFile`'s cache of the content it last wrote per file, which lives as long as the game runs.
 - **Logging** goes through `ModLog.Logger`, the game's `HBS.Logging` logger under the name
   `BattleTechInfoExporter`, and ends up in ModTek's log.
 
@@ -526,13 +525,11 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   enums are camelCase.
 - **JSON:** camelCase properties, compact (no indentation, since only tools read the files), `null`
   written explicitly, through the game's Newtonsoft.Json.
-- **Files are replaced atomically**, so a tool reading them never sees a half-written file. The
-  files that rarely change are written only when their content changed, so a tool copying the files
-  that changed skips them: `rules.json` and `star-systems.json` when their content apart from
-  `exportedAt` and `trigger` differs from what `ExportFile` last wrote, kept in memory, so each is
-  also written once after every game start (`ExportFile.IsWrittenOnlyWhenChanged`); `catalog.json`
-  only when it's stale (see below), which needs no comparison. The others are written on every
-  export, so their header and the game state's day always describe the latest one.
+- **Files are replaced atomically**, so a tool reading them never sees a half-written file, and
+  only when their content apart from `exportedAt` and `trigger` changed, so a tool copying the files
+  that changed skips the others. `ExportFile` compares with the content it last wrote, kept in
+  memory, so each file is also written once after every game start. The game state's day and date
+  count as content: an export on a new day writes it, so its day is the latest export's.
 
 ## Glossary
 

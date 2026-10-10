@@ -109,11 +109,10 @@ The last one describes the game rather than the career:
   the game's role and other advisory texts, which often don't match the best way to use a mech.
 
 Every file starts with `modVersion`, `exportedAt` and the `trigger` of the export that last wrote
-it. A file is replaced in one step, never half-written. The files that rarely change are written
-only when their content changed, so a tool can skip copying them when their timestamp hasn't
-changed: the rules and star systems when their content apart from `exportedAt` and `trigger`
-changed, plus once after every game start, the catalog only when it's rebuilt (see "Triggers").
-The other files are written on every export. Points in time are day numbers, comparable
+it. A file is replaced in one step, never half-written, and only when its content apart from
+`exportedAt` and `trigger` changed, plus once after every game start, so a tool can skip copying
+it when its timestamp hasn't changed. The game state's day and date count as content, so an export
+on a new day writes it. Points in time are day numbers, comparable
 with the company's `daysPassed`, so they don't count down from day to day.
 
 The game state holds:
