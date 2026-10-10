@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Catalog",
   "type": "object",
-  "description": "The root of catalog.json: every chassis, mech, vehicle, turret, component, terrain, biome, map and star system definition the game has loaded, keyed by id. It describes the game, not the career, so it only changes with the game's data.",
+  "description": "The root of catalog.json: every chassis, mech, vehicle, turret, component, terrain, biome and map definition the game has loaded, keyed by id. It describes the game, not the career, so it only changes with the game's data.",
   "additionalProperties": false,
   "required": [
     "modVersion",
@@ -16,8 +16,7 @@
     "componentDefinitions",
     "terrainDefinitions",
     "biomeDefinitions",
-    "mapDefinitions",
-    "starSystemDefinitions"
+    "mapDefinitions"
   ],
   "properties": {
     "modVersion": {
@@ -26,11 +25,11 @@
     },
     "exportedAt": {
       "type": "string",
-      "description": "When the file was last changed.",
+      "description": "When the file was last written.",
       "format": "date-time"
     },
     "trigger": {
-      "description": "What caused the export that last changed the file.",
+      "description": "What caused the export that last wrote the file.",
       "$ref": "#/definitions/ExportTrigger"
     },
     "sourceFingerprint": {
@@ -88,13 +87,6 @@
       "description": "The maps a star system's contracts can be fought on, keyed by map id.",
       "additionalProperties": {
         "$ref": "#/definitions/MapDefinition"
-      }
-    },
-    "starSystemDefinitions": {
-      "type": "object",
-      "description": "Every star system definition, keyed by its id.",
-      "additionalProperties": {
-        "$ref": "#/definitions/StarSystemDefinition"
       }
     }
   },
@@ -2095,13 +2087,12 @@
     },
     "MapDefinition": {
       "type": "object",
-      "description": "A combat map, the star systems whose contracts can be fought on it and the terrain it is made of. The contract generator draws a star system's map among the maps that list the system, by weight.",
+      "description": "A combat map some star system's contracts can be fought on, and the terrain it is made of. The contract generator draws a star system's map among the maps star-systems.json lists for the system, by weight.",
       "additionalProperties": false,
       "required": [
         "name",
         "biome",
         "tags",
-        "starSystems",
         "weight",
         "terrainCoverage"
       ],
@@ -2121,13 +2112,6 @@
             "type": "string"
           }
         },
-        "starSystems": {
-          "type": "array",
-          "description": "The star systems whose contracts can be fought on the map, as the contract generator selects them from the system's biomes and map tags.",
-          "items": {
-            "$ref": "#/definitions/DefinitionReference"
-          }
-        },
         "weight": {
           "type": "integer",
           "description": "The contract generator's draw weight among a star system's maps.",
@@ -2139,41 +2123,6 @@
           "additionalProperties": {
             "type": "number",
             "format": "double"
-          }
-        }
-      }
-    },
-    "StarSystemDefinition": {
-      "type": "object",
-      "description": "A star system definition. The story swaps some star systems' definitions (e.g. to change their owner), so a star system can have several; star-systems.json keys each star system by its active one.",
-      "additionalProperties": false,
-      "required": [
-        "name",
-        "owner",
-        "tags",
-        "biomes"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name, as in the references to the star system."
-        },
-        "owner": {
-          "description": "The faction that owns the star system in this definition.",
-          "$ref": "#/definitions/DefinitionReference"
-        },
-        "tags": {
-          "type": "array",
-          "description": "The star system's tags, as its starmap panel shows them.",
-          "items": {
-            "$ref": "#/definitions/DefinitionReference"
-          }
-        },
-        "biomes": {
-          "type": "array",
-          "description": "The biomes the star system's missions can be on.",
-          "items": {
-            "$ref": "#/definitions/DefinitionReference"
           }
         }
       }

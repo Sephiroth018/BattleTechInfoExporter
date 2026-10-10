@@ -5,7 +5,7 @@ using BattleTech;
 using BattleTech.Framework;
 using BattleTechInfoExporter.Models;
 using UnityEngine;
-using Contract = BattleTechInfoExporter.Models.Contract;
+using Starmap = BattleTechInfoExporter.Models.Starmap;
 using StarSystem = BattleTech.StarSystem;
 
 namespace BattleTechInfoExporter.Export;
@@ -26,7 +26,8 @@ internal static class ContractReader
     // (SimGameState.FinishCompleteBreadcrumbProcess, FailBreadcrumb).
     internal static ActiveContract? ReadActiveContract(
         SimGameState simGame,
-        (StarSystem Destination, int ArrivesOnDay)? travelInProgress)
+        Starmap starmap,
+        (StarSystem Destination, int ArrivesOnDay, int LegEndsOnDay)? travelInProgress)
     {
         if (simGame.ActiveTravelContract is not { } contract)
         {
@@ -44,22 +45,22 @@ internal static class ContractReader
             DefinitionReferences.ReferenceTo(employer),
             DefinitionReferences.ReferenceTo(target),
             ReadDifficulty(simGame, contractOverride),
-            DefinitionReferences.ReferenceTo(starSystem.Def.Description),
             GameText.ToPlainText(contract.ShortDescription),
             ReadLanceLimits(contractOverride),
             ReadBiome(simGame, contract.ContractBiome),
             ReadTerms(simGame, contract, employer, target),
             // The arrival is the trip's as the position has it, also on the last leg from the jump point.
-            travelInProgress is ({ } destination, var arrivesOnDay) && destination.ID == starSystem.ID
+            travelInProgress is ({ } destination, var arrivesOnDay, _) && destination.ID == starSystem.ID
                 ? arrivesOnDay
-                : null);
+                : null,
+            starmap.StarSystems[starSystem.Def.Description.Id]);
     }
 
     // The game generates a system's contracts when the contract screen first opens there
     // (SGRoomController_CmdCenter.StartContractScreen). The mod never generates them itself: that would change the
     // career. The active contract is left out: an accepted global contract stays in SimGameState.GlobalContracts
     // until arrival, and once arrived, GetAllCurrentlySelectableContracts adds it.
-    internal static List<Contract>? ReadContracts(SimGameState simGame)
+    internal static List<OfferedContract>? ReadContracts(SimGameState simGame, Starmap starmap)
     {
         if (!simGame.CurSystem.InitialContractsFetched)
         {
@@ -68,7 +69,7 @@ internal static class ContractReader
 
         return simGame.GetAllCurrentlySelectableContracts()
             .Where(contract => contract != simGame.ActiveTravelContract)
-            .Select(contract => ReadContract(simGame, contract))
+            .Select(contract => ReadContract(simGame, starmap, contract))
             .ToList();
     }
 
@@ -89,31 +90,57 @@ internal static class ContractReader
         return contractTypes;
     }
 
-    private static Contract ReadContract(SimGameState simGame, BattleTech.Contract contract)
+    // A contract in the current star system refers to it; a travel contract's is in full.
+    private static OfferedContract ReadContract(SimGameState simGame, Starmap starmap, Contract contract)
     {
         var contractOverride = contract.Override;
         var (employer, target) = ReadFactions(contract);
-        return new Contract(
-            ReadId(contractOverride),
-            // The contract list and details show the raw name; Contract.Name interpolates it, which the game's
-            // contracts don't need.
-            contractOverride.contractName,
-            ReadType(simGame, contract),
-            contractOverride.contractDisplayStyle,
-            DefinitionReferences.ReferenceTo(employer),
-            DefinitionReferences.ReferenceTo(target),
-            ReadDifficulty(simGame, contractOverride),
-            DefinitionReferences.ReferenceTo(ReadStarSystem(simGame, contract).Def.Description),
-            // The contract details show the interpolated description, unlike the name.
-            GameText.ToPlainText(contract.ShortDescription),
-            ReadLanceLimits(contractOverride),
-            ReadBiome(simGame, contract.ContractBiome),
-            simGame.ContractUserMeetsReputation(contract),
-            ReadNegotiation(simGame, contract, employer, target));
+        var id = ReadId(contractOverride);
+        // The contract list and details show the raw name; Contract.Name interpolates it, which the game's
+        // contracts don't need.
+        var name = contractOverride.contractName;
+        var type = ReadType(simGame, contract);
+        var difficulty = ReadDifficulty(simGame, contractOverride);
+        // The contract details show the interpolated description, unlike the name.
+        var description = GameText.ToPlainText(contract.ShortDescription);
+        var lanceLimits = ReadLanceLimits(contractOverride);
+        var biome = ReadBiome(simGame, contract.ContractBiome);
+        var meetsReputation = simGame.ContractUserMeetsReputation(contract);
+        var negotiation = ReadNegotiation(simGame, contract, employer, target);
+        var starSystem = ReadStarSystem(simGame, contract);
+        return starSystem.ID == simGame.CurSystem.ID
+            ? new LocalContract(
+                id,
+                name,
+                type,
+                contractOverride.contractDisplayStyle,
+                DefinitionReferences.ReferenceTo(employer),
+                DefinitionReferences.ReferenceTo(target),
+                difficulty,
+                description,
+                lanceLimits,
+                biome,
+                meetsReputation,
+                negotiation,
+                DefinitionReferences.ReferenceTo(starSystem.Def.Description))
+            : new TravelContract(
+                id,
+                name,
+                type,
+                contractOverride.contractDisplayStyle,
+                DefinitionReferences.ReferenceTo(employer),
+                DefinitionReferences.ReferenceTo(target),
+                difficulty,
+                description,
+                lanceLimits,
+                biome,
+                meetsReputation,
+                negotiation,
+                starmap.StarSystems[starSystem.Def.Description.Id]);
     }
 
     // The mission is fought in the current star system: a contract elsewhere needs travelling there first.
-    internal static MissionContract ReadMissionContract(SimGameState simGame, BattleTech.Contract contract)
+    internal static MissionContract ReadMissionContract(SimGameState simGame, Contract contract)
     {
         var contractOverride = contract.Override;
         var (employer, target) = ReadFactions(contract);
@@ -128,12 +155,12 @@ internal static class ContractReader
             DefinitionReferences.ReferenceTo(simGame.CurSystem.Def.Description));
     }
 
-    internal static (FactionValue Employer, FactionValue Target) ReadFactions(BattleTech.Contract contract) =>
+    internal static (FactionValue Employer, FactionValue Target) ReadFactions(Contract contract) =>
         (contract.GetTeamFaction(contract.Override.employerTeam.teamGuid),
             contract.GetTeamFaction(contract.Override.targetTeam.teamGuid));
 
     // Mirrors Contract.GetContractTypeString and the type tooltip of SGContractsWidget.PopulateContract.
-    private static DefinitionReference ReadType(SimGameState simGame, BattleTech.Contract contract) =>
+    private static DefinitionReference ReadType(SimGameState simGame, Contract contract) =>
         contract.IsPriorityContract
             ? PriorityType(simGame)
             : DefinitionReferences.ReferenceTo(contract.Override.ContractTypeValue);
@@ -183,7 +210,7 @@ internal static class ContractReader
     // Accepting a contract that can't be negotiated sets its fixed shares (SGContractsWidget.OnContractAccepted).
     private static Negotiation ReadNegotiation(
         SimGameState simGame,
-        BattleTech.Contract contract,
+        Contract contract,
         FactionValue employer,
         FactionValue target)
     {
@@ -226,7 +253,7 @@ internal static class ContractReader
     // Accepting a contract stores the shares it was accepted with (SGContractsWidget.OnContractAccepted).
     private static NegotiationOption ReadTerms(
         SimGameState simGame,
-        BattleTech.Contract contract,
+        Contract contract,
         FactionValue employer,
         FactionValue target) =>
         ReadNegotiationOption(
@@ -241,7 +268,7 @@ internal static class ContractReader
 
     private static NegotiationOption ReadNegotiationOption(
         SimGameState simGame,
-        BattleTech.Contract contract,
+        Contract contract,
         FactionValue employer,
         FactionValue target,
         int? payPercent,
@@ -256,12 +283,12 @@ internal static class ContractReader
             ReadReputation(simGame, contract, employer, target, 1f - (payShare + salvageShare)));
 
     // Mirrors SimGameState.GetScaledCBillValue, as SGContractsWidget.UpdateCurrentValues shows the pay.
-    private static int ReadPay(SimGameState simGame, BattleTech.Contract contract, float share) =>
+    private static int ReadPay(SimGameState simGame, Contract contract, float share) =>
         simGame.GetScaledCBillValue(contract.InitialContractValue, share * contract.InitialContractValue);
 
     // Mirrors SGContractsWidget.UpdateCurrentValues. Its priority share is a hardcoded quarter; this takes the
     // constant the mission's outcome uses (Contract.FinalizeSalvage), 0.25 in the game's data.
-    private static Salvage ReadSalvage(SimGameState simGame, BattleTech.Contract contract, float share)
+    private static Salvage ReadSalvage(SimGameState simGame, Contract contract, float share)
     {
         var potential = contract.Override.salvagePotential > -1 ? contract.Override.salvagePotential
             : contract.SalvagePotential > -1 ? contract.SalvagePotential
@@ -278,7 +305,7 @@ internal static class ContractReader
     // the employer's and shows each only for a faction that gains reputation.
     private static ReputationChange ReadReputation(
         SimGameState simGame,
-        BattleTech.Contract contract,
+        Contract contract,
         FactionValue employer,
         FactionValue target,
         float share)
@@ -314,6 +341,6 @@ internal static class ContractReader
 
     // The contract list marks travel contracts by the target star system in the contract's context
     // (SGContractsListItem); without one, the contract is in the current star system.
-    private static StarSystem ReadStarSystem(SimGameState simGame, BattleTech.Contract contract) =>
+    private static StarSystem ReadStarSystem(SimGameState simGame, Contract contract) =>
         contract.GameContext.GetObject(GameContextObjectTagEnum.TargetStarSystem) as StarSystem ?? simGame.CurSystem;
 }

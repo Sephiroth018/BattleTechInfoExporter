@@ -25,7 +25,7 @@ namespace BattleTechInfoExporter.Models;
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MissionOutcome(
     MissionContract Contract,
-    BattleTech.Contract.ContractState State,
+    Contract.ContractState State,
     bool IsGoodFaithEffort,
     int Rounds,
     IReadOnlyList<ObjectiveResult> Objectives,
@@ -40,6 +40,7 @@ internal sealed record MissionOutcome(
 }
 
 /// <summary>The contract a mission was for.</summary>
+/// <param name="StarSystem">The star system the mission is fought in.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MissionContract(
     string? Id,
@@ -50,7 +51,7 @@ internal sealed record MissionContract(
     DefinitionReference Target,
     int Difficulty,
     DefinitionReference StarSystem)
-    : ContractIdentity(Id, Name, Type, DisplayStyle, Employer, Target, Difficulty, StarSystem);
+    : ContractIdentity(Id, Name, Type, DisplayStyle, Employer, Target, Difficulty);
 
 /// <summary>An objective as the after-action report lists it.</summary>
 /// <param name="Title">The objective's title as plain text.</param>

@@ -1,24 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BattleTechInfoExporter.Export;
 using BattleTechInfoExporter.Models;
 
 namespace BattleTechInfoExporter.SchemaGenerator;
 
-/// <summary>Every export file's model and file name.</summary>
+/// <summary>Every export file's model and file name (<see cref="ExportFiles" />), checked to be complete.</summary>
 internal static class ExportFileModels
 {
-    internal static IReadOnlyList<(Type Model, string FileName)> All { get; } = CheckComplete(
-    [
-        (typeof(GameState), GameState.FileName),
-        (typeof(Rules), Rules.FileName),
-        (typeof(Starmap), Starmap.FileName),
-        (typeof(FinancialReport), FinancialReport.FileName),
-        (typeof(MissionOutcome), MissionOutcome.FileName),
-        (typeof(CombatState), CombatState.FileName),
-        (typeof(CombatMap), CombatMap.FileName),
-        (typeof(Catalog), Catalog.FileName)
-    ]);
+    internal static IReadOnlyList<(Type Model, string FileName)> All { get; } = CheckComplete(ExportFiles.All);
 
     // A file model missing from the list would ship without a schema.
     private static IReadOnlyList<(Type Model, string FileName)> CheckComplete(

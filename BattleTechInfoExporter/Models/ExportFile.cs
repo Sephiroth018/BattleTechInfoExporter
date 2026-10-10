@@ -40,16 +40,16 @@ internal abstract record ExportFile
     /// </summary>
     public string ModVersion { get; private init; } = string.Empty;
 
-    /// <summary>When the file was last changed.</summary>
+    /// <summary>When the file was last written.</summary>
     public DateTimeOffset ExportedAt { get; private init; }
 
-    /// <summary>What caused the export that last changed the file.</summary>
+    /// <summary>What caused the export that last wrote the file.</summary>
     public ExportTrigger Trigger { get; private init; }
 
     /// <summary>
     ///     Replaces the file in one step (<see cref="ExportFileWriter.Replace" />), stamped with the header. Leaves it
-    ///     untouched when its <see cref="ComparableContent" /> is the same as the last
-    ///     one written this session, so tools watching it only see real changes.
+    ///     untouched when its <see cref="ComparableContent" /> is the same as the last one written this session, so a
+    ///     tool copying the files that changed skips it.
     /// </summary>
     internal void Write(string fileName, ExportTrigger trigger)
     {
@@ -80,11 +80,8 @@ internal abstract record ExportFile
         ExportFileWriter.Delete(fileName);
     }
 
-    /// <summary>
-    ///     The content <see cref="Write" /> compares: what the file says apart from when and why it was written.
-    ///     Values that change without anything else changing, which aren't worth a write of their own, are cleared too.
-    /// </summary>
-    protected virtual ExportFile ComparableContent() => this with { ExportedAt = default, Trigger = default };
+    /// <summary>The content <see cref="Write" /> compares: what the file says apart from when and why it was written.</summary>
+    private ExportFile ComparableContent() => this with { ExportedAt = default, Trigger = default };
 
     /// <summary>
     ///     Reads the string properties named by their record members (<c>nameof</c>) from the header of an existing
