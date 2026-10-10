@@ -27,7 +27,7 @@ internal static class ContractReader
     internal static ActiveContract? ReadActiveContract(
         SimGameState simGame,
         Starmap starmap,
-        (StarSystem Destination, int ArrivesOnDay)? travelInProgress)
+        (StarSystem Destination, int ArrivesOnDay, int LegEndsOnDay)? travelInProgress)
     {
         if (simGame.ActiveTravelContract is not { } contract)
         {
@@ -50,7 +50,7 @@ internal static class ContractReader
             ReadBiome(simGame, contract.ContractBiome),
             ReadTerms(simGame, contract, employer, target),
             // The arrival is the trip's as the position has it, also on the last leg from the jump point.
-            travelInProgress is ({ } destination, var arrivesOnDay) && destination.ID == starSystem.ID
+            travelInProgress is ({ } destination, var arrivesOnDay, _) && destination.ID == starSystem.ID
                 ? arrivesOnDay
                 : null,
             starmap.StarSystems[starSystem.Def.Description.Id]);
