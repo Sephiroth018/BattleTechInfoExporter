@@ -69,39 +69,6 @@ internal abstract record OfferedContract(
     Negotiation Negotiation)
     : ContractBriefing(Id, Name, Type, DisplayStyle, Employer, Target, Difficulty, Description, LanceLimits, Biome);
 
-/// <summary>An offered contract with its star system.</summary>
-/// <typeparam name="TStarSystem">How the star system is exported: by reference or in full.</typeparam>
-/// <param name="StarSystem">The star system the mission is fought in.</param>
-[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal abstract record OfferedContract<TStarSystem>(
-    string? Id,
-    string Name,
-    DefinitionReference Type,
-    ContractDisplayStyle DisplayStyle,
-    DefinitionReference Employer,
-    DefinitionReference Target,
-    int Difficulty,
-    string Description,
-    LanceLimits LanceLimits,
-    DefinitionReference? Biome,
-    bool MeetsReputation,
-    Negotiation Negotiation,
-    TStarSystem StarSystem)
-    : OfferedContract(
-        Id,
-        Name,
-        Type,
-        DisplayStyle,
-        Employer,
-        Target,
-        Difficulty,
-        Description,
-        LanceLimits,
-        Biome,
-        MeetsReputation,
-        Negotiation)
-    where TStarSystem : Reference;
-
 /// <summary>An offered contract fought in the current star system.</summary>
 /// <param name="StarSystem">The current star system.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -119,7 +86,7 @@ internal sealed record LocalContract(
     bool MeetsReputation,
     Negotiation Negotiation,
     DefinitionReference StarSystem)
-    : OfferedContract<DefinitionReference>(
+    : OfferedContract(
         Id,
         Name,
         Type,
@@ -131,8 +98,7 @@ internal sealed record LocalContract(
         LanceLimits,
         Biome,
         MeetsReputation,
-        Negotiation,
-        StarSystem);
+        Negotiation);
 
 /// <summary>An offered contract fought in another star system, which the company travels to first.</summary>
 /// <param name="StarSystem">
@@ -153,7 +119,7 @@ internal sealed record TravelContract(
     bool MeetsReputation,
     Negotiation Negotiation,
     StarSystem StarSystem)
-    : OfferedContract<StarSystem>(
+    : OfferedContract(
         Id,
         Name,
         Type,
@@ -165,8 +131,7 @@ internal sealed record TravelContract(
         LanceLimits,
         Biome,
         MeetsReputation,
-        Negotiation,
-        StarSystem);
+        Negotiation);
 
 /// <summary>The accepted travel contract, until the company proceeds with it on arrival or breaks it.</summary>
 /// <param name="Terms">The terms the contract was accepted with.</param>
