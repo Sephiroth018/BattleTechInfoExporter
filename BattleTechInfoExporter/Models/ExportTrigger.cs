@@ -22,6 +22,5 @@ internal enum ExportTrigger
     PhaseStarted,
     CombatStarted,
     CombatLoaded,
-    ActivationCompleted,
-    EventResolved
+    ActivationCompleted
 }

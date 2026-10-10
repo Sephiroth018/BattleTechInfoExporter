@@ -113,8 +113,7 @@
         "PhaseStarted",
         "CombatStarted",
         "CombatLoaded",
-        "ActivationCompleted",
-        "EventResolved"
+        "ActivationCompleted"
       ],
       "enum": [
         "careerLoaded",
@@ -136,8 +135,7 @@
         "phaseStarted",
         "combatStarted",
         "combatLoaded",
-        "activationCompleted",
-        "eventResolved"
+        "activationCompleted"
       ]
     },
     "MissionContract": {

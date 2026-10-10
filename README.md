@@ -308,7 +308,8 @@ ones.
 The game state is exported when:
 
 - **The career is loaded**, new or from a save.
-- **The game saves the career** outside combat, manually or automatically.
+- **The game saves the career** outside combat, manually or automatically, e.g. once an event's
+  popup is closed, with the picked option's results applied.
 - **A contract's results are applied**, salvage included.
 - **The monthly financial report is shown**, with the expenses paid.
 - **A mech lab order finishes**, **a pilot is healed** in the med bay, or **an Argo upgrade finishes**,
@@ -321,7 +322,6 @@ The game state is exported when:
 - **Experience is spent:** a pilot's training is confirmed in the barracks.
 - **A new mech needs a place:** the game asks where to put it because every mech bay is full, e.g.
   after salvage completes a mech.
-- **An event is resolved:** its popup is closed after an option was picked.
 
 The catalog is rebuilt when the career is loaded, also after a mission, but only when it's missing
 or stale: written by another mod version, or with another `sourceFingerprint` than the game's
