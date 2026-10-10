@@ -25,11 +25,11 @@
     },
     "exportedAt": {
       "type": "string",
-      "description": "When the file was last changed.",
+      "description": "When the file was last written.",
       "format": "date-time"
     },
     "trigger": {
-      "description": "What caused the export that last changed the file.",
+      "description": "What caused the export that last wrote the file.",
       "$ref": "#/definitions/ExportTrigger"
     },
     "sourceFingerprint": {

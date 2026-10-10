@@ -37,8 +37,6 @@ internal sealed record Catalog(
 {
     internal const string FileName = "catalog.json";
 
-    protected override bool IsWrittenOnlyWhenChanged => true;
-
     /// <summary>
     ///     Whether the catalog in the file is current: written by this mod version from the same sources. An unreadable
     ///     or malformed file isn't; the rebuild replaces it.

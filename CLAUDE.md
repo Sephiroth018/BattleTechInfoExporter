@@ -513,7 +513,7 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   since the mod writes them all, `null` included; an abstract record declared as a property's type
   is `anyOf` its derived records. A change to the export format shows in the schemas' diff.
 - **Every export file starts with `modVersion`, `exportedAt` and `trigger`** (`ExportFile`, which
-  every file's model inherits), describing the export that last changed it.
+  every file's model inherits), describing the export that last wrote it.
 - **Points in time are day numbers** on the game's `DaysPassed` scale (`company.daysPassed`), e.g.
   `readyOnDay`, never countdowns, so a passing day changes only the company's day and date. Durations
   that don't count down (a route's travel days) stay durations.
@@ -527,12 +527,12 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **JSON:** camelCase properties, compact (no indentation, since only tools read the files), `null`
   written explicitly, through the game's Newtonsoft.Json.
 - **Files are replaced atomically**, so a tool reading them never sees a half-written file. The
-  files that rarely change (`rules.json`, `star-systems.json`, `catalog.json`;
-  `ExportFile.IsWrittenOnlyWhenChanged`) are written only when their content apart from
-  `exportedAt` and `trigger` changed, so a tool copying the files that changed skips them;
-  `ExportFile` compares with the content it last wrote, kept in memory, so each is also written once
-  after every game start. The others are written on every export, so their header and the game
-  state's day always describe the latest one.
+  files that rarely change are written only when their content changed, so a tool copying the files
+  that changed skips them: `rules.json` and `star-systems.json` when their content apart from
+  `exportedAt` and `trigger` differs from what `ExportFile` last wrote, kept in memory, so each is
+  also written once after every game start (`ExportFile.IsWrittenOnlyWhenChanged`); `catalog.json`
+  only when it's stale (see below), which needs no comparison. The others are written on every
+  export, so their header and the game state's day always describe the latest one.
 
 ## Glossary
 
