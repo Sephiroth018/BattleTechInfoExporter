@@ -186,8 +186,8 @@
           "format": "int32"
         },
         "starSystem": {
-          "description": "The star system the mission is fought in.",
-          "$ref": "#/definitions/DefinitionReference"
+          "description": "The star system the mission is fought in, the current one, in full, as in star-systems.json.",
+          "$ref": "#/definitions/StarSystem"
         }
       }
     },
@@ -228,6 +228,98 @@
         "BaseFlashpoint",
         "HeavyMetalFlashpointCampaign"
       ]
+    },
+    "StarSystem": {
+      "type": "object",
+      "description": "A star system with its active definition and its career state. The story swaps some star systems' definitions (e.g. to change their owner); the id and what the definition holds are the active one's.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "owner",
+        "tags",
+        "biomes",
+        "maps",
+        "difficulty",
+        "canTravelTo",
+        "route"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The active definition's id, as in the references to the star system."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name, as in the references to the star system."
+        },
+        "owner": {
+          "description": "The faction that owns the star system.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "tags": {
+          "type": "array",
+          "description": "The star system's tags, as its starmap panel shows them.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
+          }
+        },
+        "biomes": {
+          "type": "array",
+          "description": "The biomes the star system's missions can be on.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
+          }
+        },
+        "maps": {
+          "type": "array",
+          "description": "The maps the star system's contracts can be fought on, as the contract generator selects them from its biomes and map tags; each map's terrain is in the catalog's mapDefinitions.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
+          }
+        },
+        "difficulty": {
+          "type": "integer",
+          "description": "The star system's difficulty, as the starmap shows it.",
+          "format": "int32"
+        },
+        "canTravelTo": {
+          "type": "boolean",
+          "description": "Whether the star system's travel requirements are met; story systems stay locked until then."
+        },
+        "route": {
+          "description": "The trip from the current star system; null where the game finds no route, always while canTravelTo is false.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/Route"
+            }
+          ]
+        }
+      }
+    },
+    "Route": {
+      "type": "object",
+      "description": "The trip from the current star system, as the starmap plans and shows it.",
+      "additionalProperties": false,
+      "required": [
+        "days",
+        "cost"
+      ],
+      "properties": {
+        "days": {
+          "type": "integer",
+          "description": "The days the trip takes; 0 for the current star system.",
+          "format": "int32"
+        },
+        "cost": {
+          "type": "integer",
+          "description": "The C-Bills the trip costs; 0 for the current star system.",
+          "format": "int32"
+        }
+      }
     },
     "ContractState": {
       "type": "string",

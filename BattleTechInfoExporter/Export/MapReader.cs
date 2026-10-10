@@ -13,7 +13,7 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>
 ///     Builds the catalog's map definitions from the maps the contract generator selects for each star system
 ///     definition, the metadata database's map rows and each map's terrain data file, which the game reads only when
-///     the map is played (MapMetaData.LoadMapMetaData).
+///     the map is played (MapMetaData.LoadMapMetaData); and reads the maps it selects for one star system.
 /// </summary>
 internal static class MapReader
 {
@@ -35,18 +35,14 @@ internal static class MapReader
         DataManager dataManager,
         IReadOnlyDictionary<string, TerrainDefinition> terrains)
     {
-        var starSystemsPerMap = dataManager.SystemDefs
-            .SelectMany(definition =>
-            {
-                var starSystem = DefinitionReferences.ReferenceTo(definition.Value.Description);
-                return ReadPlayableMaps(definition.Value).Select(map => (Map: map, StarSystem: starSystem));
-            })
-            .GroupBy(playable => playable.Map.MapID, StringComparer.Ordinal);
+        var playableMaps = dataManager.SystemDefs
+            .SelectMany(definition => ReadPlayableMaps(definition.Value))
+            .GroupBy(map => map.MapID, StringComparer.Ordinal)
+            .Select(sameMaps => sameMaps.First());
 
         var maps = new SortedDictionary<string, MapDefinition>(StringComparer.Ordinal);
-        foreach (var starSystems in starSystemsPerMap)
+        foreach (var map in playableMaps)
         {
-            var map = starSystems.First().Map;
             if (ReadTerrainCoverage(dataManager, map, terrains) is not { } terrainCoverage)
             {
                 continue;
@@ -61,9 +57,6 @@ internal static class MapReader
                     map.FriendlyName,
                     DefinitionReferences.ReferenceTo(dataManager, (Biome.BIOMESKIN)map.BiomeSkinID),
                     tags,
-                    starSystems.Select(playable => playable.StarSystem)
-                        .OrderBy(starSystem => starSystem)
-                        .ToList(),
                     map.Weight,
                     terrainCoverage));
         }
@@ -78,7 +71,7 @@ internal static class MapReader
     // The maps the contract generator draws a star system's contracts from
     // (SimGameState.GetSinglePlayerProceduralPlayableMaps): the released maps with a procedural encounter whose
     // biome the system supports and whose tags its required and excluded map tags allow, DLC ownership included.
-    private static IEnumerable<Map_MDD> ReadPlayableMaps(StarSystemDef starSystem) =>
+    internal static IEnumerable<Map_MDD> ReadPlayableMaps(StarSystemDef starSystem) =>
         MetadataDatabase.Instance
             .GetReleasedMapsAndEncountersBySinglePlayerProceduralContractTypeAndTags(
                 starSystem.MapRequiredTags,

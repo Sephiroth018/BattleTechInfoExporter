@@ -835,6 +835,7 @@
         "owner",
         "tags",
         "biomes",
+        "maps",
         "difficulty",
         "canTravelTo",
         "route"
@@ -862,6 +863,13 @@
         "biomes": {
           "type": "array",
           "description": "The biomes the star system's missions can be on.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
+          }
+        },
+        "maps": {
+          "type": "array",
+          "description": "The maps the star system's contracts can be fought on, as the contract generator selects them from its biomes and map tags; each map's terrain is in the catalog's mapDefinitions.",
           "items": {
             "$ref": "#/definitions/DefinitionReference"
           }

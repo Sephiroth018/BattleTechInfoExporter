@@ -451,14 +451,14 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   between exports, and `star-systems.json` with every star system. Values in the game state refer
   to the rules by name, instead of repeating thresholds and effects per entry.
 - **Star systems live in `star-systems.json`, not the catalog, by decision:** keyed by the id of
-  each system's active definition, each entry holds its active definition's name, owner, tags and
-  biomes next to what changes during a career (difficulty, travel requirements, route). The story
-  swaps a system's definition (`StarSystem_SetActiveDef`, e.g. when its owner changes); the inactive
-  definitions give a consumer nothing and aren't exported. The game state repeats the full entry
-  wherever a star system other than the current one matters, and for the current one:
-  `position.starSystem`, `position.travel.destination`, the active contract's and each offered
-  travel contract's (`TravelContract`) star system; an offered contract in the current star system
-  (`LocalContract`) and the other files refer to a star system by its reference alone.
+  each system's active definition, each entry holds its active definition's name, owner, tags,
+  biomes and maps next to what changes during a career (difficulty, travel requirements, route). The
+  story swaps a system's definition (`StarSystem_SetActiveDef`, e.g. when its owner changes); the
+  inactive definitions give a consumer nothing and aren't exported. The full entry is repeated
+  wherever a step needs it: in the game state `position.starSystem`, `position.travel.destination`,
+  the active contract's and each offered travel contract's (`TravelContract`) star system, and the
+  mission's contract in the mission outcome and the combat state; an offered contract in the current
+  star system (`LocalContract`) refers to it by its reference alone.
 - **A route is the starmap's** (`RouteReader`) from the current system, its days and cost: `null`
   where the game finds no route, always for a system whose travel requirements aren't met. The
   current system's is 0 days and 0 C-Bills.
@@ -471,7 +471,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   and after every unit's activation, and deleted when the game tears the battle down or a career is loaded, so it exists
   only while its battle runs. It shows what the player's HUD shows and no more: enemies by their
   visibility (`CombatUnitReader`), from full detail down to a blip's position or the position they
-  were last detected at. Every read is a cached lookup or a statistic, apart from the map cells of
+  were last detected at. Every read is a cached lookup or a statistic, apart from the contract's star
+  system (`StarSystemReader`, a tag and a map query in the metadata database), the map cells of
   destroyed buildings and the player's units' movement (`MovementReader`): the hexes each can reach
   from the path grids the game keeps for every unit, finishing a grid still being built, and from
   the game's jump landing check per hex in jump range, with the
@@ -492,12 +493,12 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   memory) isn't detected; deleting the file forces a rebuild. Vehicles' and turrets'
   armor and structure are their combat values, after the game's vehicle multipliers. Terrains are
   keyed by design mask id, biomes by the biome id the star systems refer to.
-- **Maps are selected by the game, not derived by the consumer:** each map in the catalog's
-  `mapDefinitions` lists the star system definitions whose contracts can be fought on it, inactive
-  ones included, through the contract generator's own query per definition (`MapReader`), next to its draw weight and terrain
-  coverage, the share of its playable cells per terrain id, read from the map's terrain data file.
-  All of it is game data, so it lives in the catalog and is read only on a rebuild, never per
-  career export.
+- **Maps are selected by the game, not derived by the consumer:** each star system in
+  `star-systems.json` lists the maps its contracts can be fought on, through the contract
+  generator's own query (`MapReader.ReadPlayableMaps`), run on every career export once per distinct
+  input (required and excluded map tags, biomes) rather than per star system. The catalog's
+  `mapDefinitions` hold each map's draw weight and terrain coverage, the share of its playable cells
+  per terrain id, read from the map's terrain data file only on a rebuild.
 - **The rules export only constants the game's code reads** (`combat` and `campaign` in
   `rules.json`): a constant the game never reads, reads only in code nothing calls, or reads only
   for presentation or the AI is left out, so a consumer never plans around a number that does

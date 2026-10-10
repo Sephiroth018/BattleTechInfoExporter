@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using BattleTech;
 using BattleTech.Data;
@@ -9,25 +10,37 @@ using StarSystem = BattleTech.StarSystem;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Builds the star systems file's model from the game's starmap.</summary>
+/// <summary>Builds the star systems file's model from the game's star systems, and the current star system alone.</summary>
 internal static class StarSystemReader
 {
-    internal static Starmap Read(SimGameState simGame)
+    internal static Starmap Read(SimGameState simGame) => new(ReadStarSystems(simGame, simGame.StarSystems));
+
+    /// <summary>The current star system in full, as the star systems file has it; also in combat.</summary>
+    internal static Models.StarSystem ReadCurrentStarSystem(SimGameState simGame) =>
+        ReadStarSystems(simGame, [simGame.CurSystem]).Values.Single();
+
+    private static SortedDictionary<string, Models.StarSystem> ReadStarSystems(
+        SimGameState simGame,
+        IReadOnlyCollection<StarSystem> systems)
     {
         var visibleTags = ReadVisibleTagsByName();
         // The few biomes are resolved once instead of per star system: each lookup builds the game's biome table
         // anew (DataManagerExtensions.GetBaseDescriptionDef).
-        var biomes = simGame.StarSystems
+        var biomes = systems
             .SelectMany(system => system.Def.SupportedBiomes)
             .Distinct()
             .ToDictionary(biome => biome, biome => DefinitionReferences.ReferenceTo(simGame.DataManager, biome));
+        // The map query depends only on its inputs, which many star systems share, so it runs once per distinct input.
+        var playableMaps = new Dictionary<string, List<DefinitionReference>>(StringComparer.Ordinal);
         var starSystems = new SortedDictionary<string, Models.StarSystem>(StringComparer.Ordinal);
-        foreach (var system in simGame.StarSystems)
+        foreach (var system in systems)
         {
-            starSystems.Add(system.Def.Description.Id, ReadStarSystem(simGame, system, visibleTags, biomes));
+            starSystems.Add(
+                system.Def.Description.Id,
+                ReadStarSystem(simGame, system, visibleTags, biomes, playableMaps));
         }
 
-        return new Starmap(starSystems);
+        return starSystems;
     }
 
     // A star system's tags are its active definition's, also after a swap (StarSystem.SetNewStarSystemDef).
@@ -36,11 +49,13 @@ internal static class StarSystemReader
     private static Models.StarSystem ReadStarSystem(
         SimGameState simGame,
         StarSystem system,
-        IReadOnlyDictionary<string, DefinitionReference> visibleTags,
-        Dictionary<Biome.BIOMESKIN, DefinitionReference> biomes)
+        Dictionary<string, DefinitionReference> visibleTags,
+        Dictionary<Biome.BIOMESKIN, DefinitionReference> biomes,
+        Dictionary<string, List<DefinitionReference>> playableMaps)
     {
         var definition = system.Def;
-        var canTravelTo = simGame.Starmap.CanTravelToNode(system.ID);
+        // Mirrors Starmap.CanTravelToNode, without the starmap, which the game drops during combat.
+        var canTravelTo = definition.TravelRequirements.All(requirement => simGame.MeetsRequirements(requirement));
         // The starmap offers no trip to the current system (SGNavigationScreen.OnSystemRouted).
         var route = system.ID == simGame.CurSystem.ID ? new Route(0, 0)
             : canTravelTo ? RouteReader.ReadRoute(simGame, system)
@@ -49,8 +64,9 @@ internal static class StarSystemReader
             definition.Description.Id,
             definition.Description.Name,
             DefinitionReferences.ReferenceTo(definition.OwnerValue),
-            ReadVisibleTags(definition, visibleTags),
+            definition.Tags.Where(visibleTags.ContainsKey).Select(tag => visibleTags[tag]).ToList(),
             definition.SupportedBiomes.Select(biome => biomes[biome]).ToList(),
+            ReadPlayableMaps(definition, playableMaps),
             // As the starmap's system panel shows it (SGSystemViewPopulator).
             simGame.GetNormalizedDifficulty(definition),
             canTravelTo,
@@ -68,11 +84,29 @@ internal static class StarSystemReader
                 tag => new DefinitionReference(tag.Name, tag.FriendlyName),
                 StringComparer.Ordinal);
 
-    private static List<DefinitionReference> ReadVisibleTags(
+    // The query takes the tag sets and biomes as sets (SQL IN), so their order doesn't change its result.
+    private static List<DefinitionReference> ReadPlayableMaps(
         StarSystemDef definition,
-        IReadOnlyDictionary<string, DefinitionReference> visibleTags) =>
-        definition.Tags
-            .Where(visibleTags.ContainsKey)
-            .Select(tag => visibleTags[tag])
-            .ToList();
+        Dictionary<string, List<DefinitionReference>> playableMaps)
+    {
+        var queryInput = string.Join(
+            "|",
+            string.Join(",", definition.MapRequiredTags.OrderBy(tag => tag, StringComparer.Ordinal)),
+            string.Join(",", definition.MapExcludedTags.OrderBy(tag => tag, StringComparer.Ordinal)),
+            string.Join(
+                ",",
+                definition.SupportedBiomes
+                    .OrderBy(biome => biome)
+                    .Select(biome => ((int)biome).ToString(CultureInfo.InvariantCulture))));
+        if (!playableMaps.TryGetValue(queryInput, out var maps))
+        {
+            maps = MapReader.ReadPlayableMaps(definition)
+                .Select(map => new DefinitionReference(map.MapID, map.FriendlyName))
+                .OrderBy(map => map)
+                .ToList();
+            playableMaps.Add(queryInput, maps);
+        }
+
+        return maps;
+    }
 }

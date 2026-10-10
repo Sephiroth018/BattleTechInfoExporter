@@ -12,6 +12,10 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Owner">The faction that owns the star system.</param>
 /// <param name="Tags">The star system's tags, as its starmap panel shows them.</param>
 /// <param name="Biomes">The biomes the star system's missions can be on.</param>
+/// <param name="Maps">
+///     The maps the star system's contracts can be fought on, as the contract generator selects them from its biomes
+///     and map tags; each map's terrain is in the catalog's <c>mapDefinitions</c>.
+/// </param>
 /// <param name="Difficulty">The star system's difficulty, as the starmap shows it.</param>
 /// <param name="CanTravelTo">
 ///     Whether the star system's travel requirements are met; story systems stay locked until then.
@@ -27,6 +31,7 @@ internal sealed record StarSystem(
     DefinitionReference Owner,
     IReadOnlyList<DefinitionReference> Tags,
     IReadOnlyList<DefinitionReference> Biomes,
+    IReadOnlyList<DefinitionReference> Maps,
     int Difficulty,
     bool CanTravelTo,
     Route? Route) : Reference(Id, Name);

@@ -2087,13 +2087,12 @@
     },
     "MapDefinition": {
       "type": "object",
-      "description": "A combat map, the star systems whose contracts can be fought on it and the terrain it is made of. The contract generator draws a star system's map among the maps that list the system, by weight.",
+      "description": "A combat map some star system's contracts can be fought on, and the terrain it is made of. The contract generator draws a star system's map among the maps star-systems.json lists for the system, by weight.",
       "additionalProperties": false,
       "required": [
         "name",
         "biome",
         "tags",
-        "starSystems",
         "weight",
         "terrainCoverage"
       ],
@@ -2111,13 +2110,6 @@
           "description": "The map tags the star systems' required and excluded map tags select the map by.",
           "items": {
             "type": "string"
-          }
-        },
-        "starSystems": {
-          "type": "array",
-          "description": "The star system definitions whose contracts can be fought on the map, as the contract generator selects them from the definition's biomes and map tags; the active ones are the keys of star-systems.json.",
-          "items": {
-            "$ref": "#/definitions/DefinitionReference"
           }
         },
         "weight": {

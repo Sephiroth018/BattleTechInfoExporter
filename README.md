@@ -19,12 +19,15 @@ kept current. Three of them hold the career and are written together on every ca
   by name instead of repeating thresholds and effects per entry.
 - `star-systems.json`: every star system on the starmap, locked story systems included, keyed by
   the id of its active definition, with its name, owner, the tags the starmap shows, the biomes its
-  contracts can be fought in, its difficulty, whether its travel requirements are met, and the
-  route from the current system: the days and C-Bills the trip takes as the starmap shows them (0
-  for the current system, `null` where there is no route). The story swaps some systems'
-  definitions, e.g. when a system's owner changes; the entry is always the active one's. The game
-  state repeats the entry of the current system, the travel destination, and every travel
-  contract's system; the other files refer to a star system only by its id and name.
+  contracts can be fought in, the maps the game can put its contracts on (selected as the contract
+  generator does, from its biomes and map tags), its difficulty, whether its travel requirements
+  are met, and the route from the current system: the days and C-Bills the trip takes as the
+  starmap shows them (0 for the current system, `null` where there is no route). The story swaps
+  some systems' definitions, e.g. when a system's owner changes; the entry is always the active
+  one's. The game state repeats the entry of the current system, the travel destination, the
+  accepted and every offered travel contract's system, and the mission outcome and combat state
+  that of the mission's system; a contract offered in the current system refers to it only by its
+  id and name.
 
 One more holds the latest mission:
 
@@ -84,17 +87,14 @@ The last one describes the game rather than the career:
     unit on it on top of the terrain: heat sinking, heat per turn and damage dealt, the only
     values the game reads from a biome.
   - **Maps:** every map some star system's contracts can be fought on: name, biome, map tags, the
-    star system definitions whose contracts the game can put on it (selected as the contract
-    generator does, from the definition's biomes and map tags; every definition counts, the active
-    ones are the keys of `star-systems.json`), the contract generator's draw weight and the terrain
-    coverage: each terrain's share of the map's playable cells by terrain id, plus `none` for the
+    contract generator's draw weight and the terrain coverage: each terrain's share of the map's playable cells by terrain id, plus `none` for the
     cells with no terrain, the bare biome. Cells are all the same size, so a share is an area
     share; the shares sum to 1. The same kind of cell is a different terrain per map, e.g. water is
     ice on a polar map, so the shares name the terrain directly. Buildings aren't terrain: a cell
     under a building counts as the terrain below it.
 
-    The terrain a star system's contracts are likely fought on follows from the maps that list the
-    system, drawn by weight. The contract type and the maps the game recently offered filter
+    The terrain a star system's contracts are likely fought on follows from the maps
+    `star-systems.json` lists for the system, drawn by weight. The contract type and the maps the game recently offered filter
     further and aren't exported.
 
   The other files refer to the catalog's chassis, mechs and components by id instead
