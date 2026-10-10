@@ -907,7 +907,7 @@
       "properties": {
         "days": {
           "type": "integer",
-          "description": "The days the trip takes; 0 for the current star system.",
+          "description": "The days the trip takes from the current star system's planet, as the starmap shows them while the ship is there; during a trip, also the part already travelled (see arrivesOnDay). 0 for the current star system.",
           "format": "int32"
         },
         "cost": {
@@ -2896,10 +2896,6 @@
         "starSystem"
       ],
       "properties": {
-        "starSystem": {
-          "description": "The current star system.",
-          "$ref": "#/definitions/DefinitionReference"
-        },
         "meetsReputation": {
           "type": "boolean",
           "description": "Whether the reputation with the employer allows taking the contract; the list greys it out otherwise. Story, restoration and flashpoint contracts, and employers that don't gain reputation, are always allowed."
@@ -2958,6 +2954,10 @@
           "type": "integer",
           "description": "On the scale of maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
           "format": "int32"
+        },
+        "starSystem": {
+          "description": "The current star system.",
+          "$ref": "#/definitions/DefinitionReference"
         }
       }
     },
@@ -2981,10 +2981,6 @@
         "starSystem"
       ],
       "properties": {
-        "starSystem": {
-          "description": "The star system the mission is fought in, in full, as in star-systems.json, with the trip there.",
-          "$ref": "#/definitions/StarSystem"
-        },
         "meetsReputation": {
           "type": "boolean",
           "description": "Whether the reputation with the employer allows taking the contract; the list greys it out otherwise. Story, restoration and flashpoint contracts, and employers that don't gain reputation, are always allowed."
@@ -3043,6 +3039,10 @@
           "type": "integer",
           "description": "On the scale of maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
           "format": "int32"
+        },
+        "starSystem": {
+          "description": "The star system the mission is fought in, in full, as in star-systems.json, with the trip there.",
+          "$ref": "#/definitions/StarSystem"
         }
       }
     },

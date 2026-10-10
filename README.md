@@ -22,7 +22,9 @@ kept current. Three of them hold the career and are written together on every ca
   contracts can be fought in, the maps the game can put its contracts on (selected as the contract
   generator does, from its biomes and map tags), its difficulty, whether its travel requirements
   are met, and the route from the current system: the days and C-Bills the trip takes as the
-  starmap shows them (0 for the current system, `null` where there is no route). The story swaps
+  starmap shows them while the ship is in the system (0 for the current system, `null` where there
+  is no route). During a trip the days stay those from the current system's planet, including the
+  part already travelled; the trip's own day of arrival is in the position. The story swaps
   some systems' definitions, e.g. when a system's owner changes; the entry is always the active
   one's. The game state repeats the entry of the current system, the travel destination, the
   accepted and every offered travel contract's system; a contract offered in the current system

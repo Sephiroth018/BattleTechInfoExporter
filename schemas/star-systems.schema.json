@@ -182,7 +182,7 @@
       "properties": {
         "days": {
           "type": "integer",
-          "description": "The days the trip takes; 0 for the current star system.",
+          "description": "The days the trip takes from the current star system's planet, as the starmap shows them while the ship is there; during a trip, also the part already travelled (see arrivesOnDay). 0 for the current star system.",
           "format": "int32"
         },
         "cost": {
