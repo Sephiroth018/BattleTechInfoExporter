@@ -15,7 +15,7 @@ internal static class StarSystemReader
 {
     internal static Starmap Read(SimGameState simGame)
     {
-        var visibleTags = ReadVisibleTagsByName();
+        var tagNames = ReadTagNames();
         // The few biomes are resolved once instead of per star system: each lookup builds the game's biome table
         // anew (DataManagerExtensions.GetBaseDescriptionDef).
         var biomes = simGame.StarSystems
@@ -29,7 +29,7 @@ internal static class StarSystemReader
         {
             starSystems.Add(
                 system.Def.Description.Id,
-                ReadStarSystem(simGame, system, visibleTags, biomes, playableMaps));
+                ReadStarSystem(simGame, system, tagNames, biomes, playableMaps));
         }
 
         return new Starmap(starSystems);
@@ -41,7 +41,7 @@ internal static class StarSystemReader
     private static Models.StarSystem ReadStarSystem(
         SimGameState simGame,
         StarSystem system,
-        Dictionary<string, DefinitionReference> visibleTags,
+        Dictionary<string, string> tagNames,
         Dictionary<Biome.BIOMESKIN, DefinitionReference> biomes,
         Dictionary<string, List<DefinitionReference>> playableMaps)
     {
@@ -55,7 +55,7 @@ internal static class StarSystemReader
             definition.Description.Id,
             definition.Description.Name,
             DefinitionReferences.ReferenceTo(definition.OwnerValue),
-            definition.Tags.Where(visibleTags.ContainsKey).Select(tag => visibleTags[tag]).ToList(),
+            system.Tags.Select(tag => ReadTag(tagNames, tag)).ToList(),
             definition.SupportedBiomes.Select(biome => biomes[biome]).ToList(),
             ReadPlayableMaps(definition, playableMaps),
             // As the starmap's system panel shows it (SGSystemViewPopulator).
@@ -64,16 +64,16 @@ internal static class StarSystemReader
             route);
     }
 
-    // Mirrors the starmap's system panel (SGSystemViewPopulator, HBSTagView), which shows only the tags the
-    // metadata database marks as player-visible, by their friendly name (TagDataStructFetcher.GetItem).
-    private static Dictionary<string, DefinitionReference> ReadVisibleTagsByName() =>
-        // One query instead of one per tag (GetTagIfExists); the Name column compares binary, as Ordinal does.
+    // Named as the starmap's system panel names a tag (HBSTagView, TagDataStructFetcher.GetItem), which shows only the
+    // player-visible ones; one query instead of one per tag (GetTagIfExists). The Name column compares binary, as
+    // Ordinal does.
+    private static Dictionary<string, string> ReadTagNames() =>
         MetadataDatabase.Instance.GetAllTags()
-            .Where(tag => tag.PlayerVisible)
-            .ToDictionary(
-                tag => tag.Name,
-                tag => new DefinitionReference(tag.Name, tag.FriendlyName),
-                StringComparer.Ordinal);
+            .ToDictionary(tag => tag.Name, tag => tag.FriendlyName, StringComparer.Ordinal);
+
+    // A tag without a friendly name, which the game never shows, is named by its id.
+    private static DefinitionReference ReadTag(Dictionary<string, string> tagNames, string tag) =>
+        new(tag, tagNames.TryGetValue(tag, out var name) && !string.IsNullOrEmpty(name) ? name : tag);
 
     // The query takes the tag sets and biomes as sets (SQL IN), so their order doesn't change its result.
     private static List<DefinitionReference> ReadPlayableMaps(

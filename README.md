@@ -18,7 +18,8 @@ kept current. Three of them hold the career and are written together on every ca
   jets, and the combat and campaign rules), which the game state and the mission outcome refer to
   by name instead of repeating thresholds and effects per entry.
 - `star-systems.json`: every star system on the starmap, locked story systems included, keyed by
-  the id of its active definition, with its name, owner, the tags the starmap shows, the biomes its
+  the id of its active definition, with its name, owner, its tags (also those the starmap doesn't
+  show, which events check), the biomes its
   contracts can be fought in, the maps the game can put its contracts on (selected as the contract
   generator does, from its biomes and map tags), its difficulty, whether its travel requirements
   are met, and the route from the current system: the days and C-Bills the trip takes as the
@@ -57,9 +58,10 @@ Two more hold the running battle, and exist only while one runs:
 
 The last one describes the game rather than the career:
 
-- `catalog.json`: every chassis, mech, vehicle, turret, component, terrain, biome and map the game
-  has loaded, DLC included, keyed by id, so tools can judge what else exists beyond
-  what the career refers to, what a mission's enemies can do and what its ground does to them.
+- `catalog.json`: every chassis, mech, vehicle, turret, component, terrain, biome, map and event the
+  game has loaded, DLC included, keyed by id, so tools can judge what else exists beyond
+  what the career refers to, what a mission's enemies can do, what its ground does to them and
+  which events can come.
   - **Chassis:** the frame: weight class, tonnage and bare tonnage, max jump jets, built-in heat
     dissipation, walk and sprint distance, the pathing capabilities it moves with (see "Combat
     map"), melee values before upgrades, and per location max
@@ -98,6 +100,25 @@ The last one describes the game rather than the career:
     The terrain a star system's contracts are likely fought on follows from the maps
     `star-systems.json` lists for the system, drawn by weight. The contract type and the maps the game recently offered filter
     further and aren't exported.
+  - **Events:** every event: its title, whether it's about the company or a pilot, its draw weight,
+    whether it comes only once, whether the daily roll can draw it (otherwise only another event's
+    result schedules it), its requirements, the other pilots or mech it involves, and its options.
+    Each option has its requirements and its outcomes, drawn by weight, and each outcome its results:
+    tags added and removed, statistics changed, how many days the changes last before the game
+    reverts them (`null` when they last), actions such as killing, dismissing or sidelining the
+    pilot, and the events it schedules. A requirement names the scope it checks (the company, the
+    current star system, the commander or a pilot), the tags that must and mustn't be there and the
+    statistic comparisons that must hold; a statistic the scope doesn't have counts as 0. The game
+    state holds the company's and every pilot's tags and the statistics events compare, and
+    `star-systems.json` every star system's tags. Titles and option texts keep the game's placeholders
+    for the pilots it picks, e.g. `{TGT_MW.Callsign}`; the events' story texts are left out.
+
+    Once a day the game rolls for an event, except on the day the ship arrives at a star system and
+    on days the story moves on. The chance rises with every roll that brings none and falls back once
+    one comes. The roll draws by weight among the events the daily roll can draw whose requirements
+    are met, leaving out one-time events that have come and the events drawn lately until no other
+    can come. A pilot event is about a pilot without an event timeout who meets its requirements.
+    Every option is shown; one whose requirements aren't met can't be picked.
 
   The other files refer to the catalog's chassis, mechs and components by id instead
   of repeating their stats or limits, e.g. a location's max armor; a file and the catalog belong
@@ -132,7 +153,8 @@ The game state holds:
   when travelling, the destination, also in full, the day of arrival, the days between the current
   system's planet and its jump point, and the day the leg under way ends (reaching the jump point,
   a jump, or reaching the planet after the last jump).
-- **Pilots:** the commander and the roster with all their relevant stats.
+- **Pilots:** the commander and the roster with all their relevant stats, and the tags and
+  statistics events check.
 - **Mechs:** the mech bay's mechs with their status, the day they're ready, loadout, armor and
   performance summary; a mech in a refit also carries the refit's steps, each with only the fields
   its type uses, and what it will be once the refit is done, and
@@ -153,6 +175,10 @@ The game state holds:
   plus the accepted travel contract until it's proceeded with, with its star system in full and
   the day of arrival while travelling to it. The game generates a system's contracts only when the contract screen first
   opens; until then `contracts` is `null`.
+- **Events:** the events other events' results scheduled, with the pilot they're about and the
+  first and the last day they can come (assuming a roll every day), the events drawn lately, the
+  one-time events that have come, and the company's tags and the statistics events compare. The
+  chance of the next event isn't shown in the game and isn't exported.
 
 The rules' skill training tables hold, per level, the experience it costs, the base hit chance it
 gives (Gunnery for ranged attacks, Piloting for melee, before an attack's modifiers) and the
@@ -292,6 +318,7 @@ The game state is exported when:
 - **Experience is spent:** a pilot's training is confirmed in the barracks.
 - **A new mech needs a place:** the game asks where to put it because every mech bay is full, e.g.
   after salvage completes a mech.
+- **An event is resolved:** its popup is closed after an option was picked.
 
 The catalog is rebuilt when the career is loaded, also after a mission, but only when it's missing
 or stale: written by another mod version, or with another `sourceFingerprint` than the game's

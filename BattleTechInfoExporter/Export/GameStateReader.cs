@@ -16,12 +16,13 @@ internal static class GameStateReader
     {
         var travelInProgress = ReadTravelInProgress(simGame);
         var mechLabFinishingDays = WorkQueueReader.ReadMechLabFinishingDays(simGame);
+        var comparedStatistics = EventStateReader.ReadComparedStatistics(simGame);
         return new GameState(
             ReadCompany(simGame),
             FinancialReportReader.Read(simGame),
             WorkQueueReader.ReadWorkQueue(simGame, mechLabFinishingDays),
             ShipReader.ReadShip(simGame),
-            PilotReader.ReadPilots(simGame),
+            PilotReader.ReadPilots(simGame, comparedStatistics.Pilot),
             MechReader.ReadMechs(simGame, mechLabFinishingDays),
             MechReader.ReadMechsAwaitingPlacement(simGame),
             LanceReader.ReadLastLance(simGame),
@@ -30,7 +31,8 @@ internal static class GameStateReader
             PilotReader.ReadHiringHall(simGame),
             ContractReader.ReadActiveContract(simGame, starmap, travelInProgress),
             ContractReader.ReadContracts(simGame, starmap),
-            ReadPosition(simGame, starmap, travelInProgress));
+            ReadPosition(simGame, starmap, travelInProgress),
+            EventStateReader.ReadEventState(simGame, comparedStatistics));
     }
 
     private static Company ReadCompany(SimGameState simGame) =>

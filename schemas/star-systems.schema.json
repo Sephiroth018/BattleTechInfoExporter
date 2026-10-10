@@ -56,7 +56,8 @@
         "PhaseStarted",
         "CombatStarted",
         "CombatLoaded",
-        "ActivationCompleted"
+        "ActivationCompleted",
+        "EventResolved"
       ],
       "enum": [
         "careerLoaded",
@@ -78,7 +79,8 @@
         "phaseStarted",
         "combatStarted",
         "combatLoaded",
-        "activationCompleted"
+        "activationCompleted",
+        "eventResolved"
       ]
     },
     "StarSystem": {
@@ -111,7 +113,7 @@
         },
         "tags": {
           "type": "array",
-          "description": "The star system's tags, as its starmap panel shows them.",
+          "description": "The star system's tags, which the events' requirements check, also those its starmap panel doesn't show; named as the panel names them, by their id where the game has no name.",
           "items": {
             "$ref": "#/definitions/DefinitionReference"
           }

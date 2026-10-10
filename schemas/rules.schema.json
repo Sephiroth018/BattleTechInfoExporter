@@ -109,7 +109,8 @@
         "PhaseStarted",
         "CombatStarted",
         "CombatLoaded",
-        "ActivationCompleted"
+        "ActivationCompleted",
+        "EventResolved"
       ],
       "enum": [
         "careerLoaded",
@@ -131,7 +132,8 @@
         "phaseStarted",
         "combatStarted",
         "combatLoaded",
-        "activationCompleted"
+        "activationCompleted",
+        "eventResolved"
       ]
     },
     "MoraleLevel": {
