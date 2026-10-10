@@ -96,7 +96,11 @@ internal static class PilotReader
             pilot.Health);
     }
 
-    private static Skills ReadSkills(Pilot pilot) => new(pilot.Gunnery, pilot.Piloting, pilot.Guts, pilot.Tactics);
+    /// <summary>
+    ///     The skill levels as the game computes with them (e.g. the to-hit through AbstractActor.SkillGunnery): the
+    ///     pilot's statistics, which effects on the pilot change for their duration.
+    /// </summary>
+    internal static Skills ReadSkills(Pilot pilot) => new(pilot.Gunnery, pilot.Piloting, pilot.Guts, pilot.Tactics);
 
     private static List<DefinitionReference> ReadAbilities(PilotDef pilot) =>
         SimGameState.GetPrimaryPilotAbilities(pilot)

@@ -845,7 +845,8 @@
       "required": [
         "injuries",
         "health",
-        "bonusHealth"
+        "bonusHealth",
+        "skills"
       ],
       "properties": {
         "injuries": {
@@ -861,6 +862,43 @@
         "bonusHealth": {
           "type": "integer",
           "description": "The bonus health left, which takes hits before they become injuries and is used up by them; the portrait shows it on top of health.",
+          "format": "int32"
+        },
+        "skills": {
+          "description": "The skill levels the game computes with now, temporary changes from effects included; exported for every pilot in full view, though the HUD shows only the player's.",
+          "$ref": "#/definitions/Skills"
+        }
+      }
+    },
+    "Skills": {
+      "type": "object",
+      "description": "A pilot's skill levels, each from 1 to 10.",
+      "additionalProperties": false,
+      "required": [
+        "gunnery",
+        "piloting",
+        "guts",
+        "tactics"
+      ],
+      "properties": {
+        "gunnery": {
+          "type": "integer",
+          "description": "The gunnery level, a level of gunnery.",
+          "format": "int32"
+        },
+        "piloting": {
+          "type": "integer",
+          "description": "The piloting level, a level of piloting.",
+          "format": "int32"
+        },
+        "guts": {
+          "type": "integer",
+          "description": "The guts level, a level of guts.",
+          "format": "int32"
+        },
+        "tactics": {
+          "type": "integer",
+          "description": "The tactics level, a level of tactics.",
           "format": "int32"
         }
       }

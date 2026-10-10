@@ -115,8 +115,12 @@ internal sealed record CombatUnitState(
 ///     The bonus health left, which takes hits before they become injuries and is used up by them; the portrait
 ///     shows it on top of <paramref name="Health" />.
 /// </param>
+/// <param name="Skills">
+///     The skill levels the game computes with now, temporary changes from effects included; exported for every
+///     pilot in full view, though the HUD shows only the player's.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record CombatPilotState(int Injuries, int Health, int BonusHealth);
+internal sealed record CombatPilotState(int Injuries, int Health, int BonusHealth, Skills Skills);
 
 /// <summary>A location's armor and structure left, in whole points as the paper doll shows them.</summary>
 /// <param name="Location">The game's name of the location (a mech's, vehicle's or turret's).</param>
