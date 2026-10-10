@@ -3188,7 +3188,7 @@
         },
         "usedOneTimeEvents": {
           "type": "array",
-          "description": "The one-time events that have come, which never come again.",
+          "description": "The one-time events the daily roll has drawn, which it never draws again.",
           "items": {
             "$ref": "#/definitions/DefinitionReference"
           }
@@ -3204,7 +3204,7 @@
     },
     "ScheduledEvent": {
       "type": "object",
-      "description": "An event a result has scheduled. The days assume a daily roll on every day from the next on; the game skips the roll on the day the ship arrives at a star system and on the days the story moves on.",
+      "description": "An event a result has scheduled. The days assume a daily roll on every day from the next on; the game skips the roll on the day the ship arrives at a star system and on the days the story moves on, and on a day one scheduled event comes, the ones after it in the list don't roll.",
       "additionalProperties": false,
       "required": [
         "event",

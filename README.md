@@ -178,9 +178,10 @@ The game state holds:
   the day of arrival while travelling to it. The game generates a system's contracts only when the contract screen first
   opens; until then `contracts` is `null`.
 - **Events:** the events other events' results scheduled, with the pilot they're about and the
-  first and the last day they can come (assuming a roll every day), the events drawn lately and
-  the one-time events that have come. The chance of the next event isn't shown in the game and
-  isn't exported.
+  first and the last day they can come (assuming a roll every day; on a day one comes, the ones
+  listed after it wait), the events drawn lately and the one-time events the daily roll has drawn.
+  An event scheduled for a pilot who has left is left out, as the game drops it. The chance of the
+  next event isn't shown in the game and isn't exported.
 
 The rules' skill training tables hold, per level, the experience it costs, the base hit chance it
 gives (Gunnery for ranged attacks, Piloting for melee, before an attack's modifiers) and the

@@ -16,9 +16,12 @@ internal static class EventStateReader
         return new EventState(
             ReferencesTo(simGame, tracker.discardList),
             ReferencesTo(simGame, tracker.usedOneTimeEvents),
-            // A saved event the game no longer has, e.g. a removed mod's, isn't loaded (SimGameEventTracker.Hydrate).
+            // A saved event the game no longer has, e.g. a removed mod's, isn't loaded (SimGameEventTracker.Hydrate),
+            // and one about a pilot who left the roster is dropped when it comes (OnSuccessfulEventRoll).
             simGame.specialEventTracker
-                .Where(scheduled => scheduled.predefinedEvent is not null)
+                .Where(scheduled => scheduled.predefinedEvent is not null
+                                    && (scheduled.predefinedPilot is null
+                                        || simGame.PilotRoster.Contains(scheduled.predefinedPilot)))
                 .Select(scheduled => ReadScheduledEvent(simGame, scheduled))
                 .ToList());
     }

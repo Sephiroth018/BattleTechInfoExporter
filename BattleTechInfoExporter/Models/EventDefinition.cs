@@ -83,7 +83,9 @@ internal sealed record EventOutcome(int Weight, IReadOnlyList<EventResult> Resul
 /// </param>
 /// <param name="AddedTags">The tags added.</param>
 /// <param name="RemovedTags">The tags removed.</param>
-/// <param name="StatisticChanges">The statistics changed.</param>
+/// <param name="StatisticChanges">
+///     The statistics changed; a boolean statistic's value as 1 or 0, as the requirements compare it.
+/// </param>
 /// <param name="DurationDays">
 ///     How many days the tag and statistic changes last before the game reverts them; <c>null</c> when they last.
 /// </param>

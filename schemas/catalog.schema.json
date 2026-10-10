@@ -2454,7 +2454,7 @@
         },
         "statisticChanges": {
           "type": "array",
-          "description": "The statistics changed.",
+          "description": "The statistics changed; a boolean statistic's value as 1 or 0, as the requirements compare it.",
           "items": {
             "$ref": "#/definitions/CareerStatisticChange"
           }

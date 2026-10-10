@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using BattleTech;
 using BattleTech.Data;
@@ -69,9 +70,7 @@ internal static class EventDefinitionReader
             result.Requirements is { } requirement ? ReadRequirement(requirement, requirement.Scope) : null,
             ReadTags(result.AddedTags),
             ReadTags(result.RemovedTags),
-            // The value is already resolved from its constant, e.g. [rep_gain_small].
-            (result.Stats ?? []).Select(stat => new CareerStatisticChange(stat.name, stat.ToSingle(), stat.set))
-            .ToList(),
+            (result.Stats ?? []).Select(ReadStatisticChange).OfType<CareerStatisticChange>().ToList(),
             // SimGameState.ApplySimGameEventResult tracks a result as temporary only with a duration.
             result.TemporaryResult && result.ResultDuration > 0 ? result.ResultDuration : null,
             (result.Actions ?? [])
@@ -88,6 +87,24 @@ internal static class EventDefinitionReader
                 forcedEvent.Probability,
                 forcedEvent.RetainPilot))
             .ToList());
+
+    // The value is already resolved from its constant, e.g. [rep_gain_small]. A boolean is 1 or 0, as
+    // SimGameState.MeetsStatRequirements compares it; a text can't be compared, so it's left out.
+    private static CareerStatisticChange? ReadStatisticChange(SimGameStat stat)
+    {
+        if (stat.Type == typeof(bool))
+        {
+            return new CareerStatisticChange(stat.name, stat.ToBool() ? 1f : 0f, stat.set);
+        }
+
+        if (float.TryParse(stat.value, NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
+        {
+            return new CareerStatisticChange(stat.name, value, stat.set);
+        }
+
+        ModLog.Logger.LogWarning($"Left out the change to the text statistic {stat.name} of an event result");
+        return null;
+    }
 
     // An empty requirement is met by anything (RequirementDef.HasRequirement), so it's left out.
     private static EventRequirement? ReadRequirement(RequirementDef? requirement, EventScope scope) =>
