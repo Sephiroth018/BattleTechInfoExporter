@@ -14,12 +14,14 @@ namespace BattleTechInfoExporter.Export;
 internal static class BuildingReader
 {
     /// <summary>Every building, in the order of their ids; the combat state's lists are drawn from it.</summary>
-    // A dropship's building is enabled only while it is landed (DropshipGameLogic.ShowDropshipBasedOnAnimationState):
-    // off the map or hovering, it occupies no cell and can't be targeted.
+    // A building is on the map when the obstruction's cells are enabled. A dropship's are enabled only while it is
+    // landed (DropshipGameLogic.ShowDropshipBasedOnAnimationState): off the map or hovering, it occupies no cell and
+    // can't be targeted. A dropship spawned at runtime for a lance or a pickup has no cells at all, which
+    // ObstructionGameLogic.IsBuildingEnabled alone counts as enabled.
     internal static IReadOnlyList<BattleTech.Building> ReadAll(CombatGameState combat) =>
         combat.GetAllMiscCombatants()
             .OfType<BattleTech.Building>()
-            .Where(building => ObstructionOf(combat, building).IsBuildingEnabled)
+            .Where(building => ObstructionOf(combat, building) is { IsBuildingEnabled: true, occupiedCells.Count: > 0 })
             .OrderBy(building => building.GUID, StringComparer.Ordinal)
             .ToList();
 
