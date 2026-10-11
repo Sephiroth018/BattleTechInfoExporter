@@ -9,10 +9,10 @@ internal static class StoreReader
 {
     // A store exists when it has stock (StarSystem.HasFactionStore, HasBlackMarketStore). CanUseSystemStore doesn't
     // check it, the other two do.
-    internal static Stores ReadStores(SimGameState simGame)
+    internal static ByStore<Store?> ReadStores(SimGameState simGame)
     {
         var system = simGame.CurSystem;
-        return new Stores(
+        return new ByStore<Store?>(
             ReadStoreIfUsable(
                 system.CanUseSystemStore() && !system.SystemShop.IsEmpty,
                 system.SystemShop,
@@ -42,11 +42,8 @@ internal static class StoreReader
         return new Store(
             DefinitionReferences.ReferenceTo(priceFaction),
             ReferencedEntries.Read(
-                    items.Where(item => IsComponent(item.Type)),
-                    item => ComponentReferences.TryReferenceTo(
-                        simGame.DataManager,
-                        Shop.ShopItemTypeToComponentType(item.Type),
-                        item.ID),
+                    items.Where(item => ShopItemReferences.IsComponent(item.Type)),
+                    item => ShopItemReferences.TryReferenceToComponent(simGame.DataManager, item.Type, item.ID),
                     (component, item) => new ComponentForSale(component, CountOf(item), PriceOf(shop, item)))
                 .OrderBy(component => component.Component)
                 .ToList(),
@@ -69,7 +66,7 @@ internal static class StoreReader
     // them.
     private static bool IsKnownType(Shop shop, ShopDefItem item)
     {
-        if (IsComponent(item.Type) || item.Type is ShopItemType.Mech or ShopItemType.MechPart)
+        if (ShopItemReferences.IsComponent(item.Type) || item.Type is ShopItemType.Mech or ShopItemType.MechPart)
         {
             return true;
         }
@@ -77,10 +74,6 @@ internal static class StoreReader
         ModLog.Logger.LogWarning($"Skipped {item.ID} in the {shop.ThisShopType} store: unexpected type {item.Type}");
         return false;
     }
-
-    private static bool IsComponent(ShopItemType type) =>
-        type is ShopItemType.Weapon or ShopItemType.AmmunitionBox or ShopItemType.HeatSink or ShopItemType.JumpJet
-            or ShopItemType.Upgrade;
 
     private static int? CountOf(ShopDefItem item) => item.IsInfinite ? null : item.Count;
 

@@ -92,6 +92,7 @@
         "tags",
         "biomes",
         "maps",
+        "stores",
         "difficulty",
         "canTravelTo",
         "route"
@@ -129,6 +130,10 @@
           "items": {
             "$ref": "#/definitions/DefinitionReference"
           }
+        },
+        "stores": {
+          "description": "The item collections each of the star system's stores draws its stock from on arrival, every entry of each once, by their ids in the catalog's itemCollectionDefinitions. A store without any doesn't exist in the star system.",
+          "$ref": "#/definitions/ByStoreOfIReadOnlyListOfString"
         },
         "difficulty": {
           "type": "integer",
@@ -168,6 +173,39 @@
         "name": {
           "type": "string",
           "description": "The name the UI shows."
+        }
+      }
+    },
+    "ByStoreOfIReadOnlyListOfString": {
+      "type": "object",
+      "description": "A value per store of a star system: its system store, faction store and black market.",
+      "additionalProperties": false,
+      "required": [
+        "system",
+        "faction",
+        "blackMarket"
+      ],
+      "properties": {
+        "system": {
+          "type": "array",
+          "description": "The value for the system store.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "faction": {
+          "type": "array",
+          "description": "The value for the faction store.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "blackMarket": {
+          "type": "array",
+          "description": "The value for the black market.",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

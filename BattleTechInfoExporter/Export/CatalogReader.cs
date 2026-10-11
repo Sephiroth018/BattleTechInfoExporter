@@ -63,7 +63,8 @@ internal static class CatalogReader
             terrainDefinitions,
             TerrainReader.ReadBiomeDefinitions(dataManager),
             MapReader.ReadMapDefinitions(dataManager, terrainDefinitions),
-            EventDefinitionReader.ReadEventDefinitions(dataManager));
+            EventDefinitionReader.ReadEventDefinitions(dataManager),
+            ItemCollectionReader.ReadItemCollectionDefinitions(dataManager));
     }
 
     private static SortedDictionary<string, TEntry> ToSortedDictionary<TDefinition, TEntry>(

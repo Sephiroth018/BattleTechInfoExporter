@@ -19,6 +19,11 @@ namespace BattleTechInfoExporter.Models;
 ///     The maps the star system's contracts can be fought on, as the contract generator selects them from its biomes
 ///     and map tags; each map's terrain is in the catalog's <c>mapDefinitions</c>.
 /// </param>
+/// <param name="Stores">
+///     The item collections each of the star system's stores draws its stock from on arrival, every entry of each
+///     once, by their ids in the catalog's <see cref="Catalog.ItemCollectionDefinitions" />. A store without any
+///     doesn't exist in the star system.
+/// </param>
 /// <param name="Difficulty">The star system's difficulty, as the starmap shows it.</param>
 /// <param name="CanTravelTo">
 ///     Whether the star system's travel requirements are met; story systems stay locked until then.
@@ -35,6 +40,7 @@ internal sealed record StarSystem(
     IReadOnlyList<DefinitionReference> Tags,
     IReadOnlyList<DefinitionReference> Biomes,
     IReadOnlyList<DefinitionReference> Maps,
+    ByStore<IReadOnlyList<string>> Stores,
     int Difficulty,
     bool CanTravelTo,
     Route? Route) : Reference(Id, Name);

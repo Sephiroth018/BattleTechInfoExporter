@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Catalog",
   "type": "object",
-  "description": "The root of catalog.json: every chassis, mech, vehicle, turret, component, terrain, biome, map and event definition the game has loaded, keyed by id. It describes the game, not the career, so it only changes with the game's data.",
+  "description": "The root of catalog.json: every chassis, mech, vehicle, turret, component, terrain, biome, map, event and item collection definition the game has loaded, keyed by id. It describes the game, not the career, so it only changes with the game's data.",
   "additionalProperties": false,
   "required": [
     "modVersion",
@@ -17,7 +17,8 @@
     "terrainDefinitions",
     "biomeDefinitions",
     "mapDefinitions",
-    "eventDefinitions"
+    "eventDefinitions",
+    "itemCollectionDefinitions"
   ],
   "properties": {
     "modVersion": {
@@ -95,6 +96,13 @@
       "description": "The events, keyed by event id.",
       "additionalProperties": {
         "$ref": "#/definitions/EventDefinition"
+      }
+    },
+    "itemCollectionDefinitions": {
+      "type": "object",
+      "description": "The item collections the stores draw their stock from and the rewards are drawn from, keyed by collection id; a star system's stores name theirs in star-systems.json.",
+      "additionalProperties": {
+        "$ref": "#/definitions/ItemCollectionDefinition"
       }
     }
   },
@@ -2687,6 +2695,165 @@
         "keepsPilot": {
           "type": "boolean",
           "description": "Whether the scheduled event is about the same pilot as the result."
+        }
+      }
+    },
+    "ItemCollectionDefinition": {
+      "type": "object",
+      "description": "An item collection: a weighted list the stores and the rewards draw their items from. A draw picks one entry by weight; a collection drawn in full yields every entry once, as a store's own collections are.",
+      "additionalProperties": false,
+      "required": [
+        "components",
+        "mechs",
+        "mechParts",
+        "collections",
+        "emptyWeight"
+      ],
+      "properties": {
+        "components": {
+          "type": "array",
+          "description": "The components a draw can yield.",
+          "items": {
+            "$ref": "#/definitions/ComponentCollectionEntry"
+          }
+        },
+        "mechs": {
+          "type": "array",
+          "description": "The whole mechs a draw can yield.",
+          "items": {
+            "$ref": "#/definitions/MechCollectionEntry"
+          }
+        },
+        "mechParts": {
+          "type": "array",
+          "description": "The mech parts a draw can yield.",
+          "items": {
+            "$ref": "#/definitions/MechPartsCollectionEntry"
+          }
+        },
+        "collections": {
+          "type": "array",
+          "description": "The collections a draw can yield, drawn in turn.",
+          "items": {
+            "$ref": "#/definitions/NestedCollectionEntry"
+          }
+        },
+        "emptyWeight": {
+          "type": "integer",
+          "description": "The draw weight of the collection's empty entries, which use up a draw and yield nothing; 0 where it has none.",
+          "format": "int32"
+        }
+      }
+    },
+    "ComponentCollectionEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "component",
+        "count",
+        "weight"
+      ],
+      "properties": {
+        "component": {
+          "description": "The component, by the id its definition is keyed by.",
+          "$ref": "#/definitions/ComponentReference"
+        },
+        "count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The copies a draw yields; null: unlimited.",
+          "format": "int32"
+        },
+        "weight": {
+          "type": "integer",
+          "description": "The entry's draw weight among the collection's entries.",
+          "format": "int32"
+        }
+      }
+    },
+    "MechCollectionEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mech",
+        "count",
+        "weight"
+      ],
+      "properties": {
+        "mech": {
+          "description": "The mech, described in mechDefinitions.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The copies a draw yields; null: unlimited.",
+          "format": "int32"
+        },
+        "weight": {
+          "type": "integer",
+          "description": "The entry's draw weight among the collection's entries.",
+          "format": "int32"
+        }
+      }
+    },
+    "MechPartsCollectionEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mech",
+        "count",
+        "weight"
+      ],
+      "properties": {
+        "mech": {
+          "description": "The mech the parts assemble into, described in mechDefinitions.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The copies a draw yields; null: unlimited.",
+          "format": "int32"
+        },
+        "weight": {
+          "type": "integer",
+          "description": "The entry's draw weight among the collection's entries.",
+          "format": "int32"
+        }
+      }
+    },
+    "NestedCollectionEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "collection",
+        "draws",
+        "weight"
+      ],
+      "properties": {
+        "collection": {
+          "type": "string",
+          "description": "The collection drawn from, by its id in itemCollectionDefinitions."
+        },
+        "draws": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The draws from the collection, each by weight and with the same entry possible again; null: every entry once.",
+          "format": "int32"
+        },
+        "weight": {
+          "type": "integer",
+          "description": "The entry's draw weight among the collection's entries.",
+          "format": "int32"
         }
       }
     }

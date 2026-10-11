@@ -31,10 +31,11 @@ internal static class CatalogSourceFingerprint
     ];
 
     // Every type the catalog reads: the career's chassis, mechs, components and star systems, which also select the
-    // maps, and events, the ones above, and the terrain data MapReader reads from disk.
+    // maps, events and item collections, the ones above, and the terrain data MapReader reads from disk.
     private static readonly IReadOnlyList<BattleTechResourceType> ResourceTypes =
     [
         BattleTechResourceType.SimGameEventDef,
+        BattleTechResourceType.ItemCollectionDef,
         BattleTechResourceType.ChassisDef,
         BattleTechResourceType.MechDef,
         BattleTechResourceType.WeaponDef,
