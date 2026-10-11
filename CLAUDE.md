@@ -98,6 +98,10 @@ Once per repository, before the rest of the workflow applies:
 - **The user's own review comments fire no events** (a solo author can only leave "comment"
   reviews). When the user says they've reviewed, read all three surfaces: PR comments, inline diff
   comments and review summaries. Answer each comment on the PR, inline ones in their own thread.
+- **Before merging, check what `main` gained since the branch was cut**
+  (`git log --first-parent --oneline <merge-base>..origin/main`). If another PR landed, merge
+  `main` into the branch and redo what depends on `main`'s state: a version bump that another PR
+  took (see the project's "Versioning"), and the build and inspections when the merge touched code.
 - **Merge only after the user's go-ahead in chat, given after the latest commit.** A later commit
   that changes the PR's diff needs a fresh go-ahead; a conflict-free update from `main` doesn't.
   Merge with a merge commit.
@@ -678,4 +682,7 @@ While the export format is still being worked out, versions stay at 0.x and a br
 bumps only the minor version; 1.0.0 marks the format as settled. The version is defined once (see
 "Structure") and flows into both the DLL and `mod.json`. Issues name the part their change bumps
 (major, minor or patch), never the resulting version, which goes stale when another PR merges
-first; the PR applies the bump to the version on `main`.
+first; the PR applies the bump to the version on `main` as it is when the PR merges. Before merging,
+compare the branch's `<VersionPrefix>` with `origin/main`'s: if another PR took the number, bump
+again on the branch. The Release build of the merged `main` must come out as build 0; a higher build
+number means the number was already taken.
