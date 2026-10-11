@@ -249,8 +249,10 @@ game marks, the cell it checks for a unit standing there: a dropship's whole foo
 each drop pod lands on, one per unit of the lance. The zones appear when the mission readies a landing and vanish when
 it happens. The game doesn't tie them to the objective announcing them, e.g. "reinforcements in 5
 rounds"; the objective carries the beacon the HUD draws at its place instead, so a tool can match
-the two by position as the player does. The band along the encounter boundary, which the HUD
-marks the same way, isn't exported.
+the two by position as the player does. Only story missions place such landing spots and drop
+pods; a generated mission's reinforcements arrive at a drawn drop zone (a zone of type
+`regionDef_HostileDropZone`), where standing does no harm. The band along the encounter boundary,
+which the HUD marks the same way, isn't exported.
 
 Buildings on a side, e.g. a base to destroy or defend, are listed by their id in the combat map
 with their side as units have it, as the map highlights them in the team's color; the other
