@@ -264,7 +264,8 @@ it stands in by its catalog id (`null` on open ground). What else it carries fol
   unit lives): e.g. `CenterTorsoDestruction`, `HeadDestruction`, `LegDestruction` (both legs),
   `AmmoExplosion`, `PilotKilled` (also an incapacitated pilot), `PilotEjection`, a turret's
   `CenterTorsoDestruction` or a vehicle's `VehicleLocationDestroyed`. They have no lines of fire,
-  no movement and aren't targets.
+  no movement and aren't targets, but an objective still lists them among its target units. An
+  enemy that withdrew or was removed by the mission's script leaves no wreck and is left out.
 
 The player's units carry their lines of fire to every enemy in full view, and those enemies theirs
 to the player's units, as hovering over a target shows them from where the unit stands: the line

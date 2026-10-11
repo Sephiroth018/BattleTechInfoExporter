@@ -61,14 +61,26 @@ internal static class CombatUnitReader
             };
 
     // Mirrors the HUD (AbstractActor.OnPlayerVisibilityChanged): its own side and scripted reveals in full view, the
-    // others as the player's side, allies included, sees them. A wreck stays in full view; never detected enemies are
-    // left out.
+    // others as the player's side, allies included, sees them. A wreck stays in full view: the visibility caches drop
+    // a dead unit (AbstractActor.UpdateVisibilityCacheForDeadUnit) and its body stays shown
+    // (PilotableActorRepresentation.OnPlayerVisibilityChanged). A despawned enemy (withdrawn or removed by script)
+    // leaves no wreck, and never detected enemies are left out.
     private static UnitVisibility? ReadVisibility(
         CombatGameState combat,
         AbstractActor actor,
         UnitAllegiance allegiance)
     {
-        if (allegiance is UnitAllegiance.Player or UnitAllegiance.Ally || actor.IsDead || actor.IsForcedVisible)
+        if (allegiance is UnitAllegiance.Player or UnitAllegiance.Ally)
+        {
+            return UnitVisibility.Full;
+        }
+
+        if (actor.IsDead)
+        {
+            return actor.WasDespawned ? null : UnitVisibility.Full;
+        }
+
+        if (actor.IsForcedVisible)
         {
             return UnitVisibility.Full;
         }
