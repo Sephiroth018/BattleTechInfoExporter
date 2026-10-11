@@ -9,10 +9,10 @@ internal static class StoreReader
 {
     // A store exists when it has stock (StarSystem.HasFactionStore, HasBlackMarketStore). CanUseSystemStore doesn't
     // check it, the other two do.
-    internal static Stores ReadStores(SimGameState simGame)
+    internal static ByStore<Store?> ReadStores(SimGameState simGame)
     {
         var system = simGame.CurSystem;
-        return new Stores(
+        return new ByStore<Store?>(
             ReadStoreIfUsable(
                 system.CanUseSystemStore() && !system.SystemShop.IsEmpty,
                 system.SystemShop,

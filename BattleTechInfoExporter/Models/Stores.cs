@@ -3,16 +3,6 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
-/// <summary>
-///     The current system's stores; each is <c>null</c> if the system has none or the company can't use it. Their
-///     stock changes only on arrival in a system.
-/// </summary>
-/// <param name="System">The system store, usable unless the reputation with the system's owner is LOATHED.</param>
-/// <param name="Faction">The faction store, usable only while allied with its owner.</param>
-/// <param name="BlackMarket">The black market, usable once the company has gained access to black markets.</param>
-[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record Stores(Store? System, Store? Faction, Store? BlackMarket);
-
 /// <param name="Faction">
 ///     The faction whose reputation sets the prices, by the price change in <see cref="Rules.ReputationLevels" />:
 ///     for the system store the system's owner, for the faction store its owner (usually the system's owner too,

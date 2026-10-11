@@ -79,7 +79,7 @@ internal static class StarSystemReader
 
     // The stores draw from the active definition's collections (StarSystem.SetNewStarSystemDef resets them on a swap).
     // A definition without a store has null instead of an empty list (Shop.Initialize checks both).
-    private static StoreCollections ReadStoreCollections(StarSystemDef definition) =>
+    private static ByStore<IReadOnlyList<string>> ReadStoreCollections(StarSystemDef definition) =>
         new(
             definition.SystemShopItems ?? [],
             definition.FactionShopItems ?? [],

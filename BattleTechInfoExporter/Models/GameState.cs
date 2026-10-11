@@ -16,7 +16,12 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="MechsAwaitingPlacement">The new mechs the game asks to place, store or scrap, in order.</param>
 /// <param name="LastLance">The units of the lance last sent on a mission.</param>
 /// <param name="Storage">What the company keeps in storage.</param>
-/// <param name="Stores">The current system's stores.</param>
+/// <param name="Stores">
+///     The current system's stores, each <c>null</c> if the system has none or the company can't use it: the system
+///     store unless the reputation with the system's owner is LOATHED, the faction store only while allied with its
+///     owner, the black market once the company has gained access to black markets. Their stock changes only on
+///     arrival in a system.
+/// </param>
 /// <param name="HiringHall">The pilots for hire in the current system's hiring hall.</param>
 /// <param name="ActiveContract">The travel contract the company has accepted; <c>null</c> without one.</param>
 /// <param name="Contracts">
@@ -39,7 +44,7 @@ internal sealed record GameState(
     IReadOnlyList<MechAwaitingPlacement> MechsAwaitingPlacement,
     IReadOnlyList<LastLanceUnit> LastLance,
     Storage Storage,
-    Stores Stores,
+    ByStore<Store?> Stores,
     IReadOnlyList<HiringHallPilot> HiringHall,
     ActiveContract? ActiveContract,
     IReadOnlyList<OfferedContract>? Contracts,

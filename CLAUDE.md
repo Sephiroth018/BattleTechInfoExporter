@@ -565,6 +565,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **Turret:** a fixed emplacement with a single location (`TurretDef`).
 - **Catalog:** the export of every chassis, mech, vehicle, turret, component, terrain, biome, map,
   event and item collection definition the game has loaded (`catalog.json`).
+- **Item collection:** a weighted list the stores and rewards draw items from (`ItemCollectionDef`):
+  components, whole mechs, mech parts or other collections, drawn in turn.
 - **Star system:** a system on the starmap (`StarSystem`). Never "location" (a mech's body
   location) or "planet".
 - **Star system definition:** a version of a star system (`StarSystemDef`) with its name, owner,

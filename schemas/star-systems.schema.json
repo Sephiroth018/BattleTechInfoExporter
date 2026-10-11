@@ -132,8 +132,8 @@
           }
         },
         "stores": {
-          "description": "The item collections the star system's stores draw their stock from.",
-          "$ref": "#/definitions/StoreCollections"
+          "description": "The item collections each of the star system's stores draws its stock from on arrival, every entry of each once, by their ids in the catalog's itemCollectionDefinitions. A store without any doesn't exist in the star system.",
+          "$ref": "#/definitions/ByStoreOfIReadOnlyListOfString"
         },
         "difficulty": {
           "type": "integer",
@@ -176,9 +176,9 @@
         }
       }
     },
-    "StoreCollections": {
+    "ByStoreOfIReadOnlyListOfString": {
       "type": "object",
-      "description": "The item collections each of a star system's stores draws its stock from on arrival, every entry of each once, by their ids in the catalog's itemCollectionDefinitions. A store without any doesn't exist in the star system.",
+      "description": "A value per store of a star system: its system store, faction store and black market.",
       "additionalProperties": false,
       "required": [
         "system",
@@ -188,21 +188,21 @@
       "properties": {
         "system": {
           "type": "array",
-          "description": "The system store's collections.",
+          "description": "The value for the system store.",
           "items": {
             "type": "string"
           }
         },
         "faction": {
           "type": "array",
-          "description": "The faction store's collections.",
+          "description": "The value for the faction store.",
           "items": {
             "type": "string"
           }
         },
         "blackMarket": {
           "type": "array",
-          "description": "The black market's collections.",
+          "description": "The value for the black market.",
           "items": {
             "type": "string"
           }
