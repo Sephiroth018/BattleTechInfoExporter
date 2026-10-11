@@ -635,9 +635,9 @@ the semantic release, and the merged `main` is build 0 of that version.
 
 ## Changelog
 
-`CHANGELOG.md` at the repository root tells the consumer, a chat holding copies of the export files
-and code parsing them, what each version changed in those files: keyed by `modVersion`, newest
-first, with a preamble on how to apply it. Every PR that bumps the version adds its entry under the
+`CHANGELOG.md` at the repository root, shipped in the mod folder like the schemas, tells the
+consumer, a chat holding copies of the export files and code parsing them, what each version
+changed in those files: keyed by `modVersion`, newest first, with a preamble on how to apply it. Every PR that bumps the version adds its entry under the
 new version as part of its changes, checked under step 6 of the Definition of done. An entry starts
 with the files whose content changed (every version rewrites every file's header, so a file not
 listed needn't be re-copied), then per file, with `(breaking)` on a file whose reading code must

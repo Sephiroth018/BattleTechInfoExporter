@@ -6,7 +6,7 @@ and pilot upgrades. In career mode it exports nothing.
 
 The mod is a work in progress; see [Planned](#planned) for what's still missing. What each
 version changed in the export files is in the [changelog](CHANGELOG.md), written for the tool
-reading them.
+reading them and shipped in the mod folder as `Mods/BattleTechInfoExporter/CHANGELOG.md`.
 
 ## Export files
 

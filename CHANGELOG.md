@@ -2,7 +2,8 @@
 
 This file is for the tool that reads the mod's export files, typically a Claude chat holding copies
 of the files in `Mods/BattleTechInfoExporter/exports/` and parsing code written against them. It
-lists, per mod version, what changed in those files.
+lists, per mod version, what changed in those files. The installed mod ships it next to `exports/`,
+so the copy there is the one matching the files.
 
 How to use it:
 
@@ -22,6 +23,10 @@ rules.json, star-systems.json, financial-report.json (0.42.0 to 0.56.0), mission
 salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, catalog.json.
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
+
+## 0.61.1
+
+No export file changed. This file is first shipped with the mod.
 
 ## 0.61.0
 
