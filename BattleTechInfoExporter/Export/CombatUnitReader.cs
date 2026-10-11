@@ -14,41 +14,44 @@ internal static class CombatUnitReader
 {
     internal static SortedDictionary<string, CombatUnit> ReadUnits(CombatGameState combat)
     {
-        var knownUnits = new List<(AbstractActor Actor, UnitAllegiance Allegiance, UnitVisibility Visibility)>();
+        var knownUnits = new List<(AbstractActor Actor, TeamSide Side, UnitVisibility Visibility)>();
         foreach (var actor in combat.AllActors)
         {
-            var allegiance = ReadAllegiance(combat, actor);
-            if (ReadVisibility(combat, actor, allegiance) is { } visibility)
+            var side = ReadSide(combat, actor.team);
+            if (ReadVisibility(combat, actor, side.Allegiance) is { } visibility)
             {
-                knownUnits.Add((actor, allegiance, visibility));
+                knownUnits.Add((actor, side, visibility));
             }
         }
 
         var playerUnits = knownUnits
-            .Where(unit => unit.Allegiance == UnitAllegiance.Player && !unit.Actor.IsDead)
+            .Where(unit => unit.Side.Allegiance == UnitAllegiance.Player && !unit.Actor.IsDead)
             .Select(unit => unit.Actor)
             .ToList();
         var targetableEnemies = knownUnits
-            .Where(unit => unit.Allegiance == UnitAllegiance.Enemy && unit.Visibility == UnitVisibility.Full)
+            .Where(unit => unit.Side.Allegiance == UnitAllegiance.Enemy && unit.Visibility == UnitVisibility.Full)
             .Select(unit => unit.Actor)
             .ToList();
 
         var units = new SortedDictionary<string, CombatUnit>(StringComparer.Ordinal);
-        foreach (var (actor, allegiance, visibility) in knownUnits)
+        foreach (var (actor, side, visibility) in knownUnits)
         {
-            var targets = allegiance == UnitAllegiance.Player && !actor.IsDead ? targetableEnemies
-                : allegiance == UnitAllegiance.Enemy && visibility == UnitVisibility.Full ? playerUnits
+            var targets = side.Allegiance == UnitAllegiance.Player && !actor.IsDead ? targetableEnemies
+                : side.Allegiance == UnitAllegiance.Enemy && visibility == UnitVisibility.Full ? playerUnits
                 : null;
-            units.Add(actor.GUID, ReadUnit(combat, actor, allegiance, visibility, targets));
+            units.Add(actor.GUID, ReadUnit(combat, actor, side, visibility, targets));
         }
 
         return units;
     }
 
-    private static UnitAllegiance ReadAllegiance(CombatGameState combat, AbstractActor actor) =>
-        actor.team == combat.LocalPlayerTeam
+    internal static TeamSide ReadSide(CombatGameState combat, Team team) =>
+        new(DefinitionReferences.ReferenceTo(team.FactionValue), ReadAllegiance(combat, team));
+
+    private static UnitAllegiance ReadAllegiance(CombatGameState combat, Team team) =>
+        team == combat.LocalPlayerTeam
             ? UnitAllegiance.Player
-            : combat.HostilityMatrix.GetHostilityOfLocalPlayer(actor.team) switch
+            : combat.HostilityMatrix.GetHostilityOfLocalPlayer(team) switch
             {
                 Hostility.FRIENDLY => UnitAllegiance.Ally,
                 Hostility.ENEMY => UnitAllegiance.Enemy,
@@ -95,18 +98,16 @@ internal static class CombatUnitReader
     private static CombatUnit ReadUnit(
         CombatGameState combat,
         AbstractActor actor,
-        UnitAllegiance allegiance,
+        TeamSide side,
         UnitVisibility visibility,
         IReadOnlyList<AbstractActor>? targets)
     {
         var isSighted = visibility == UnitVisibility.Full;
         var isLastSeen = visibility == UnitVisibility.LastSeen;
-        var bayMech = allegiance == UnitAllegiance.Player && actor is Mech mech
-            ? MechReader.ReferenceToBayMech(mech.MechDef)
-            : null;
+        var isPlayers = side.Allegiance == UnitAllegiance.Player;
+        var bayMech = isPlayers && actor is Mech mech ? MechReader.ReferenceToBayMech(mech.MechDef) : null;
         return new CombatUnit(
-            DefinitionReferences.ReferenceTo(actor.team.FactionValue),
-            allegiance,
+            side,
             visibility,
             isSighted || visibility is UnitVisibility.BlipMaximum or UnitVisibility.BlipType ? ReadKind(actor) : null,
             // What Mech, Vehicle and Turret.GetActorInfoFromVisLevel show at Blip4Maximum.
@@ -125,7 +126,7 @@ internal static class CombatUnitReader
             isSighted && actor.GetPilot() is { } pilot ? PilotReader.ReferenceTo(pilot) : null,
             isSighted ? ReadState(actor) : null,
             targets is null ? null : ReadLinesOfFire(actor, targets),
-            allegiance == UnitAllegiance.Player && targets is not null ? MovementReader.Read(actor, targets) : null);
+            isPlayers && targets is not null ? MovementReader.Read(actor, targets) : null);
     }
 
     private static ArgumentException NoUnitKind(AbstractActor actor) =>
@@ -173,17 +174,24 @@ internal static class CombatUnitReader
             actor.IsProne,
             actor.IsShutDown,
             actor.IsUnsteady,
-            mech?.CurrentHeat,
-            mech?.CurrentStability,
+            mech is null ? null : new MechState(ReadHeat(mech), mech.CurrentStability),
             actor.HasActivatedThisRound,
             HudInitiative.FromGamePhase(actor.Initiative),
             actor.allComponents.Select(component => ReadComponent(actor, component)).ToList(),
             // Pilot.InjurePilot takes hits off the bonus health first.
-            pilot is null ? null : new CombatPilotState(pilot.Injuries, pilot.Health, pilot.BonusHealth),
+            pilot is null
+                ? null
+                : new CombatPilotState(pilot.Injuries, pilot.Health, pilot.BonusHealth, PilotReader.ReadSkills(pilot)),
             ReadAbilities(actor),
             actor.OffensivePushCost,
             actor.DefensivePushCost);
     }
+
+    // What the heat bar (CombatHUDHeatDisplay) draws, and the dissipation Mech.ApplyHeatSinks subtracts: the heat
+    // sinks times the terrain's, biome's and global multipliers. The thresholds are the statistics MechHeatSequence
+    // checks, which Guts' traits and heat banks raise.
+    private static MechHeat ReadHeat(Mech mech) =>
+        new(mech.CurrentHeat, mech.AdjustedHeatsinkCapacity, mech.OverheatLevel, mech.MaxHeat);
 
     // Whole points, as the paper doll shows them (HUDMechArmorReadout.FormatForSummary, which the vehicle and turret
     // readouts share): cut off, except that a remainder below 1 shows as 1.

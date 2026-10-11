@@ -5,8 +5,7 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>A unit in combat, with as much of it as the HUD shows at its <see cref="Visibility" />.</summary>
-/// <param name="Faction">The faction of the unit's team.</param>
-/// <param name="Allegiance">Whose side the unit is on, seen from the player.</param>
+/// <param name="Side">Whose side the unit is on.</param>
 /// <param name="Visibility">How much of the unit the HUD shows, deciding which of its other fields are set.</param>
 /// <param name="Kind">
 ///     The kind of unit; <c>null</c> where the HUD doesn't tell: at <see cref="UnitVisibility.BlipMinimum" /> and
@@ -42,8 +41,7 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatUnit(
-    DefinitionReference Faction,
-    UnitAllegiance Allegiance,
+    TeamSide Side,
     UnitVisibility Visibility,
     UnitKind? Kind,
     float? Tonnage,
@@ -78,8 +76,7 @@ internal sealed record CombatUnit(
 ///     Whether the mech is unsteady, which it becomes at <see cref="StabilityRules.UnsteadyThresholdPercent" /> of
 ///     its stability; only mechs can be.
 /// </param>
-/// <param name="Heat"><c>null</c> for vehicles and turrets, which have none.</param>
-/// <param name="Stability"><c>null</c> for vehicles and turrets, which have none.</param>
+/// <param name="Mech">What only a mech has; <c>null</c> for vehicles and turrets.</param>
 /// <param name="HasActivated">Whether the unit has finished its activation this round.</param>
 /// <param name="Initiative">The phase the unit acts in, on the scale of <see cref="CombatState.Phase" />.</param>
 /// <param name="Components">Every component mounted, in the game's order.</param>
@@ -97,8 +94,7 @@ internal sealed record CombatUnitState(
     bool IsProne,
     bool IsShutDown,
     bool IsUnsteady,
-    int? Heat,
-    float? Stability,
+    MechState? Mech,
     bool HasActivated,
     int Initiative,
     IReadOnlyList<CombatComponent> Components,
@@ -106,6 +102,31 @@ internal sealed record CombatUnitState(
     IReadOnlyList<CombatAbility> Abilities,
     int PrecisionStrikeCost,
     int VigilanceCost);
+
+/// <param name="Heat">The mech's heat.</param>
+/// <param name="Stability">
+///     The instability taken, from 0 up, as the stability bar fills: the mech is unsteady at
+///     <see cref="StabilityRules.UnsteadyThresholdPercent" /> of its max and knocked down when the bar is full.
+/// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record MechState(MechHeat Heat, float Stability);
+
+/// <summary>A mech's heat as the HUD's heat bar shows it, with the thresholds it draws and the sinking it predicts.</summary>
+/// <param name="Current">The heat now.</param>
+/// <param name="DissipationPerRound">
+///     The heat the mech sheds at the end of its activation now: its heat sinks after the terrain it stands in, the
+///     biome and effects; standing in water or on a cold map changes it.
+/// </param>
+/// <param name="OverheatsAbove">
+///     The heat above which the mech overheats, after the pilot's Guts and effects; the base is in
+///     <see cref="HeatRules.OverheatsAbove" />.
+/// </param>
+/// <param name="MaxHeat">
+///     The heat at which the mech shuts down, after heat banks and effects; the base is in
+///     <see cref="HeatRules.MaxHeat" />.
+/// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record MechHeat(int Current, int DissipationPerRound, int OverheatsAbove, int MaxHeat);
 
 /// <param name="Injuries">The injuries, including those from before the mission.</param>
 /// <param name="Health">
@@ -115,8 +136,12 @@ internal sealed record CombatUnitState(
 ///     The bonus health left, which takes hits before they become injuries and is used up by them; the portrait
 ///     shows it on top of <paramref name="Health" />.
 /// </param>
+/// <param name="Skills">
+///     The skill levels the game computes with now, temporary changes from effects included; exported for every
+///     pilot in full view, though the HUD shows only the player's.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record CombatPilotState(int Injuries, int Health, int BonusHealth);
+internal sealed record CombatPilotState(int Injuries, int Health, int BonusHealth, Skills Skills);
 
 /// <summary>A location's armor and structure left, in whole points as the paper doll shows them.</summary>
 /// <param name="Location">The game's name of the location (a mech's, vehicle's or turret's).</param>
