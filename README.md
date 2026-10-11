@@ -4,7 +4,9 @@ A mod for BattleTech (Harebrained Schemes, 2018) that exports the career state o
 campaign as JSON at key moments, for tools to read: for example a Claude session that plans mech
 and pilot upgrades. In career mode it exports nothing.
 
-The mod is a work in progress; see [Planned](#planned) for what's still missing.
+The mod is a work in progress; see [Planned](#planned) for what's still missing. What each
+version changed in the export files is in the [changelog](CHANGELOG.md), written for the tool
+reading them.
 
 ## Export files
 

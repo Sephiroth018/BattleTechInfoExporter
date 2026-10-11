@@ -629,8 +629,24 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 Every merged PR that changes the mod gets a GitHub release, after the merge, from the merged
 `main`: a Release build, then
 `gh release create v<Major.Minor.Patch>` with the zip attached and release notes summarizing the PR
-(marked as generated with Claude Code). The tag has no build number: it marks the semantic release,
-and the merged `main` is build 0 of that version.
+(marked as generated with Claude Code). For the export format's changes, the notes point to the
+version's entry in `CHANGELOG.md` instead of restating them. The tag has no build number: it marks
+the semantic release, and the merged `main` is build 0 of that version.
+
+## Changelog
+
+`CHANGELOG.md` at the repository root tells the consumer, a chat holding copies of the export files
+and code parsing them, what each version changed in those files: keyed by `modVersion`, newest
+first, with a preamble on how to apply it. Every PR that bumps the version adds its entry under the
+new version as part of its changes, checked under step 6 of the Definition of done. An entry starts
+with the files whose content changed (every version rewrites every file's header, so a file not
+listed needn't be re-copied), then per file, with `(breaking)` on a file whose reading code must
+change, bullets of JSON paths with one verb each: added, removed, renamed, moved, meaning changed,
+values corrected, type changed. A value keeping its shape with a new meaning gets its own entry,
+since the schemas don't show it; a fix that corrects exported numbers is an entry like any other,
+saying what to re-derive. Nothing internal: no reader, type or game class names, refactors, build
+or schema generator changes. Like the README, it never refers to issues or PRs: its reader can't
+use them, and no dates either.
 
 ## Testing and CI
 
@@ -683,8 +699,9 @@ both checks, check 1 because the mod ran, or stops and reports instead of mergin
 
 Semantic versioning on the first three parts, bumped in every PR as part of its changes: major for
 breaking changes to the exported JSON (its consumers must adapt), minor for new data, files or
-triggers, patch for fixes. The fourth part, the build number, is never set by hand (see "Structure").
-While the export format is still being worked out, versions stay at 0.x and a breaking format change
+triggers, patch for fixes. Every bump adds its entry to `CHANGELOG.md` (see "Changelog"), and a
+bump taken by a parallel PR moves the entry's heading along with it. The fourth part, the build
+number, is never set by hand (see "Structure"). While the export format is still being worked out, versions stay at 0.x and a breaking format change
 bumps only the minor version; 1.0.0 marks the format as settled. The version is defined once (see
 "Structure") and flows into both the DLL and `mod.json`. Issues name the part their change bumps
 (major, minor or patch), never the resulting version, which goes stale when another PR merges
