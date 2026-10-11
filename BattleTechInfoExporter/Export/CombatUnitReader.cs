@@ -24,14 +24,13 @@ internal static class CombatUnitReader
             }
         }
 
-        var playerUnits = knownUnits
-            .Where(unit => unit.Side.Allegiance == UnitAllegiance.Player && !unit.Actor.IsDead)
+        var livingUnits = knownUnits.Where(unit => !unit.Actor.IsDead).ToList();
+        var playerUnits = livingUnits
+            .Where(unit => unit.Side.Allegiance == UnitAllegiance.Player)
             .Select(unit => unit.Actor)
             .ToList();
-        var targetableEnemies = knownUnits
-            .Where(unit => unit.Side.Allegiance == UnitAllegiance.Enemy
-                           && unit.Visibility == UnitVisibility.Full
-                           && !unit.Actor.IsDead)
+        var targetableEnemies = livingUnits
+            .Where(unit => unit.Side.Allegiance == UnitAllegiance.Enemy && unit.Visibility == UnitVisibility.Full)
             .Select(unit => unit.Actor)
             .ToList();
 

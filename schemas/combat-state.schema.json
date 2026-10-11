@@ -405,7 +405,7 @@
             "array",
             "null"
           ],
-          "description": "The lines of fire to the units it could attack: from the player's units to every enemy at full, and from those enemies to the player's units. null for the others.",
+          "description": "The lines of fire to the units it could attack: from the player's units to every living enemy at full, and from those enemies to the player's units. null for the others, destroyed units included.",
           "items": {
             "$ref": "#/definitions/LineOfFire"
           }
