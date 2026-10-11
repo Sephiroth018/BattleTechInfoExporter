@@ -27,9 +27,9 @@ internal sealed record ItemCollectionDefinition(
 internal sealed record ComponentCollectionEntry(ComponentReference Component, int? Count, int Weight)
     : ComponentEntry(Component), IItemCollectionItem;
 
-/// <param name="Mech">The mech, described in <see cref="Catalog.MechDefinitions" />.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record MechCollectionEntry(DefinitionReference Mech, int? Count, int Weight) : IItemCollectionItem;
+internal sealed record MechCollectionEntry(DefinitionReference Mech, int? Count, int Weight)
+    : MechEntry(Mech), IItemCollectionItem;
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechPartsCollectionEntry(DefinitionReference Mech, int? Count, int Weight)

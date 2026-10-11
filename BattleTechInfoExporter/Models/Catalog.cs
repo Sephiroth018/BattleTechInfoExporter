@@ -25,8 +25,8 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="MapDefinitions">The maps a star system's contracts can be fought on, keyed by map id.</param>
 /// <param name="EventDefinitions">The events, keyed by event id.</param>
 /// <param name="ItemCollectionDefinitions">
-///     The item collections the stores draw their stock from, keyed by collection id; a star system's stores name
-///     theirs in <c>star-systems.json</c>.
+///     The item collections the stores draw their stock from and the rewards are drawn from, keyed by collection
+///     id; a star system's stores name theirs in <c>star-systems.json</c>.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Catalog(

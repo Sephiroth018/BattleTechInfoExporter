@@ -461,7 +461,9 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   to the rules by name, instead of repeating thresholds and effects per entry.
 - **Star systems live in `star-systems.json`, not the catalog, by decision:** keyed by the id of
   each system's active definition, each entry holds its active definition's name, owner, tags,
-  biomes and maps next to what changes during a career (difficulty, travel requirements, route). The
+  biomes, maps and the item collections its stores draw from (`stores`, by their ids in the
+  catalog's `itemCollectionDefinitions`) next to what changes during a career (difficulty, travel
+  requirements, route). The
   story swaps a system's definition (`StarSystem_SetActiveDef`, e.g. when its owner changes); the
   inactive definitions give a consumer nothing and aren't exported. The full entry is repeated
   wherever a step needs it: in the game state `position.starSystem`, `position.travel.destination`,

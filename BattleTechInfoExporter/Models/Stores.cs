@@ -36,9 +36,8 @@ internal sealed record ComponentForSale(ComponentReference Component, int? Count
 ///     A whole mech, rarely in stock, described in the catalog. Buying it puts the mech with its stock loadout into
 ///     the mech bay.
 /// </summary>
-/// <param name="Mech">The mech, described in the catalog's <see cref="Catalog.MechDefinitions" />.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record MechForSale(DefinitionReference Mech, int? Count, int Price) : IForSale;
+internal sealed record MechForSale(DefinitionReference Mech, int? Count, int Price) : MechEntry(Mech), IForSale;
 
 /// <param name="Count">The parts in stock; <c>null</c> for unlimited.</param>
 /// <param name="Price">The C-Bills for one part, after the system's discount and the reputation's price change.</param>

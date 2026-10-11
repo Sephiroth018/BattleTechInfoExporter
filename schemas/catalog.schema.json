@@ -100,7 +100,7 @@
     },
     "itemCollectionDefinitions": {
       "type": "object",
-      "description": "The item collections the stores draw their stock from, keyed by collection id; a star system's stores name theirs in star-systems.json.",
+      "description": "The item collections the stores draw their stock from and the rewards are drawn from, keyed by collection id; a star system's stores name theirs in star-systems.json.",
       "additionalProperties": {
         "$ref": "#/definitions/ItemCollectionDefinition"
       }

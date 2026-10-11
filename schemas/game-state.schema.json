@@ -2479,7 +2479,7 @@
       ],
       "properties": {
         "mech": {
-          "description": "The mech, described in the catalog's mechDefinitions.",
+          "description": "The mech, described in mechDefinitions.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "count": {
