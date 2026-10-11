@@ -6,7 +6,7 @@ using Pilot = BattleTech.Pilot;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Builds the pilots of the barracks from the game's career state.</summary>
+/// <summary>Builds the pilots of the barracks and the hiring hall from the game's career state.</summary>
 internal static class PilotReader
 {
     // The commander is kept apart from the roster; the barracks lists them first (SGBarracksWidget.Reset).
@@ -81,13 +81,13 @@ internal static class PilotReader
                 definition.MissionsEjected,
                 definition.LifetimeInjuries,
                 definition.DateOfHire),
-            definition.PilotTags.ToList(),
             EventStatisticReader.ReadStatistics(pilot.StatCollection, comparedStatistics));
     }
 
     private static Models.Pilot ReadPilotCommon(SimGameState simGame, Pilot pilot)
     {
-        var description = pilot.pilotDef.Description;
+        var definition = pilot.pilotDef;
+        var description = definition.Description;
         return new Models.Pilot(
             description.Id,
             FullName(description),
@@ -97,8 +97,9 @@ internal static class PilotReader
             description.Gender,
             simGame.GetPilotFullExpertise(pilot),
             ReadSkills(pilot),
-            ReadAbilities(pilot.pilotDef),
-            pilot.Health);
+            ReadAbilities(definition),
+            pilot.Health,
+            definition.PilotTags.ToList());
     }
 
     // The pilot's statistics, which AbstractActor.SkillGunnery and the others read; effects on the pilot change them.

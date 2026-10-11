@@ -21,6 +21,7 @@ namespace BattleTechInfoExporter.Models;
 ///     skill levels.
 /// </param>
 /// <param name="Health">The injuries the pilot can take before being incapacitated.</param>
+/// <param name="Tags">The pilot's tags, which the events' requirements check.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal record Pilot(
     string Id,
@@ -32,7 +33,8 @@ internal record Pilot(
     string Expertise,
     Skills Skills,
     IReadOnlyList<DefinitionReference> Abilities,
-    int Health);
+    int Health,
+    IReadOnlyList<string> Tags);
 
 /// <summary>A pilot's skill levels, each from 1 to 10.</summary>
 /// <param name="Gunnery">The gunnery level, a level of <see cref="SkillRules.Gunnery" />.</param>

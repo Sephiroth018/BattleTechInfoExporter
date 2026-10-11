@@ -180,8 +180,8 @@ The game state holds:
 - **Storage:** the stored components, chassis and mech parts.
 - **Stores:** the current system's system store, faction store and black market with their stock
   and prices; what they can carry follows from the catalog's item collections.
-- **Hiring hall:** the current system's pilots for hire, like the roster's pilots plus hiring cost,
-  salary and whether the company can hire them.
+- **Hiring hall:** the current system's pilots for hire, like the roster's pilots, their tags
+  included, plus hiring cost, salary and whether the company can hire them.
 - **Contracts:** the contracts the Command Center offers, each with its description and terms,
   and the negotiation as the values at each slider position (pay and salvage together take at most 100 %,
   exactly 100 % when the employer gains no reputation), and its star system: by reference in the

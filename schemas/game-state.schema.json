@@ -1158,13 +1158,13 @@
         "skills",
         "abilities",
         "health",
+        "tags",
         "experience",
         "injuries",
         "status",
         "readyOnDay",
         "spirits",
         "serviceRecord",
-        "tags",
         "statistics"
       ],
       "properties": {
@@ -1213,6 +1213,13 @@
           "description": "The injuries the pilot can take before being incapacitated.",
           "format": "int32"
         },
+        "tags": {
+          "type": "array",
+          "description": "The pilot's tags, which the events' requirements check.",
+          "items": {
+            "type": "string"
+          }
+        },
         "experience": {
           "description": "The pilot's experience points, spent and unspent.",
           "$ref": "#/definitions/Experience"
@@ -1241,13 +1248,6 @@
         "serviceRecord": {
           "description": "The pilot's missions, kills and injuries so far, and the day of hire.",
           "$ref": "#/definitions/ServiceRecord"
-        },
-        "tags": {
-          "type": "array",
-          "description": "The pilot's tags, which the events' requirements check.",
-          "items": {
-            "type": "string"
-          }
         },
         "statistics": {
           "type": "object",
@@ -2540,6 +2540,7 @@
         "skills",
         "abilities",
         "health",
+        "tags",
         "hireCost",
         "salary",
         "canHire"
@@ -2589,6 +2590,13 @@
           "type": "integer",
           "description": "The injuries the pilot can take before being incapacitated.",
           "format": "int32"
+        },
+        "tags": {
+          "type": "array",
+          "description": "The pilot's tags, which the events' requirements check.",
+          "items": {
+            "type": "string"
+          }
         },
         "hireCost": {
           "type": "integer",
