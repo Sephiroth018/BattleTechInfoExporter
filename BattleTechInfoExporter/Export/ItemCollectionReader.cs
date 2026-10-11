@@ -32,11 +32,8 @@ internal static class ItemCollectionReader
         var entries = collection.Entries.Where(entry => IsKnownType(collection, entry)).ToList();
         return new ItemCollectionDefinition(
             ReferencedEntries.Read(
-                    entries.Where(entry => StoreReader.IsComponent(entry.Type)),
-                    entry => ComponentReferences.TryReferenceTo(
-                        dataManager,
-                        Shop.ShopItemTypeToComponentType(entry.Type),
-                        entry.ID),
+                    entries.Where(entry => ShopItemReferences.IsComponent(entry.Type)),
+                    entry => ShopItemReferences.TryReferenceToComponent(dataManager, entry.Type, entry.ID),
                     (component, entry) => new ComponentCollectionEntry(component, CountOf(entry), entry.Weight))
                 .OrderBy(component => component.Component)
                 .ToList(),
@@ -63,7 +60,7 @@ internal static class ItemCollectionReader
     // Collections hold items, other collections and empty entries; the deprecated chassis type no longer occurs.
     private static bool IsKnownType(ItemCollectionDef collection, ItemCollectionDef.Entry entry)
     {
-        if (StoreReader.IsComponent(entry.Type)
+        if (ShopItemReferences.IsComponent(entry.Type)
             || entry.Type is ShopItemType.Mech or ShopItemType.MechPart or ShopItemType.Reference
                 or ShopItemType.None)
         {

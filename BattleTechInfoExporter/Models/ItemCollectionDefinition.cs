@@ -23,20 +23,6 @@ internal sealed record ItemCollectionDefinition(
     IReadOnlyList<NestedCollectionEntry> Collections,
     int EmptyWeight);
 
-/// <summary>An entry of an item collection.</summary>
-internal interface IItemCollectionEntry
-{
-    /// <summary>The entry's draw weight among the collection's entries.</summary>
-    int Weight { get; }
-}
-
-/// <summary>An item an item collection's draw can yield.</summary>
-internal interface IItemCollectionItem : IItemCollectionEntry
-{
-    /// <summary>The copies a draw yields; <c>null</c>: unlimited.</summary>
-    int? Count { get; }
-}
-
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ComponentCollectionEntry(ComponentReference Component, int? Count, int Weight)
     : ComponentEntry(Component), IItemCollectionItem;

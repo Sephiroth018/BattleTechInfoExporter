@@ -405,7 +405,8 @@ name, version and folder, `ModLog` its logger. Folders:
   statistics the events compare.
   `DefinitionReferences` makes the
   references that need only a description, a faction, a biome or a data-driven enum value, and
-  `ComponentReferences` every reference to a component; a reference
+  `ComponentReferences` every reference to a component, and `ShopItemReferences` the references to what a
+  store or item collection holds, by the game's shop item type; a reference
   with a naming rule of its own is made by the reader that owns it. `ReferencedEntries` builds the
   lists of entries that refer to a definition, leaving out what has none, `GameText` makes every exported game text plain,
   and `HudInitiative` numbers phases and initiative as the HUD does.
