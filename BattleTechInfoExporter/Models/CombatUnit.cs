@@ -56,8 +56,11 @@ internal sealed record CombatUnit(
     IReadOnlyList<LineOfFire>? LinesOfFire,
     UnitMovement? Movement);
 
-/// <param name="IsDestroyed">
-///     Whether the unit is destroyed; only the player's and allied units stay listed once destroyed.
+/// <param name="DeathMethod">
+///     How the unit was destroyed, as the game records it (<see cref="BattleTech.DeathMethod" />), e.g.
+///     <c>CenterTorsoDestruction</c>, <c>LegDestruction</c>, <c>PilotKilled</c> (also an incapacitated pilot),
+///     <c>PilotEjection</c>, a turret's <c>CenterTorsoDestruction</c> or a vehicle's
+///     <c>VehicleLocationDestroyed</c>; <c>null</c> while the unit lives.
 /// </param>
 /// <param name="Locations">
 ///     The armor and structure left per location, in the game's order: a mech's from head to legs, a vehicle's from
@@ -86,7 +89,7 @@ internal sealed record CombatUnit(
 /// <param name="VigilanceCost">The resolve Vigilance costs the unit now.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatUnitState(
-    bool IsDestroyed,
+    DeathMethod? DeathMethod,
     IReadOnlyList<UnitLocation> Locations,
     int EvasionPips,
     Guard Guard,

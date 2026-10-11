@@ -29,14 +29,17 @@ internal static class CombatUnitReader
             .Select(unit => unit.Actor)
             .ToList();
         var targetableEnemies = knownUnits
-            .Where(unit => unit.Side.Allegiance == UnitAllegiance.Enemy && unit.Visibility == UnitVisibility.Full)
+            .Where(unit => unit.Side.Allegiance == UnitAllegiance.Enemy
+                           && unit.Visibility == UnitVisibility.Full
+                           && !unit.Actor.IsDead)
             .Select(unit => unit.Actor)
             .ToList();
 
         var units = new SortedDictionary<string, CombatUnit>(StringComparer.Ordinal);
         foreach (var (actor, side, visibility) in knownUnits)
         {
-            var targets = side.Allegiance == UnitAllegiance.Player && !actor.IsDead ? targetableEnemies
+            var targets = actor.IsDead ? null
+                : side.Allegiance == UnitAllegiance.Player ? targetableEnemies
                 : side.Allegiance == UnitAllegiance.Enemy && visibility == UnitVisibility.Full ? playerUnits
                 : null;
             units.Add(actor.GUID, ReadUnit(combat, actor, side, visibility, targets));
@@ -59,23 +62,14 @@ internal static class CombatUnitReader
             };
 
     // Mirrors the HUD (AbstractActor.OnPlayerVisibilityChanged): its own side and scripted reveals in full view, the
-    // others as the player's side, allies included, sees them. Destroyed and never detected enemies are left out.
+    // others as the player's side, allies included, sees them. A wreck stays in full view; never detected enemies are
+    // left out.
     private static UnitVisibility? ReadVisibility(
         CombatGameState combat,
         AbstractActor actor,
         UnitAllegiance allegiance)
     {
-        if (allegiance is UnitAllegiance.Player or UnitAllegiance.Ally)
-        {
-            return UnitVisibility.Full;
-        }
-
-        if (actor.IsDead)
-        {
-            return null;
-        }
-
-        if (actor.IsForcedVisible)
+        if (allegiance is UnitAllegiance.Player or UnitAllegiance.Ally || actor.IsDead || actor.IsForcedVisible)
         {
             return UnitVisibility.Full;
         }
@@ -166,7 +160,7 @@ internal static class CombatUnitReader
         var mech = actor as Mech;
         var pilot = actor.GetPilot();
         return new CombatUnitState(
-            actor.IsDead,
+            actor.IsDead ? actor.DeathMethod : null,
             ReadLocations(actor),
             actor.EvasivePipsCurrent,
             new Guard(actor.GuardLevel, actor.BracedLastRound, actor.HasCover, actor.HasBulwarkAbility),
