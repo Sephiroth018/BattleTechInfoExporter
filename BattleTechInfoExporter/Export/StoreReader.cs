@@ -78,7 +78,8 @@ internal static class StoreReader
         return false;
     }
 
-    private static bool IsComponent(ShopItemType type) =>
+    /// <summary>Whether a store or item collection entry of the type is a component, not a mech or mech parts.</summary>
+    internal static bool IsComponent(ShopItemType type) =>
         type is ShopItemType.Weapon or ShopItemType.AmmunitionBox or ShopItemType.HeatSink or ShopItemType.JumpJet
             or ShopItemType.Upgrade;
 

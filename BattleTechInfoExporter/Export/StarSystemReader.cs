@@ -58,6 +58,7 @@ internal static class StarSystemReader
             system.Tags.Select(tag => ReadTag(tagNames, tag)).ToList(),
             definition.SupportedBiomes.Select(biome => biomes[biome]).ToList(),
             ReadPlayableMaps(definition, playableMaps),
+            ReadStoreCollections(definition),
             // As the starmap's system panel shows it (SGSystemViewPopulator).
             simGame.GetNormalizedDifficulty(definition),
             canTravelTo,
@@ -75,6 +76,14 @@ internal static class StarSystemReader
     // A tag without a friendly name, which the game never shows, is named by its id.
     private static DefinitionReference ReadTag(Dictionary<string, string> tagNames, string tag) =>
         new(tag, tagNames.TryGetValue(tag, out var name) ? name : tag);
+
+    // The stores draw from the active definition's collections (StarSystem.SetNewStarSystemDef resets them on a swap).
+    // A definition without a store has null instead of an empty list (Shop.Initialize checks both).
+    private static StoreCollections ReadStoreCollections(StarSystemDef definition) =>
+        new(
+            definition.SystemShopItems ?? [],
+            definition.FactionShopItems ?? [],
+            definition.BlackMarketShopItems ?? []);
 
     // The query takes the tag sets and biomes as sets (SQL IN), so their order doesn't change its result.
     private static List<DefinitionReference> ReadPlayableMaps(

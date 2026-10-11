@@ -398,8 +398,9 @@ name, version and folder, `ModLog` its logger. Folders:
   block through the game's own path checks, and `BuildingReader` the buildings, also the damaged
   ones for the combat state; `CatalogReader` builds the catalog from the
   definitions the game has loaded, with `TerrainReader` reading the terrains and biomes from the
-  design masks, `MapReader` the maps from the metadata database and their terrain data files, and
-  `EventDefinitionReader` the events, which also makes the references to them; `EventStateReader`
+  design masks, `MapReader` the maps from the metadata database and their terrain data files,
+  `EventDefinitionReader` the events, which also makes the references to them, and
+  `ItemCollectionReader` the item collections the stores draw from; `EventStateReader`
   builds the game state's events section, and `EventStatisticReader` the company's and the pilots'
   statistics the events compare.
   `DefinitionReferences` makes the
@@ -496,8 +497,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   (`hexGrid`). A hex is what a unit standing on it gets from the cell at its center (`MapHexReader`);
   blocked steps follow the game's path node steps (`HexStepReader`).
 - **The catalog is a file of its own that doesn't depend on the career:** `catalog.json`, with
-  every chassis, mech, vehicle, turret, component, terrain, biome, map and event definition
-  the game has loaded, rebuilt on a career load only when it's missing or stale: written by another mod version or with
+  every chassis, mech, vehicle, turret, component, terrain, biome, map, event and item collection
+  definition the game has loaded, rebuilt on a career load only when it's missing or stale: written by another mod version or with
   another `sourceFingerprint`, the hash of the game's manifest entries for everything it reads (id,
   file and last write time). A change touching no file it reads (a DLL mod patching definitions in
   memory) isn't detected; deleting the file forces a rebuild. Vehicles' and turrets'
@@ -559,8 +560,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **Vehicle:** a ground unit with fixed armor and loadout (`VehicleDef`), only met as an enemy or
   ally in combat.
 - **Turret:** a fixed emplacement with a single location (`TurretDef`).
-- **Catalog:** the export of every chassis, mech, vehicle, turret, component, terrain, biome, map
-  and event definition the game has loaded (`catalog.json`).
+- **Catalog:** the export of every chassis, mech, vehicle, turret, component, terrain, biome, map,
+  event and item collection definition the game has loaded (`catalog.json`).
 - **Star system:** a system on the starmap (`StarSystem`). Never "location" (a mech's body
   location) or "planet".
 - **Star system definition:** a version of a star system (`StarSystemDef`) with its name, owner,

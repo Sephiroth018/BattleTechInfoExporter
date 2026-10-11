@@ -21,7 +21,8 @@ kept current. Three of them hold the career and are written together on every ca
   the id of its active definition, with its name, owner, its tags (also those the starmap doesn't
   show, which events check), the biomes its
   contracts can be fought in, the maps the game can put its contracts on (selected as the contract
-  generator does, from its biomes and map tags), its difficulty, whether its travel requirements
+  generator does, from its biomes and map tags), the item collections its system store, faction
+  store and black market draw their stock from (see the catalog), its difficulty, whether its travel requirements
   are met, and the route from the current system: the days and C-Bills the trip takes as the
   starmap shows them while the ship is in the system (0 for the current system, `null` where there
   is no route). During a trip the days stay those from the current system's planet, including the
@@ -58,10 +59,10 @@ Two more hold the running battle, and exist only while one runs:
 
 The last one describes the game rather than the career:
 
-- `catalog.json`: every chassis, mech, vehicle, turret, component, terrain, biome, map and event the
-  game has loaded, DLC included, keyed by id, so tools can judge what else exists beyond
-  what the career refers to, what a mission's enemies can do, what its ground does to them and
-  which events can come.
+- `catalog.json`: every chassis, mech, vehicle, turret, component, terrain, biome, map, event and
+  item collection the game has loaded, DLC included, keyed by id, so tools can judge what else
+  exists beyond what the career refers to, what a mission's enemies can do, what its ground does to
+  them, which events can come and where a mech or component can be bought.
   - **Chassis:** the frame: weight class, tonnage and bare tonnage, max jump jets, built-in heat
     dissipation, walk and sprint distance, the pathing capabilities it moves with (see "Combat
     map"), melee values before upgrades, and per location max
@@ -120,6 +121,17 @@ The last one describes the game rather than the career:
     are met, leaving out one-time events that have come and the events drawn lately until no other
     can come. A pilot event is about a pilot without an event timeout who meets its requirements.
     Every option is shown; one whose requirements aren't met can't be picked.
+  - **Item collections:** the weighted lists the stores draw their stock from: the components,
+    whole mechs, mech parts and other collections a draw can yield, each with its draw weight, and
+    the weight of an empty draw. An item carries the copies a draw yields (`null` for unlimited), a
+    nested collection the number of draws from it, each by weight and with the same entry possible
+    again (`null` for every entry once). When the ship arrives in a system, each of its stores
+    takes every entry of the collections `star-systems.json` lists for it, drawing the nested
+    collections, so the collections say what a store can carry and how likely, never what it has:
+    `game-state.json` shows the current system's stock. The story adds collections to a system
+    (better "progression" tiers, the Restoration's mech parts) by swapping its definition, which
+    the star system's entry follows. The game has no unlock dates in the campaign; the few DLC
+    mechs that need a finished flashpoint aren't marked.
 
   The other files refer to the catalog's chassis, mechs and components by id instead
   of repeating their stats or limits, e.g. a location's max armor; a file and the catalog belong
@@ -167,7 +179,7 @@ The game state holds:
   mechs the game keeps.
 - **Storage:** the stored components, chassis and mech parts.
 - **Stores:** the current system's system store, faction store and black market with their stock
-  and prices.
+  and prices; what they can carry follows from the catalog's item collections.
 - **Hiring hall:** the current system's pilots for hire, like the roster's pilots plus hiring cost,
   salary and whether the company can hire them.
 - **Contracts:** the contracts the Command Center offers, each with its description and terms,

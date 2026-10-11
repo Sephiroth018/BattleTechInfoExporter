@@ -1,0 +1,58 @@
+using System.Collections.Generic;
+using JetBrains.Annotations;
+
+namespace BattleTechInfoExporter.Models;
+
+/// <summary>
+///     An item collection: a weighted list the stores and the rewards draw their items from. A draw picks one entry
+///     by weight; a collection drawn in full yields every entry once, as a store's own collections are.
+/// </summary>
+/// <param name="Components">The components a draw can yield.</param>
+/// <param name="Mechs">The whole mechs a draw can yield.</param>
+/// <param name="MechParts">The mech parts a draw can yield.</param>
+/// <param name="Collections">The collections a draw can yield, drawn in turn.</param>
+/// <param name="EmptyWeight">
+///     The draw weight of the collection's empty entries, which use up a draw and yield nothing; 0 where it has
+///     none.
+/// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record ItemCollectionDefinition(
+    IReadOnlyList<ComponentCollectionEntry> Components,
+    IReadOnlyList<MechCollectionEntry> Mechs,
+    IReadOnlyList<MechPartsCollectionEntry> MechParts,
+    IReadOnlyList<NestedCollectionEntry> Collections,
+    int EmptyWeight);
+
+/// <summary>An entry of an item collection.</summary>
+internal interface IItemCollectionEntry
+{
+    /// <summary>The entry's draw weight among the collection's entries.</summary>
+    int Weight { get; }
+}
+
+/// <summary>An item an item collection's draw can yield.</summary>
+internal interface IItemCollectionItem : IItemCollectionEntry
+{
+    /// <summary>The copies a draw yields; <c>null</c>: unlimited.</summary>
+    int? Count { get; }
+}
+
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record ComponentCollectionEntry(ComponentReference Component, int? Count, int Weight)
+    : ComponentEntry(Component), IItemCollectionItem;
+
+/// <param name="Mech">The mech, described in <see cref="Catalog.MechDefinitions" />.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record MechCollectionEntry(DefinitionReference Mech, int? Count, int Weight) : IItemCollectionItem;
+
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record MechPartsCollectionEntry(DefinitionReference Mech, int? Count, int Weight)
+    : MechPartsEntry(Mech), IItemCollectionItem;
+
+/// <param name="Collection">The collection drawn from, by its id in <see cref="Catalog.ItemCollectionDefinitions" />.</param>
+/// <param name="Draws">
+///     The draws from the collection, each by weight and with the same entry possible again; <c>null</c>: every
+///     entry once.
+/// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record NestedCollectionEntry(string Collection, int? Draws, int Weight) : IItemCollectionEntry;
