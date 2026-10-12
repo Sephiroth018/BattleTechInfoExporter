@@ -74,42 +74,11 @@ internal static class ExportFileWriter
         }
     }
 
-    internal static void Delete(string fileName)
-    {
-        var path = FilePath(fileName);
-        if (!File.Exists(path))
-        {
-            return;
-        }
+    internal static void Delete(string fileName) => ModFolderFiles.Delete(ExportDirectory, fileName);
 
-        File.Delete(path);
-        ModLog.Logger.Log($"Deleted {fileName} from {ExportDirectory}");
-    }
-
-    /// <summary>
-    ///     Deletes every file in the folder but those named, e.g. the files of an earlier mod version, so a tool never
-    ///     reads one that's no longer kept current.
-    /// </summary>
-    /// <exception cref="IOException">A file can't be deleted.</exception>
-    /// <exception cref="UnauthorizedAccessException">A file can't be deleted.</exception>
-    internal static void DeleteAllExcept(IEnumerable<string> fileNames)
-    {
-        if (!Directory.Exists(ExportDirectory))
-        {
-            return;
-        }
-
-        // File names compare as Windows' file system does.
-        var keptFileNames = new HashSet<string>(fileNames, StringComparer.OrdinalIgnoreCase);
-        foreach (var path in Directory.GetFiles(ExportDirectory))
-        {
-            var fileName = Path.GetFileName(path);
-            if (!keptFileNames.Contains(fileName))
-            {
-                Delete(fileName);
-            }
-        }
-    }
+    /// <inheritdoc cref="ModFolderFiles.DeleteAllExcept" />
+    internal static void DeleteAllExcept(IEnumerable<string> fileNames) =>
+        ModFolderFiles.DeleteAllExcept(ExportDirectory, fileNames);
 
     private static string FilePath(string fileName) => Path.Combine(ExportDirectory, fileName);
 }

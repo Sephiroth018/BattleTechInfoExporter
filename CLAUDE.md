@@ -373,9 +373,10 @@ and fails the build when an exported property has no description. The mod grants
 `InternalsVisibleTo` for the serializer settings, the one exception to "its own test project only".
 
 In the mod, `ModEntryPoint` is the
-only public type; it deletes the files in `exports/` that aren't in `ExportFiles` (e.g. an earlier
-version's) and applies all Harmony patches in the assembly. `ModAssembly` holds the mod's
-name, version and folder, `ModLog` its logger. Folders:
+only public type; it deletes the files in `exports/` and the schemas in `schemas/` that aren't in
+`ExportFiles` (e.g. an earlier version's, through `ModFolderFiles`) and applies all Harmony patches
+in the assembly. `ModAssembly` holds the mod's name, version and folder, `ModLog` its logger.
+Folders:
 
 - `Triggers/`: the patches that decide when to export, and the recorder patches they share.
 - `Export/`: the exporters, the single entry points the triggers call: `GameStateExporter` for the
