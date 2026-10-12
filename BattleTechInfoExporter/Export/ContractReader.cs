@@ -56,22 +56,14 @@ internal static class ContractReader
             starmap.StarSystems[starSystem.Def.Description.Id]);
     }
 
-    // The game generates a system's contracts when the contract screen first opens there
-    // (SGRoomController_CmdCenter.StartContractScreen). The mod never generates them itself: that would change the
-    // career. The active contract is left out: an accepted global contract stays in SimGameState.GlobalContracts
-    // until arrival, and once arrived, GetAllCurrentlySelectableContracts adds it.
-    internal static List<OfferedContract>? ReadContracts(SimGameState simGame, Starmap starmap)
-    {
-        if (!simGame.CurSystem.InitialContractsFetched)
-        {
-            return null;
-        }
-
-        return simGame.GetAllCurrentlySelectableContracts()
+    // The current system's contracts are generated before the read (SystemContractGenerator). The active contract is left
+    // out: an accepted global contract stays in SimGameState.GlobalContracts until arrival, and once arrived,
+    // GetAllCurrentlySelectableContracts adds it.
+    internal static List<OfferedContract> ReadContracts(SimGameState simGame, Starmap starmap) =>
+        simGame.GetAllCurrentlySelectableContracts()
             .Where(contract => contract != simGame.ActiveTravelContract)
             .Select(contract => ReadContract(simGame, starmap, contract))
             .ToList();
-    }
 
     // SimGameState.ContractTypeDescriptions has the procedural mission types; priority contracts share one entry.
     internal static List<ContractTypeDescription> ReadContractTypes(SimGameState simGame)

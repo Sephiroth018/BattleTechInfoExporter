@@ -380,7 +380,8 @@ only public type; it deletes the files in `exports/` and the schemas in `schemas
 in the assembly. `ModAssembly` holds the mod's name, version and folder, `ModLog` its logger.
 Folders:
 
-- `Triggers/`: the patches that decide when to export, and the recorder patches they share.
+- `Triggers/`: the patches that decide when to export, the recorder patches they share, and
+  `ContractGenerationPatch`, which makes the game's own contract generation complete in one go.
 - `Export/`: the exporters, the single entry points the triggers call: `GameStateExporter` for the
   career state, the rules and the star systems, `MissionExporter` for the mission file,
   one method per write, `CombatExporter` for the combat map and the combat state, which it also deletes, and `CatalogExporter`
@@ -389,7 +390,8 @@ Folders:
   loading the vehicles, turrets and design masks the career doesn't and exporting once they are
   loaded. All run their export inside `CampaignExport`. `GameStateReader` builds the game
   state file's models from the game, one reader per section of the file (`FinancialReportReader` the
-  financial report), taking the star systems it shows in full from the star systems file's model; `RulesReader` builds the
+  financial report), taking the star systems it shows in full from the star systems file's model, after
+  `SystemContractGenerator` generated the current system's contracts where the game hadn't yet; `RulesReader` builds the
   rules file's tables, with `AbilityReader` reading each ability, `CombatRulesReader` the combat
   constants and `CampaignRulesReader` the campaign constants; `EffectReader` reads the statistic
   changes of abilities, components, terrains and rules; `StarSystemReader` builds the star systems file from the starmap, with

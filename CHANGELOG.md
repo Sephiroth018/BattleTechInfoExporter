@@ -24,6 +24,19 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.64.0
+
+Changed: game-state.json.
+
+### game-state.json
+- Changed `contracts`: never `null` anymore. The current system's contracts are generated for
+  the export when the game hasn't yet, so every export in a system lists them; a system that
+  offers no contracts has an empty list, and so has the destination of a trip before the jump
+  into it.
+- Added `trigger` values `jumped`, the ship jumped into its destination system, and `arrived`,
+  it reached the planet there after the trip. Like the other career triggers, they also appear
+  in rules.json and star-systems.json.
+
 ## 0.63.0
 
 Changed: game-state.json, catalog.json.

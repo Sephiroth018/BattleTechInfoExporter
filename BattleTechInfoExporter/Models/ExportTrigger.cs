@@ -12,6 +12,8 @@ internal enum ExportTrigger
     PilotHealed,
     ShipUpgradeCompleted,
     ContractsGenerated,
+    Jumped,
+    Arrived,
     StoreClosed,
     PurchaseCompleted,
     SaleCompleted,
