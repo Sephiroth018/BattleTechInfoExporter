@@ -192,8 +192,8 @@ The game state holds:
   the day of arrival while travelling to it. The game generates a system's contracts only when the contract screen first
   opens there; the mod generates them for the export when the game hasn't yet, the same way opening the
   screen would, so they land in the next save like the screen's. A system that offers no contracts
-  has an empty list, and so has the destination during a trip, until the arrival generates its
-  contracts. The game's own generation completes in one go instead of with a wait per contract,
+  has an empty list, and so has the destination during a trip until the jump into it, which
+  generates its contracts. The game's own generation completes in one go instead of with a wait per contract,
   so the contract screen opens at once.
 - **Events:** the events other events' results scheduled, with the pilot they're about and the
   first and the last day they can come (assuming a roll every day; on a day one comes, the ones
@@ -361,7 +361,9 @@ appear in the combat state's building lists without being in the map.
 The game state is exported when:
 
 - **The career is loaded**, new or from a save.
-- **The ship arrives in a star system** after a trip, with the system's contracts.
+- **The ship jumps into its destination system**, at the end of that day, with the system's
+  contracts; a day on which work orders also finished is exported once, as the jump.
+- **The ship arrives at the planet** after a trip.
 - **The game saves the career** outside combat, manually or automatically, e.g. once an event's
   popup is closed, with the picked option's results applied.
 - **A contract's results are applied**, salvage included.

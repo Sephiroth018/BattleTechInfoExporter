@@ -120,7 +120,7 @@
     },
     "contracts": {
       "type": "array",
-      "description": "The contracts the Command Center offers, without the active contract, generated for the export when the game hasn't yet; during a trip, the destination's are generated on arrival, so until then the list has no system contracts.",
+      "description": "The contracts the Command Center offers, without the active contract, generated for the export when the game hasn't yet, from the jump into the destination on; before that jump, the list has no system contracts.",
       "items": {
         "$ref": "#/definitions/OfferedContract"
       }
@@ -148,6 +148,7 @@
         "PilotHealed",
         "ShipUpgradeCompleted",
         "ContractsGenerated",
+        "Jumped",
         "Arrived",
         "StoreClosed",
         "PurchaseCompleted",
@@ -173,6 +174,7 @@
         "pilotHealed",
         "shipUpgradeCompleted",
         "contractsGenerated",
+        "jumped",
         "arrived",
         "storeClosed",
         "purchaseCompleted",

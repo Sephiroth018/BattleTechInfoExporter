@@ -32,9 +32,10 @@ Changed: game-state.json.
 - Changed `contracts`: never `null` anymore. The current system's contracts are generated for
   the export when the game hasn't yet, so every export in a system lists them; a system that
   offers no contracts has an empty list. During a trip, the destination's contracts are generated
-  on arrival, so until then the list holds no system contracts.
-- Added `trigger` value `arrived`: the ship arrived in a star system after a trip. Like the other
-  career triggers, it also appears in rules.json and star-systems.json.
+  from the jump into it on; before that jump, the list holds no system contracts.
+- Added `trigger` values `jumped`, the ship jumped into its destination system, and `arrived`,
+  it reached the planet there after the trip. Like the other career triggers, they also appear
+  in rules.json and star-systems.json.
 
 ## 0.63.0
 
