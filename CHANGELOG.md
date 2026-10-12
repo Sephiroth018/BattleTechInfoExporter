@@ -26,7 +26,7 @@ changes the format.
 
 ## 0.62.1
 
-No export file changed.
+No export file changed. Stale schemas of earlier versions are now removed from `schemas/`.
 
 ## 0.62.0
 

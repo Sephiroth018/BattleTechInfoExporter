@@ -34,13 +34,7 @@ internal static class ModFolderFiles
 
     internal static void Delete(string folder, string fileName)
     {
-        var path = Path.Combine(folder, fileName);
-        if (!File.Exists(path))
-        {
-            return;
-        }
-
-        File.Delete(path);
+        File.Delete(Path.Combine(folder, fileName));
         ModLog.Logger.Log($"Deleted {fileName} from {folder}");
     }
 }
