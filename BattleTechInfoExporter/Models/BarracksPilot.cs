@@ -15,7 +15,6 @@ internal sealed record BarracksPilot : Pilot
         int? readyOnDay,
         Spirits spirits,
         ServiceRecord serviceRecord,
-        IReadOnlyList<string> tags,
         IReadOnlyDictionary<string, float> statistics) : base(pilot)
     {
         Experience = experience;
@@ -24,7 +23,6 @@ internal sealed record BarracksPilot : Pilot
         ReadyOnDay = readyOnDay;
         Spirits = spirits;
         ServiceRecord = serviceRecord;
-        Tags = tags;
         Statistics = statistics;
     }
 
@@ -48,9 +46,6 @@ internal sealed record BarracksPilot : Pilot
 
     /// <summary>The pilot's missions, kills and injuries so far, and the day of hire.</summary>
     public ServiceRecord ServiceRecord { get; }
-
-    /// <summary>The pilot's tags, which the events' requirements check.</summary>
-    public IReadOnlyList<string> Tags { get; }
 
     /// <summary>
     ///     The pilot's statistics some event's requirements compare, keyed by the game's name, as they compare them; a
