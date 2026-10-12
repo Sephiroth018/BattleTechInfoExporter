@@ -34,9 +34,8 @@ internal static partial class ChangelogAssembler
             && (releaseVersions.Contains(versionBeingBuilt) || versionBeingBuilt <= historyVersion))
         {
             throw new InvalidOperationException(
-                $"Unreleased fragments exist, but the version being built, {versionBeingBuilt}, isn't new: a changelog "
-                + "entry needs a commit whose type bumps the version, computed from the newest release tag the "
-                + "branch can see");
+                $"Unreleased fragments exist, but the version being built, {versionBeingBuilt}, is released: a changelog "
+                + "entry needs a commit whose type bumps the version");
         }
 
         var versions = releaseVersions.Append(versionBeingBuilt).Distinct().Where(version => version > historyVersion);

@@ -433,9 +433,11 @@ Folders:
 
 The version is `Major.Minor.Patch.Build`, computed by the build from git (`ComputeBuildVersion` in
 `Directory.Build.targets`): the newest release tag reachable from HEAD, bumped by the type of the
-first-parent commits since it (see "Versioning"), with the build number counting those commits, the
-first being build 0. The build stamps it into the DLL and generates `mod.json` from it and the
-description, author, repository URL and supported game version in `Directory.Build.props`.
+first-parent commits since it (see "Versioning"), with the build number counting those commits:
+with a bump from 0, so a PR's merge commit on `main` is build 0; without one the tagged commit is
+build 0, so a commit after a release never shares its version. The build stamps it into the DLL and
+generates `mod.json` from it and the description, author, repository URL and supported game version
+in `Directory.Build.props`.
 
 Planned features are issues on the GitHub Project "Road to 1.0", whose status follows the work (see
 "Issues and projects").
@@ -654,8 +656,9 @@ assembles it into the mod's output folder from `changelog/`, so no PR touches a 
 it. `changelog/preamble.md` is the preamble, `changelog/history.md` the entries written before
 fragments existed, frozen, and every other file there is a fragment: `<issue>-<slug>.md`, one per
 PR that changes the export format, holding the entry's body. The generator puts each fragment under
-the release whose tag first contains the commit that added it, uncommitted or unreleased ones under
-the version being built, and writes "No export file changed." for a release without one. A
+the release whose tag, among those reachable from HEAD, first contains the commit that added it,
+uncommitted or unreleased ones under the version being built, and writes "No export file changed."
+for a release without one. A
 fragment's body starts with `Changed:` and the files whose content changed (every version rewrites
 every file's header, so a file not listed needn't be re-copied), then per file, with `(breaking)`
 on a file whose reading code must change, bullets of JSON paths with one verb each: added, removed,

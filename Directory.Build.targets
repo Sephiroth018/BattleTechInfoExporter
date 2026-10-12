@@ -3,9 +3,10 @@
     The version comes from git: the newest release tag (v<Major.Minor.Patch>) reachable from HEAD, bumped by the
     first-parent commits since it, by their conventional type. A "!" after the type is breaking: major, or minor
     while the major is 0. feat is minor, fix and refactor patch; docs, chore and test don't bump and roll into
-    the next release. The build number counts those commits, the first being build 0, so a PR's merge commit on
-    main is build 0 and a commit exactly at a tag is that release. Merges are counted and typed as one commit,
-    so a merge from main into a branch adds nothing. IDE design-time builds skip git and keep the SDK's default.
+    the next release. The build number counts those commits: with a bump from 0, so a PR's merge commit on main is
+    build 0; without one the tagged commit is build 0, so a commit after a release never shares its version. Merges
+    are counted and typed as one commit, so a merge from main into a branch adds nothing. IDE design-time builds
+    skip git and keep the SDK's default version.
   -->
   <Target Name="ComputeBuildVersion" BeforeTargets="GetAssemblyVersion" Condition="'$(DesignTimeBuild)' != 'true'">
     <!-- Release tags form a chain on main, so the tag with the fewest commits on top is the newest. -->
@@ -16,9 +17,8 @@
     <Error Condition="!$([System.Text.RegularExpressions.Regex]::IsMatch('$(ReleaseTag)', '^v\d+\.\d+\.\d+$'))"
            Text="No release tag v&lt;Major.Minor.Patch&gt; is reachable from HEAD (found '$(ReleaseTag)'); fetch the tags." />
     <PropertyGroup>
-      <CommitRange>$(ReleaseTag)..HEAD</CommitRange>
       <!-- Counted by git's own message grep, which matches lines, so the subjects never pass through MSBuild. -->
-      <CountCommits>git rev-list --count --first-parent --extended-regexp $(CommitRange)</CountCommits>
+      <CountCommits>git rev-list --count --first-parent --extended-regexp $(ReleaseTag)..HEAD</CountCommits>
     </PropertyGroup>
     <Exec Command="$(CountCommits)" WorkingDirectory="$(MSBuildThisFileDirectory)" ConsoleToMsBuild="true"
           StandardOutputImportance="low">
@@ -41,17 +41,18 @@
       <Major>$(ReleaseVersion.Split('.')[0])</Major>
       <Minor>$(ReleaseVersion.Split('.')[1])</Minor>
       <Patch>$(ReleaseVersion.Split('.')[2])</Patch>
+      <Bump>none</Bump>
       <Bump Condition="'$(FixCommits)' > '0'">patch</Bump>
       <Bump Condition="'$(FeatureCommits)' > '0' Or '$(BreakingCommits)' > '0'">minor</Bump>
       <Bump Condition="'$(BreakingCommits)' > '0' And '$(Major)' > '0'">major</Bump>
-      <VersionPrefix Condition="'$(Bump)' == ''">$(ReleaseVersion)</VersionPrefix>
+      <VersionPrefix Condition="'$(Bump)' == 'none'">$(ReleaseVersion)</VersionPrefix>
       <VersionPrefix Condition="'$(Bump)' == 'patch'">$(Major).$(Minor).$([MSBuild]::Add($(Patch), 1))</VersionPrefix>
       <VersionPrefix Condition="'$(Bump)' == 'minor'">$(Major).$([MSBuild]::Add($(Minor), 1)).0</VersionPrefix>
       <VersionPrefix Condition="'$(Bump)' == 'major'">$([MSBuild]::Add($(Major), 1)).0.0</VersionPrefix>
-      <BuildNumber>$([System.Math]::Max(0, $([MSBuild]::Subtract($(CommitsSinceRelease), 1))))</BuildNumber>
+      <BuildNumber>$(CommitsSinceRelease)</BuildNumber>
+      <BuildNumber Condition="'$(Bump)' != 'none'">$([MSBuild]::Subtract($(CommitsSinceRelease), 1))</BuildNumber>
       <Version>$(VersionPrefix).$(BuildNumber)</Version>
     </PropertyGroup>
-    <Message Importance="normal" Text="Version $(Version): $(ReleaseTag) + $(CommitsSinceRelease) commits, bump $(Bump)" Condition="'$(Bump)' != ''" />
-    <Message Importance="normal" Text="Version $(Version): $(ReleaseTag) + $(CommitsSinceRelease) commits, no bump" Condition="'$(Bump)' == ''" />
+    <Message Importance="normal" Text="Version $(Version): $(ReleaseTag) + $(CommitsSinceRelease) commits, bump $(Bump)" />
   </Target>
 </Project>

@@ -465,8 +465,8 @@ dotnet BattleTechInfoExporter.SchemaGenerator/bin/Debug/net9.0/BattleTechInfoExp
 
 The version is `Major.Minor.Patch.Build`, derived from git: the newest release tag reachable from
 the commit being built, bumped by the conventional type of the commits since it (`feat!` major,
-`feat` minor, `fix` patch), and the build number counting those commits from 0. The changelog's
-newest entry gets that version.
+`feat` minor, `fix` patch), and the build number counting those commits. The changelog's newest
+entry gets that version.
 
 `dotnet tool restore` installs the ReSharper command line tools that format and inspect the code;
 CLAUDE.md lists their commands.

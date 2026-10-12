@@ -12,24 +12,13 @@ if (args.Length != 3)
 }
 
 var repository = new GitRepository(args[0]);
-var (fragments, errors) = ChangelogFragments.Read(repository);
-if (errors.Count > 0)
-{
-    foreach (var error in errors)
-    {
-        Console.Error.WriteLine($"error : {error}");
-    }
-
-    return 1;
-}
-
 string content;
 try
 {
     content = ChangelogAssembler.Assemble(
         File.ReadAllText(Path.Combine(repository.ChangelogDirectory, "preamble.md")),
         Version.Parse(args[1]),
-        fragments,
+        ChangelogFragments.Read(repository),
         repository.ReleaseVersions(),
         File.ReadAllText(Path.Combine(repository.ChangelogDirectory, "history.md")));
 }

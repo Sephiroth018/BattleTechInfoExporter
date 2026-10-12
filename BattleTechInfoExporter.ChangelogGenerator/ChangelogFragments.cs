@@ -17,37 +17,40 @@ internal static partial class ChangelogFragments
 {
     private const string RequiredStart = "Changed: ";
 
-    internal static (IReadOnlyList<ChangelogFragment> Fragments, IReadOnlyList<string> Errors) Read(
-        GitRepository repository)
+    /// <exception cref="InvalidOperationException">A fragment's body doesn't start as an entry must.</exception>
+    internal static IReadOnlyList<ChangelogFragment> Read(GitRepository repository)
     {
-        var additions = repository.FragmentAdditions()
-            .Select((addition, order) => (addition.FileName, addition.Commit, Order: order))
-            .ToDictionary(addition => addition.FileName);
-        var fragments = new List<ChangelogFragment>();
-        var errors = new List<string>();
-        var fileNames = Directory.GetFiles(repository.ChangelogDirectory, "*.md")
+        var additions = repository.FragmentAdditions();
+        var fragments = Directory.GetFiles(repository.ChangelogDirectory, "*.md")
             .Select(path => Path.GetFileName(path))
             .Where(fileName => FragmentFileName().IsMatch(fileName))
-            .OrderBy(fileName => additions.TryGetValue(fileName, out var addition) ? addition.Order : int.MaxValue)
-            .ThenBy(fileName => fileName, StringComparer.Ordinal);
-        foreach (var fileName in fileNames)
+            .Select(fileName => (
+                FileName: fileName,
+                Body: File.ReadAllText(Path.Combine(repository.ChangelogDirectory, fileName)).Trim(),
+                Order: additions.ToList().FindIndex(addition => addition.FileName == fileName)))
+            .OrderBy(fragment => fragment.Order >= 0 ? fragment.Order : additions.Count)
+            .ThenBy(fragment => fragment.FileName, StringComparer.Ordinal)
+            .ToList();
+        var malformed = fragments.Where(fragment => !fragment.Body.StartsWith(RequiredStart, StringComparison.Ordinal))
+            .Select(fragment => fragment.FileName)
+            .ToList();
+        if (malformed.Count > 0)
         {
-            var body = File.ReadAllText(Path.Combine(repository.ChangelogDirectory, fileName)).Trim();
-            if (!body.StartsWith(RequiredStart, StringComparison.Ordinal))
-            {
-                errors.Add(
-                    $"changelog/{fileName} must start with \"{RequiredStart}\" and the files whose content changed");
-            }
-
-            fragments.Add(new ChangelogFragment(
-                fileName,
-                body,
-                additions.TryGetValue(fileName, out var addition)
-                    ? repository.ReleaseContaining(addition.Commit)
-                    : null));
+            throw new InvalidOperationException(
+                $"Fragments that don't start with \"{RequiredStart}\" and the files whose content changed: {
+                    string.Join(", ", malformed)}");
         }
 
-        return (fragments, errors);
+        // A fragment added by a tagged commit needs no lookup; one added by an untagged commit (unreleased, or a
+        // merge from main into a branch) asks git which release first shipped it.
+        return fragments
+            .Select(fragment => new ChangelogFragment(
+                fragment.FileName,
+                fragment.Body,
+                fragment.Order < 0
+                    ? null
+                    : additions[fragment.Order].Release ?? repository.ReleaseFirstShipping(fragment.FileName)))
+            .ToList();
     }
 
     [GeneratedRegex(@"^\d+-[a-z0-9-]+\.md$")]
