@@ -47,7 +47,7 @@
 
   <!-- Everything the mod folder needs; deployed to the game and packaged for releases. -->
   <ItemGroup>
-    <ModFile Include="$(TargetPath);$(OutDir)mod.json;$(OutDir)CHANGELOG.md" />
+    <ModFile Include="$(TargetPath);$(OutDir)mod.json;$(RepositoryRoot)\CHANGELOG.md" />
   </ItemGroup>
 
   <Target Name="ValidateBattleTechGameDir"
