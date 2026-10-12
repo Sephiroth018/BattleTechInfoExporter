@@ -230,9 +230,9 @@ adjustments the game's tooltips show are left out: its pay never applies them.
 Every file has a JSON Schema (draft-04) in `Mods/BattleTechInfoExporter/schemas/`, e.g.
 `game-state.schema.json`, generated from the same models the mod writes the files from, so it
 always matches the mod version it ships with. On every game start the mod deletes any other file
-there, e.g. the schema of a file an earlier version wrote. It describes every property: its type, whether it can
-be `null`, the values of enums, and what it means. A property that holds one of several record
-shapes, such as a refit step, is any of them, without tying its `type` to a shape.
+there, e.g. the schema of a file an earlier version wrote. It describes every property: its type,
+whether it can be `null`, the values of enums, and what it means. A property that holds one of
+several record shapes, such as a refit step, is any of them, without tying its `type` to a shape.
 
 ## Combat state
 

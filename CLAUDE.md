@@ -104,7 +104,9 @@ Once per repository, before the rest of the workflow applies:
   took (see the project's "Versioning"), and the build and inspections when the merge touched code.
 - **Merge only after the user's go-ahead in chat, given after the latest commit.** A later commit
   that changes the PR's diff needs a fresh go-ahead; a conflict-free update from `main` doesn't.
-  Merge with a merge commit.
+  Merge with a merge commit, and never delete the remote branch yourself (no `--delete-branch`, no
+  `git push --delete`): the repository deletes it after the merge, and only then does GitHub
+  retarget the PRs stacked on it to `main`; a branch deleted by a client closes them instead.
 - **After merging:** switch to `main`, `git pull --prune`, delete the local branch.
 
 ## Definition of done
