@@ -40,7 +40,7 @@ Changed: combat-state.json.
   are on the map), with `linesOfFire` and `movement` `null`, and no longer appear in the player's
   units' `linesOfFire`. An enemy that withdrew or was removed by the mission's script
   (`DespawnedEscaped`, `DespawnedNoMessage`) leaves no wreck and stays left out.
-- Changed `objectives[].targetUnits`: lists destroyed enemy targets too, now that they are in
+- Changed `objectives[].targetUnitIds`: lists destroyed enemy targets too, now that they are in
   `units`; the units left to destroy are those with `state.deathMethod` `null`.
 
 ## 0.61.1
