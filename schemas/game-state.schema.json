@@ -120,7 +120,7 @@
     },
     "contracts": {
       "type": "array",
-      "description": "The contracts the Command Center offers, without the active contract, generated for the export when the game hasn't yet, from the jump into the destination on; before that jump, the list has no system contracts.",
+      "description": "The contracts the Command Center offers, without the active contract, generated for the export when the game hasn't yet; during a trip, only from the jump into the destination on.",
       "items": {
         "$ref": "#/definitions/OfferedContract"
       }

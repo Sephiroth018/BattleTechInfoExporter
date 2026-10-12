@@ -31,8 +31,7 @@ internal static class DayPassedTrigger
     {
         try
         {
-            // A jump moves the ship to the next system on its path (SGTravelManager.HandleNextTravelStep); only the
-            // one into the destination matters, whose contracts the export generates.
+            // A jump changes the current system; systems jumped through on the way aren't exported.
             if (simGame.CurSystem != dayStart.System && SystemContractGenerator.IsInDestination(simGame))
             {
                 GameStateExporter.Export(simGame, ExportTrigger.Jumped);

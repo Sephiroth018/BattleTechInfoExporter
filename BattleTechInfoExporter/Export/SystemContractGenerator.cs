@@ -14,9 +14,8 @@ internal static class SystemContractGenerator
     /// </summary>
     internal static void GenerateMissingContracts(SimGameState simGame)
     {
-        // The screen can't open before the UX is attached. It can from the jump into the destination on, which is
-        // the current system from then (SGTravelManager.HandleNextTravelStep); a system jumped through on the way
-        // is skipped.
+        // The screen can't open before the UX is attached, nor during a trip before the jump into the destination
+        // (SGTravelManager.HandleNextTravelStep).
         if (!simGame.UXAttached || !IsInDestination(simGame) || simGame.CurSystem.InitialContractsFetched)
         {
             return;
