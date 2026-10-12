@@ -65,7 +65,7 @@ The last one describes the game rather than the career:
   item collection the game has loaded, DLC included, keyed by id, so tools can judge what else
   exists beyond what the career refers to, what a mission's enemies can do, what its ground does to
   them, which events can come and where a mech or component can be bought.
-  - **Chassis:** the frame: weight class, tonnage and bare tonnage, max jump jets, built-in heat
+  - **Chassis:** the frame: weight class, tonnage and bare tonnage, value, max jump jets, built-in heat
     dissipation, walk and sprint distance, the pathing capabilities it moves with (see "Combat
     map"), melee values before upgrades, and per location max
     armor, structure, hardpoints and component slots; plus the stock mech, the mech the game treats as the chassis'
@@ -223,9 +223,12 @@ points divided by the company's MechTech, rounded up, in days), med bay heal poi
 death chances, hiring costs and the limits the Mercenary Review Board rating and the morale put on
 hiring, how salvage picks come about and how a destroyed enemy mech yields its parts (1 for a
 destroyed center torso, 2 for both legs, 3 for the head or an incapacitated pilot), the financial
-report's upkeep and spending levels, contract pay, reputation and experience by outcome, alliances
-and travel. Each mission type carries the multiplier of its contracts' pay. The reputation payment
-adjustments the game's tooltips show are left out: its pay never applies them.
+report's upkeep and spending levels, the shares of a value a store pays for a stored chassis or
+component and scrapping pays, contract pay, reputation and experience by outcome, alliances and
+travel. Each mission type carries the multiplier of its contracts' pay. The reputation payment
+adjustments the game's tooltips show are left out: its pay never applies them. Selling pays the
+same in every store: the reputation price change applies to purchases only, and mech parts and
+the mechs in the mech bay can't be sold.
 
 Every file has a JSON Schema (draft-04) in `Mods/BattleTechInfoExporter/schemas/`, e.g.
 `game-state.schema.json`, generated from the same models the mod writes the files from, so it

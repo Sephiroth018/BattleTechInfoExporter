@@ -24,6 +24,15 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.63.0
+
+Changed: catalog.json.
+
+### catalog.json
+- Added `chassisDefinitions.<id>.value`: the chassis' C-Bill value, which a stored chassis' sell
+  price and a mech's, chassis' or mech parts' scrap value are computed from with the rules'
+  `campaign.finances.sellShare` and `scrapShare`.
+
 ## 0.62.1
 
 No export file changed.

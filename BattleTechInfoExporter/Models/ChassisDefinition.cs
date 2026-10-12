@@ -7,6 +7,11 @@ namespace BattleTechInfoExporter.Models;
 /// <summary>A chassis: the frame its mechs share, without anything a loadout decides.</summary>
 /// <param name="Name">The name with the variant, as in the references to the chassis.</param>
 /// <param name="InitialTonnage">The bare chassis' tonnage, which a mech's tonnage starts from.</param>
+/// <param name="Value">
+///     The C-Bill value of the chassis, which <see cref="FinancesRules.SellShare" /> and
+///     <see cref="FinancesRules.ScrapShare" /> apply to when a stored chassis is sold or a mech, chassis or mech
+///     parts are scrapped.
+/// </param>
 /// <param name="MaxJumpJets">The most jump jets a mech of the chassis can mount; 0 when it can't jump.</param>
 /// <param name="HeatDissipation">The heat the chassis itself removes per round, on top of its heat sinks.</param>
 /// <param name="Movement">The walk and sprint distances and the pathing, which no loadout changes.</param>
@@ -21,6 +26,7 @@ internal sealed record ChassisDefinition(
     WeightClass WeightClass,
     float Tonnage,
     float InitialTonnage,
+    int Value,
     int MaxJumpJets,
     int HeatDissipation,
     ChassisMovement Movement,

@@ -9,9 +9,17 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="ShipMaintenance">The ship's own maintenance in each report's expenses.</param>
 /// <param name="SpendingLevels">The spending levels, which <see cref="Spending.Level" /> refers to.</param>
 /// <param name="JumpCost">The C-Bills each jump of a trip costs.</param>
-/// <param name="SellShare">The share of its value a store pays for a mech or an undamaged component.</param>
-/// <param name="SellDamagedShare">The share of its value a store pays for a damaged component.</param>
-/// <param name="ScrapShare">The share of the chassis' value scrapping a mech, chassis or mech part pays.</param>
+/// <param name="SellShare">
+///     The share of its value a store pays for a stored chassis or an undamaged component, rounded down. Every
+///     store pays the same: the reputation price change applies to purchases only. Mech parts and the mechs in the
+///     mech bay can't be sold, only scrapped.
+/// </param>
+/// <param name="SellDamagedShare">The share of its value a store pays for a damaged component, rounded down.</param>
+/// <param name="ScrapShare">
+///     The share of the chassis' value scrapping a mech or chassis pays, rounded to the nearest C-Bill; mech parts
+///     pay it times their share of the parts needed. Scrapping a component pays this share of its value, rounded
+///     down.
+/// </param>
 /// <param name="MaxDebt">The company is dissolved when its funds fall below this.</param>
 /// <param name="BadFaithMoraleChange">When a mission is failed without a good faith effort.</param>
 /// <param name="CatastropheMoraleChange">When every pilot sent on a mission is killed.</param>

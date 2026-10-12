@@ -164,6 +164,7 @@
         "weightClass",
         "tonnage",
         "initialTonnage",
+        "value",
         "maxJumpJets",
         "heatDissipation",
         "movement",
@@ -189,6 +190,11 @@
           "type": "number",
           "description": "The bare chassis' tonnage, which a mech's tonnage starts from.",
           "format": "float"
+        },
+        "value": {
+          "type": "integer",
+          "description": "The C-Bill value of the chassis, which sellShare and scrapShare apply to when a stored chassis is sold or a mech, chassis or mech parts are scrapped.",
+          "format": "int32"
         },
         "maxJumpJets": {
           "type": "integer",

@@ -97,6 +97,7 @@ internal static class CatalogReader
             chassis.weightClass,
             chassis.Tonnage,
             chassis.InitialTonnage,
+            chassis.Description.Cost,
             chassis.MaxJumpjets,
             chassis.Heatsinks,
             ReadMovement(chassis.MovementCapDef, chassis.PathingCapDefID),
