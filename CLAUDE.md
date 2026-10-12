@@ -392,7 +392,7 @@ Folders:
   loaded. All run their export inside `CampaignExport`. `GameStateReader` builds the game
   state file's models from the game, one reader per section of the file (`FinancialReportReader` the
   financial report), taking the star systems it shows in full from the star systems file's model, after
-  `ContractGenerator` generated the current system's contracts where the game hadn't yet; `RulesReader` builds the
+  `SystemContractGenerator` generated the current system's contracts where the game hadn't yet; `RulesReader` builds the
   rules file's tables, with `AbilityReader` reading each ability, `CombatRulesReader` the combat
   constants and `CampaignRulesReader` the campaign constants; `EffectReader` reads the statistic
   changes of abilities, components, terrains and rules; `StarSystemReader` builds the star systems file from the starmap, with

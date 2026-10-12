@@ -19,7 +19,7 @@ internal static class ContractGenerationPatch
     {
         try
         {
-            ContractGenerator.Generate(system);
+            SystemContractGenerator.Generate(system);
         }
         catch (Exception exception)
         {

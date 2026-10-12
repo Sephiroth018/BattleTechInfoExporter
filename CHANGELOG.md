@@ -31,10 +31,11 @@ Changed: game-state.json.
 ### game-state.json
 - Changed `contracts`: never `null` anymore. The current system's contracts are generated for
   the export when the game hasn't yet, so every export in a system lists them; a system that
-  offers no contracts has an empty list. During a trip, the destination's contracts are generated
-  on arrival, so until then the list holds no system contracts.
-- Added `trigger` value `arrived`: the ship arrived in a star system after a trip. Like the other
-  career triggers, it also appears in rules.json and star-systems.json.
+  offers no contracts has an empty list, and so has the destination of a trip before the jump
+  into it.
+- Added `trigger` values `jumped`, the ship jumped into its destination system, and `arrived`,
+  it reached the planet there after the trip. Like the other career triggers, they also appear
+  in rules.json and star-systems.json.
 
 ## 0.63.0
 
@@ -52,7 +53,7 @@ Changed: game-state.json, catalog.json.
 
 ## 0.62.1
 
-No export file changed.
+No export file changed. Stale schemas of earlier versions are now removed from `schemas/`.
 
 ## 0.62.0
 
@@ -70,7 +71,7 @@ Changed: combat-state.json.
   are on the map), with `linesOfFire` and `movement` `null`, and no longer appear in the player's
   units' `linesOfFire`. An enemy that withdrew or was removed by the mission's script
   (`DespawnedEscaped`, `DespawnedNoMessage`) leaves no wreck and stays left out.
-- Changed `objectives[].targetUnits`: lists destroyed enemy targets too, now that they are in
+- Changed `objectives[].targetUnitIds`: lists destroyed enemy targets too, now that they are in
   `units`; the units left to destroy are those with `state.deathMethod` `null`.
 
 ## 0.61.1

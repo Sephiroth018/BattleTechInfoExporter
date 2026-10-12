@@ -6,7 +6,7 @@ namespace BattleTechInfoExporter.Export;
 ///     Generates a star system's contracts the way the Command Center's contract screen does when it first opens
 ///     there.
 /// </summary>
-internal static class ContractGenerator
+internal static class SystemContractGenerator
 {
     /// <summary>
     ///     Generates the current system's contracts when the game hasn't yet, so every career export in a system has
@@ -14,10 +14,9 @@ internal static class ContractGenerator
     /// </summary>
     internal static void GenerateMissingContracts(SimGameState simGame)
     {
-        // The screen can't open before the UX is attached or during a trip (SGTravelManager.HandleNextTravelStep).
-        if (!simGame.UXAttached
-            || simGame.TravelState != SimGameTravelStatus.IN_SYSTEM
-            || simGame.CurSystem.InitialContractsFetched)
+        // The screen can't open before the UX is attached, nor during a trip before the jump into the destination
+        // (SGTravelManager.HandleNextTravelStep).
+        if (!simGame.UXAttached || !IsInDestination(simGame) || simGame.CurSystem.InitialContractsFetched)
         {
             return;
         }
@@ -26,6 +25,11 @@ internal static class ContractGenerator
         // Not OnInitialContractFetched: it fires ContractsGeneratedTrigger, a second export inside this one.
         simGame.CurSystem.initialContractsFetched = true;
     }
+
+    /// <summary>Whether the ship is in the system it travels to, or in a system without a trip under way.</summary>
+    internal static bool IsInDestination(SimGameState simGame) =>
+        simGame.TravelState == SimGameTravelStatus.IN_SYSTEM
+        || simGame.Starmap?.Destination?.System == simGame.CurSystem;
 
     /// <summary>
     ///     StarSystem.GenerateInitialContracts' call without its callback and its useCoroutine, which waits 0.2 s per

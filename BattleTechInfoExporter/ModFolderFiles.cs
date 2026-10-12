@@ -35,6 +35,7 @@ internal static class ModFolderFiles
     internal static void Delete(string folder, string fileName)
     {
         var path = Path.Combine(folder, fileName);
+        // Only for the log: File.Delete itself doesn't mind a missing file.
         if (!File.Exists(path))
         {
             return;

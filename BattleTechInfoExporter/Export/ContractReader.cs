@@ -56,7 +56,7 @@ internal static class ContractReader
             starmap.StarSystems[starSystem.Def.Description.Id]);
     }
 
-    // The current system's contracts are generated before the read (ContractGenerator). The active contract is left
+    // The current system's contracts are generated before the read (SystemContractGenerator). The active contract is left
     // out: an accepted global contract stays in SimGameState.GlobalContracts until arrival, and once arrived,
     // GetAllCurrentlySelectableContracts adds it.
     internal static List<OfferedContract> ReadContracts(SimGameState simGame, Starmap starmap) =>
