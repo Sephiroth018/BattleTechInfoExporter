@@ -405,7 +405,7 @@
             "array",
             "null"
           ],
-          "description": "The lines of fire to the units it could attack: from the player's units to every enemy at full, and from those enemies to the player's units. null for the others.",
+          "description": "The lines of fire to the units it could attack: from the player's units to every living enemy at full, and from those enemies to the player's units. null for the others, destroyed units included.",
           "items": {
             "$ref": "#/definitions/LineOfFire"
           }
@@ -579,7 +579,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "isDestroyed",
+        "deathMethod",
         "locations",
         "evasionPips",
         "guard",
@@ -597,9 +597,16 @@
         "vigilanceCost"
       ],
       "properties": {
-        "isDestroyed": {
-          "type": "boolean",
-          "description": "Whether the unit is destroyed; only the player's and allied units stay listed once destroyed."
+        "deathMethod": {
+          "description": "How the unit was destroyed, as the game records it (DeathMethod), e.g. CenterTorsoDestruction, LegDestruction, PilotKilled (also an incapacitated pilot), PilotEjection, a turret's CenterTorsoDestruction or a vehicle's VehicleLocationDestroyed; null while the unit lives.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/DeathMethod"
+            }
+          ]
         },
         "locations": {
           "type": "array",
@@ -689,6 +696,49 @@
           "format": "int32"
         }
       }
+    },
+    "DeathMethod": {
+      "type": "string",
+      "x-enumNames": [
+        "NOT_SET",
+        "HeadDestruction",
+        "CenterTorsoDestruction",
+        "LegDestruction",
+        "AmmoExplosion",
+        "EngineDestroyed",
+        "GyroDestroyed",
+        "PilotKilled",
+        "CockpitDestroyed",
+        "VitalComponentDestroyed",
+        "Unknown",
+        "VehicleLocationDestroyed",
+        "PilotEjection",
+        "PilotEjectionActorDisabled",
+        "DespawnedNoMessage",
+        "DespawnedEscaped",
+        "PilotEjectionNoMessage",
+        "ComponentExplosion"
+      ],
+      "enum": [
+        "NOT_SET",
+        "HeadDestruction",
+        "CenterTorsoDestruction",
+        "LegDestruction",
+        "AmmoExplosion",
+        "EngineDestroyed",
+        "GyroDestroyed",
+        "PilotKilled",
+        "CockpitDestroyed",
+        "VitalComponentDestroyed",
+        "Unknown",
+        "VehicleLocationDestroyed",
+        "PilotEjection",
+        "PilotEjectionActorDisabled",
+        "DespawnedNoMessage",
+        "DespawnedEscaped",
+        "PilotEjectionNoMessage",
+        "ComponentExplosion"
+      ]
     },
     "UnitLocation": {
       "type": "object",

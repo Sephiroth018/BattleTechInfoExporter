@@ -258,7 +258,14 @@ it stands in by its catalog id (`null` on open ground). What else it carries fol
 - **Sensor blips:** the position and as much as the HUD shows: nothing more at the lowest level,
   the kind of unit at the next, and its tonnage, or a turret's weight class, at the highest.
 - **Enemies out of sensor range:** where the player's side last detected them, without facing or
-  terrain, until they are seen again. Destroyed enemies are left out.
+  terrain, until they are seen again.
+- **Destroyed units,** enemies included, stay listed in full view, as their wrecks are on the map,
+  with how they were destroyed under `state.deathMethod` as the game records it (`null` while a
+  unit lives): e.g. `CenterTorsoDestruction`, `HeadDestruction`, `LegDestruction` (both legs),
+  `AmmoExplosion`, `PilotKilled` (also an incapacitated pilot), `PilotEjection`, a turret's
+  `CenterTorsoDestruction` or a vehicle's `VehicleLocationDestroyed`. They have no lines of fire,
+  no movement and aren't targets, but an objective still lists them among its target units. An
+  enemy that withdrew or was removed by the mission's script leaves no wreck and is left out.
 
 The player's units carry their lines of fire to every enemy in full view, and those enemies theirs
 to the player's units, as hovering over a target shows them from where the unit stands: the line

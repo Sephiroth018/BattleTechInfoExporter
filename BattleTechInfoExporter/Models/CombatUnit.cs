@@ -32,8 +32,9 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Pilot">The pilot, which the HUD names only at <see cref="UnitVisibility.Full" />.</param>
 /// <param name="State">The unit's condition, shown at <see cref="UnitVisibility.Full" />.</param>
 /// <param name="LinesOfFire">
-///     The lines of fire to the units it could attack: from the player's units to every enemy at
-///     <see cref="UnitVisibility.Full" />, and from those enemies to the player's units. <c>null</c> for the others.
+///     The lines of fire to the units it could attack: from the player's units to every living enemy at
+///     <see cref="UnitVisibility.Full" />, and from those enemies to the player's units. <c>null</c> for the others,
+///     destroyed units included.
 /// </param>
 /// <param name="Movement">
 ///     Where the player's unit can move and what it gets there; <c>null</c> for the others, and for a unit that can't
@@ -56,8 +57,11 @@ internal sealed record CombatUnit(
     IReadOnlyList<LineOfFire>? LinesOfFire,
     UnitMovement? Movement);
 
-/// <param name="IsDestroyed">
-///     Whether the unit is destroyed; only the player's and allied units stay listed once destroyed.
+/// <param name="DeathMethod">
+///     How the unit was destroyed, as the game records it (<see cref="BattleTech.DeathMethod" />), e.g.
+///     <c>CenterTorsoDestruction</c>, <c>LegDestruction</c>, <c>PilotKilled</c> (also an incapacitated pilot),
+///     <c>PilotEjection</c>, a turret's <c>CenterTorsoDestruction</c> or a vehicle's
+///     <c>VehicleLocationDestroyed</c>; <c>null</c> while the unit lives.
 /// </param>
 /// <param name="Locations">
 ///     The armor and structure left per location, in the game's order: a mech's from head to legs, a vehicle's from
@@ -86,7 +90,7 @@ internal sealed record CombatUnit(
 /// <param name="VigilanceCost">The resolve Vigilance costs the unit now.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatUnitState(
-    bool IsDestroyed,
+    DeathMethod? DeathMethod,
     IReadOnlyList<UnitLocation> Locations,
     int EvasionPips,
     Guard Guard,

@@ -24,6 +24,25 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.62.0
+
+Changed: combat-state.json.
+
+### combat-state.json (breaking)
+- Replaced `units.<id>.state.isDestroyed` with `units.<id>.state.deathMethod`: `null` while the
+  unit lives, otherwise how it was destroyed, as the game records it: `HeadDestruction`,
+  `CenterTorsoDestruction` (also a turret's), `LegDestruction` (both legs), `AmmoExplosion`,
+  `ComponentExplosion`, `EngineDestroyed`, `GyroDestroyed`, `PilotKilled` (also an incapacitated
+  pilot), `CockpitDestroyed`, `VitalComponentDestroyed`, `VehicleLocationDestroyed`,
+  `PilotEjection`, `PilotEjectionNoMessage`, `PilotEjectionActorDisabled`, `DespawnedNoMessage`,
+  `DespawnedEscaped` or `Unknown`.
+- Changed `units`: destroyed enemies, which were left out, stay listed in full view (their wrecks
+  are on the map), with `linesOfFire` and `movement` `null`, and no longer appear in the player's
+  units' `linesOfFire`. An enemy that withdrew or was removed by the mission's script
+  (`DespawnedEscaped`, `DespawnedNoMessage`) leaves no wreck and stays left out.
+- Changed `objectives[].targetUnitIds`: lists destroyed enemy targets too, now that they are in
+  `units`; the units left to destroy are those with `state.deathMethod` `null`.
+
 ## 0.61.1
 
 No export file changed. This file is first shipped with the mod.
