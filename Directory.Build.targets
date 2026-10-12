@@ -1,33 +1,80 @@
 <Project>
   <!--
-    Build counts the commits since VersionPrefix last changed, so the bump commit (on main, the PR's
-    merge commit) and an uncommitted bump are build 0. Merges are diffed against their first parent
-    only, so a merge from main into a branch doesn't reset the count. IDE design-time builds keep the
-    three-part version instead of running git.
+    The version comes from git: the newest release tag (v<Major.Minor.Patch>) reachable from HEAD, bumped by the
+    first-parent commits since it, by their conventional type. A "!" after the type is breaking: major, or minor
+    while the major is 0. feat is minor, fix and refactor patch; docs, chore and test don't bump and roll into
+    the next release. The build number counts those commits: with a bump from 0, so a PR's merge commit on main is
+    build 0; without one the tagged commit is build 0, so a commit after a release never shares its version. Merges
+    are counted and typed as one commit, so a merge from main into a branch adds nothing. IDE design-time builds
+    skip git and keep the SDK's default version.
   -->
   <Target Name="ComputeBuildVersion" BeforeTargets="GetAssemblyVersion" Condition="'$(DesignTimeBuild)' != 'true'">
-    <!-- "hash subject" rather than a format with %H, which a Windows batch file mangles. -->
-    <Exec Command="git log --first-parent -S&quot;&lt;VersionPrefix&gt;$(VersionPrefix)&lt;/VersionPrefix&gt;&quot; --oneline --no-abbrev-commit --max-count=1 -- Directory.Build.props"
-          WorkingDirectory="$(MSBuildThisFileDirectory)" ConsoleToMsBuild="true" StandardOutputImportance="low">
-      <Output TaskParameter="ConsoleOutput" PropertyName="VersionPrefixCommitLine" />
+    <!-- Release tags form a chain on main, so the tag with the fewest commits on top is the newest. -->
+    <Exec Command="git describe --tags --match v[0-9]*.[0-9]*.[0-9]* --exclude *-* --abbrev=0" WorkingDirectory="$(MSBuildThisFileDirectory)"
+          ConsoleToMsBuild="true" StandardOutputImportance="low" IgnoreExitCode="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="ReleaseTag" />
     </Exec>
+    <Error Condition="!$([System.Text.RegularExpressions.Regex]::IsMatch('$(ReleaseTag)', '^v\d+\.\d+\.\d+$'))"
+           Text="No release tag v&lt;Major.Minor.Patch&gt; is reachable from HEAD (found '$(ReleaseTag)'); fetch the tags." />
     <PropertyGroup>
-      <VersionPrefixCommit>$(VersionPrefixCommitLine.Split(' ')[0])</VersionPrefixCommit>
+      <!-- Counted by git's own message grep, so the subjects never pass through MSBuild. It matches every line of a
+           message, so a body line written like a subject ("fix(#12): ...") counts too; bodies don't start lines so. -->
+      <CountCommits>git rev-list --count --first-parent --extended-regexp $(ReleaseTag)..HEAD</CountCommits>
     </PropertyGroup>
-    <Exec Command="git rev-list --count $(VersionPrefixCommit)..HEAD" Condition="'$(VersionPrefixCommit)' != ''"
-          WorkingDirectory="$(MSBuildThisFileDirectory)" ConsoleToMsBuild="true" StandardOutputImportance="low">
-      <Output TaskParameter="ConsoleOutput" PropertyName="BuildNumber" />
+    <Exec Command="$(CountCommits)" WorkingDirectory="$(MSBuildThisFileDirectory)" ConsoleToMsBuild="true"
+          StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="CommitsSinceRelease" />
     </Exec>
-    <!-- No commit introduces the prefix: fine while the bump is uncommitted, an error otherwise. -->
-    <Exec Command="git diff --quiet HEAD -- Directory.Build.props" Condition="'$(VersionPrefixCommit)' == ''"
-          WorkingDirectory="$(MSBuildThisFileDirectory)" IgnoreExitCode="true">
-      <Output TaskParameter="ExitCode" PropertyName="VersionPrefixUnchangedExitCode" />
+    <Exec Command="$(CountCommits) --grep=&quot;^[a-z]+(\([^)]*\))?!:&quot;" WorkingDirectory="$(MSBuildThisFileDirectory)"
+          ConsoleToMsBuild="true" StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="BreakingCommits" />
     </Exec>
-    <Error Condition="'$(VersionPrefixCommit)' == '' And '$(VersionPrefixUnchangedExitCode)' == '0'"
-           Text="No commit introduces &lt;VersionPrefix&gt;$(VersionPrefix)&lt;/VersionPrefix&gt; in Directory.Build.props; ComputeBuildVersion searches for that exact text." />
+    <Exec Command="$(CountCommits) --grep=&quot;^feat(\([^)]*\))?!?:&quot;" WorkingDirectory="$(MSBuildThisFileDirectory)"
+          ConsoleToMsBuild="true" StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="FeatureCommits" />
+    </Exec>
+    <Exec Command="$(CountCommits) --grep=&quot;^(fix|refactor)(\([^)]*\))?!?:&quot;" WorkingDirectory="$(MSBuildThisFileDirectory)"
+          ConsoleToMsBuild="true" StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="FixCommits" />
+    </Exec>
     <PropertyGroup>
-      <BuildNumber Condition="'$(BuildNumber)' == ''">0</BuildNumber>
+      <ReleaseVersion>$(ReleaseTag.Substring(1))</ReleaseVersion>
+      <Major>$(ReleaseVersion.Split('.')[0])</Major>
+      <Minor>$(ReleaseVersion.Split('.')[1])</Minor>
+      <Patch>$(ReleaseVersion.Split('.')[2])</Patch>
+      <Bump>none</Bump>
+      <Bump Condition="'$(FixCommits)' > '0'">patch</Bump>
+      <Bump Condition="'$(FeatureCommits)' > '0' Or '$(BreakingCommits)' > '0'">minor</Bump>
+      <Bump Condition="'$(BreakingCommits)' > '0' And '$(Major)' > '0'">major</Bump>
+      <VersionPrefix Condition="'$(Bump)' == 'none'">$(ReleaseVersion)</VersionPrefix>
+      <VersionPrefix Condition="'$(Bump)' == 'patch'">$(Major).$(Minor).$([MSBuild]::Add($(Patch), 1))</VersionPrefix>
+      <VersionPrefix Condition="'$(Bump)' == 'minor'">$(Major).$([MSBuild]::Add($(Minor), 1)).0</VersionPrefix>
+      <VersionPrefix Condition="'$(Bump)' == 'major'">$([MSBuild]::Add($(Major), 1)).0.0</VersionPrefix>
+      <BuildNumber>$(CommitsSinceRelease)</BuildNumber>
+      <BuildNumber Condition="'$(Bump)' != 'none'">$([MSBuild]::Subtract($(CommitsSinceRelease), 1))</BuildNumber>
       <Version>$(VersionPrefix).$(BuildNumber)</Version>
     </PropertyGroup>
+    <Message Importance="normal" Text="Version $(Version): $(ReleaseTag) + $(CommitsSinceRelease) commits, bump $(Bump)" />
+    <!--
+      The changelog's newest entry must be this version's: older means the entry is missing, or another PR released
+      its number first and the heading has to move on. Newer is a branch that hasn't merged main since a release.
+    -->
+    <PropertyGroup>
+      <Changelog>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)CHANGELOG.md'))</Changelog>
+      <ChangelogVersion>$([System.Text.RegularExpressions.Regex]::Match($(Changelog), '(?m)^## (\d+\.\d+\.\d+)$').Groups[1].Value)</ChangelogVersion>
+    </PropertyGroup>
+    <Error Condition="'$(ChangelogVersion)' == ''" Text="CHANGELOG.md has no version heading (## Major.Minor.Patch)." />
+    <PropertyGroup>
+      <ChangelogMajor>$(ChangelogVersion.Split('.')[0])</ChangelogMajor>
+      <ChangelogMinor>$(ChangelogVersion.Split('.')[1])</ChangelogMinor>
+      <ChangelogPatch>$(ChangelogVersion.Split('.')[2])</ChangelogPatch>
+      <BuiltMajor>$(VersionPrefix.Split('.')[0])</BuiltMajor>
+      <BuiltMinor>$(VersionPrefix.Split('.')[1])</BuiltMinor>
+      <BuiltPatch>$(VersionPrefix.Split('.')[2])</BuiltPatch>
+      <ChangelogOutdated>false</ChangelogOutdated>
+      <ChangelogOutdated Condition="'$(ChangelogMajor)' &lt; '$(BuiltMajor)' Or ('$(ChangelogMajor)' == '$(BuiltMajor)' And ('$(ChangelogMinor)' &lt; '$(BuiltMinor)' Or ('$(ChangelogMinor)' == '$(BuiltMinor)' And '$(ChangelogPatch)' &lt; '$(BuiltPatch)')))">true</ChangelogOutdated>
+    </PropertyGroup>
+    <Error Condition="$(ChangelogOutdated)"
+           Text="CHANGELOG.md's newest entry is $(ChangelogVersion), but this build is $(VersionPrefix): add this version's entry, or move the heading on when another PR released its number first." />
   </Target>
 </Project>

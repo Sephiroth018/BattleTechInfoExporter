@@ -11,9 +11,10 @@
     <ModDirectoryInGame>$(BattleTechGameDir)\Mods\$(MSBuildProjectName)\</ModDirectoryInGame>
     <!-- The models' doc comments are the schemas' descriptions. -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <SchemaGeneratorProject>$(MSBuildThisFileDirectory)..\BattleTechInfoExporter.SchemaGenerator\BattleTechInfoExporter.SchemaGenerator.csproj</SchemaGeneratorProject>
     <!-- No trailing backslash, which would escape the closing quote of the generator's argument. -->
-    <SchemaDirectory>$(MSBuildThisFileDirectory)..\schemas</SchemaDirectory>
+    <RepositoryRoot>$(MSBuildThisFileDirectory)..</RepositoryRoot>
+    <SchemaGeneratorProject>$(RepositoryRoot)\BattleTechInfoExporter.SchemaGenerator\BattleTechInfoExporter.SchemaGenerator.csproj</SchemaGeneratorProject>
+    <SchemaDirectory>$(RepositoryRoot)\schemas</SchemaDirectory>
   </PropertyGroup>
 
   <ItemGroup>
@@ -45,7 +46,7 @@
 
   <!-- Everything the mod folder needs; deployed to the game and packaged for releases. -->
   <ItemGroup>
-    <ModFile Include="$(TargetPath);$(OutDir)mod.json;$(MSBuildThisFileDirectory)..\CHANGELOG.md" />
+    <ModFile Include="$(TargetPath);$(OutDir)mod.json;$(RepositoryRoot)\CHANGELOG.md" />
   </ItemGroup>
 
   <Target Name="ValidateBattleTechGameDir"
@@ -56,7 +57,7 @@
   <!-- A target, because Version gets its build number only once ComputeBuildVersion has run. -->
   <Target Name="SetPackageFile" AfterTargets="ComputeBuildVersion">
     <PropertyGroup>
-      <PackageFile>$(MSBuildThisFileDirectory)..\artifacts\$(MSBuildProjectName)-$(Version).zip</PackageFile>
+      <PackageFile>$(RepositoryRoot)\artifacts\$(MSBuildProjectName)-$(Version).zip</PackageFile>
     </PropertyGroup>
   </Target>
 
