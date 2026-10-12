@@ -25,9 +25,9 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="HiringHall">The pilots for hire in the current system's hiring hall.</param>
 /// <param name="ActiveContract">The travel contract the company has accepted; <c>null</c> without one.</param>
 /// <param name="Contracts">
-///     The contracts the Command Center offers, without the active contract; <c>null</c> until the game has
-///     generated the current system's contracts, which it does when the contract screen first opens in a system or
-///     after a contract.
+///     The contracts the Command Center offers, without the active contract, generated for the export when the game
+///     hasn't yet; during a trip, the destination's are generated on arrival, so until then the list has no
+///     system contracts.
 /// </param>
 /// <param name="Position">Where the ship is: the star system, and the travel under way.</param>
 /// <param name="Events">
@@ -47,7 +47,7 @@ internal sealed record GameState(
     ByStore<Store?> Stores,
     IReadOnlyList<HiringHallPilot> HiringHall,
     ActiveContract? ActiveContract,
-    IReadOnlyList<OfferedContract>? Contracts,
+    IReadOnlyList<OfferedContract> Contracts,
     Position Position,
     EventState Events) : ExportFile
 {
