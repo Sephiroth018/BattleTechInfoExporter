@@ -13,7 +13,7 @@ internal static class GameStateExporter
             trigger,
             () =>
             {
-                ContractGenerator.GenerateMissingContracts(simGame);
+                SystemContractGenerator.GenerateMissingContracts(simGame);
                 // All are read before any is written, so a failing read leaves all files from the same export.
                 var starmap = StarSystemReader.Read(simGame);
                 var gameState = GameStateReader.Read(simGame, starmap);

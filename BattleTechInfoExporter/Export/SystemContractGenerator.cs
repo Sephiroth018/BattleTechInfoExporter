@@ -6,7 +6,7 @@ namespace BattleTechInfoExporter.Export;
 ///     Generates a star system's contracts the way the Command Center's contract screen does when it first opens
 ///     there.
 /// </summary>
-internal static class ContractGenerator
+internal static class SystemContractGenerator
 {
     /// <summary>
     ///     Generates the current system's contracts when the game hasn't yet, so every career export in a system has
