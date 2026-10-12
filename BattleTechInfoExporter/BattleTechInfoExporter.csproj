@@ -12,7 +12,9 @@
     <!-- The models' doc comments are the schemas' descriptions. -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <SchemaGeneratorProject>$(MSBuildThisFileDirectory)..\BattleTechInfoExporter.SchemaGenerator\BattleTechInfoExporter.SchemaGenerator.csproj</SchemaGeneratorProject>
-    <!-- No trailing backslash, which would escape the closing quote of the generator's argument. -->
+    <ChangelogGeneratorProject>$(MSBuildThisFileDirectory)..\BattleTechInfoExporter.ChangelogGenerator\BattleTechInfoExporter.ChangelogGenerator.csproj</ChangelogGeneratorProject>
+    <!-- No trailing backslashes, which would escape the closing quotes of the generators' arguments. -->
+    <RepositoryRoot>$(MSBuildThisFileDirectory)..</RepositoryRoot>
     <SchemaDirectory>$(MSBuildThisFileDirectory)..\schemas</SchemaDirectory>
   </PropertyGroup>
 
@@ -45,7 +47,7 @@
 
   <!-- Everything the mod folder needs; deployed to the game and packaged for releases. -->
   <ItemGroup>
-    <ModFile Include="$(TargetPath);$(OutDir)mod.json;$(MSBuildThisFileDirectory)..\changelog\history.md" />
+    <ModFile Include="$(TargetPath);$(OutDir)mod.json;$(OutDir)CHANGELOG.md" />
   </ItemGroup>
 
   <Target Name="ValidateBattleTechGameDir"
@@ -83,6 +85,21 @@
     <ItemGroup>
       <ModFile Include="$(SchemaDirectory)\*.schema.json" ModFolder="schemas\" />
     </ItemGroup>
+  </Target>
+
+  <!--
+    The shipped CHANGELOG.md is assembled on every build from the fragments in changelog/ and the release tags, so it
+    names the version being built. Its generator doesn't reference the mod, but is built the same way as the schema
+    generator so the solution build doesn't build it a second time.
+  -->
+  <Target Name="BuildChangelogGenerator" AfterTargets="Build" Condition="'$(DesignTimeBuild)' != 'true'">
+    <MSBuild Projects="$(ChangelogGeneratorProject)" Targets="Build" RemoveProperties="CurrentSolutionConfigurationContents">
+      <Output TaskParameter="TargetOutputs" PropertyName="ChangelogGeneratorPath" />
+    </MSBuild>
+  </Target>
+
+  <Target Name="GenerateChangelog" AfterTargets="BuildChangelogGenerator" Condition="'$(DesignTimeBuild)' != 'true'">
+    <Exec Command="dotnet &quot;$(ChangelogGeneratorPath)&quot; &quot;$(RepositoryRoot)&quot; $(VersionPrefix) &quot;$(OutDir)CHANGELOG.md&quot;" />
   </Target>
 
   <!-- mod.json is generated so its metadata has a single source: the properties in Directory.Build.props. -->

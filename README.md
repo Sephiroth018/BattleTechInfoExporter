@@ -5,8 +5,9 @@ campaign as JSON at key moments, for tools to read: for example a Claude session
 and pilot upgrades. In career mode it exports nothing.
 
 The mod is a work in progress; see [Planned](#planned) for what's still missing. What each
-version changed in the export files is in the [changelog](CHANGELOG.md), written for the tool
-reading them and shipped in the mod folder as `Mods/BattleTechInfoExporter/CHANGELOG.md`.
+version changed in the export files is in the changelog, written for the tool reading them and
+shipped in the mod folder as `Mods/BattleTechInfoExporter/CHANGELOG.md`; the build assembles it
+from the entries in [`changelog/`](changelog/).
 
 ## Export files
 
@@ -447,7 +448,10 @@ assemblies the build references in place.
 
    - `dotnet build` builds the mod and regenerates the schemas in `schemas/` with the schema
      generator (`BattleTechInfoExporter.SchemaGenerator`), from the models and their doc comments.
-     It fails when an exported property has no description.
+     It fails when an exported property has no description. It also assembles `CHANGELOG.md` next
+     to the DLL with the changelog generator (`BattleTechInfoExporter.ChangelogGenerator`), from
+     the entries in `changelog/`, one file per change, grouped by the release tags that contain
+     them.
    - `dotnet build -p:DeployToGame=true` also copies the mod and its schemas into the game's
      `Mods/BattleTechInfoExporter/` folder, to test it in the game.
    - `dotnet build -c Release` also packages them as `artifacts/BattleTechInfoExporter-<version>.zip`.
@@ -461,7 +465,8 @@ dotnet BattleTechInfoExporter.SchemaGenerator/bin/Debug/net9.0/BattleTechInfoExp
 
 The version is `Major.Minor.Patch.Build`, derived from git: the newest release tag reachable from
 the commit being built, bumped by the conventional type of the commits since it (`feat!` major,
-`feat` minor, `fix` patch), and the build number counting those commits from 0.
+`feat` minor, `fix` patch), and the build number counting those commits from 0. The changelog's
+newest entry gets that version.
 
 `dotnet tool restore` installs the ReSharper command line tools that format and inspect the code;
 CLAUDE.md lists their commands.

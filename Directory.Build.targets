@@ -51,7 +51,7 @@
       <BuildNumber>$([System.Math]::Max(0, $([MSBuild]::Subtract($(CommitsSinceRelease), 1))))</BuildNumber>
       <Version>$(VersionPrefix).$(BuildNumber)</Version>
     </PropertyGroup>
-    <Message Importance="high" Text="Version $(Version): $(ReleaseTag) + $(CommitsSinceRelease) commits, bump $(Bump)" Condition="'$(Bump)' != ''" />
-    <Message Importance="high" Text="Version $(Version): $(ReleaseTag) + $(CommitsSinceRelease) commits, no bump" Condition="'$(Bump)' == ''" />
+    <Message Importance="normal" Text="Version $(Version): $(ReleaseTag) + $(CommitsSinceRelease) commits, bump $(Bump)" Condition="'$(Bump)' != ''" />
+    <Message Importance="normal" Text="Version $(Version): $(ReleaseTag) + $(CommitsSinceRelease) commits, no bump" Condition="'$(Bump)' == ''" />
   </Target>
 </Project>
