@@ -11,10 +11,9 @@
     <ModDirectoryInGame>$(BattleTechGameDir)\Mods\$(MSBuildProjectName)\</ModDirectoryInGame>
     <!-- The models' doc comments are the schemas' descriptions. -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <!-- No trailing backslash, which would escape the closing quote of a generator's argument. -->
+    <!-- No trailing backslash, which would escape the closing quote of the generator's argument. -->
     <RepositoryRoot>$(MSBuildThisFileDirectory)..</RepositoryRoot>
     <SchemaGeneratorProject>$(RepositoryRoot)\BattleTechInfoExporter.SchemaGenerator\BattleTechInfoExporter.SchemaGenerator.csproj</SchemaGeneratorProject>
-    <ChangelogGeneratorProject>$(RepositoryRoot)\BattleTechInfoExporter.ChangelogGenerator\BattleTechInfoExporter.ChangelogGenerator.csproj</ChangelogGeneratorProject>
     <SchemaDirectory>$(RepositoryRoot)\schemas</SchemaDirectory>
   </PropertyGroup>
 
@@ -85,18 +84,6 @@
     <ItemGroup>
       <ModFile Include="$(SchemaDirectory)\*.schema.json" ModFolder="schemas\" />
     </ItemGroup>
-  </Target>
-
-  <!--
-    The shipped CHANGELOG.md is assembled on every build from the fragments in changelog/ and the release tags, so it
-    names the version being built. Its generator's build keeps this build's global properties, so a solution build
-    recognizes it as the same build of that project.
-  -->
-  <Target Name="GenerateChangelog" AfterTargets="Build" Condition="'$(DesignTimeBuild)' != 'true'">
-    <MSBuild Projects="$(ChangelogGeneratorProject)" Targets="Build">
-      <Output TaskParameter="TargetOutputs" PropertyName="ChangelogGeneratorPath" />
-    </MSBuild>
-    <Exec Command="dotnet &quot;$(ChangelogGeneratorPath)&quot; &quot;$(RepositoryRoot)&quot; $(VersionPrefix) &quot;$(OutDir)CHANGELOG.md&quot;" />
   </Target>
 
   <!-- mod.json is generated so its metadata has a single source: the properties in Directory.Build.props. -->

@@ -10,14 +10,15 @@
   -->
   <Target Name="ComputeBuildVersion" BeforeTargets="GetAssemblyVersion" Condition="'$(DesignTimeBuild)' != 'true'">
     <!-- Release tags form a chain on main, so the tag with the fewest commits on top is the newest. -->
-    <Exec Command="git describe --tags --match v* --abbrev=0" WorkingDirectory="$(MSBuildThisFileDirectory)"
+    <Exec Command="git describe --tags --match v[0-9]*.[0-9]*.[0-9]* --exclude *-* --abbrev=0" WorkingDirectory="$(MSBuildThisFileDirectory)"
           ConsoleToMsBuild="true" StandardOutputImportance="low" IgnoreExitCode="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="ReleaseTag" />
     </Exec>
     <Error Condition="!$([System.Text.RegularExpressions.Regex]::IsMatch('$(ReleaseTag)', '^v\d+\.\d+\.\d+$'))"
            Text="No release tag v&lt;Major.Minor.Patch&gt; is reachable from HEAD (found '$(ReleaseTag)'); fetch the tags." />
     <PropertyGroup>
-      <!-- Counted by git's own message grep, which matches lines, so the subjects never pass through MSBuild. -->
+      <!-- Counted by git's own message grep, so the subjects never pass through MSBuild. It matches every line of a
+           message, so a body line written like a subject ("fix(#12): ...") counts too; bodies don't start lines so. -->
       <CountCommits>git rev-list --count --first-parent --extended-regexp $(ReleaseTag)..HEAD</CountCommits>
     </PropertyGroup>
     <Exec Command="$(CountCommits)" WorkingDirectory="$(MSBuildThisFileDirectory)" ConsoleToMsBuild="true"
@@ -54,5 +55,26 @@
       <Version>$(VersionPrefix).$(BuildNumber)</Version>
     </PropertyGroup>
     <Message Importance="normal" Text="Version $(Version): $(ReleaseTag) + $(CommitsSinceRelease) commits, bump $(Bump)" />
+    <!--
+      The changelog's newest entry must be this version's: older means the entry is missing, or another PR released
+      its number first and the heading has to move on. Newer is a branch that hasn't merged main since a release.
+    -->
+    <PropertyGroup>
+      <Changelog>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)CHANGELOG.md'))</Changelog>
+      <ChangelogVersion>$([System.Text.RegularExpressions.Regex]::Match($(Changelog), '(?m)^## (\d+\.\d+\.\d+)$').Groups[1].Value)</ChangelogVersion>
+    </PropertyGroup>
+    <Error Condition="'$(ChangelogVersion)' == ''" Text="CHANGELOG.md has no version heading (## Major.Minor.Patch)." />
+    <PropertyGroup>
+      <ChangelogMajor>$(ChangelogVersion.Split('.')[0])</ChangelogMajor>
+      <ChangelogMinor>$(ChangelogVersion.Split('.')[1])</ChangelogMinor>
+      <ChangelogPatch>$(ChangelogVersion.Split('.')[2])</ChangelogPatch>
+      <BuiltMajor>$(VersionPrefix.Split('.')[0])</BuiltMajor>
+      <BuiltMinor>$(VersionPrefix.Split('.')[1])</BuiltMinor>
+      <BuiltPatch>$(VersionPrefix.Split('.')[2])</BuiltPatch>
+      <ChangelogOutdated>false</ChangelogOutdated>
+      <ChangelogOutdated Condition="'$(ChangelogMajor)' &lt; '$(BuiltMajor)' Or ('$(ChangelogMajor)' == '$(BuiltMajor)' And ('$(ChangelogMinor)' &lt; '$(BuiltMinor)' Or ('$(ChangelogMinor)' == '$(BuiltMinor)' And '$(ChangelogPatch)' &lt; '$(BuiltPatch)')))">true</ChangelogOutdated>
+    </PropertyGroup>
+    <Error Condition="$(ChangelogOutdated)"
+           Text="CHANGELOG.md's newest entry is $(ChangelogVersion), but this build is $(VersionPrefix): add this version's entry, or move the heading on when another PR released its number first." />
   </Target>
 </Project>

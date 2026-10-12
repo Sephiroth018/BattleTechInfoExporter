@@ -4,5 +4,4 @@
     <!-- It references the built mod by path, so the mod must build first. -->
     <BuildDependency Project="BattleTechInfoExporter/BattleTechInfoExporter.csproj" />
   </Project>
-  <Project Path="BattleTechInfoExporter.ChangelogGenerator/BattleTechInfoExporter.ChangelogGenerator.csproj" />
 </Solution>

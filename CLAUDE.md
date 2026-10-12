@@ -366,18 +366,14 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
 
 ## Structure
 
-Three projects in `BattleTechInfoExporter.slnx`: the mod, `BattleTechInfoExporter/`, and two
-generators its build builds and runs (net9.0, never shipped). The schema generator,
-`BattleTechInfoExporter.SchemaGenerator/`, runs on the built mod and writes a JSON Schema per export
-file into `schemas/` (`ExportFileModels` checks the mod's `ExportFiles` lists every file,
-`ExportSchemaGenerator` generates them with the mod's own serializer settings, `ModelDocumentation`
-turns the models' doc comments into their descriptions), and fails the build when an exported
-property has no description. The mod grants it `InternalsVisibleTo` for the serializer settings, the
-one exception to "its own test project only". The changelog generator,
-`BattleTechInfoExporter.ChangelogGenerator/`, assembles the shipped `CHANGELOG.md` into the mod's
-output folder (`GitRepository` asks git for the release tags and the commit that added each
-fragment, `ChangelogFragments` reads the fragments, `ChangelogAssembler` builds the text; see
-"Changelog").
+Two projects in `BattleTechInfoExporter.slnx`: the mod, `BattleTechInfoExporter/`, and the schema
+generator, `BattleTechInfoExporter.SchemaGenerator/` (net9.0, never shipped). The mod's build builds
+and runs the generator on the built mod; it writes a JSON Schema per export file into `schemas/`
+(`ExportFileModels` checks the mod's `ExportFiles` lists every file, `ExportSchemaGenerator`
+generates them with the mod's own serializer settings, `ModelDocumentation` turns the models' doc
+comments into their descriptions), and fails the build when an exported property has no
+description. The mod grants it `InternalsVisibleTo` for the serializer settings, the one exception
+to "its own test project only".
 
 In the mod, `ModEntryPoint` is the
 only public type; it deletes the files in `exports/` and the schemas in `schemas/` that aren't in
@@ -435,9 +431,10 @@ The version is `Major.Minor.Patch.Build`, computed by the build from git (`Compu
 `Directory.Build.targets`): the newest release tag reachable from HEAD, bumped by the type of the
 first-parent commits since it (see "Versioning"), with the build number counting those commits:
 with a bump from 0, so a PR's merge commit on `main` is build 0; without one the tagged commit is
-build 0, so a commit after a release never shares its version. The build stamps it into the DLL and
-generates `mod.json` from it and the description, author, repository URL and supported game version
-in `Directory.Build.props`.
+build 0, so a commit after a release never shares its version. The same target fails the build when
+`CHANGELOG.md`'s newest heading is older than that version. The build stamps the version into the
+DLL and generates `mod.json` from it and the description, author, repository URL and supported game
+version in `Directory.Build.props`.
 
 Planned features are issues on the GitHub Project "Road to 1.0", whose status follows the work (see
 "Issues and projects").
@@ -620,7 +617,7 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 
 ## Commands
 
-- **Build:** `dotnet build`, which also regenerates the schemas and assembles the changelog.
+- **Build:** `dotnet build`, which also regenerates the schemas.
 - **Validate exports:** `dotnet
   BattleTechInfoExporter.SchemaGenerator/bin/Debug/net9.0/BattleTechInfoExporter.SchemaGenerator.dll
   <game> --validate <game>/Mods/BattleTechInfoExporter/exports` checks the game's current export
@@ -642,33 +639,28 @@ Every merged PR that changes the mod gets a GitHub release, after the merge, fro
 `main`: a Release build, then
 `gh release create v<Major.Minor.Patch>` on the merge commit, with the zip attached and release
 notes summarizing the PR (marked as generated with Claude Code). For the export format's changes,
-the notes link the PR's changelog fragment at the tag instead of restating them. The tag has no
+the notes point to the version's entry in `CHANGELOG.md` instead of restating them. The tag has no
 build number: it marks the semantic release, and the merge commit is build 0 of that version. The
 tag is what the next build derives its version from, so a PR whose type doesn't bump (`docs`,
 `chore`) gets no release and rolls into the next one.
 
 ## Changelog
 
-The shipped `CHANGELOG.md`, in the mod folder like the schemas, tells the consumer, a chat holding
-copies of the export files and code parsing them, what each version changed in those files: keyed
-by `modVersion`, newest first, with a preamble on how to apply it. It isn't committed: every build
-assembles it into the mod's output folder from `changelog/`, so no PR touches a version number in
-it. `changelog/preamble.md` is the preamble, `changelog/history.md` the entries written before
-fragments existed, frozen, and every other file there is a fragment: `<issue>-<slug>.md`, one per
-PR that changes the export format, holding the entry's body. The generator puts each fragment under
-the release whose tag, among those reachable from HEAD, first contains the commit that added it,
-uncommitted or unreleased ones under the version being built, and writes "No export file changed."
-for a release without one. A
-fragment's body starts with `Changed:` and the files whose content changed (every version rewrites
-every file's header, so a file not listed needn't be re-copied), then per file, with `(breaking)`
-on a file whose reading code must change, bullets of JSON paths with one verb each: added, removed,
+`CHANGELOG.md` at the repository root, shipped in the mod folder like the schemas, tells the
+consumer, a chat holding copies of the export files and code parsing them, what each version
+changed in those files: keyed by `modVersion`, newest first, with a preamble on how to apply it.
+Every PR that bumps the version adds its entry under the version its branch's build computes (see
+"Versioning"), as part of its changes, checked under step 6 of the Definition of done; the build
+fails when the newest heading is older than the version it computes, so a missing entry, or a
+number another PR released first, is caught, and after merging `main` the heading moves on to the
+new number. An entry starts with the files whose content changed (every version rewrites every
+file's header, so a file not listed needn't be re-copied), then per file, with `(breaking)` on a
+file whose reading code must change, bullets of JSON paths with one verb each: added, removed,
 renamed, moved, meaning changed, values corrected, type changed. A value keeping its shape with a
-new meaning gets its own bullet, since the schemas don't show it; a fix that corrects exported
-numbers is a fragment like any other, saying what to re-derive. Nothing internal: no reader, type or
-game class names, refactors, build or generator changes. Like the README, it never refers to issues
-or PRs: its reader can't use them, and no dates either. The fragment is part of the PR's changes,
-checked under step 6 of the Definition of done, and the build fails on a fragment that no bumping
-commit accompanies.
+new meaning gets its own entry, since the schemas don't show it; a fix that corrects exported
+numbers is an entry like any other, saying what to re-derive. Nothing internal: no reader, type or
+game class names, refactors, build or schema generator changes. Like the README, it never refers
+to issues or PRs: its reader can't use them, and no dates either.
 
 ## Testing and CI
 
@@ -726,11 +718,12 @@ the exported JSON, whose consumers must adapt: major. `feat`, new data, files or
 `fix` and `refactor`: patch. `docs`, `chore` and `test` don't bump. The highest bump among the
 commits wins. On `main` the only commit since the last release is a PR's merge commit, so the PR
 title's type is the bump, and the PR carries no version number at all: two parallel PRs never
-collide, and the second to merge gets the next number from the first's tag without a change on its
-branch. A branch's build shows the number its PR would get from the tags it can see; one that hasn't
-merged `main` since a release computes from an older tag. While the export format is still being
-worked out, versions stay at 0.x and a breaking format change bumps only the minor version; 1.0.0
-marks the format as settled. Issues name the part their change bumps (major, minor or patch) and
-the PR title's type applies it. A PR that changes the export format adds a changelog fragment (see
-"Changelog"). Before tagging a release, check that the merge commit carries no tag yet
-(`git describe --exact-match` fails); a tag means the release exists.
+collide, and the second to merge gets the next number from the first's tag; only its changelog
+heading moves on (see "Changelog"). A branch's build shows the number its PR would get from the
+tags it can see; one that hasn't merged `main` since a release computes from an older tag. While
+the export format is still being worked out, versions stay at 0.x and a breaking format change
+bumps only the minor version; 1.0.0 marks the format as settled. Issues name the part their change
+bumps (major, minor or patch) and the PR title's type applies it. Every bump adds its entry to
+`CHANGELOG.md` under the number the branch's build computes, and the build fails while that heading
+is older than the version (see "Changelog"). Before tagging a release, check that the merge commit
+carries no tag yet (`git describe --exact-match` fails); a tag means the release exists.
