@@ -100,8 +100,8 @@ Once per repository, before the rest of the workflow applies:
   comments and review summaries. Answer each comment on the PR, inline ones in their own thread.
 - **Before merging, check what `main` gained since the branch was cut**
   (`git log --first-parent --oneline <merge-base>..origin/main`). If another PR landed, merge
-  `main` into the branch and redo what depends on `main`'s state: a version bump that another PR
-  took (see the project's "Versioning"), and the build and inspections when the merge touched code.
+  `main` into the branch and redo what depends on `main`'s state, such as the build and inspections
+  when the merge touched code.
 - **Merge only after the user's go-ahead in chat, given after the latest commit.** A later commit
   that changes the PR's diff needs a fresh go-ahead; a conflict-free update from `main` doesn't.
   Merge with a merge commit, and never delete the remote branch yourself (no `--delete-branch`, no
@@ -426,11 +426,11 @@ Folders:
   the JSON conventions, the content compared before a write and the writing itself, through
   `ExportFileWriter` and the clock.
 
-The version is `Major.Minor.Patch.Build`. Its first three parts live only in `<VersionPrefix>` in
-`Directory.Build.props`, next to the description, author, repository URL and supported game version;
-the build appends the build number (`ComputeBuildVersion` in `Directory.Build.targets`: the commits
-since `<VersionPrefix>` last changed, so a bump is build 0 and every later commit adds one), stamps
-the version into the DLL and generates `mod.json` from them.
+The version is `Major.Minor.Patch.Build`, computed by the build from git (`ComputeBuildVersion` in
+`Directory.Build.targets`): the newest release tag reachable from HEAD, bumped by the type of the
+first-parent commits since it (see "Versioning"), with the build number counting those commits, the
+first being build 0. The build stamps it into the DLL and generates `mod.json` from it and the
+description, author, repository URL and supported game version in `Directory.Build.props`.
 
 Planned features are issues on the GitHub Project "Road to 1.0", whose status follows the work (see
 "Issues and projects").
@@ -633,10 +633,12 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 
 Every merged PR that changes the mod gets a GitHub release, after the merge, from the merged
 `main`: a Release build, then
-`gh release create v<Major.Minor.Patch>` with the zip attached and release notes summarizing the PR
-(marked as generated with Claude Code). For the export format's changes, the notes point to the
-version's entry in `CHANGELOG.md` instead of restating them. The tag has no build number: it marks
-the semantic release, and the merged `main` is build 0 of that version.
+`gh release create v<Major.Minor.Patch>` on the merge commit, with the zip attached and release
+notes summarizing the PR (marked as generated with Claude Code). For the export format's changes,
+the notes point to the version's entry in `CHANGELOG.md` instead of restating them. The tag has no
+build number: it marks the semantic release, and the merge commit is build 0 of that version. The
+tag is what the next build derives its version from, so a PR whose type doesn't bump (`docs`,
+`chore`) gets no release and rolls into the next one.
 
 ## Changelog
 
@@ -702,15 +704,18 @@ both checks, check 1 because the mod ran, or stops and reports instead of mergin
 
 ## Versioning
 
-Semantic versioning on the first three parts, bumped in every PR as part of its changes: major for
-breaking changes to the exported JSON (its consumers must adapt), minor for new data, files or
-triggers, patch for fixes. Every bump adds its entry to `CHANGELOG.md` (see "Changelog"), and a
-bump taken by a parallel PR moves the entry's heading along with it. The fourth part, the build
-number, is never set by hand (see "Structure"). While the export format is still being worked out, versions stay at 0.x and a breaking format change
-bumps only the minor version; 1.0.0 marks the format as settled. The version is defined once (see
-"Structure") and flows into both the DLL and `mod.json`. Issues name the part their change bumps
-(major, minor or patch), never the resulting version, which goes stale when another PR merges
-first; the PR applies the bump to the version on `main` as it is when the PR merges. Before merging,
-compare the branch's `<VersionPrefix>` with `origin/main`'s: if another PR took the number, bump
-again on the branch. The Release build of the merged `main` must come out as build 0; a higher build
-number means the number was already taken.
+Semantic versioning on the first three parts, never set by hand: the build derives the version
+from the newest release tag reachable from HEAD and the conventional type of the first-parent
+commits since it (see "Structure"). A `!` after the type (`feat!(#12):`) is a breaking change to
+the exported JSON, whose consumers must adapt: major. `feat`, new data, files or triggers: minor.
+`fix` and `refactor`: patch. `docs`, `chore` and `test` don't bump. The highest bump among the
+commits wins. On `main` the only commit since the last release is a PR's merge commit, so the PR
+title's type is the bump, and the PR carries no version number at all: two parallel PRs never
+collide, and the second to merge gets the next number from the first's tag without a change on its
+branch. A branch's build shows the number its PR would get from the tags it can see; one that hasn't
+merged `main` since a release computes from an older tag. While the export format is still being
+worked out, versions stay at 0.x and a breaking format change bumps only the minor version; 1.0.0
+marks the format as settled. Issues name the part their change bumps (major, minor or patch) and
+the PR title's type applies it. Every bump adds its entry to the changelog (see "Changelog"). Before
+tagging a release, check that the merge commit carries no tag yet (`git describe --exact-match`
+fails); a tag means the release exists.

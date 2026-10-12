@@ -459,9 +459,9 @@ files against them, e.g. the ones the game just wrote:
 dotnet BattleTechInfoExporter.SchemaGenerator/bin/Debug/net9.0/BattleTechInfoExporter.SchemaGenerator.dll <game folder> --validate <game folder>/Mods/BattleTechInfoExporter/exports
 ```
 
-The version is `Major.Minor.Patch.Build`. The first three parts are set in `Directory.Build.props`;
-the build number counts the commits since they last changed, so the commit that changes them is
-build 0, as is a build with that change uncommitted.
+The version is `Major.Minor.Patch.Build`, derived from git: the newest release tag reachable from
+the commit being built, bumped by the conventional type of the commits since it (`feat!` major,
+`feat` minor, `fix` patch), and the build number counting those commits from 0.
 
 `dotnet tool restore` installs the ReSharper command line tools that format and inspect the code;
 CLAUDE.md lists their commands.
