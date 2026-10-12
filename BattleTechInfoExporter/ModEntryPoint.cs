@@ -17,8 +17,10 @@ public static class ModEntryPoint
     {
         try
         {
-            ExportFileWriter.DeleteAllExcept(ExportFiles.All.Select(file => file.FileName));
-            ModFolderFiles.DeleteAllExcept(ExportFiles.SchemaDirectory,
+            ModFolderFiles.DeleteAllExcept(ExportFileWriter.ExportDirectory,
+                ExportFiles.All.Select(file => file.FileName));
+            // The build ships the schemas into the mod folder's schemas/.
+            ModFolderFiles.DeleteAllExcept(Path.Combine(ModAssembly.Directory, "schemas"),
                 ExportFiles.All.Select(file => ExportFiles.SchemaFileName(file.FileName)));
         }
         // The exports still run; a leftover file only stays.

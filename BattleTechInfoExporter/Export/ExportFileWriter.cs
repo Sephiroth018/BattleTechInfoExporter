@@ -76,9 +76,5 @@ internal static class ExportFileWriter
 
     internal static void Delete(string fileName) => ModFolderFiles.Delete(ExportDirectory, fileName);
 
-    /// <inheritdoc cref="ModFolderFiles.DeleteAllExcept" />
-    internal static void DeleteAllExcept(IEnumerable<string> fileNames) =>
-        ModFolderFiles.DeleteAllExcept(ExportDirectory, fileNames);
-
     private static string FilePath(string fileName) => Path.Combine(ExportDirectory, fileName);
 }

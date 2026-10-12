@@ -11,9 +11,6 @@ namespace BattleTechInfoExporter.Export;
 /// </summary>
 internal static class ExportFiles
 {
-    /// <summary>The schemas' folder in the mod's folder, where the build ships them.</summary>
-    internal static readonly string SchemaDirectory = Path.Combine(ModAssembly.Directory, "schemas");
-
     internal static IReadOnlyList<(Type Model, string FileName)> All { get; } =
     [
         (typeof(GameState), GameState.FileName),
