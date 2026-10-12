@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using BattleTechInfoExporter.Models;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Every export file's model and file name; the mod writes no other files into the exports folder.</summary>
+/// <summary>
+///     Every export file's model and file name, and the name of each file's schema; the mod writes no other files
+///     into the exports folder and ships no other schemas.
+/// </summary>
 internal static class ExportFiles
 {
     internal static IReadOnlyList<(Type Model, string FileName)> All { get; } =
@@ -17,4 +21,7 @@ internal static class ExportFiles
         (typeof(CombatMap), CombatMap.FileName),
         (typeof(Catalog), Catalog.FileName)
     ];
+
+    /// <summary>The file name of an export file's schema, e.g. <c>game-state.schema.json</c>.</summary>
+    internal static string SchemaFileName(string fileName) => Path.ChangeExtension(fileName, ".schema.json");
 }

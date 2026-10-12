@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using BattleTechInfoExporter.Export;
 using BattleTechInfoExporter.SchemaGenerator;
 using NJsonSchema;
 
@@ -59,7 +60,7 @@ var schemaDirectory = args[1];
 Directory.CreateDirectory(schemaDirectory);
 var schemaFiles = schemas
     .Select(schema => (
-        Path: Path.Combine(schemaDirectory, SchemaFileName(schema.FileName)),
+        Path: Path.Combine(schemaDirectory, ExportFiles.SchemaFileName(schema.FileName)),
         Content: SchemaFileContent(schema.Schema)))
     .ToList();
 foreach (var (path, content) in schemaFiles)
@@ -72,7 +73,7 @@ foreach (var (path, content) in schemaFiles)
     }
 }
 
-foreach (var stalePath in Directory.GetFiles(schemaDirectory, SchemaFileName("*"))
+foreach (var stalePath in Directory.GetFiles(schemaDirectory, ExportFiles.SchemaFileName("*"))
              .Except(schemaFiles.Select(file => file.Path)))
 {
     File.Delete(stalePath);
@@ -80,8 +81,6 @@ foreach (var stalePath in Directory.GetFiles(schemaDirectory, SchemaFileName("*"
 }
 
 return 0;
-
-static string SchemaFileName(string exportFileName) => Path.ChangeExtension(exportFileName, ".schema.json");
 
 // LF and a final newline, as .gitattributes and .editorconfig want, so the committed files never differ by platform.
 static string SchemaFileContent(JsonSchema schema) => schema.ToJson().ReplaceLineEndings("\n") + "\n";

@@ -24,6 +24,10 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.62.1
+
+No export file changed. Stale schemas of earlier versions are now removed from `schemas/`.
+
 ## 0.62.0
 
 Changed: combat-state.json.

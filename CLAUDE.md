@@ -104,7 +104,9 @@ Once per repository, before the rest of the workflow applies:
   took (see the project's "Versioning"), and the build and inspections when the merge touched code.
 - **Merge only after the user's go-ahead in chat, given after the latest commit.** A later commit
   that changes the PR's diff needs a fresh go-ahead; a conflict-free update from `main` doesn't.
-  Merge with a merge commit.
+  Merge with a merge commit, and never delete the remote branch yourself (no `--delete-branch`, no
+  `git push --delete`): the repository deletes it after the merge, and only then does GitHub
+  retarget the PRs stacked on it to `main`; a branch deleted by a client closes them instead.
 - **After merging:** switch to `main`, `git pull --prune`, delete the local branch.
 
 ## Definition of done
@@ -373,9 +375,10 @@ and fails the build when an exported property has no description. The mod grants
 `InternalsVisibleTo` for the serializer settings, the one exception to "its own test project only".
 
 In the mod, `ModEntryPoint` is the
-only public type; it deletes the files in `exports/` that aren't in `ExportFiles` (e.g. an earlier
-version's) and applies all Harmony patches in the assembly. `ModAssembly` holds the mod's
-name, version and folder, `ModLog` its logger. Folders:
+only public type; it deletes the files in `exports/` and the schemas in `schemas/` that aren't in
+`ExportFiles` (e.g. an earlier version's, through `ModFolderFiles`) and applies all Harmony patches
+in the assembly. `ModAssembly` holds the mod's name, version and folder, `ModLog` its logger.
+Folders:
 
 - `Triggers/`: the patches that decide when to export, and the recorder patches they share.
 - `Export/`: the exporters, the single entry points the triggers call: `GameStateExporter` for the
