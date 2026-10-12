@@ -13,6 +13,8 @@ internal enum ExportTrigger
     ShipUpgradeCompleted,
     ContractsGenerated,
     StoreClosed,
+    PurchaseCompleted,
+    SaleCompleted,
     MechBayChanged,
     ExperienceSpent,
     MechPlacementShown,

@@ -26,7 +26,12 @@ changes the format.
 
 ## 0.63.0
 
-Changed: catalog.json.
+Changed: game-state.json, catalog.json.
+
+### game-state.json
+- Added `trigger` values `purchaseCompleted` and `saleCompleted`: something was bought or sold in
+  a store, once per purchase or sale (a stack sold at once is one sale). Like the other career
+  triggers, they also appear in rules.json and star-systems.json.
 
 ### catalog.json
 - Added `chassisDefinitions.<id>.value`: the chassis' C-Bill value, which a stored chassis' sell

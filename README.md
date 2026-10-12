@@ -364,6 +364,8 @@ The game state is exported when:
 - **A mech lab order finishes**, **a pilot is healed** in the med bay, or **an Argo upgrade finishes**,
   once per day; when several finish on the same day, the `trigger` names the last of them.
 - **The contracts of the current system are generated.**
+- **Something is bought or sold in a store**, once per purchase or sale, a stack sold at once
+  included.
 - **A store is closed.**
 - **The mech bay changes:** a refit, repair, readying or storing is queued, an order is cancelled,
   the queue is reordered, or a mech, chassis or mech parts are scrapped.
