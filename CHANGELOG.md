@@ -24,6 +24,46 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.67.0
+
+Changed: game-state.json (breaking), rules.json (breaking), mission-outcome.json,
+combat-state.json (breaking), catalog.json (breaking).
+
+### game-state.json
+- Renamed `contracts[].negotiation.valuesByShare[].share` to `sharePercent`, and
+  `activeContract.terms.shares.pay` and `.salvage` to `payPercent` and `salvagePercent`: a value from
+  0 to 100 says so in its name, where the rules' `*Share` values are fractions from 0 to 1.
+- Renamed `events.scheduledEvents[].chance` to `chancePercent`, for the same reason.
+- Values corrected `mechs[].loadout.locations[].armor.current`, `rearArmor.current` and `structure`:
+  rounded to a tenth, so float noise (34.3999977 for 34.4) no longer shows.
+
+### rules.json
+- Renamed `combat.stability.unsteadyThresholdPercent` to `unsteadyAbovePercent`, as the combat
+  state names the threshold.
+- Values corrected `target` of every statistic change (`skills.<skill>.levels[].abilities[].effects[]`
+  and the ones in `combat`): one that was `NotSet` is now the target the game resolves it to,
+  `SingleTarget` for an `OnHit` or `OnWeaponFire` trigger and `Creator` otherwise. Re-derive whose
+  statistic a weapon's on-hit effect changes: the unit hit, not the firing unit.
+
+### mission-outcome.json
+- Values corrected `lance[].damagedLocations[].armor.current`, `rearArmor.current` and `structure`:
+  rounded to a tenth, as in game-state.json.
+
+### combat-state.json
+- Type changed `units.<id>.state.mech.stability`: an object `{current, unsteadyAbove, maxStability}`
+  instead of the current instability alone, mirroring `heat`, so the distance to unsteady and to a
+  knockdown can be read.
+
+### catalog.json
+- Renamed `eventDefinitions.<id>.options[].outcomes[].results[].forcedEvents[].chance` to
+  `chancePercent`.
+- Values corrected `componentDefinitions.<group>.<id>.effects[].target`: as in rules.json; most
+  weapons' on-hit effects were `NotSet` and are now `SingleTarget`.
+- Values corrected `terrainDefinitions.<id>.sprintMultiplier`: `null` on the impassable terrains
+  whose `moveCost` is already `null`, instead of the game's 99999.9 sentinel.
+- Removed `terrainDefinitions.DesignMaskMapBoundary`: no playable hex has it, like the other
+  non-terrain masks already left out.
+
 ## 0.66.0
 
 Changed: game-state.json (breaking), rules.json (breaking), mission-outcome.json (breaking),

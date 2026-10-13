@@ -184,12 +184,12 @@ internal sealed record FixedTerms(int Pay, Salvage Salvage, ReputationChange Rep
     : Negotiation(false), IContractTerms;
 
 /// <summary>What one slider position gives, each value for its own slider.</summary>
-/// <param name="Share">The slider's position in percent.</param>
+/// <param name="SharePercent">The slider's position, from 0 to 100.</param>
 /// <param name="Pay">The pay when the pay slider is at this share.</param>
 /// <param name="Salvage">The salvage when the salvage slider is at this share.</param>
 /// <param name="Reputation">The reputation changes when this share is left over for reputation.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record ValuesAtShare(int Share, int Pay, Salvage Salvage, ReputationChange Reputation);
+internal sealed record ValuesAtShare(int SharePercent, int Pay, Salvage Salvage, ReputationChange Reputation);
 
 /// <summary>The terms a contract was accepted with.</summary>
 /// <param name="Shares">The slider positions the terms were negotiated at; <c>null</c> for fixed terms.</param>
@@ -200,10 +200,10 @@ internal sealed record AcceptedTerms(
     Salvage Salvage,
     ReputationChange Reputation) : IContractTerms;
 
-/// <param name="Pay">The pay slider's position in percent.</param>
-/// <param name="Salvage">The salvage slider's position in percent.</param>
+/// <param name="PayPercent">The pay slider's position, from 0 to 100.</param>
+/// <param name="SalvagePercent">The salvage slider's position, from 0 to 100.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record NegotiatedShares(int Pay, int Salvage);
+internal sealed record NegotiatedShares(int PayPercent, int SalvagePercent);
 
 /// <summary>
 ///     The reputation changes of a contract: of its success, as the negotiation shows them, or of a mission's outcome.

@@ -68,7 +68,7 @@ internal static class MapHexReader
         return new MapHex(
             hex.q,
             hex.r,
-            Math.Round(cell.cachedHeight, 1),
+            Rounding.ToTenth(cell.cachedHeight),
             combat.MapMetaData.GetPriorityDesignMask(cell)?.Id);
     }
 

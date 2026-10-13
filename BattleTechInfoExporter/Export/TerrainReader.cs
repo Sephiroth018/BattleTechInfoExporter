@@ -27,12 +27,18 @@ internal static class TerrainReader
         .ToList();
 
     // The masks that aren't terrains: each biome's mask (MapMetaData.biomeDesignMask), which the maps name as
-    // Biome.GetDesignMaskNameFromBiomeSkin does, the generic biome's included, and the masks painted onto cells at
+    // Biome.GetDesignMaskNameFromBiomeSkin does, the generic biome's included, the masks painted onto cells at
     // runtime but never applied as a cell's terrain (MapMetaData.GetPriorityTerrainMaskFlags), whose values never
-    // take effect.
+    // take effect, and the map boundary's, which no playable cell has (MapMetaData.IsWithinBounds).
     private static readonly HashSet<string> NonTerrainMaskIds = new(
         AllBiomes.Select(Biome.GetDesignMaskNameFromBiomeSkin)
-            .Concat(["DesignMaskDropshipLandingZone", "DesignMaskDropPodLandingZone", "DesignMaskDangerousLocation"]),
+            .Concat(
+            [
+                "DesignMaskDropshipLandingZone",
+                "DesignMaskDropPodLandingZone",
+                "DesignMaskDangerousLocation",
+                "DesignMaskMapBoundary"
+            ]),
         StringComparer.Ordinal);
 
     internal static SortedDictionary<string, TerrainDefinition> ReadTerrainDefinitions(DataManager dataManager)
@@ -87,7 +93,7 @@ internal static class TerrainReader
                     mask.moveCostWheeledMedium,
                     mask.moveCostWheeledHeavy,
                     mask.moveCostWheeledAssault)),
-            mask.moveCostSprintMultiplier,
+            NullIfImpassable(mask.moveCostSprintMultiplier),
             mask.visibilityMultiplier,
             mask.visibilityHeight,
             mask.sensorRangeMultiplier,
@@ -108,9 +114,9 @@ internal static class TerrainReader
             mask.stickyEffect is { } stickyEffect ? EffectReader.ReadStatisticChanges(stickyEffect) : []);
 
     private static ByWeightClass<float?> MoveCosts(float light, float medium, float heavy, float assault) =>
-        new(MoveCost(light), MoveCost(medium), MoveCost(heavy), MoveCost(assault));
+        new(NullIfImpassable(light), NullIfImpassable(medium), NullIfImpassable(heavy), NullIfImpassable(assault));
 
-    private static float? MoveCost(float cost) => cost >= ImpassableMoveCost ? null : cost;
+    private static float? NullIfImpassable(float cost) => cost >= ImpassableMoveCost ? null : cost;
 
     // Mech.AdjustedHeatsinkCapacity, Mech.AddEnvironmentHeat and Weapon.DamagePerShotAdjusted read the biome's
     // mask; nothing else does.

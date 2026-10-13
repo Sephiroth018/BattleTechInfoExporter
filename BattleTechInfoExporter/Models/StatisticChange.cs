@@ -16,7 +16,8 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="Duration">How long the change lasts; <c>null</c> when it lasts for the whole mission.</param>
 /// <param name="Target">
-///     Whose statistic changes: the unit with the ability or component (<c>Creator</c>) or the unit it targets.
+///     Whose statistic changes: the unit with the ability or component (<c>Creator</c>), the unit it targets
+///     (<c>SingleTarget</c>) or a group around it; always one the game acts on, where its data leaves it unset.
 /// </param>
 /// <param name="Trigger">When the change is made, e.g. on the ability's activation, on a hit or always (<c>Passive</c>).</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

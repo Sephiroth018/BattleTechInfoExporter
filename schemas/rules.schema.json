@@ -548,7 +548,7 @@
           ]
         },
         "target": {
-          "description": "Whose statistic changes: the unit with the ability or component (Creator) or the unit it targets.",
+          "description": "Whose statistic changes: the unit with the ability or component (Creator), the unit it targets (SingleTarget) or a group around it; always one the game acts on, where its data leaves it unset.",
           "$ref": "#/definitions/EffectTargetType"
         },
         "trigger": {
@@ -1823,10 +1823,10 @@
     },
     "StabilityRules": {
       "type": "object",
-      "description": "The stability rules of mechs. A mech's stability bar has levels levels; a mech that reaches unsteadyThresholdPercent of its stability is unsteady and loses its evasive pips, and an unsteady mech that fills the bar is knocked down.",
+      "description": "The stability rules of mechs. A mech's stability bar has levels levels; a mech that reaches unsteadyAbovePercent of its stability is unsteady and loses its evasive pips, and an unsteady mech that fills the bar is knocked down.",
       "additionalProperties": false,
       "required": [
-        "unsteadyThresholdPercent",
+        "unsteadyAbovePercent",
         "levels",
         "levelsRecovered",
         "levelsAdded",
@@ -1836,9 +1836,9 @@
         "instabilityFromDamage"
       ],
       "properties": {
-        "unsteadyThresholdPercent": {
+        "unsteadyAbovePercent": {
           "type": "integer",
-          "description": "In percent of the stability bar; a mech's UnsteadyThreshold statistic starts at it.",
+          "description": "In percent of the stability bar; a mech's UnsteadyThreshold statistic starts at it, and the combat state's unsteadyAbove is its current value in points.",
           "format": "int32"
         },
         "levels": {

@@ -154,13 +154,13 @@ internal sealed record AddFlashpointAction(string Flashpoint)
 
 /// <summary>
 ///     An event a result schedules: from the daily roll <paramref name="MinDaysWait" /> on, each roll brings it with
-///     <paramref name="Chance" />, and roll <paramref name="MaxDaysWait" /> always does.
+///     <paramref name="ChancePercent" />, and roll <paramref name="MaxDaysWait" /> always does.
 /// </summary>
 /// <param name="Event">The event scheduled.</param>
 /// <param name="Scope">What the scheduled event is about.</param>
 /// <param name="MinDaysWait">The first daily roll, counted from the next, that can bring the event.</param>
 /// <param name="MaxDaysWait">The daily roll, counted from the next, that brings the event for sure.</param>
-/// <param name="Chance">The chance per daily roll, in percent.</param>
+/// <param name="ChancePercent">The chance per daily roll, from 0 to 100.</param>
 /// <param name="KeepsPilot">Whether the scheduled event is about the same pilot as the result.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ForcedEvent(
@@ -168,5 +168,5 @@ internal sealed record ForcedEvent(
     EventScope Scope,
     int MinDaysWait,
     int MaxDaysWait,
-    int Chance,
+    int ChancePercent,
     bool KeepsPilot);

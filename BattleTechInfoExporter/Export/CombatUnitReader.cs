@@ -190,7 +190,7 @@ internal static class CombatUnitReader
             actor.IsProne,
             actor.IsShutDown,
             actor.IsUnsteady,
-            mech is null ? null : new MechState(ReadHeat(mech), mech.CurrentStability),
+            mech is null ? null : new MechState(ReadHeat(mech), ReadStability(mech)),
             actor.HasActivatedThisRound,
             HudInitiative.FromGamePhase(actor.Initiative),
             actor.allComponents.Select(component => ReadComponent(actor, component)).ToList(),
@@ -208,6 +208,10 @@ internal static class CombatUnitReader
     // checks, which Guts' traits and heat banks raise.
     private static MechHeat ReadHeat(Mech mech) =>
         new(mech.CurrentHeat, mech.AdjustedHeatsinkCapacity, mech.OverheatLevel, mech.MaxHeat);
+
+    // Mech.UnsteadyThreshold already scales the statistic's percent to the bar; Mech.AddInstability compares with it.
+    private static MechStability ReadStability(Mech mech) =>
+        new(mech.CurrentStability, mech.UnsteadyThreshold, mech.MaxStability);
 
     // Whole points, as the paper doll shows them (HUDMechArmorReadout.FormatForSummary, which the vehicle and turret
     // readouts share): cut off, except that a remainder below 1 shows as 1.

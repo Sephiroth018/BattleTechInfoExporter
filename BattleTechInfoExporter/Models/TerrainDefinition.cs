@@ -13,7 +13,7 @@ namespace BattleTechInfoExporter.Models;
 ///     What a step into the terrain costs of the unit's movement, per meter of the step: open ground costs 1.05;
 ///     <c>null</c> where the unit can't enter.
 /// </param>
-/// <param name="SprintMultiplier">Multiplies the move cost when sprinting.</param>
+/// <param name="SprintMultiplier">Multiplies the move cost when sprinting; <c>null</c> where the terrain is impassable.</param>
 /// <param name="VisibilityMultiplier">
 ///     Multiplies the spotting distance a sight line uses up while it passes through the terrain below
 ///     <paramref name="VisibilityHeight" />.
@@ -43,7 +43,7 @@ namespace BattleTechInfoExporter.Models;
 internal sealed record TerrainDefinition(
     string Name,
     TerrainMoveCosts MoveCost,
-    float SprintMultiplier,
+    float? SprintMultiplier,
     float VisibilityMultiplier,
     float VisibilityHeight,
     float SensorRangeMultiplier,

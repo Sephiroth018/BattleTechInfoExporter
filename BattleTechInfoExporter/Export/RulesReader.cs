@@ -99,7 +99,7 @@ internal static class RulesReader
         RoundedPercent(floor + level / divisor);
 
     // Rounded to a tenth, so float noise doesn't show.
-    private static float RoundedPercent(float share) => Mathf.Round(share * 1000f) / 10f;
+    private static float RoundedPercent(float share) => Rounding.ToTenth(share * 100f);
 
     // Names, thresholds and resolve come from two constant files that mods can change separately;
     // only levels present in all three are complete.

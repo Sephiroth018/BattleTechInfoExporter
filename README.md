@@ -256,7 +256,8 @@ it stands in by its catalog id (`null` on open ground). What else it carries fol
   prone, shut down, unsteady, what only a mech has under `mech` (`null` for vehicles and turrets):
   its heat (the heat now, what it sheds at the end of its activation after the terrain it stands
   in, the biome and effects, and the levels it overheats above and shuts down at, after the pilot's
-  Guts, heat banks and effects) and its stability, whether the unit has activated this round, its
+  Guts, heat banks and effects) and its stability (the instability taken, and the levels it becomes
+  unsteady above and is knocked down at), whether the unit has activated this round, its
   initiative, every component's damage level with the shots left in each ammo box and in weapons
   that carry their own, the pilot's injuries, health and bonus health left (which takes hits before they
   become injuries) and skills as the game computes with them now, effects included, together under

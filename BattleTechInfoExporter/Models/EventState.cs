@@ -28,11 +28,13 @@ internal sealed record EventState(
 /// <param name="LatestOnDay">
 ///     The day the event comes for sure, on the scale of <see cref="Company.DaysPassed" />.
 /// </param>
-/// <param name="Chance">The chance per daily roll from <paramref name="EarliestOnDay" /> on, in percent.</param>
+/// <param name="ChancePercent">
+///     The chance per daily roll from <paramref name="EarliestOnDay" /> on, from 0 to 100.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ScheduledEvent(
     DefinitionReference Event,
     PilotReference? Pilot,
     int EarliestOnDay,
     int LatestOnDay,
-    int Chance);
+    int ChancePercent);
