@@ -164,11 +164,10 @@ internal sealed record CombatPilotState(int Injuries, int Health, int BonusHealt
 
 /// <summary>A location's armor and structure left, in whole points as the paper doll shows them.</summary>
 /// <param name="Location">The game's name of the location (a mech's, vehicle's or turret's).</param>
-/// <param name="Armor">The armor left; on a mech's torso, the front armor.</param>
-/// <param name="RearArmor"><c>null</c> outside a mech's torso, which alone has rear armor.</param>
+/// <param name="Armor">The armor left, by side; only a mech's torso has a rear.</param>
 /// <param name="Structure">The structure left; 0 once the location is destroyed.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record UnitLocation(string Location, int Armor, int? RearArmor, int Structure);
+internal sealed record UnitLocation(string Location, LocationArmor<int> Armor, int Structure);
 
 /// <summary>The unit's guard, which the HUD shows as guarded at <see cref="Level" /> 1 or more.</summary>
 /// <param name="Level">

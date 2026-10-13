@@ -70,19 +70,12 @@ internal static class CatalogReader
     private static SortedDictionary<string, TEntry> ToSortedDictionary<TDefinition, TEntry>(
         IEnumerable<KeyValuePair<string, TDefinition>> definitions,
         Func<TDefinition, TEntry?> readEntry)
-        where TEntry : class
-    {
-        var entries = new SortedDictionary<string, TEntry>(StringComparer.Ordinal);
-        foreach (var definition in definitions)
-        {
-            if (!IsLeftOut(definition.Key) && readEntry(definition.Value) is { } entry)
-            {
-                entries.Add(definition.Key, entry);
-            }
-        }
-
-        return entries;
-    }
+        where TEntry : class, ICatalogEntry =>
+        CatalogEntries.ById(
+            definitions
+                .Where(definition => !IsLeftOut(definition.Key))
+                .Select(definition => readEntry(definition.Value))
+                .OfType<TEntry>());
 
     // Also the copies of stock mechs AssetUnlocks.CreateCustomMechsForBase makes for unlocked skins, e.g.
     // UNLOCKED_chrPrfMech_shadowhawkBacker-UMBRA-SHD-2D: only their look differs.
@@ -91,9 +84,12 @@ internal static class CatalogReader
         || id.IndexOf(TargetVehicleIdPart, StringComparison.Ordinal) >= 0
         || id.StartsWith(AssetUnlocks.UnlockedIdPrefix, StringComparison.Ordinal);
 
-    private static ChassisDefinition ReadChassis(DataManager dataManager, ChassisDef chassis) =>
-        new(
-            MechReader.ReferenceTo(chassis).Name,
+    private static ChassisDefinition ReadChassis(DataManager dataManager, ChassisDef chassis)
+    {
+        var reference = MechReader.ReferenceTo(chassis);
+        return new ChassisDefinition(
+            reference.Id,
+            reference.Name,
             chassis.weightClass,
             chassis.Tonnage,
             chassis.InitialTonnage,
@@ -113,15 +109,13 @@ internal static class CatalogReader
                     var definition = chassis.GetLocationDef(location);
                     return new ChassisLocationDefinition(
                         location,
-                        ReadMaxArmor(definition),
+                        MechReader.ArmorOf(definition, definition.MaxArmor, definition.MaxRearArmor),
                         definition.InternalStructure,
                         ReadHardpoints(chassis, location),
                         definition.InventorySlots);
                 })
                 .ToList());
-
-    private static LocationArmor ReadMaxArmor(LocationDef location) =>
-        new(location.MaxArmor, MechReader.HasRearArmor(location) ? location.MaxRearArmor : null);
+    }
 
     // Counted as TooltipPrefab_Chassis.SetHardpointData does.
     private static Hardpoints ReadHardpoints(ChassisDef chassis, ChassisLocations location)
@@ -146,8 +140,10 @@ internal static class CatalogReader
             return null;
         }
 
+        var reference = MechReader.ReferenceTo(mech);
         return new MechDefinition(
-            MechReader.ReferenceTo(mech).Name,
+            reference.Id,
+            reference.Name,
             MechReader.ReferenceTo(mech.Chassis),
             mech.Description.Cost,
             MechReader.ReadUsedTonnage(mech),
@@ -160,11 +156,10 @@ internal static class CatalogReader
                     var loadout = mech.GetLocationLoadoutDef(location);
                     return new MechLocationDefinition(
                         location,
-                        new LocationArmor(
+                        MechReader.ArmorOf(
+                            mech.GetChassisLocationDef(location),
                             loadout.AssignedArmor,
-                            MechReader.HasRearArmor(mech.GetChassisLocationDef(location))
-                                ? loadout.AssignedRearArmor
-                                : null),
+                            loadout.AssignedRearArmor),
                         MechReader.ComponentsMountedIn(mech, location)
                             .Select(component => new LoadoutComponent(
                                 ComponentReferences.ReferenceTo(component),
@@ -188,6 +183,7 @@ internal static class CatalogReader
         }
 
         return new VehicleDefinition(
+            vehicle.Description.Id,
             vehicle.Description.Name,
             chassis.weightClass,
             chassis.Tonnage,
@@ -196,12 +192,15 @@ internal static class CatalogReader
             VehicleLocationsOf(chassis)
                 .Select(location => new VehicleLocationDefinition(
                     location,
-                    vehicle.GetLocationLoadoutDef(location).AssignedArmor * combatMultipliers.ArmorMultiplierVehicle,
+                    new LocationArmor<float>(
+                        vehicle.GetLocationLoadoutDef(location).AssignedArmor *
+                        combatMultipliers.ArmorMultiplierVehicle,
+                        null),
                     vehicle.GetChassisLocationDef(location).InternalStructure
                     * combatMultipliers.StructureMultiplierVehicle,
                     vehicle.Inventory
                         .Where(component => component.MountedLocation == location)
-                        .Select(ComponentReferences.ReferenceTo)
+                        .Select(FixedComponent)
                         .ToList()))
                 .ToList());
     }
@@ -218,14 +217,19 @@ internal static class CatalogReader
         }
 
         return new TurretDefinition(
+            turret.Description.Id,
             turret.Description.Name,
             chassis.weightClass,
             chassis.Tonnage,
             chassis.FiringArcDegrees,
-            turret.AssignedArmor * combatMultipliers.ArmorMultiplierVehicle,
+            new LocationArmor<float>(turret.AssignedArmor * combatMultipliers.ArmorMultiplierVehicle, null),
             chassis.MaxInternalStructure * combatMultipliers.StructureMultiplierVehicle,
-            turret.Inventory.Select(ComponentReferences.ReferenceTo).ToList());
+            turret.Inventory.Select(FixedComponent).ToList());
     }
+
+    // A vehicle's or turret's loadout can't be changed, so every component is fixed.
+    private static LoadoutComponent FixedComponent(BaseComponentRef component) =>
+        new(ComponentReferences.ReferenceTo(component), true);
 
     /// <summary>The vehicle's locations from front to rear, then the turret if it has one.</summary>
     internal static IEnumerable<VehicleChassisLocations> VehicleLocationsOf(VehicleChassisDef chassis) =>
@@ -278,19 +282,19 @@ internal static class CatalogReader
             switch (component.Value)
             {
                 case WeaponDef weapon:
-                    weapons.Add(component.Key, ReadWeapon(weapon));
+                    AddById(weapons, ReadWeapon(weapon));
                     break;
                 case AmmunitionBoxDef ammunitionBox:
-                    ammunitionBoxes.Add(component.Key, ReadAmmunitionBox(dataManager, ammunitionBox));
+                    AddById(ammunitionBoxes, ReadAmmunitionBox(dataManager, ammunitionBox));
                     break;
                 case HeatSinkDef heatSink:
-                    heatSinks.Add(component.Key, ReadHeatSink(heatSink));
+                    AddById(heatSinks, ReadHeatSink(heatSink));
                     break;
                 case JumpJetDef jumpJet:
-                    jumpJets.Add(component.Key, ReadJumpJet(jumpJet));
+                    AddById(jumpJets, ReadJumpJet(jumpJet));
                     break;
                 case UpgradeDef upgrade:
-                    upgrades.Add(component.Key, ReadComponent(upgrade));
+                    AddById(upgrades, ReadComponent(upgrade));
                     break;
                 default:
                     throw new InvalidOperationException(
@@ -301,14 +305,17 @@ internal static class CatalogReader
         return new ComponentDefinitions(weapons, ammunitionBoxes, heatSinks, jumpJets, upgrades);
     }
 
+    private static void AddById<TEntry>(SortedDictionary<string, TEntry> group, TEntry entry)
+        where TEntry : ICatalogEntry =>
+        group.Add(entry.Id, entry);
+
     private static ComponentDefinition ReadComponent(MechComponentDef definition) =>
         new(
+            definition.Description.Id,
             ComponentReferences.NameOf(definition),
             definition.Tonnage,
             definition.InventorySize,
             definition.Description.Cost,
-            new[] { definition.BonusValueA, definition.BonusValueB }.Where(bonus => !string.IsNullOrEmpty(bonus))
-                .ToList(),
             EffectReader.ReadStatisticChanges(definition.statusEffects),
             // Contract.AddMechComponentToSalvage skips blacklisted components.
             !definition.ComponentTags.Contains(MechValidationRules.Tag_Blacklisted));

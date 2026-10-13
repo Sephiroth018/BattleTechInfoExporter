@@ -17,8 +17,9 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MapDefinition(
+    string Id,
     string Name,
     DefinitionReference Biome,
     IReadOnlyList<string> Tags,
     int Weight,
-    IReadOnlyDictionary<string, double> TerrainCoverage);
+    IReadOnlyDictionary<string, double> TerrainCoverage) : ICatalogEntry;

@@ -53,59 +53,12 @@ internal abstract record ContractBriefing(
 ///     restoration and flashpoint contracts, and employers that don't gain reputation, are always allowed.
 /// </param>
 /// <param name="Negotiation">The terms the contract can be accepted with: negotiated or fixed.</param>
-[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal abstract record OfferedContract(
-    string? Id,
-    string Name,
-    DefinitionReference Type,
-    ContractDisplayStyle DisplayStyle,
-    DefinitionReference Employer,
-    DefinitionReference Target,
-    int Difficulty,
-    string Description,
-    LanceLimits LanceLimits,
-    DefinitionReference? Biome,
-    bool MeetsReputation,
-    Negotiation Negotiation)
-    : ContractBriefing(Id, Name, Type, DisplayStyle, Employer, Target, Difficulty, Description, LanceLimits, Biome);
-
-/// <summary>An offered contract fought in the current star system.</summary>
-/// <param name="StarSystem">The current star system.</param>
-[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record LocalContract(
-    string? Id,
-    string Name,
-    DefinitionReference Type,
-    ContractDisplayStyle DisplayStyle,
-    DefinitionReference Employer,
-    DefinitionReference Target,
-    int Difficulty,
-    string Description,
-    LanceLimits LanceLimits,
-    DefinitionReference? Biome,
-    bool MeetsReputation,
-    Negotiation Negotiation,
-    DefinitionReference StarSystem)
-    : OfferedContract(
-        Id,
-        Name,
-        Type,
-        DisplayStyle,
-        Employer,
-        Target,
-        Difficulty,
-        Description,
-        LanceLimits,
-        Biome,
-        MeetsReputation,
-        Negotiation);
-
-/// <summary>An offered contract fought in another star system, which the company travels to first.</summary>
 /// <param name="StarSystem">
-///     The star system the mission is fought in, in full, as in <c>star-systems.json</c>, with the trip there.
+///     The star system the mission is fought in, in full, as in <c>star-systems.json</c>, with the trip there: the
+///     current one, whose route is empty, or another the company travels to first.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record TravelContract(
+internal sealed record OfferedContract(
     string? Id,
     string Name,
     DefinitionReference Type,
@@ -119,19 +72,7 @@ internal sealed record TravelContract(
     bool MeetsReputation,
     Negotiation Negotiation,
     StarSystem StarSystem)
-    : OfferedContract(
-        Id,
-        Name,
-        Type,
-        DisplayStyle,
-        Employer,
-        Target,
-        Difficulty,
-        Description,
-        LanceLimits,
-        Biome,
-        MeetsReputation,
-        Negotiation);
+    : ContractBriefing(Id, Name, Type, DisplayStyle, Employer, Target, Difficulty, Description, LanceLimits, Biome);
 
 /// <summary>The accepted travel contract, until the company proceeds with it on arrival or breaks it.</summary>
 /// <param name="Terms">The terms the contract was accepted with.</param>

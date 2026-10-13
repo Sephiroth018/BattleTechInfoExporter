@@ -11,7 +11,6 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Tonnage">The component's weight in tons.</param>
 /// <param name="Slots">The slots the component takes up in the location it's mounted in.</param>
 /// <param name="Value">The C-Bill value of the component.</param>
-/// <param name="Bonuses">The short bonus texts shown on the component, e.g. "+ 5 Dmg.".</param>
 /// <param name="Effects">The statistics the component changes while mounted.</param>
 /// <param name="IsSalvageable">
 ///     Whether the component can come as salvage; the game's <c>BLACKLISTED</c> tag rules it out. Nothing else
@@ -19,13 +18,13 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal record ComponentDefinition(
+    string Id,
     string Name,
     float Tonnage,
     int Slots,
     int Value,
-    IReadOnlyList<string> Bonuses,
     IReadOnlyList<StatisticChange> Effects,
-    bool IsSalvageable);
+    bool IsSalvageable) : ICatalogEntry;
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record WeaponDefinition : ComponentDefinition

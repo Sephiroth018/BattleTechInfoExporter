@@ -17,11 +17,12 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ItemCollectionDefinition(
+    string Id,
     IReadOnlyList<ComponentCollectionEntry> Components,
     IReadOnlyList<MechCollectionEntry> Mechs,
     IReadOnlyList<MechPartsCollectionEntry> MechParts,
     IReadOnlyList<NestedCollectionEntry> Collections,
-    int EmptyWeight);
+    int EmptyWeight) : ICatalogEntry;
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ComponentCollectionEntry(ComponentReference Component, int? Count, int Weight)

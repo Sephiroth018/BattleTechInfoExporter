@@ -41,6 +41,7 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record TerrainDefinition(
+    string Id,
     string Name,
     TerrainMoveCosts MoveCost,
     float? SprintMultiplier,
@@ -56,7 +57,7 @@ internal sealed record TerrainDefinition(
     int HeatPerRound,
     DamageMultipliers DamageDealt,
     DamageMultipliers DamageTaken,
-    IReadOnlyList<StatisticChange> StickyEffects);
+    IReadOnlyList<StatisticChange> StickyEffects) : ICatalogEntry;
 
 /// <summary>By the unit: a mech, a tracked vehicle or a wheeled vehicle, and its weight class.</summary>
 /// <param name="Mech">For mechs, by their weight class.</param>

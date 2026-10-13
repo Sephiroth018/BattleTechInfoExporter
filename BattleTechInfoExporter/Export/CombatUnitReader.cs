@@ -218,8 +218,9 @@ internal static class CombatUnitReader
     private static UnitLocation ReadLocation(string location, float armor, float? rearArmor, float structure) =>
         new(
             location,
-            HUDMechArmorReadout.FormatForSummary(armor),
-            rearArmor is { } rear ? HUDMechArmorReadout.FormatForSummary(rear) : null,
+            new LocationArmor<int>(
+                HUDMechArmorReadout.FormatForSummary(armor),
+                rearArmor is { } rear ? HUDMechArmorReadout.FormatForSummary(rear) : null),
             HUDMechArmorReadout.FormatForSummary(structure));
 
     private static List<UnitLocation> ReadLocations(AbstractActor actor) =>

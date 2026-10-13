@@ -515,7 +515,7 @@
     },
     "MechReference": {
       "type": "object",
-      "description": "A mech in the mech bay: its own id, as in id, and its chassis name with the variant.",
+      "description": "A mech in the mech bay: its own id and name, as in id and name.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -755,7 +755,6 @@
       "required": [
         "location",
         "armor",
-        "rearArmor",
         "structure"
       ],
       "properties": {
@@ -764,21 +763,36 @@
           "description": "The game's name of the location (a mech's, vehicle's or turret's)."
         },
         "armor": {
-          "type": "integer",
-          "description": "The armor left; on a mech's torso, the front armor.",
-          "format": "int32"
-        },
-        "rearArmor": {
-          "type": [
-            "integer",
-            "null"
-          ],
-          "description": "null outside a mech's torso, which alone has rear armor.",
-          "format": "int32"
+          "description": "The armor left, by side; only a mech's torso has a rear.",
+          "$ref": "#/definitions/LocationArmorOfInteger"
         },
         "structure": {
           "type": "integer",
           "description": "The structure left; 0 once the location is destroyed.",
+          "format": "int32"
+        }
+      }
+    },
+    "LocationArmorOfInteger": {
+      "type": "object",
+      "description": "A location's armor by side, in whatever a file measures armor in.",
+      "additionalProperties": false,
+      "required": [
+        "front",
+        "rear"
+      ],
+      "properties": {
+        "front": {
+          "type": "integer",
+          "description": "The front armor; outside the torso, the location's only armor.",
+          "format": "int32"
+        },
+        "rear": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "null outside the torso, which alone has rear armor.",
           "format": "int32"
         }
       }

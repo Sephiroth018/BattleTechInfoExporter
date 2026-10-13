@@ -22,6 +22,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Locations">The body locations, from head to legs.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ChassisDefinition(
+    string Id,
     string Name,
     WeightClass WeightClass,
     float Tonnage,
@@ -32,7 +33,7 @@ internal sealed record ChassisDefinition(
     ChassisMovement Movement,
     ChassisMelee Melee,
     DefinitionReference? StockMech,
-    IReadOnlyList<ChassisLocationDefinition> Locations) : UnitDefinition(Name, WeightClass, Tonnage);
+    IReadOnlyList<ChassisLocationDefinition> Locations) : UnitDefinition(Id, Name, WeightClass, Tonnage);
 
 /// <summary>How the unit moves, with the distances in meters; a chassis' speed doesn't depend on its loadout.</summary>
 /// <param name="Walk">
@@ -70,15 +71,17 @@ internal sealed record ChassisMelee(
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ChassisLocationDefinition(
     ChassisLocations Location,
-    LocationArmor MaxArmor,
+    LocationArmor<float> MaxArmor,
     float Structure,
     Hardpoints Hardpoints,
     int Slots);
 
+/// <summary>A location's armor by side, in whatever a file measures armor in.</summary>
 /// <param name="Front">The front armor; outside the torso, the location's only armor.</param>
 /// <param name="Rear"><c>null</c> outside the torso, which alone has rear armor.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record LocationArmor(float Front, float? Rear);
+internal sealed record LocationArmor<TSide>(TSide Front, TSide? Rear)
+    where TSide : struct;
 
 /// <summary>The number of weapon hardpoints of each kind.</summary>
 /// <param name="Ballistic">For weapons of the <c>Ballistic</c> <see cref="WeaponDefinition.Category" />.</param>

@@ -82,7 +82,6 @@ internal static class ContractReader
         return contractTypes;
     }
 
-    // A contract in the current star system refers to it; a travel contract's is in full.
     private static OfferedContract ReadContract(SimGameState simGame, Starmap starmap, Contract contract)
     {
         var contractOverride = contract.Override;
@@ -99,36 +98,20 @@ internal static class ContractReader
         var biome = ReadBiome(simGame, contract.ContractBiome);
         var meetsReputation = simGame.ContractUserMeetsReputation(contract);
         var negotiation = ReadNegotiation(simGame, contract, employer, target);
-        var starSystem = ReadStarSystem(simGame, contract);
-        return starSystem.ID == simGame.CurSystem.ID
-            ? new LocalContract(
-                id,
-                name,
-                type,
-                contractOverride.contractDisplayStyle,
-                DefinitionReferences.ReferenceTo(employer),
-                DefinitionReferences.ReferenceTo(target),
-                difficulty,
-                description,
-                lanceLimits,
-                biome,
-                meetsReputation,
-                negotiation,
-                DefinitionReferences.ReferenceTo(starSystem.Def.Description))
-            : new TravelContract(
-                id,
-                name,
-                type,
-                contractOverride.contractDisplayStyle,
-                DefinitionReferences.ReferenceTo(employer),
-                DefinitionReferences.ReferenceTo(target),
-                difficulty,
-                description,
-                lanceLimits,
-                biome,
-                meetsReputation,
-                negotiation,
-                starmap.StarSystems[starSystem.Def.Description.Id]);
+        return new OfferedContract(
+            id,
+            name,
+            type,
+            contractOverride.contractDisplayStyle,
+            DefinitionReferences.ReferenceTo(employer),
+            DefinitionReferences.ReferenceTo(target),
+            difficulty,
+            description,
+            lanceLimits,
+            biome,
+            meetsReputation,
+            negotiation,
+            starmap.StarSystems[ReadStarSystem(simGame, contract).Def.Description.Id]);
     }
 
     // The mission is fought in the current star system: a contract elsewhere needs travelling there first.

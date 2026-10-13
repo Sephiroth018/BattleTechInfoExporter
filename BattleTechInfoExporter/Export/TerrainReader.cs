@@ -41,36 +41,27 @@ internal static class TerrainReader
             ]),
         StringComparer.Ordinal);
 
-    internal static SortedDictionary<string, TerrainDefinition> ReadTerrainDefinitions(DataManager dataManager)
-    {
-        var terrains = new SortedDictionary<string, TerrainDefinition>(StringComparer.Ordinal);
-        foreach (var mask in dataManager.DesignMaskDefs.Where(mask => !NonTerrainMaskIds.Contains(mask.Key)))
-        {
-            terrains.Add(mask.Key, ReadTerrain(mask.Value));
-        }
-
-        return terrains;
-    }
+    internal static SortedDictionary<string, TerrainDefinition> ReadTerrainDefinitions(DataManager dataManager) =>
+        CatalogEntries.ById(
+            dataManager.DesignMaskDefs
+                .Where(mask => !NonTerrainMaskIds.Contains(mask.Key))
+                .Select(mask => ReadTerrain(mask.Value)));
 
     /// <summary>Keyed by the biome's id as the star systems refer to it; a biome whose mask isn't loaded has no entry.</summary>
-    internal static SortedDictionary<string, BiomeDefinition> ReadBiomeDefinitions(DataManager dataManager)
+    internal static SortedDictionary<string, BiomeDefinition> ReadBiomeDefinitions(DataManager dataManager) =>
+        CatalogEntries.ById(Biomes.Select(biome => ReadBiome(dataManager, biome)).OfType<BiomeDefinition>());
+
+    private static BiomeDefinition? ReadBiome(DataManager dataManager, Biome.BIOMESKIN biome)
     {
-        var biomes = new SortedDictionary<string, BiomeDefinition>(StringComparer.Ordinal);
-        foreach (var biome in Biomes)
+        var reference = DefinitionReferences.ReferenceTo(dataManager, biome);
+        var maskId = Biome.GetDesignMaskNameFromBiomeSkin(biome);
+        if (dataManager.DesignMaskDefs.TryGet(maskId, out var mask))
         {
-            var reference = DefinitionReferences.ReferenceTo(dataManager, biome);
-            var maskId = Biome.GetDesignMaskNameFromBiomeSkin(biome);
-            if (dataManager.DesignMaskDefs.TryGet(maskId, out var mask))
-            {
-                biomes.Add(reference.Id, ReadBiome(reference.Name, mask));
-            }
-            else
-            {
-                ModLog.Logger.LogWarning($"Left out biome {reference.Id}: its design mask {maskId} isn't loaded");
-            }
+            return ReadBiome(reference, mask);
         }
 
-        return biomes;
+        ModLog.Logger.LogWarning($"Left out biome {reference.Id}: its design mask {maskId} isn't loaded");
+        return null;
     }
 
     // The move cost is PathNodeGrid.GetTerrainCost's, visibility LineOfSight.visCostOfCell's, sensors and
@@ -79,6 +70,7 @@ internal static class TerrainReader
     // taken AbstractActor.GetAdjustedDamage's and the sticky effect AbstractActor.ApplyDesignMaskStickyEffect's.
     private static TerrainDefinition ReadTerrain(DesignMaskDef mask) =>
         new(
+            mask.Id,
             mask.Description.Name,
             new TerrainMoveCosts(
                 MoveCosts(mask.moveCostMechLight, mask.moveCostMechMedium, mask.moveCostMechHeavy,
@@ -120,8 +112,8 @@ internal static class TerrainReader
 
     // Mech.AdjustedHeatsinkCapacity, Mech.AddEnvironmentHeat and Weapon.DamagePerShotAdjusted read the biome's
     // mask; nothing else does.
-    private static BiomeDefinition ReadBiome(string name, DesignMaskDef mask) =>
-        new(name, mask.heatSinkMultiplier, mask.heatPerTurn, ReadDamageDealt(mask));
+    private static BiomeDefinition ReadBiome(DefinitionReference biome, DesignMaskDef mask) =>
+        new(biome.Id, biome.Name, mask.heatSinkMultiplier, mask.heatPerTurn, ReadDamageDealt(mask));
 
     // Weapon.GetMaskDamageMultiplier picks the category by the weapon category's DesignMaskString.
     private static DamageMultipliers ReadDamageDealt(DesignMaskDef mask) =>

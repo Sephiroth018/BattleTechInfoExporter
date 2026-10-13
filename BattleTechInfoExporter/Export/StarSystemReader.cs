@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using BattleTech;
-using BattleTech.Data;
 using BattleTechInfoExporter.Models;
 using Starmap = BattleTechInfoExporter.Models.Starmap;
 using StarSystem = BattleTech.StarSystem;
@@ -15,7 +14,6 @@ internal static class StarSystemReader
 {
     internal static Starmap Read(SimGameState simGame)
     {
-        var tagNames = ReadTagNames();
         // The few biomes are resolved once instead of per star system: each lookup builds the game's biome table
         // anew (DataManagerExtensions.GetBaseDescriptionDef).
         var biomes = simGame.StarSystems
@@ -29,7 +27,7 @@ internal static class StarSystemReader
         {
             starSystems.Add(
                 system.Def.Description.Id,
-                ReadStarSystem(simGame, system, tagNames, biomes, playableMaps));
+                ReadStarSystem(simGame, system, biomes, playableMaps));
         }
 
         return new Starmap(starSystems);
@@ -41,7 +39,6 @@ internal static class StarSystemReader
     private static Models.StarSystem ReadStarSystem(
         SimGameState simGame,
         StarSystem system,
-        Dictionary<string, string> tagNames,
         Dictionary<Biome.BIOMESKIN, DefinitionReference> biomes,
         Dictionary<string, List<DefinitionReference>> playableMaps)
     {
@@ -55,7 +52,7 @@ internal static class StarSystemReader
             definition.Description.Id,
             definition.Description.Name,
             DefinitionReferences.ReferenceTo(definition.OwnerValue),
-            system.Tags.Select(tag => ReadTag(tagNames, tag)).ToList(),
+            system.Tags.ToList(),
             definition.SupportedBiomes.Select(biome => biomes[biome]).ToList(),
             ReadPlayableMaps(definition, playableMaps),
             ReadStoreCollections(definition),
@@ -64,18 +61,6 @@ internal static class StarSystemReader
             canTravelTo,
             route);
     }
-
-    // Named as the starmap's system panel names a tag (HBSTagView, TagDataStructFetcher.GetItem), which shows only the
-    // player-visible ones; one query instead of one per tag (GetTagIfExists). The Name column compares binary, as
-    // Ordinal does.
-    private static Dictionary<string, string> ReadTagNames() =>
-        MetadataDatabase.Instance.GetAllTags()
-            .Where(tag => !string.IsNullOrEmpty(tag.FriendlyName))
-            .ToDictionary(tag => tag.Name, tag => tag.FriendlyName, StringComparer.Ordinal);
-
-    // A tag without a friendly name, which the game never shows, is named by its id.
-    private static DefinitionReference ReadTag(Dictionary<string, string> tagNames, string tag) =>
-        new(tag, tagNames.TryGetValue(tag, out var name) ? name : tag);
 
     // The stores draw from the active definition's collections (StarSystem.SetNewStarSystemDef resets them on a swap).
     // A definition without a store has null instead of an empty list (Shop.Initialize checks both).

@@ -14,16 +14,9 @@ namespace BattleTechInfoExporter.Export;
 internal static class ItemCollectionReader
 {
     internal static SortedDictionary<string, ItemCollectionDefinition> ReadItemCollectionDefinitions(
-        DataManager dataManager)
-    {
-        var definitions = new SortedDictionary<string, ItemCollectionDefinition>(StringComparer.Ordinal);
-        foreach (var collection in dataManager.ItemCollectionDefs)
-        {
-            definitions.Add(collection.Key, ReadItemCollection(dataManager, collection.Value));
-        }
-
-        return definitions;
-    }
+        DataManager dataManager) =>
+        CatalogEntries.ById(
+            dataManager.ItemCollectionDefs.Select(collection => ReadItemCollection(dataManager, collection.Value)));
 
     // What a draw yields (ItemCollectionResultGenerator.GenerateItemCollection): an item, another collection drawn in
     // turn, or nothing for an entry of type None, which still uses up the draw.
@@ -31,6 +24,7 @@ internal static class ItemCollectionReader
     {
         var entries = collection.Entries.Where(entry => IsKnownType(collection, entry)).ToList();
         return new ItemCollectionDefinition(
+            collection.ID,
             ReferencedEntries.Read(
                     entries.Where(entry => ShopItemReferences.IsComponent(entry.Type)),
                     entry => ShopItemReferences.TryReferenceToComponent(dataManager, entry.Type, entry.ID),

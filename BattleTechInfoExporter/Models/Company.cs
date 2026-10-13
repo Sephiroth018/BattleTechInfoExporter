@@ -14,7 +14,9 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Morale">The company's morale, with its level in <see cref="Rules.MoraleLevels" />.</param>
 /// <param name="Funds">The company's C-Bills.</param>
 /// <param name="MercenaryReviewBoard">The company's standing with the Mercenary Review Board.</param>
-/// <param name="Reputation">The reputation with each faction that gains it, except the Mercenary Review Board.</param>
+/// <param name="Reputation">
+///     The reputation with each faction that gains it, keyed by faction id, except the Mercenary Review Board.
+/// </param>
 /// <param name="MechTech">
 ///     The tech points the mech lab works a day (<see cref="CampaignRules.MechLab" />), including
 ///     <paramref name="TemporaryMechTechChanges" />.
@@ -40,7 +42,7 @@ internal sealed record Company(
     Morale Morale,
     int Funds,
     MercenaryReviewBoard MercenaryReviewBoard,
-    IReadOnlyList<FactionReputation> Reputation,
+    IReadOnlyDictionary<string, FactionReputation> Reputation,
     int MechTech,
     IReadOnlyList<TemporaryChange> TemporaryMechTechChanges,
     int MedTech,

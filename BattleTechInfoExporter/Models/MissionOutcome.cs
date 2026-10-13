@@ -107,8 +107,8 @@ internal sealed record LanceUnitOutcome(
     IReadOnlyList<AmmunitionUse> Ammunition);
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record DamagedLocation(ChassisLocations Location, Armor Armor, Armor? RearArmor, float Structure)
-    : MechLocationCondition(Location, Armor, RearArmor, Structure);
+internal sealed record DamagedLocation(ChassisLocations Location, LocationArmor<Armor> Armor, float Structure)
+    : MechLocationCondition(Location, Armor, Structure);
 
 /// <param name="Location">The location it is mounted in.</param>
 /// <param name="DamageLevel">The game's damage level, e.g. <c>Penalized</c> or <c>Destroyed</c>.</param>

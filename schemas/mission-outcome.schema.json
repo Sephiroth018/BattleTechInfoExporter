@@ -453,7 +453,7 @@
     },
     "MechReference": {
       "type": "object",
-      "description": "A mech in the mech bay: its own id, as in id, and its chassis name with the variant.",
+      "description": "A mech in the mech bay: its own id and name, as in id and name.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -497,7 +497,6 @@
       "required": [
         "location",
         "armor",
-        "rearArmor",
         "structure"
       ],
       "properties": {
@@ -506,19 +505,8 @@
           "$ref": "#/definitions/ChassisLocations"
         },
         "armor": {
-          "description": "The front armor, or the only armor outside the torso.",
-          "$ref": "#/definitions/Armor"
-        },
-        "rearArmor": {
-          "description": "null outside the torso, which alone has rear armor.",
-          "oneOf": [
-            {
-              "type": "null"
-            },
-            {
-              "$ref": "#/definitions/Armor"
-            }
-          ]
+          "description": "The armor left and fitted, by side.",
+          "$ref": "#/definitions/LocationArmorOfArmor"
         },
         "structure": {
           "type": "number",
@@ -562,6 +550,32 @@
         "Legs",
         "All"
       ]
+    },
+    "LocationArmorOfArmor": {
+      "type": "object",
+      "description": "A location's armor by side, in whatever a file measures armor in.",
+      "additionalProperties": false,
+      "required": [
+        "front",
+        "rear"
+      ],
+      "properties": {
+        "front": {
+          "description": "The front armor; outside the torso, the location's only armor.",
+          "$ref": "#/definitions/Armor"
+        },
+        "rear": {
+          "description": "null outside the torso, which alone has rear armor.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/Armor"
+            }
+          ]
+        }
+      }
     },
     "Armor": {
       "type": "object",

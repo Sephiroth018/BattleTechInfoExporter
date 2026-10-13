@@ -13,20 +13,21 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Locations">The locations from front to rear, then the turret if the vehicle has one.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record VehicleDefinition(
+    string Id,
     string Name,
     WeightClass WeightClass,
     float Tonnage,
     VehicleMovementType MovementType,
     ChassisMovement Movement,
-    IReadOnlyList<VehicleLocationDefinition> Locations) : UnitDefinition(Name, WeightClass, Tonnage);
+    IReadOnlyList<VehicleLocationDefinition> Locations) : UnitDefinition(Id, Name, WeightClass, Tonnage);
 
 /// <param name="Location">The location, e.g. <c>Front</c> or <c>Turret</c>.</param>
-/// <param name="Armor">The armor in combat, after the game's vehicle multiplier.</param>
+/// <param name="Armor">The armor in combat, after the game's vehicle multiplier; a vehicle has no rear armor.</param>
 /// <param name="Structure">The internal structure in combat, after the game's vehicle multiplier.</param>
-/// <param name="Components">The components mounted in the location, in the game's order.</param>
+/// <param name="Components">The components mounted in the location, in the game's order, all fixed.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record VehicleLocationDefinition(
     VehicleChassisLocations Location,
-    float Armor,
+    LocationArmor<float> Armor,
     float Structure,
-    IReadOnlyList<ComponentReference> Components);
+    IReadOnlyList<LoadoutComponent> Components);

@@ -168,6 +168,7 @@
       "description": "A chassis: the frame its mechs share, without anything a loadout decides.",
       "additionalProperties": false,
       "required": [
+        "id",
         "name",
         "weightClass",
         "tonnage",
@@ -181,6 +182,10 @@
         "locations"
       ],
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id from the game's data files, which the entry is keyed by and the references to it use."
+        },
         "name": {
           "type": "string",
           "description": "The name with the variant, as in the references to the chassis."
@@ -352,7 +357,7 @@
         },
         "maxArmor": {
           "description": "The most armor the location can take.",
-          "$ref": "#/definitions/LocationArmor"
+          "$ref": "#/definitions/LocationArmorOfSingle"
         },
         "structure": {
           "type": "number",
@@ -406,8 +411,9 @@
         "All"
       ]
     },
-    "LocationArmor": {
+    "LocationArmorOfSingle": {
       "type": "object",
+      "description": "A location's armor by side, in whatever a file measures armor in.",
       "additionalProperties": false,
       "required": [
         "front",
@@ -467,6 +473,7 @@
       "description": "A mech: a loadout on a chassis, as a mech assembled from parts or bought comes with it. The frame is in chassisDefinitions.",
       "additionalProperties": false,
       "required": [
+        "id",
         "name",
         "chassis",
         "value",
@@ -476,6 +483,10 @@
         "locations"
       ],
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id from the game's data files, which the entry is keyed by and the references to it use."
+        },
         "name": {
           "type": "string",
           "description": "The name with the variant, as in the references to the mech."
@@ -767,7 +778,7 @@
         },
         "armor": {
           "description": "The armor fitted.",
-          "$ref": "#/definitions/LocationArmor"
+          "$ref": "#/definitions/LocationArmorOfSingle"
         },
         "components": {
           "type": "array",
@@ -848,6 +859,7 @@
       "description": "A vehicle with its chassis' data: its armor and loadout are fixed, as it fights in combat.",
       "additionalProperties": false,
       "required": [
+        "id",
         "name",
         "weightClass",
         "tonnage",
@@ -856,6 +868,10 @@
         "locations"
       ],
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id from the game's data files, which the entry is keyed by and the references to it use."
+        },
         "name": {
           "type": "string",
           "description": "The name the combat HUD shows."
@@ -916,9 +932,8 @@
           "$ref": "#/definitions/VehicleChassisLocations"
         },
         "armor": {
-          "type": "number",
-          "description": "The armor in combat, after the game's vehicle multiplier.",
-          "format": "float"
+          "description": "The armor in combat, after the game's vehicle multiplier; a vehicle has no rear armor.",
+          "$ref": "#/definitions/LocationArmorOfSingle"
         },
         "structure": {
           "type": "number",
@@ -927,9 +942,9 @@
         },
         "components": {
           "type": "array",
-          "description": "The components mounted in the location, in the game's order.",
+          "description": "The components mounted in the location, in the game's order, all fixed.",
           "items": {
-            "$ref": "#/definitions/ComponentReference"
+            "$ref": "#/definitions/LoadoutComponent"
           }
         }
       }
@@ -965,6 +980,7 @@
       "description": "A turret with its chassis' data: a fixed emplacement with a single location.",
       "additionalProperties": false,
       "required": [
+        "id",
         "name",
         "weightClass",
         "tonnage",
@@ -974,6 +990,10 @@
         "components"
       ],
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id from the game's data files, which the entry is keyed by and the references to it use."
+        },
         "name": {
           "type": "string",
           "description": "The name the combat HUD shows."
@@ -993,9 +1013,8 @@
           "format": "float"
         },
         "armor": {
-          "type": "number",
-          "description": "The armor in combat, after the game's vehicle multiplier.",
-          "format": "float"
+          "description": "The armor in combat, after the game's vehicle multiplier; a turret has no rear armor.",
+          "$ref": "#/definitions/LocationArmorOfSingle"
         },
         "structure": {
           "type": "number",
@@ -1004,16 +1023,16 @@
         },
         "components": {
           "type": "array",
-          "description": "The components mounted, in the game's order.",
+          "description": "The components mounted, in the game's order, all fixed.",
           "items": {
-            "$ref": "#/definitions/ComponentReference"
+            "$ref": "#/definitions/LoadoutComponent"
           }
         }
       }
     },
     "ComponentDefinitions": {
       "type": "object",
-      "description": "The catalog's component definitions, which every export file's references point to, grouped by type and keyed by component id. A reference whose definition the game can't find has no entry; its id stands in for its name.",
+      "description": "The catalog's component definitions, which every export file's references point to, grouped by type and keyed by component id: a reference's type names its group, Weapon in weapons, AmmunitionBox in ammunitionBoxes, HeatSink in heatSinks, JumpJet in jumpJets and Upgrade in upgrades. A reference whose definition the game can't find has no entry; its id stands in for its name.",
       "additionalProperties": false,
       "required": [
         "weapons",
@@ -1025,35 +1044,35 @@
       "properties": {
         "weapons": {
           "type": "object",
-          "description": "The weapons, keyed by component id, without the game's internal melee, jump attack and AI weapons, which no unit mounts.",
+          "description": "The components of type Weapon, keyed by component id, without the game's internal melee, jump attack and AI weapons, which no unit mounts.",
           "additionalProperties": {
             "$ref": "#/definitions/WeaponDefinition"
           }
         },
         "ammunitionBoxes": {
           "type": "object",
-          "description": "The ammunition boxes, keyed by component id.",
+          "description": "The components of type AmmunitionBox, keyed by component id.",
           "additionalProperties": {
             "$ref": "#/definitions/AmmunitionBoxDefinition"
           }
         },
         "heatSinks": {
           "type": "object",
-          "description": "The heat sinks, keyed by component id.",
+          "description": "The components of type HeatSink, keyed by component id.",
           "additionalProperties": {
             "$ref": "#/definitions/HeatSinkDefinition"
           }
         },
         "jumpJets": {
           "type": "object",
-          "description": "The jump jets, keyed by component id.",
+          "description": "The components of type JumpJet, keyed by component id.",
           "additionalProperties": {
             "$ref": "#/definitions/JumpJetDefinition"
           }
         },
         "upgrades": {
           "type": "object",
-          "description": "The upgrades, e.g. actuators, cockpit mods and gyros, keyed by component id; they have only the common fields.",
+          "description": "The components of type Upgrade, e.g. actuators, cockpit mods and gyros, keyed by component id; they have only the common fields.",
           "additionalProperties": {
             "$ref": "#/definitions/ComponentDefinition"
           }
@@ -1064,11 +1083,11 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "id",
         "name",
         "tonnage",
         "slots",
         "value",
-        "bonuses",
         "effects",
         "isSalvageable",
         "category",
@@ -1087,6 +1106,10 @@
         "isIndirectFireCapable"
       ],
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id from the game's data files, which the entry is keyed by and the references to it use."
+        },
         "name": {
           "type": "string",
           "description": "The name the mech lab shows, as in the references to the component."
@@ -1105,13 +1128,6 @@
           "type": "integer",
           "description": "The C-Bill value of the component.",
           "format": "int32"
-        },
-        "bonuses": {
-          "type": "array",
-          "description": "The short bonus texts shown on the component, e.g. \"+ 5 Dmg.\".",
-          "items": {
-            "type": "string"
-          }
         },
         "effects": {
           "type": "array",
@@ -1718,17 +1734,21 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "id",
         "name",
         "tonnage",
         "slots",
         "value",
-        "bonuses",
         "effects",
         "isSalvageable",
         "ammoCategory",
         "capacity"
       ],
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id from the game's data files, which the entry is keyed by and the references to it use."
+        },
         "name": {
           "type": "string",
           "description": "The name the mech lab shows, as in the references to the component."
@@ -1747,13 +1767,6 @@
           "type": "integer",
           "description": "The C-Bill value of the component.",
           "format": "int32"
-        },
-        "bonuses": {
-          "type": "array",
-          "description": "The short bonus texts shown on the component, e.g. \"+ 5 Dmg.\".",
-          "items": {
-            "type": "string"
-          }
         },
         "effects": {
           "type": "array",
@@ -1781,16 +1794,20 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "id",
         "name",
         "tonnage",
         "slots",
         "value",
-        "bonuses",
         "effects",
         "isSalvageable",
         "dissipation"
       ],
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id from the game's data files, which the entry is keyed by and the references to it use."
+        },
         "name": {
           "type": "string",
           "description": "The name the mech lab shows, as in the references to the component."
@@ -1809,13 +1826,6 @@
           "type": "integer",
           "description": "The C-Bill value of the component.",
           "format": "int32"
-        },
-        "bonuses": {
-          "type": "array",
-          "description": "The short bonus texts shown on the component, e.g. \"+ 5 Dmg.\".",
-          "items": {
-            "type": "string"
-          }
         },
         "effects": {
           "type": "array",
@@ -1840,17 +1850,21 @@
       "description": "A jump jet, which only mechs whose chassis tonnage is within its range can mount.",
       "additionalProperties": false,
       "required": [
+        "id",
         "name",
         "tonnage",
         "slots",
         "value",
-        "bonuses",
         "effects",
         "isSalvageable",
         "minTonnage",
         "maxTonnage"
       ],
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id from the game's data files, which the entry is keyed by and the references to it use."
+        },
         "name": {
           "type": "string",
           "description": "The name the mech lab shows, as in the references to the component."
@@ -1869,13 +1883,6 @@
           "type": "integer",
           "description": "The C-Bill value of the component.",
           "format": "int32"
-        },
-        "bonuses": {
-          "type": "array",
-          "description": "The short bonus texts shown on the component, e.g. \"+ 5 Dmg.\".",
-          "items": {
-            "type": "string"
-          }
         },
         "effects": {
           "type": "array",
@@ -1905,15 +1912,19 @@
       "description": "The fields every component definition has; the definitions of types with stats of their own derive from it. Upgrades have no others.",
       "additionalProperties": false,
       "required": [
+        "id",
         "name",
         "tonnage",
         "slots",
         "value",
-        "bonuses",
         "effects",
         "isSalvageable"
       ],
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id from the game's data files, which the entry is keyed by and the references to it use."
+        },
         "name": {
           "type": "string",
           "description": "The name the mech lab shows, as in the references to the component."
@@ -1933,13 +1944,6 @@
           "description": "The C-Bill value of the component.",
           "format": "int32"
         },
-        "bonuses": {
-          "type": "array",
-          "description": "The short bonus texts shown on the component, e.g. \"+ 5 Dmg.\".",
-          "items": {
-            "type": "string"
-          }
-        },
         "effects": {
           "type": "array",
           "description": "The statistics the component changes while mounted.",
@@ -1958,6 +1962,7 @@
       "description": "A terrain's effects on the units in it: forest, water, rough ground, roads and the like. A cell has one terrain at most, so the effects never stack; the map's biome applies on top (see BiomeDefinition).",
       "additionalProperties": false,
       "required": [
+        "id",
         "name",
         "moveCost",
         "sprintMultiplier",
@@ -1976,6 +1981,10 @@
         "stickyEffects"
       ],
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id from the game's data files, which the entry is keyed by and the references to it use."
+        },
         "name": {
           "type": "string",
           "description": "As the combat HUD shows it."
@@ -2170,12 +2179,17 @@
       "description": "A biome's effects on every unit on its maps, on top of the terrain's (see TerrainDefinition); the game reads nothing else from a biome.",
       "additionalProperties": false,
       "required": [
+        "id",
         "name",
         "heatSinkMultiplier",
         "heatPerRound",
         "damageDealt"
       ],
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id from the game's data files, which the entry is keyed by and the references to it use."
+        },
         "name": {
           "type": "string",
           "description": "As in the references to the biome."
@@ -2201,6 +2215,7 @@
       "description": "A combat map some star system's contracts can be fought on, and the terrain it is made of. The contract generator draws a star system's map among the maps star-systems.json lists for the system, by weight.",
       "additionalProperties": false,
       "required": [
+        "id",
         "name",
         "biome",
         "tags",
@@ -2208,6 +2223,10 @@
         "terrainCoverage"
       ],
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id from the game's data files, which the entry is keyed by and the references to it use."
+        },
         "name": {
           "type": "string",
           "description": "The map's friendly name."
@@ -2243,6 +2262,7 @@
       "description": "An event the game can show between missions: when it can come, and the options it offers.",
       "additionalProperties": false,
       "required": [
+        "id",
         "name",
         "scope",
         "weight",
@@ -2254,9 +2274,13 @@
         "options"
       ],
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id from the game's data files, which the entry is keyed by and the references to it use."
+        },
         "name": {
           "type": "string",
-          "description": "The event's title; placeholders such as {TGT_MW.Callsign} stand for the pilots the game picks."
+          "description": "The event's title as plain text; placeholders such as {TGT_MW.Callsign} stand for the pilots the game picks, and a switch on their gender is resolved to its default wording."
         },
         "scope": {
           "description": "What the event is about: the company, or a pilot it picks among those meeting requirements and without an event timeout.",
@@ -2958,6 +2982,7 @@
       "description": "An item collection: a weighted list the stores and the rewards draw their items from. A draw picks one entry by weight; a collection drawn in full yields every entry once, as a store's own collections are.",
       "additionalProperties": false,
       "required": [
+        "id",
         "components",
         "mechs",
         "mechParts",
@@ -2965,6 +2990,10 @@
         "emptyWeight"
       ],
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id from the game's data files, which the entry is keyed by and the references to it use."
+        },
         "components": {
           "type": "array",
           "description": "The components a draw can yield.",
