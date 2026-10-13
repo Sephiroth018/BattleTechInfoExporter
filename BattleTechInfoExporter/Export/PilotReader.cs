@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BattleTech;
+using BattleTech.Data;
 using BattleTechInfoExporter.Models;
 using Pilot = BattleTech.Pilot;
 
@@ -24,9 +25,17 @@ internal static class PilotReader
                 new Pilot(definition, definition.Description.FullName(), true)))
             .ToList();
 
-    internal static PilotReference ReferenceTo(Pilot pilot)
+    internal static PilotReference ReferenceTo(Pilot pilot) => ReferenceTo(pilot.pilotDef);
+
+    // A pilot an event adds to the hiring hall may be missing from the loaded pilots; its id stands in for the names.
+    internal static PilotReference ReferenceTo(DataManager dataManager, string pilotId) =>
+        dataManager.PilotDefs.TryGet(pilotId, out var definition)
+            ? ReferenceTo(definition)
+            : new PilotReference(pilotId, pilotId, pilotId);
+
+    private static PilotReference ReferenceTo(PilotDef definition)
     {
-        var description = pilot.pilotDef.Description;
+        var description = definition.Description;
         return new PilotReference(description.Id, FullName(description), description.Callsign);
     }
 

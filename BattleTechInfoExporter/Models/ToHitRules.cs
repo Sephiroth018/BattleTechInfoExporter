@@ -5,7 +5,7 @@ namespace BattleTechInfoExporter.Models;
 
 /// <summary>
 ///     How an attack's hit chance follows from its difficulty: the base chance of the skill level (see
-///     <see cref="SkillLevel.BaseHitChancePercent" />) loses <see cref="DifficultySteps" /> per point of the
+///     <see cref="GunneryLevel.BaseHitChancePercent" />) loses <see cref="DifficultySteps" /> per point of the
 ///     summed modifiers, is rounded to <see cref="RoundedToPercent" /> and clamped between
 ///     <see cref="MinChancePercent" /> and <see cref="MaxChancePercent" />.
 /// </summary>

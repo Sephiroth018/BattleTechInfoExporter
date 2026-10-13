@@ -713,7 +713,7 @@ both checks, check 1 because the mod ran, or stops and reports instead of mergin
 
 Semantic versioning on the first three parts, never set by hand: the build derives the version
 from the newest release tag reachable from HEAD and the conventional type of the first-parent
-commits since it (see "Structure"). A `!` after the type (`feat!(#12):`) is a breaking change to
+commits since it (see "Structure"). A `!` after the type and issue (`feat(#12)!:`) is a breaking change to
 the exported JSON, whose consumers must adapt: major. `feat`, new data, files or triggers: minor.
 `fix` and `refactor`: patch. `docs`, `chore` and `test` don't bump. The highest bump among the
 commits wins. On `main` the only commit since the last release is a PR's merge commit, so the PR

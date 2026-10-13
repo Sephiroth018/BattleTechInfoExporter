@@ -208,26 +208,19 @@ internal static class ContractReader
     {
         if (!contract.CanNegotiate)
         {
-            return new Negotiation(
-                false,
-                null,
-                ReadNegotiationOption(
-                    simGame,
-                    contract,
-                    employer,
-                    target,
-                    null,
-                    null,
-                    contract.Override.negotiatedSalary,
-                    contract.Override.negotiatedSalvage));
+            var payShare = contract.Override.negotiatedSalary;
+            var salvageShare = contract.Override.negotiatedSalvage;
+            return new FixedTerms(
+                ReadPay(simGame, contract, payShare),
+                ReadSalvage(simGame, contract, salvageShare),
+                ReadReputation(simGame, contract, employer, target, ReputationShare(payShare, salvageShare)));
         }
 
         // Pay, salvage and reputation each depend only on their own share. The sliders' shares can't exceed 100
         // together; without employer reputation they are coupled and leave nothing for it
         // (SGContractsWidget.OnNegPaymentChange, ShouldAdjustReputation). Accepting sets the reputation share to the
         // rest (Contract.SetNegotiatedValues).
-        return new Negotiation(
-            true,
+        return new NegotiableTerms(
             NegotiationShares
                 .Select(share =>
                 {
@@ -238,41 +231,28 @@ internal static class ContractReader
                         ReadSalvage(simGame, contract, fraction),
                         ReadReputation(simGame, contract, employer, target, fraction));
                 })
-                .ToList(),
-            null);
+                .ToList());
     }
 
     // Accepting a contract stores the shares it was accepted with (SGContractsWidget.OnContractAccepted).
-    private static NegotiationOption ReadTerms(
+    private static AcceptedTerms ReadTerms(
         SimGameState simGame,
         Contract contract,
         FactionValue employer,
-        FactionValue target) =>
-        ReadNegotiationOption(
-            simGame,
-            contract,
-            employer,
-            target,
-            contract.CanNegotiate ? Mathf.RoundToInt(contract.PercentageContractValue * 100) : null,
-            contract.CanNegotiate ? Mathf.RoundToInt(contract.PercentageContractSalvage * 100) : null,
-            contract.PercentageContractValue,
-            contract.PercentageContractSalvage);
-
-    private static NegotiationOption ReadNegotiationOption(
-        SimGameState simGame,
-        Contract contract,
-        FactionValue employer,
-        FactionValue target,
-        int? payPercent,
-        int? salvagePercent,
-        float payShare,
-        float salvageShare) =>
-        new(
-            payPercent,
-            salvagePercent,
+        FactionValue target)
+    {
+        var payShare = contract.PercentageContractValue;
+        var salvageShare = contract.PercentageContractSalvage;
+        return new AcceptedTerms(
+            contract.CanNegotiate
+                ? new NegotiatedShares(Mathf.RoundToInt(payShare * 100), Mathf.RoundToInt(salvageShare * 100))
+                : null,
             ReadPay(simGame, contract, payShare),
             ReadSalvage(simGame, contract, salvageShare),
-            ReadReputation(simGame, contract, employer, target, 1f - (payShare + salvageShare)));
+            ReadReputation(simGame, contract, employer, target, ReputationShare(payShare, salvageShare)));
+    }
+
+    private static float ReputationShare(float payShare, float salvageShare) => 1f - (payShare + salvageShare);
 
     // Mirrors SimGameState.GetScaledCBillValue, as SGContractsWidget.UpdateCurrentValues shows the pay.
     private static int ReadPay(SimGameState simGame, Contract contract, float share) =>

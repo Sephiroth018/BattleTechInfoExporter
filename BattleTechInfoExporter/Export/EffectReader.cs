@@ -74,17 +74,26 @@ internal static class EffectReader
         return value;
     }
 
-    // The filters as the game's data sets them; EffectManager.GetTargetComponents applies the first one set of
-    // sub type, type and category.
     private static EffectTargetCollection? ReadTargetCollection(StatisticEffectData statistic) =>
         statistic.targetCollection == StatisticEffectData.TargetCollection.NotSet
             ? null
-            : new EffectTargetCollection(
-                statistic.targetCollection,
-                statistic.targetWeaponSubType == WeaponSubType.NotSet ? null : statistic.targetWeaponSubType,
-                statistic.targetWeaponType == WeaponType.NotSet ? null : statistic.targetWeaponType,
-                statistic.TargetWeaponCategoryValue.Is_NotSet ? null : statistic.TargetWeaponCategoryValue.FriendlyName,
-                statistic.TargetAmmoCategoryValue.Is_NotSet ? null : statistic.TargetAmmoCategoryValue.FriendlyName);
+            : new EffectTargetCollection(statistic.targetCollection, ReadFilter(statistic));
+
+    // Mirrors EffectManager.GetTargetComponents, which applies the first filter set in this order and ignores the
+    // rest; the random and the strongest weapon are picked among all weapons.
+    private static ComponentFilter? ReadFilter(StatisticEffectData statistic) =>
+        statistic.targetCollection switch
+        {
+            StatisticEffectData.TargetCollection.Weapon when statistic.targetWeaponSubType != WeaponSubType.NotSet =>
+                new WeaponSubTypeFilter(statistic.targetWeaponSubType),
+            StatisticEffectData.TargetCollection.Weapon when statistic.targetWeaponType != WeaponType.NotSet =>
+                new WeaponTypeFilter(statistic.targetWeaponType),
+            StatisticEffectData.TargetCollection.Weapon when !statistic.TargetWeaponCategoryValue.Is_NotSet =>
+                new WeaponCategoryFilter(statistic.TargetWeaponCategoryValue.FriendlyName),
+            StatisticEffectData.TargetCollection.AmmoBox when !statistic.TargetAmmoCategoryValue.Is_NotSet =>
+                new AmmoCategoryFilter(statistic.TargetAmmoCategoryValue.FriendlyName),
+            _ => null
+        };
 
     // Mirrors the ETimer that Effect picks; an ETimer only counts down from a positive duration.
     private static EffectDuration? ReadDuration(EffectDurationData duration)

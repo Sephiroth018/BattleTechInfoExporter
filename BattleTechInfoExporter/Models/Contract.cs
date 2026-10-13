@@ -154,27 +154,34 @@ internal sealed record ActiveContract(
     string Description,
     LanceLimits LanceLimits,
     DefinitionReference? Biome,
-    NegotiationOption Terms,
+    AcceptedTerms Terms,
     int? ArrivesOnDay,
     StarSystem StarSystem)
     : ContractBriefing(Id, Name, Type, DisplayStyle, Employer, Target, Difficulty, Description, LanceLimits, Biome);
 
-/// <summary>The contract's terms.</summary>
+/// <summary>
+///     The terms a contract can be accepted with; each <see cref="CanNegotiate" /> has a record with the fields of
+///     its own.
+/// </summary>
 /// <param name="CanNegotiate">
-///     Whether the terms are negotiated with the sliders (<see cref="ValuesByShare" />) or fixed
+///     Whether the terms are negotiated with the sliders (<see cref="NegotiableTerms" />) or fixed
 ///     (<see cref="FixedTerms" />).
 /// </param>
-/// <param name="ValuesByShare">
-///     The values at each slider position; <c>null</c> when the contract can't be negotiated. A row is not a deal:
-///     the pay comes from the row at the pay share, the salvage from the row at the salvage share and the reputation
-///     from the row at the share left over.
-/// </param>
-/// <param name="FixedTerms">The terms of a contract that can't be negotiated; <c>null</c> otherwise.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record Negotiation(
-    bool CanNegotiate,
-    IReadOnlyList<ValuesAtShare>? ValuesByShare,
-    NegotiationOption? FixedTerms);
+internal abstract record Negotiation(bool CanNegotiate);
+
+/// <summary>The terms of a contract negotiated with the sliders.</summary>
+/// <param name="ValuesByShare">
+///     The values at each slider position. A row is not a deal: the pay comes from the row at the pay share, the
+///     salvage from the row at the salvage share and the reputation from the row at the share left over.
+/// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record NegotiableTerms(IReadOnlyList<ValuesAtShare> ValuesByShare) : Negotiation(true);
+
+/// <summary>The terms of a contract that can't be negotiated.</summary>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record FixedTerms(int Pay, Salvage Salvage, ReputationChange Reputation)
+    : Negotiation(false), IContractTerms;
 
 /// <summary>What one slider position gives, each value for its own slider.</summary>
 /// <param name="Share">The slider's position in percent.</param>
@@ -184,18 +191,19 @@ internal sealed record Negotiation(
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ValuesAtShare(int Share, int Pay, Salvage Salvage, ReputationChange Reputation);
 
-/// <param name="PayShare">The pay slider's position in percent; <c>null</c> for fixed terms.</param>
-/// <param name="SalvageShare">The salvage slider's position in percent; <c>null</c> for fixed terms.</param>
-/// <param name="Pay">The pay in C-Bills.</param>
-/// <param name="Salvage">The salvage the company gets.</param>
-/// <param name="Reputation">The reputation changes when the contract succeeds.</param>
+/// <summary>The terms a contract was accepted with.</summary>
+/// <param name="Shares">The slider positions the terms were negotiated at; <c>null</c> for fixed terms.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record NegotiationOption(
-    int? PayShare,
-    int? SalvageShare,
+internal sealed record AcceptedTerms(
+    NegotiatedShares? Shares,
     int Pay,
     Salvage Salvage,
-    ReputationChange Reputation);
+    ReputationChange Reputation) : IContractTerms;
+
+/// <param name="Pay">The pay slider's position in percent.</param>
+/// <param name="Salvage">The salvage slider's position in percent.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record NegotiatedShares(int Pay, int Salvage);
 
 /// <summary>
 ///     The reputation changes of a contract: of its success, as the negotiation shows them, or of a mission's outcome.

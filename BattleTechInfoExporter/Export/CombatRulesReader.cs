@@ -220,20 +220,19 @@ internal static class CombatRulesReader
         var hitTables = constants.HitTables;
         var toHit = constants.ToHit;
         return new HitTables(
-            new HitTablesOf<ArmorLocation>(
+            new MechHitTables(
                 hitTables.HitMechLocationFromFront,
                 hitTables.HitMechLocationFromLeft,
                 hitTables.HitMechLocationFromRight,
                 hitTables.HitMechLocationFromBack,
-                hitTables.HitMechLocationProne,
                 // DamageOrderUtility.ApplyDamageToAllLocations skips the head.
-                hitTables.HitMechLocationFromArtillery.Keys.Where(location => location != ArmorLocation.Head).ToList()),
+                hitTables.HitMechLocationFromArtillery.Keys.Where(location => location != ArmorLocation.Head).ToList(),
+                hitTables.HitMechLocationProne),
             new HitTablesOf<VehicleChassisLocations>(
                 hitTables.HitVehicleLocationFromFront,
                 hitTables.HitVehicleLocationFromLeft,
                 hitTables.HitVehicleLocationFromRight,
                 hitTables.HitVehicleLocationFromBack,
-                null,
                 hitTables.HitVehicleLocationFromArtillery.Keys.ToList()),
             new CalledShotRules(hitTables.CalledShotBonusMultiplier, hitTables.CalledShotBonusDegradeLerpFactor),
             new ClusteredHitWeights(

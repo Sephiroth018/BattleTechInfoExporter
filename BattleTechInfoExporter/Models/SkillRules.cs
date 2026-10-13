@@ -15,36 +15,47 @@ namespace BattleTechInfoExporter.Models;
 internal sealed record SkillRules(
     int MaxPrimaryAbilities,
     int MaxPrimaryAbilitiesPerSkill,
-    Skill Gunnery,
-    Skill Piloting,
-    Skill Guts,
-    Skill Tactics);
+    Skill<GunneryLevel> Gunnery,
+    Skill<PilotingLevel> Piloting,
+    Skill<SkillLevel> Guts,
+    Skill<SkillLevel> Tactics);
 
 /// <param name="Description">What the skill controls, as the barracks explains it.</param>
 /// <param name="Levels">The levels a pilot can train to; every pilot starts at level 1.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record Skill(string Description, IReadOnlyList<SkillLevel> Levels);
+internal sealed record Skill<TLevel>(string Description, IReadOnlyList<TLevel> Levels)
+    where TLevel : SkillLevel;
 
+/// <summary>A level of a skill; the skills with numbers of their own per level derive from it.</summary>
 /// <param name="Level">The skill level, from 2.</param>
 /// <param name="ExperienceCost">The experience spent to reach the level from the one below.</param>
-/// <param name="BaseHitChancePercent">
-///     Gunnery only: the hit chance of ranged attacks at this level, before the attack's modifiers.
-/// </param>
-/// <param name="BaseMeleeHitChancePercent">
-///     Piloting only: the hit chance of melee attacks at this level, before the attack's modifiers.
-/// </param>
-/// <param name="MovementAfterStandingUpPercent">
-///     Piloting only: the share of its walk, sprint and backward distance a mech keeps in the round it stands up.
-/// </param>
 /// <param name="Abilities">The primary abilities and passive traits unlocked at the level.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record SkillLevel(
+internal record SkillLevel(int Level, int ExperienceCost, IReadOnlyList<SkillLevelAbility> Abilities);
+
+/// <param name="BaseHitChancePercent">
+///     The hit chance of ranged attacks at this level, before the attack's modifiers.
+/// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record GunneryLevel(
     int Level,
     int ExperienceCost,
-    float? BaseHitChancePercent,
-    float? BaseMeleeHitChancePercent,
-    float? MovementAfterStandingUpPercent,
-    IReadOnlyList<SkillLevelAbility> Abilities);
+    IReadOnlyList<SkillLevelAbility> Abilities,
+    float BaseHitChancePercent) : SkillLevel(Level, ExperienceCost, Abilities);
+
+/// <param name="BaseMeleeHitChancePercent">
+///     The hit chance of melee attacks at this level, before the attack's modifiers.
+/// </param>
+/// <param name="MovementAfterStandingUpPercent">
+///     The share of its walk, sprint and backward distance a mech keeps in the round it stands up.
+/// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record PilotingLevel(
+    int Level,
+    int ExperienceCost,
+    IReadOnlyList<SkillLevelAbility> Abilities,
+    float BaseMeleeHitChancePercent,
+    float MovementAfterStandingUpPercent) : SkillLevel(Level, ExperienceCost, Abilities);
 
 /// <param name="Ability">The ability, by its definition's id and name.</param>
 /// <param name="IsPrimary">A primary ability is chosen, a passive trait comes with the level.</param>

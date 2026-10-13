@@ -252,23 +252,23 @@
         },
         "gunnery": {
           "description": "The Gunnery skill's training table.",
-          "$ref": "#/definitions/Skill"
+          "$ref": "#/definitions/SkillOfGunneryLevel"
         },
         "piloting": {
           "description": "The Piloting skill's training table.",
-          "$ref": "#/definitions/Skill"
+          "$ref": "#/definitions/SkillOfPilotingLevel"
         },
         "guts": {
           "description": "The Guts skill's training table.",
-          "$ref": "#/definitions/Skill"
+          "$ref": "#/definitions/SkillOfSkillLevel"
         },
         "tactics": {
           "description": "The Tactics skill's training table.",
-          "$ref": "#/definitions/Skill"
+          "$ref": "#/definitions/SkillOfSkillLevel"
         }
       }
     },
-    "Skill": {
+    "SkillOfGunneryLevel": {
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -284,21 +284,19 @@
           "type": "array",
           "description": "The levels a pilot can train to; every pilot starts at level 1.",
           "items": {
-            "$ref": "#/definitions/SkillLevel"
+            "$ref": "#/definitions/GunneryLevel"
           }
         }
       }
     },
-    "SkillLevel": {
+    "GunneryLevel": {
       "type": "object",
       "additionalProperties": false,
       "required": [
         "level",
         "experienceCost",
-        "baseHitChancePercent",
-        "baseMeleeHitChancePercent",
-        "movementAfterStandingUpPercent",
-        "abilities"
+        "abilities",
+        "baseHitChancePercent"
       ],
       "properties": {
         "level": {
@@ -311,36 +309,17 @@
           "description": "The experience spent to reach the level from the one below.",
           "format": "int32"
         },
-        "baseHitChancePercent": {
-          "type": [
-            "null",
-            "number"
-          ],
-          "description": "Gunnery only: the hit chance of ranged attacks at this level, before the attack's modifiers.",
-          "format": "float"
-        },
-        "baseMeleeHitChancePercent": {
-          "type": [
-            "null",
-            "number"
-          ],
-          "description": "Piloting only: the hit chance of melee attacks at this level, before the attack's modifiers.",
-          "format": "float"
-        },
-        "movementAfterStandingUpPercent": {
-          "type": [
-            "null",
-            "number"
-          ],
-          "description": "Piloting only: the share of its walk, sprint and backward distance a mech keeps in the round it stands up.",
-          "format": "float"
-        },
         "abilities": {
           "type": "array",
           "description": "The primary abilities and passive traits unlocked at the level.",
           "items": {
             "$ref": "#/definitions/SkillLevelAbility"
           }
+        },
+        "baseHitChancePercent": {
+          "type": "number",
+          "description": "The hit chance of ranged attacks at this level, before the attack's modifiers.",
+          "format": "float"
         }
       }
     },
@@ -596,51 +575,23 @@
       "additionalProperties": false,
       "required": [
         "collection",
-        "weaponSubType",
-        "weaponType",
-        "weaponCategory",
-        "ammoCategory"
+        "filter"
       ],
       "properties": {
         "collection": {
           "description": "The pilot, the weapons, the ammunition boxes, one random working weapon or the strongest working weapon.",
           "$ref": "#/definitions/TargetCollection"
         },
-        "weaponSubType": {
-          "description": "Only weapons of this sub type; null when not filtered by it.",
+        "filter": {
+          "description": "Which of the weapons or ammunition boxes; null for all of them, and always for the pilot, the random and the strongest weapon.",
           "oneOf": [
             {
               "type": "null"
             },
             {
-              "$ref": "#/definitions/WeaponSubType"
+              "$ref": "#/definitions/ComponentFilter"
             }
           ]
-        },
-        "weaponType": {
-          "description": "Only weapons of this type; null when not filtered by it.",
-          "oneOf": [
-            {
-              "type": "null"
-            },
-            {
-              "$ref": "#/definitions/WeaponType"
-            }
-          ]
-        },
-        "weaponCategory": {
-          "type": [
-            "null",
-            "string"
-          ],
-          "description": "The weapon category, as the catalog's weapons name theirs."
-        },
-        "ammoCategory": {
-          "type": [
-            "null",
-            "string"
-          ],
-          "description": "The ammunition category, as the catalog's ammunition boxes name theirs."
         }
       }
     },
@@ -662,6 +613,94 @@
         "SingleRandomWeapon",
         "StrongestWeapon"
       ]
+    },
+    "ComponentFilter": {
+      "description": "The one property the game filters the components by; the game's data can name several, of which only the first in ComponentFilterKind's order counts. Each kind has a record with its value's type.",
+      "x-abstract": true,
+      "anyOf": [
+        {
+          "$ref": "#/definitions/AmmoCategoryFilter"
+        },
+        {
+          "$ref": "#/definitions/WeaponCategoryFilter"
+        },
+        {
+          "$ref": "#/definitions/WeaponSubTypeFilter"
+        },
+        {
+          "$ref": "#/definitions/WeaponTypeFilter"
+        }
+      ]
+    },
+    "ComponentFilterKind": {
+      "type": "string",
+      "description": "The property of a component an effect's filter compares, in the order the game checks them.",
+      "x-enumNames": [
+        "WeaponSubType",
+        "WeaponType",
+        "WeaponCategory",
+        "AmmoCategory"
+      ],
+      "enum": [
+        "weaponSubType",
+        "weaponType",
+        "weaponCategory",
+        "ammoCategory"
+      ]
+    },
+    "AmmoCategoryFilter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "value"
+      ],
+      "properties": {
+        "kind": {
+          "description": "Which property of the components the filter compares, deciding the type of its value.",
+          "$ref": "#/definitions/ComponentFilterKind"
+        },
+        "value": {
+          "type": "string",
+          "description": "The ammunition category the ammunition boxes must have, as the catalog's ammunition boxes name theirs."
+        }
+      }
+    },
+    "WeaponCategoryFilter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "value"
+      ],
+      "properties": {
+        "kind": {
+          "description": "Which property of the components the filter compares, deciding the type of its value.",
+          "$ref": "#/definitions/ComponentFilterKind"
+        },
+        "value": {
+          "type": "string",
+          "description": "The weapon category the weapons must have, as the catalog's weapons name theirs."
+        }
+      }
+    },
+    "WeaponSubTypeFilter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "value"
+      ],
+      "properties": {
+        "kind": {
+          "description": "Which property of the components the filter compares, deciding the type of its value.",
+          "$ref": "#/definitions/ComponentFilterKind"
+        },
+        "value": {
+          "description": "The weapon sub type the weapons must have, e.g. Melee or DFA.",
+          "$ref": "#/definitions/WeaponSubType"
+        }
+      }
     },
     "WeaponSubType": {
       "type": "string",
@@ -759,6 +798,24 @@
         "COILM",
         "COILL"
       ]
+    },
+    "WeaponTypeFilter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "value"
+      ],
+      "properties": {
+        "kind": {
+          "description": "Which property of the components the filter compares, deciding the type of its value.",
+          "$ref": "#/definitions/ComponentFilterKind"
+        },
+        "value": {
+          "description": "The weapon type the weapons must have, e.g. LRM or SRM.",
+          "$ref": "#/definitions/WeaponType"
+        }
+      }
     },
     "WeaponType": {
       "type": "string",
@@ -879,6 +936,117 @@
         "TurnUpdate",
         "Preview"
       ]
+    },
+    "SkillOfPilotingLevel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "description",
+        "levels"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "What the skill controls, as the barracks explains it."
+        },
+        "levels": {
+          "type": "array",
+          "description": "The levels a pilot can train to; every pilot starts at level 1.",
+          "items": {
+            "$ref": "#/definitions/PilotingLevel"
+          }
+        }
+      }
+    },
+    "PilotingLevel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "experienceCost",
+        "abilities",
+        "baseMeleeHitChancePercent",
+        "movementAfterStandingUpPercent"
+      ],
+      "properties": {
+        "level": {
+          "type": "integer",
+          "description": "The skill level, from 2.",
+          "format": "int32"
+        },
+        "experienceCost": {
+          "type": "integer",
+          "description": "The experience spent to reach the level from the one below.",
+          "format": "int32"
+        },
+        "abilities": {
+          "type": "array",
+          "description": "The primary abilities and passive traits unlocked at the level.",
+          "items": {
+            "$ref": "#/definitions/SkillLevelAbility"
+          }
+        },
+        "baseMeleeHitChancePercent": {
+          "type": "number",
+          "description": "The hit chance of melee attacks at this level, before the attack's modifiers.",
+          "format": "float"
+        },
+        "movementAfterStandingUpPercent": {
+          "type": "number",
+          "description": "The share of its walk, sprint and backward distance a mech keeps in the round it stands up.",
+          "format": "float"
+        }
+      }
+    },
+    "SkillOfSkillLevel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "description",
+        "levels"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "What the skill controls, as the barracks explains it."
+        },
+        "levels": {
+          "type": "array",
+          "description": "The levels a pilot can train to; every pilot starts at level 1.",
+          "items": {
+            "$ref": "#/definitions/SkillLevel"
+          }
+        }
+      }
+    },
+    "SkillLevel": {
+      "type": "object",
+      "description": "A level of a skill; the skills with numbers of their own per level derive from it.",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "experienceCost",
+        "abilities"
+      ],
+      "properties": {
+        "level": {
+          "type": "integer",
+          "description": "The skill level, from 2.",
+          "format": "int32"
+        },
+        "experienceCost": {
+          "type": "integer",
+          "description": "The experience spent to reach the level from the one below.",
+          "format": "int32"
+        },
+        "abilities": {
+          "type": "array",
+          "description": "The primary abilities and passive traits unlocked at the level.",
+          "items": {
+            "$ref": "#/definitions/SkillLevelAbility"
+          }
+        }
+      }
     },
     "SpiritsLevelCosts": {
       "type": "object",
@@ -1846,7 +2014,7 @@
       "properties": {
         "mech": {
           "description": "The weights of a mech's armor locations.",
-          "$ref": "#/definitions/HitTablesOfOfArmorLocation"
+          "$ref": "#/definitions/MechHitTables"
         },
         "vehicle": {
           "description": "The weights of a vehicle's locations.",
@@ -1862,16 +2030,17 @@
         }
       }
     },
-    "HitTablesOfOfArmorLocation": {
+    "MechHitTables": {
       "type": "object",
+      "description": "A mech's hit tables, which a vehicle's lack: a mech can be prone.",
       "additionalProperties": false,
       "required": [
         "fromFront",
         "fromLeft",
         "fromRight",
         "fromBack",
-        "prone",
-        "artillery"
+        "artillery",
+        "prone"
       ],
       "properties": {
         "fromFront": {
@@ -1918,25 +2087,22 @@
             "format": "int32"
           }
         },
+        "artillery": {
+          "type": "array",
+          "description": "The locations an artillery strike or mortar hits, each with its own damage.",
+          "items": {
+            "$ref": "#/definitions/ArmorLocation"
+          }
+        },
         "prone": {
-          "type": [
-            "null",
-            "object"
-          ],
-          "description": "null for vehicles, which can't be prone.",
+          "type": "object",
+          "description": "The weight of each location for an attack on a prone mech, from any side.",
           "x-dictionaryKey": {
             "$ref": "#/definitions/ArmorLocation"
           },
           "additionalProperties": {
             "type": "integer",
             "format": "int32"
-          }
-        },
-        "artillery": {
-          "type": "array",
-          "description": "The locations an artillery strike or mortar hits, each with its own damage.",
-          "items": {
-            "$ref": "#/definitions/ArmorLocation"
           }
         }
       }
@@ -1977,13 +2143,13 @@
     },
     "HitTablesOfOfVehicleChassisLocations": {
       "type": "object",
+      "description": "The hit tables of a kind of unit, by the direction the attack comes from.",
       "additionalProperties": false,
       "required": [
         "fromFront",
         "fromLeft",
         "fromRight",
         "fromBack",
-        "prone",
         "artillery"
       ],
       "properties": {
@@ -2023,20 +2189,6 @@
         "fromBack": {
           "type": "object",
           "description": "The weight of each location for an attack from behind.",
-          "x-dictionaryKey": {
-            "$ref": "#/definitions/VehicleChassisLocations"
-          },
-          "additionalProperties": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "prone": {
-          "type": [
-            "null",
-            "object"
-          ],
-          "description": "null for vehicles, which can't be prone.",
           "x-dictionaryKey": {
             "$ref": "#/definitions/VehicleChassisLocations"
           },

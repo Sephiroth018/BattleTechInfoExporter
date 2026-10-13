@@ -34,40 +34,57 @@ internal static class RulesReader
     private static SkillRules ReadSkillRules(SimGameState simGame)
     {
         var progression = simGame.Constants.Progression;
+        var toHit = simGame.CombatConstants.ToHit;
+        var piloting = simGame.CombatConstants.PilotingConstants;
         return new SkillRules(
             3,
             2,
-            ReadSkill(simGame, SkillType.Gunnery, progression.GunneryDefaultTooltip),
-            ReadSkill(simGame, SkillType.Piloting, progression.PilotingDefaultTooltip),
+            ReadSkill(
+                simGame,
+                SkillType.Gunnery,
+                progression.GunneryDefaultTooltip,
+                (level, experienceCost, abilities) => new GunneryLevel(
+                    level,
+                    experienceCost,
+                    abilities,
+                    // Mirrors ToHit.GetBaseToHitChance.
+                    HitChancePercent(toHit.ToHitBaseFloor, level, toHit.ToHitGunneryDivisor))),
+            ReadSkill(
+                simGame,
+                SkillType.Piloting,
+                progression.PilotingDefaultTooltip,
+                (level, experienceCost, abilities) => new PilotingLevel(
+                    level,
+                    experienceCost,
+                    abilities,
+                    // Mirrors ToHit.GetBaseMeleeToHitChance.
+                    HitChancePercent(piloting.PilotingBaseFloor, level, piloting.PilotingDivisor),
+                    // Mirrors Pathing.ResetPathGrid after standing up, whose 0.75 is hardcoded.
+                    RoundedPercent(1f - (0.75f - level / piloting.PilotingDivisor)))),
             ReadSkill(simGame, SkillType.Guts, progression.GutsDefaultTooltip),
             ReadSkill(simGame, SkillType.Tactics, progression.TacticsDefaultTooltip));
     }
 
+    private static Skill<SkillLevel> ReadSkill(SimGameState simGame, SkillType skill, string description) =>
+        ReadSkill(simGame, skill, description, (level, experienceCost, abilities) =>
+            new SkillLevel(level, experienceCost, abilities));
+
     // SimGameState.AbilityTree is keyed by the skill's name and indexed by level - 1; the barracks prices the
     // pip for level n at GetLevelCost(n - 1). Level 1 is where every pilot starts, so the table begins at 2.
-    private static Skill ReadSkill(SimGameState simGame, SkillType skill, string description)
+    private static Skill<TLevel> ReadSkill<TLevel>(
+        SimGameState simGame,
+        SkillType skill,
+        string description,
+        Func<int, int, IReadOnlyList<SkillLevelAbility>, TLevel> createLevel)
+        where TLevel : SkillLevel
     {
         var abilitiesByLevel = simGame.AbilityTree[skill.ToString()];
-        var toHit = simGame.CombatConstants.ToHit;
-        var piloting = simGame.CombatConstants.PilotingConstants;
-        return new Skill(
+        return new Skill<TLevel>(
             GameText.ToPlainText(description),
             Enumerable.Range(2, Math.Max(0, abilitiesByLevel.Count - 1))
-                .Select(level => new SkillLevel(
+                .Select(level => createLevel(
                     level,
                     simGame.GetLevelCost(level - 1),
-                    // Mirrors ToHit.GetBaseToHitChance.
-                    skill == SkillType.Gunnery
-                        ? HitChancePercent(toHit.ToHitBaseFloor, level, toHit.ToHitGunneryDivisor)
-                        : null,
-                    // Mirrors ToHit.GetBaseMeleeToHitChance.
-                    skill == SkillType.Piloting
-                        ? HitChancePercent(piloting.PilotingBaseFloor, level, piloting.PilotingDivisor)
-                        : null,
-                    // Mirrors Pathing.ResetPathGrid after standing up, whose 0.75 is hardcoded.
-                    skill == SkillType.Piloting
-                        ? RoundedPercent(1f - (0.75f - level / piloting.PilotingDivisor))
-                        : null,
                     abilitiesByLevel[level - 1]
                         // The per-level accuracy traits have no name and no effects, only a label for the
                         // level's hit chance.

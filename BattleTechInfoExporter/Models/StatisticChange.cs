@@ -32,17 +32,38 @@ internal sealed record StatisticChange(
 /// <param name="Collection">
 ///     The pilot, the weapons, the ammunition boxes, one random working weapon or the strongest working weapon.
 /// </param>
-/// <param name="WeaponSubType">Only weapons of this sub type; <c>null</c> when not filtered by it.</param>
-/// <param name="WeaponType">Only weapons of this type; <c>null</c> when not filtered by it.</param>
-/// <param name="WeaponCategory">The weapon category, as the catalog's weapons name theirs.</param>
-/// <param name="AmmoCategory">The ammunition category, as the catalog's ammunition boxes name theirs.</param>
+/// <param name="Filter">
+///     Which of the weapons or ammunition boxes; <c>null</c> for all of them, and always for the pilot, the random
+///     and the strongest weapon.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record EffectTargetCollection(
-    StatisticEffectData.TargetCollection Collection,
-    WeaponSubType? WeaponSubType,
-    WeaponType? WeaponType,
-    string? WeaponCategory,
-    string? AmmoCategory);
+internal sealed record EffectTargetCollection(StatisticEffectData.TargetCollection Collection, ComponentFilter? Filter);
+
+/// <summary>
+///     The one property the game filters the components by; the game's data can name several, of which only the
+///     first in <see cref="ComponentFilterKind" />'s order counts. Each kind has a record with its value's type.
+/// </summary>
+/// <param name="Kind">Which property of the components the filter compares, deciding the type of its value.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal abstract record ComponentFilter(ComponentFilterKind Kind);
+
+/// <param name="Value">The weapon sub type the weapons must have, e.g. <c>Melee</c> or <c>DFA</c>.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record WeaponSubTypeFilter(WeaponSubType Value) : ComponentFilter(ComponentFilterKind.WeaponSubType);
+
+/// <param name="Value">The weapon type the weapons must have, e.g. <c>LRM</c> or <c>SRM</c>.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record WeaponTypeFilter(WeaponType Value) : ComponentFilter(ComponentFilterKind.WeaponType);
+
+/// <param name="Value">The weapon category the weapons must have, as the catalog's weapons name theirs.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record WeaponCategoryFilter(string Value) : ComponentFilter(ComponentFilterKind.WeaponCategory);
+
+/// <param name="Value">
+///     The ammunition category the ammunition boxes must have, as the catalog's ammunition boxes name theirs.
+/// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record AmmoCategoryFilter(string Value) : ComponentFilter(ComponentFilterKind.AmmoCategory);
 
 /// <param name="Count">How many of <see cref="Unit" /> the change lasts, at least 1.</param>
 /// <param name="Unit">What the duration counts.</param>

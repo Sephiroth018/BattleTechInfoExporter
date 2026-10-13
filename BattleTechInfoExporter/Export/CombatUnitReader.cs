@@ -111,15 +111,16 @@ internal static class CombatUnitReader
         var isLastSeen = visibility == UnitVisibility.LastSeen;
         var isPlayers = side.Allegiance == UnitAllegiance.Player;
         var bayMech = isPlayers && actor is Mech mech ? MechReader.ReferenceToBayMech(mech.MechDef) : null;
+        var isTurret = actor is Turret;
+        // A blip at Blip4Maximum shows a mech's or vehicle's tonnage and a turret's weight class (Mech, Vehicle and
+        // Turret.GetActorInfoFromVisLevel).
+        var isBlipMaximum = visibility == UnitVisibility.BlipMaximum;
         return new CombatUnit(
             side,
             visibility,
-            isSighted || visibility is UnitVisibility.BlipMaximum or UnitVisibility.BlipType ? ReadKind(actor) : null,
-            // What Mech, Vehicle and Turret.GetActorInfoFromVisLevel show at Blip4Maximum.
-            visibility == UnitVisibility.BlipMaximum ? ReadTonnage(actor) : null,
-            visibility == UnitVisibility.BlipMaximum && actor is Turret turret
-                ? turret.TurretDef.Chassis.weightClass
-                : null,
+            isSighted || isBlipMaximum || visibility == UnitVisibility.BlipType ? ReadKind(actor) : null,
+            isSighted || (isBlipMaximum && !isTurret) ? ReadTonnage(actor) : null,
+            isSighted || (isBlipMaximum && isTurret) ? ReadWeightClass(actor) : null,
             isSighted && bayMech is null ? ReadDefinition(actor) : null,
             bayMech,
             ReadPosition(
@@ -146,12 +147,22 @@ internal static class CombatUnitReader
             _ => throw NoUnitKind(actor)
         };
 
-    private static float? ReadTonnage(AbstractActor actor) =>
+    private static float ReadTonnage(AbstractActor actor) =>
         actor switch
         {
             Mech mech => mech.MechDef.Chassis.Tonnage,
             Vehicle vehicle => vehicle.VehicleDef.Chassis.Tonnage,
-            _ => null
+            Turret turret => turret.TurretDef.Chassis.Tonnage,
+            _ => throw NoUnitKind(actor)
+        };
+
+    private static WeightClass ReadWeightClass(AbstractActor actor) =>
+        actor switch
+        {
+            Mech mech => mech.MechDef.Chassis.weightClass,
+            Vehicle vehicle => vehicle.VehicleDef.Chassis.weightClass,
+            Turret turret => turret.TurretDef.Chassis.weightClass,
+            _ => throw NoUnitKind(actor)
         };
 
     // Named as in the catalog: a mech with its variant, a vehicle or turret as the HUD names it.

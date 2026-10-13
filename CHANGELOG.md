@@ -24,6 +24,47 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.65.0
+
+Changed: game-state.json (breaking), rules.json (breaking), combat-state.json, catalog.json
+(breaking).
+
+### game-state.json
+- Type changed `mechs[]`: one shape per `status`. `readyOnDay` is only on a mech the mech lab holds
+  (`readying`, `inMaintenance`), never `null`; `refit` and `afterRefit` only on `inMaintenance`,
+  never `null`; `repair` only on `ready`.
+- Type changed `contracts[].negotiation`: one shape per `canNegotiate`. `valuesByShare` is only
+  on a negotiable contract; a fixed contract carries `pay`, `salvage` and `reputation` directly
+  instead of `fixedTerms`.
+- Moved `activeContract.terms.payShare` and `salvageShare` to `activeContract.terms.shares.pay` and
+  `.salvage`; `shares` is `null` for fixed terms.
+
+### rules.json
+- Removed `skills.guts.levels[]` and `skills.tactics.levels[]` `baseHitChancePercent`,
+  `baseMeleeHitChancePercent` and `movementAfterStandingUpPercent`, which were always `null`.
+  `skills.gunnery.levels[]` keep `baseHitChancePercent`, `skills.piloting.levels[]` the other two,
+  never `null`.
+- Removed `combat.hitTables.vehicle.prone`, which was always `null`.
+- Type changed every statistic change's `appliesTo` (`skills.<skill>.levels[].abilities[].effects[]`
+  and the ones in `combat`): `weaponSubType`, `weaponType`, `weaponCategory` and `ammoCategory` are
+  replaced by `filter`, `{kind, value}` or `null`: the one filter the game applies, the first set
+  in that order, with `value` typed by `kind` (a weapon sub type or type enum value, or a category
+  name). Re-derive which weapons an effect applies to from `filter` alone.
+
+### combat-state.json
+- Values corrected `units.<id>.tonnage` and `weightClass`: set for every unit in full view, not
+  only for sensor blips.
+
+### catalog.json
+- Type changed `componentDefinitions.<group>.<id>.effects[].appliesTo`: as the rules' statistic
+  changes.
+- Type changed `eventDefinitions.<id>.options[].outcomes[].results[].actions[]`: one shape per kind
+  of action, keyed by `type`; `value` is replaced by the typed field the kind needs: `days`
+  (`MechWarrior_SetTimeout`), `injuries` (`MechWarrior_AddInjuries`, `MechWarrior_SubtractInjuries`),
+  `callsign` (`MechWarrior_Callsign`), `pilot` (`MechWarrior_AddHiring`, a pilot reference),
+  `itemCollection` (`System_ShowRewards`), `flashpoint` (`System_AddFlashpoint`); the kill, dismiss,
+  heal and single injury actions carry only `type`.
+
 ## 0.64.0
 
 Changed: game-state.json.
