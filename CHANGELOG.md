@@ -24,6 +24,48 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.66.0
+
+Changed: game-state.json (breaking), rules.json (breaking), mission-outcome.json (breaking),
+combat-state.json (breaking), catalog.json (breaking). Renames and moves only; no value changed.
+
+### game-state.json
+- Renamed `hiringHall[].hireCost` to `price`, and `ship.upgrades[].purchaseCost` to `price`: what
+  the company pays to buy something is `price` everywhere, as in the stores.
+
+### rules.json
+- Renamed `moraleLevels[].name` to `level`, as in every other level table.
+- Moved `campaign.hiring.mercenaryReviewBoardLevels` to the root `mercenaryReviewBoardLevels`,
+  next to the other level tables the game state refers to.
+- Renamed `moraleLevels[].resolvePerTurn` to `resolvePerRound`.
+- Renamed `combat.resolve.baselineGainMultiplier` to `baselineGainScalesWith`.
+
+### mission-outcome.json
+- Renamed `payment` to `pay`, as in the contracts' terms.
+- Moved `mercenaryReviewBoardReputation` to `reputation.mercenaryReviewBoard`, next to `employer`
+  and `target`.
+- Renamed `lance[].ammunition[].used` to `shotsFired`.
+
+### combat-state.json
+- Renamed `units.<id>.facing` to `facingDegrees`, as every other angle names its unit.
+- Renamed `units.<id>.state.mech.heat.dissipationPerRound` to `dissipation`, as on the catalog's
+  chassis, heat sinks and mech stats.
+- Renamed `units.<id>.state.components[].ammo` to `shotsLeft`.
+- Renamed `units.<id>.linesOfFire[].level` to `blocking`.
+
+### catalog.json
+- Renamed `componentDefinitions.<group>.<id>.cost` to `value`, as on chassis and mechs.
+- Renamed `componentDefinitions.weapons.<id>.instability` to `stabilityDamage`, as the UI names it.
+- Renamed `chassisDefinitions.<id>.heatDissipation` to `dissipation`, as on heat sinks and mech
+  stats; type changed from integer to number.
+- Renamed `turretDefinitions.<id>.firingArc` to `firingArcDegrees`, as in the rules.
+- Renamed `terrainDefinitions.<id>.rangedTargetability` to `toHitAgainstRanged`,
+  `meleeTargetability` to `toHitAgainstMelee` and `toHitFrom` to `toHitFromRanged`: to-hit
+  modifiers where a positive value makes the attack harder, like the rules' `combat.toHit` and the
+  weapons' `accuracyModifier` and `refireModifier`.
+- Renamed `terrainDefinitions.<id>.heatPerTurn` and `biomeDefinitions.<id>.heatPerTurn` to
+  `heatPerRound`.
+
 ## 0.65.0
 
 Changed: game-state.json (breaking), rules.json (breaking), combat-state.json, catalog.json

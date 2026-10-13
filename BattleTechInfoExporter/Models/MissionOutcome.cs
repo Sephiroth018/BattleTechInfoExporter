@@ -16,9 +16,8 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="Rounds">The combat rounds the mission took, counted from 1.</param>
 /// <param name="Objectives">The objectives as the after-action report lists them.</param>
-/// <param name="Payment">The C-Bills paid, with the good faith modifier and the bonuses applied.</param>
-/// <param name="Reputation">The final reputation changes with the employer and the target.</param>
-/// <param name="MercenaryReviewBoardReputation">The change of the Mercenary Review Board rating.</param>
+/// <param name="Pay">The C-Bills paid, with the good faith modifier and the bonuses applied.</param>
+/// <param name="Reputation">The final reputation changes with the employer, the target and the Mercenary Review Board.</param>
 /// <param name="ExperiencePerPilot">The experience every pilot of <see cref="Lance" /> gets.</param>
 /// <param name="Lance">The company's mechs and pilots on the mission, in lance order.</param>
 /// <param name="Salvage">The salvage offer, and what the company got once it is final.</param>
@@ -29,9 +28,8 @@ internal sealed record MissionOutcome(
     bool IsGoodFaithEffort,
     int Rounds,
     IReadOnlyList<ObjectiveResult> Objectives,
-    int Payment,
-    ReputationChange Reputation,
-    int MercenaryReviewBoardReputation,
+    int Pay,
+    MissionReputationChange Reputation,
     int ExperiencePerPilot,
     IReadOnlyList<LanceUnitOutcome> Lance,
     MissionSalvage Salvage) : ExportFile
@@ -122,13 +120,19 @@ internal sealed record DamagedComponent(
 
 /// <summary>The shots a mech fired from an ammo box, or from a weapon that carries its own ammo.</summary>
 /// <param name="Location">The location the box or weapon is mounted in.</param>
-/// <param name="Used">
+/// <param name="ShotsFired">
 ///     The shots fired, also from a box destroyed since; the capacity is the catalog's
 ///     <see cref="AmmunitionBoxDefinition.Capacity" /> or <see cref="WeaponDefinition.InternalAmmoCapacity" />.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record AmmunitionUse(ComponentReference Component, ChassisLocations Location, int Used)
+internal sealed record AmmunitionUse(ComponentReference Component, ChassisLocations Location, int ShotsFired)
     : ComponentEntry(Component);
+
+/// <summary>A mission's reputation changes, which also move the Mercenary Review Board rating.</summary>
+/// <param name="MercenaryReviewBoard">The change of the Mercenary Review Board rating.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record MissionReputationChange(int? Employer, int? Target, int MercenaryReviewBoard)
+    : ReputationChange(Employer, Target);
 
 /// <summary>The salvage of the mission: the offer as the mission ended, and what the company got once it is final.</summary>
 /// <param name="Total">How many items of <see cref="Pool" /> the company gets.</param>

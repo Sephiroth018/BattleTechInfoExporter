@@ -174,7 +174,7 @@
         "initialTonnage",
         "value",
         "maxJumpJets",
-        "heatDissipation",
+        "dissipation",
         "movement",
         "melee",
         "stockMech",
@@ -209,10 +209,10 @@
           "description": "The most jump jets a mech of the chassis can mount; 0 when it can't jump.",
           "format": "int32"
         },
-        "heatDissipation": {
-          "type": "integer",
+        "dissipation": {
+          "type": "number",
           "description": "The heat the chassis itself removes per round, on top of its heat sinks.",
-          "format": "int32"
+          "format": "float"
         },
         "movement": {
           "description": "The walk and sprint distances and the pathing, which no loadout changes.",
@@ -968,7 +968,7 @@
         "name",
         "weightClass",
         "tonnage",
-        "firingArc",
+        "firingArcDegrees",
         "armor",
         "structure",
         "components"
@@ -987,9 +987,9 @@
           "description": "The weight in tons; for a chassis, the most a mech of it may weigh.",
           "format": "float"
         },
-        "firingArc": {
+        "firingArcDegrees": {
           "type": "number",
-          "description": "The arc it can fire into, in degrees.",
+          "description": "The arc it can fire into without turning, in degrees.",
           "format": "float"
         },
         "armor": {
@@ -1067,7 +1067,7 @@
         "name",
         "tonnage",
         "slots",
-        "cost",
+        "value",
         "bonuses",
         "effects",
         "isSalvageable",
@@ -1075,7 +1075,7 @@
         "ammoCategory",
         "internalAmmoCapacity",
         "damage",
-        "instability",
+        "stabilityDamage",
         "shotsWhenFired",
         "projectilesPerShot",
         "heatDamage",
@@ -1101,7 +1101,7 @@
           "description": "The slots the component takes up in the location it's mounted in.",
           "format": "int32"
         },
-        "cost": {
+        "value": {
           "type": "integer",
           "description": "The C-Bill value of the component.",
           "format": "int32"
@@ -1148,7 +1148,7 @@
           "description": "The damage of one shot.",
           "format": "float"
         },
-        "instability": {
+        "stabilityDamage": {
           "type": "number",
           "description": "The stability damage of one shot.",
           "format": "float"
@@ -1179,7 +1179,7 @@
         },
         "accuracyModifier": {
           "type": "number",
-          "description": "The weapon's own to-hit modifier, which the hit chance adds to the others.",
+          "description": "The weapon's own to-hit modifier, which the hit chance adds to the others; positive makes the attack harder, as in the rules' combat.toHit.",
           "format": "float"
         },
         "criticalChanceMultiplier": {
@@ -1189,7 +1189,7 @@
         },
         "refireModifier": {
           "type": "integer",
-          "description": "The accuracy penalty for firing again in the next round.",
+          "description": "The to-hit modifier for firing again in the next round; positive makes the attack harder.",
           "format": "int32"
         },
         "isIndirectFireCapable": {
@@ -1721,7 +1721,7 @@
         "name",
         "tonnage",
         "slots",
-        "cost",
+        "value",
         "bonuses",
         "effects",
         "isSalvageable",
@@ -1743,7 +1743,7 @@
           "description": "The slots the component takes up in the location it's mounted in.",
           "format": "int32"
         },
-        "cost": {
+        "value": {
           "type": "integer",
           "description": "The C-Bill value of the component.",
           "format": "int32"
@@ -1784,7 +1784,7 @@
         "name",
         "tonnage",
         "slots",
-        "cost",
+        "value",
         "bonuses",
         "effects",
         "isSalvageable",
@@ -1805,7 +1805,7 @@
           "description": "The slots the component takes up in the location it's mounted in.",
           "format": "int32"
         },
-        "cost": {
+        "value": {
           "type": "integer",
           "description": "The C-Bill value of the component.",
           "format": "int32"
@@ -1843,7 +1843,7 @@
         "name",
         "tonnage",
         "slots",
-        "cost",
+        "value",
         "bonuses",
         "effects",
         "isSalvageable",
@@ -1865,7 +1865,7 @@
           "description": "The slots the component takes up in the location it's mounted in.",
           "format": "int32"
         },
-        "cost": {
+        "value": {
           "type": "integer",
           "description": "The C-Bill value of the component.",
           "format": "int32"
@@ -1908,7 +1908,7 @@
         "name",
         "tonnage",
         "slots",
-        "cost",
+        "value",
         "bonuses",
         "effects",
         "isSalvageable"
@@ -1928,7 +1928,7 @@
           "description": "The slots the component takes up in the location it's mounted in.",
           "format": "int32"
         },
-        "cost": {
+        "value": {
           "type": "integer",
           "description": "The C-Bill value of the component.",
           "format": "int32"
@@ -1965,12 +1965,12 @@
         "visibilityHeight",
         "sensorRangeMultiplier",
         "signatureMultiplier",
-        "rangedTargetability",
-        "meleeTargetability",
-        "toHitFrom",
+        "toHitAgainstRanged",
+        "toHitAgainstMelee",
+        "toHitFromRanged",
         "grantsGuarded",
         "heatSinkMultiplier",
-        "heatPerTurn",
+        "heatPerRound",
         "damageDealt",
         "damageTaken",
         "stickyEffects"
@@ -2009,19 +2009,19 @@
           "description": "Multiplies the signature of a unit in the terrain.",
           "format": "float"
         },
-        "rangedTargetability": {
+        "toHitAgainstRanged": {
           "type": "number",
-          "description": "The to-hit modifier of ranged attacks against a unit in the terrain.",
+          "description": "The to-hit modifier of ranged attacks against a unit in the terrain; positive makes the attack harder, as in the rules' combat.toHit.",
           "format": "float"
         },
-        "meleeTargetability": {
+        "toHitAgainstMelee": {
           "type": "number",
-          "description": "The to-hit modifier of melee attacks against a unit in the terrain.",
+          "description": "The to-hit modifier of melee attacks against a unit in the terrain; positive makes the attack harder.",
           "format": "float"
         },
-        "toHitFrom": {
+        "toHitFromRanged": {
           "type": "number",
-          "description": "The to-hit modifier of ranged attacks by a unit in the terrain.",
+          "description": "The to-hit modifier of ranged attacks by a unit in the terrain; positive makes the attack harder.",
           "format": "float"
         },
         "grantsGuarded": {
@@ -2033,7 +2033,7 @@
           "description": "Multiplies the heat sink capacity of a mech in the terrain.",
           "format": "float"
         },
-        "heatPerTurn": {
+        "heatPerRound": {
           "type": "integer",
           "description": "Added to a mech's heat at the end of its activation in the terrain.",
           "format": "int32"
@@ -2169,7 +2169,7 @@
       "required": [
         "name",
         "heatSinkMultiplier",
-        "heatPerTurn",
+        "heatPerRound",
         "damageDealt"
       ],
       "properties": {
@@ -2182,7 +2182,7 @@
           "description": "Multiplies every mech's heat sink capacity.",
           "format": "float"
         },
-        "heatPerTurn": {
+        "heatPerRound": {
           "type": "integer",
           "description": "Added to every mech's heat at the end of its activation.",
           "format": "int32"

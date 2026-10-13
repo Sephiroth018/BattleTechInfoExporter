@@ -15,7 +15,7 @@ other file there, e.g. one an earlier version wrote, so a tool never reads a fil
 kept current. Three of them hold the career and are written together on every career export:
 
 - `game-state.json`: the career state, the next financial report included.
-- `rules.json`: the game's rules for this career (morale and reputation levels, skill training
+- `rules.json`: the game's rules for this career (morale, reputation and Mercenary Review Board levels, skill training
   tables, spirits levels, mech parts per mech, mission types, jump distance per number of jump
   jets, and the combat and campaign rules), which the game state and the mission outcome refer to
   by name instead of repeating thresholds and effects per entry.
@@ -39,7 +39,7 @@ One more holds the latest mission:
 
 - `mission-outcome.json`: written when a mission ends, before the salvage is chosen, and again
   once the salvage is final, after the priority salvage is confirmed. It holds the contract, the
-  outcome and objectives, the rounds the mission took, the payment, reputation and experience, the
+  outcome and objectives, the rounds the mission took, the pay, reputation and experience, the
   lance with each pilot's injuries, kills and the day they are out of the med bay, each mech's
   armor, structure and component damage, the days and C-Bills its repair would take and the shots
   it fired from every ammo box and flamer, and the salvage: the pool to
@@ -86,12 +86,12 @@ The last one describes the game rather than the career:
   - **Terrains:** what forest, water, rough ground, roads and the other terrains do to the units
     in them: move cost per unit type and weight class (`null` where impassable; open ground costs
     1.05 per meter), sprint multiplier, visibility, sensor range and signature, to-hit modifiers
-    against and from the terrain, cover, heat sinking and heat per turn, damage dealt and taken,
+    against and from the terrain, cover, heat sinking and heat per round, damage dealt and taken,
     and the statistic changes a unit picks up in it, e.g. rough ground's extra instability. A cell
     has one terrain at most. Only what the game's combat code reads is exported; its tooltips also
     claim a stability damage multiplier that only the AI reads.
   - **Biomes:** keyed by the biome id the star systems refer to, what a map's biome does to every
-    unit on it on top of the terrain: heat sinking, heat per turn and damage dealt, the only
+    unit on it on top of the terrain: heat sinking, heat per round and damage dealt, the only
     values the game reads from a biome.
   - **Maps:** every map some star system's contracts can be fought on: name, biome, map tags, the
     contract generator's draw weight and the terrain coverage: each terrain's share of the map's playable cells by terrain id, plus `none` for the
@@ -184,7 +184,7 @@ The game state holds:
 - **Stores:** the current system's system store, faction store and black market with their stock
   and prices; what they can carry follows from the catalog's item collections.
 - **Hiring hall:** the current system's pilots for hire, like the roster's pilots, their tags
-  included, plus hiring cost, salary and whether the company can hire them.
+  included, plus price, salary and whether the company can hire them.
 - **Contracts:** the contracts the Command Center offers, each with its description and terms:
   fixed, or negotiable as the values at each slider position (pay and salvage together take at most 100 %,
   exactly 100 % when the employer gains no reputation), and its star system: by reference in the
@@ -225,7 +225,7 @@ left out, as are the melee damage multipliers the game ignores in favour of the 
 The rules' `campaign` object holds the campaign constants the game's code reads, as the career's
 difficulty settings adjust them: mech lab costs in tech points and C-Bills (an order takes its tech
 points divided by the company's MechTech, rounded up, in days), med bay heal points and the pilot
-death chances, hiring costs and the limits the Mercenary Review Board rating and the morale put on
+death chances, hiring prices and the limits the Mercenary Review Board rating and the morale put on
 hiring, how salvage picks come about and how a destroyed enemy mech yields its parts (1 for a
 destroyed center torso, 2 for both legs, 3 for the head or an incapacitated pilot), the financial
 report's upkeep and spending levels, the shares of a value a store pays for a stored chassis or
@@ -257,7 +257,7 @@ it stands in by its catalog id (`null` on open ground). What else it carries fol
   its heat (the heat now, what it sheds at the end of its activation after the terrain it stands
   in, the biome and effects, and the levels it overheats above and shuts down at, after the pilot's
   Guts, heat banks and effects) and its stability, whether the unit has activated this round, its
-  initiative, every component's damage level with the rounds left in each ammo box and in weapons
+  initiative, every component's damage level with the shots left in each ammo box and in weapons
   that carry their own, the pilot's injuries, health and bonus health left (which takes hits before they
   become injuries) and skills as the game computes with them now, effects included, together under
   `pilot`, which is `null` for a unit without one, the abilities that can be activated with their cooldowns and uses left,

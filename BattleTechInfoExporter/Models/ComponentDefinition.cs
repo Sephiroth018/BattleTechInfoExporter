@@ -10,7 +10,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Name">The name the mech lab shows, as in the references to the component.</param>
 /// <param name="Tonnage">The component's weight in tons.</param>
 /// <param name="Slots">The slots the component takes up in the location it's mounted in.</param>
-/// <param name="Cost">The C-Bill value of the component.</param>
+/// <param name="Value">The C-Bill value of the component.</param>
 /// <param name="Bonuses">The short bonus texts shown on the component, e.g. "+ 5 Dmg.".</param>
 /// <param name="Effects">The statistics the component changes while mounted.</param>
 /// <param name="IsSalvageable">
@@ -22,7 +22,7 @@ internal record ComponentDefinition(
     string Name,
     float Tonnage,
     int Slots,
-    int Cost,
+    int Value,
     IReadOnlyList<string> Bonuses,
     IReadOnlyList<StatisticChange> Effects,
     bool IsSalvageable);
@@ -36,7 +36,7 @@ internal sealed record WeaponDefinition : ComponentDefinition
         string? ammoCategory,
         int? internalAmmoCapacity,
         float damage,
-        float instability,
+        float stabilityDamage,
         int shotsWhenFired,
         int projectilesPerShot,
         float heatDamage,
@@ -51,7 +51,7 @@ internal sealed record WeaponDefinition : ComponentDefinition
         AmmoCategory = ammoCategory;
         InternalAmmoCapacity = internalAmmoCapacity;
         Damage = damage;
-        Instability = instability;
+        StabilityDamage = stabilityDamage;
         ShotsWhenFired = shotsWhenFired;
         ProjectilesPerShot = projectilesPerShot;
         HeatDamage = heatDamage;
@@ -82,7 +82,7 @@ internal sealed record WeaponDefinition : ComponentDefinition
     public float Damage { get; }
 
     /// <summary>The stability damage of one shot.</summary>
-    public float Instability { get; }
+    public float StabilityDamage { get; }
 
     /// <summary>The shots fired per attack.</summary>
     public int ShotsWhenFired { get; }
@@ -102,13 +102,16 @@ internal sealed record WeaponDefinition : ComponentDefinition
     /// <summary>The range brackets, which decide the to-hit modifier by the target's distance.</summary>
     public WeaponRanges Ranges { get; }
 
-    /// <summary>The weapon's own to-hit modifier, which the hit chance adds to the others.</summary>
+    /// <summary>
+    ///     The weapon's own to-hit modifier, which the hit chance adds to the others; positive makes the attack harder,
+    ///     as in the rules' <c>combat.toHit</c>.
+    /// </summary>
     public float AccuracyModifier { get; }
 
     /// <summary>Multiplies the chance of the weapon's hits to cause a critical hit; 1 leaves it unchanged.</summary>
     public float CriticalChanceMultiplier { get; }
 
-    /// <summary>The accuracy penalty for firing again in the next round.</summary>
+    /// <summary>The to-hit modifier for firing again in the next round; positive makes the attack harder.</summary>
     public int RefireModifier { get; }
 
     /// <summary>Whether the weapon can fire at targets out of line of sight.</summary>

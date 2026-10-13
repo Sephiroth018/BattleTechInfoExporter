@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using BattleTech;
 using BattleTechInfoExporter.Models;
@@ -87,19 +86,6 @@ internal static class CampaignRulesReader
             story.DefaultPilotsPerSystem,
             story.DefaultRoninHiringChance,
             simGame.CombatConstants.PilotingConstants.DefaultMaxInjuries,
-            // Level n starts at the (n - 1)th cap (SimGameState.GetMRBLevelFromRep); the limits and multipliers are
-            // indexed by level, so only levels present in all three are complete.
-            Enumerable.Range(
-                    0,
-                    Math.Min(
-                        story.MRBRepCap.Length + 1,
-                        Math.Min(story.MRBRepHiringPowerLevelLimits.Length, story.MRBRepMod.Length)))
-                .Select(level => new MercenaryReviewBoardLevel(
-                    level,
-                    level == 0 ? 0 : Mathf.RoundToInt(story.MRBRepCap[level - 1]),
-                    Mathf.RoundToInt(story.MRBRepHiringPowerLevelLimits[level]),
-                    story.MRBRepMod[level]))
-                .ToList(),
             // SimGameState.GetMoraleHiringLevelIndex picks the first threshold the morale is below.
             story.MoraleHiringThresholds
                 .Take(story.MaxMoralePowerLevelLimits.Length)

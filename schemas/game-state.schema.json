@@ -1009,7 +1009,7 @@
         "location",
         "details",
         "requiredUpgrades",
-        "purchaseCost",
+        "price",
         "upkeep",
         "installDays",
         "effects"
@@ -1042,7 +1042,7 @@
             "$ref": "#/definitions/DefinitionReference"
           }
         },
-        "purchaseCost": {
+        "price": {
           "type": "integer",
           "description": "The one-time C-Bills to buy the upgrade.",
           "format": "int32"
@@ -2672,7 +2672,7 @@
         "abilities",
         "health",
         "tags",
-        "hireCost",
+        "price",
         "salary",
         "canHire"
       ],
@@ -2729,7 +2729,7 @@
             "type": "string"
           }
         },
-        "hireCost": {
+        "price": {
           "type": "integer",
           "description": "The one-time C-Bills to hire the pilot.",
           "format": "int32"

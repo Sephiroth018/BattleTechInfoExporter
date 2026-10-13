@@ -215,7 +215,7 @@ internal sealed record NegotiatedShares(int Pay, int Salvage);
 ///     The change, usually a loss, with the target; <c>null</c> when the target doesn't gain reputation.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record ReputationChange(int? Employer, int? Target);
+internal record ReputationChange(int? Employer, int? Target);
 
 /// <param name="Total">The salvage the company gets, including the priority salvage.</param>
 /// <param name="Priority">The part of the salvage the company picks itself; the rest is assigned to it.</param>

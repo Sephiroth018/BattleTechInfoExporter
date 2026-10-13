@@ -8,11 +8,11 @@ namespace BattleTechInfoExporter.Models;
 /// </summary>
 /// <param name="Name">As in the references to the biome.</param>
 /// <param name="HeatSinkMultiplier">Multiplies every mech's heat sink capacity.</param>
-/// <param name="HeatPerTurn">Added to every mech's heat at the end of its activation.</param>
+/// <param name="HeatPerRound">Added to every mech's heat at the end of its activation.</param>
 /// <param name="DamageDealt">Multiplies every unit's weapon damage, by weapon category.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record BiomeDefinition(
     string Name,
     float HeatSinkMultiplier,
-    int HeatPerTurn,
+    int HeatPerRound,
     DamageMultipliers DamageDealt);

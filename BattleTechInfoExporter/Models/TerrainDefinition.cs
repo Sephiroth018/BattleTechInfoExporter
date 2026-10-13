@@ -21,12 +21,19 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="VisibilityHeight">In meters above the ground.</param>
 /// <param name="SensorRangeMultiplier">Multiplies the sensor range of a unit in the terrain.</param>
 /// <param name="SignatureMultiplier">Multiplies the signature of a unit in the terrain.</param>
-/// <param name="RangedTargetability">The to-hit modifier of ranged attacks against a unit in the terrain.</param>
-/// <param name="MeleeTargetability">The to-hit modifier of melee attacks against a unit in the terrain.</param>
-/// <param name="ToHitFrom">The to-hit modifier of ranged attacks by a unit in the terrain.</param>
+/// <param name="ToHitAgainstRanged">
+///     The to-hit modifier of ranged attacks against a unit in the terrain; positive makes the attack harder, as in
+///     the rules' <c>combat.toHit</c>.
+/// </param>
+/// <param name="ToHitAgainstMelee">
+///     The to-hit modifier of melee attacks against a unit in the terrain; positive makes the attack harder.
+/// </param>
+/// <param name="ToHitFromRanged">
+///     The to-hit modifier of ranged attacks by a unit in the terrain; positive makes the attack harder.
+/// </param>
 /// <param name="GrantsGuarded">Whether a unit in the terrain has a guard level from cover.</param>
 /// <param name="HeatSinkMultiplier">Multiplies the heat sink capacity of a mech in the terrain.</param>
-/// <param name="HeatPerTurn">Added to a mech's heat at the end of its activation in the terrain.</param>
+/// <param name="HeatPerRound">Added to a mech's heat at the end of its activation in the terrain.</param>
 /// <param name="DamageDealt">Multiplies the damage of a unit firing from the terrain, by weapon category.</param>
 /// <param name="DamageTaken">Multiplies the damage a unit in the terrain takes, by weapon category.</param>
 /// <param name="StickyEffects">
@@ -41,12 +48,12 @@ internal sealed record TerrainDefinition(
     float VisibilityHeight,
     float SensorRangeMultiplier,
     float SignatureMultiplier,
-    float RangedTargetability,
-    float MeleeTargetability,
-    float ToHitFrom,
+    float ToHitAgainstRanged,
+    float ToHitAgainstMelee,
+    float ToHitFromRanged,
     bool GrantsGuarded,
     float HeatSinkMultiplier,
-    int HeatPerTurn,
+    int HeatPerRound,
     DamageMultipliers DamageDealt,
     DamageMultipliers DamageTaken,
     IReadOnlyList<StatisticChange> StickyEffects);

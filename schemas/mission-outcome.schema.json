@@ -13,9 +13,8 @@
     "isGoodFaithEffort",
     "rounds",
     "objectives",
-    "payment",
+    "pay",
     "reputation",
-    "mercenaryReviewBoardReputation",
     "experiencePerPilot",
     "lance",
     "salvage"
@@ -58,19 +57,14 @@
         "$ref": "#/definitions/ObjectiveResult"
       }
     },
-    "payment": {
+    "pay": {
       "type": "integer",
       "description": "The C-Bills paid, with the good faith modifier and the bonuses applied.",
       "format": "int32"
     },
     "reputation": {
-      "description": "The final reputation changes with the employer and the target.",
-      "$ref": "#/definitions/ReputationChange"
-    },
-    "mercenaryReviewBoardReputation": {
-      "type": "integer",
-      "description": "The change of the Mercenary Review Board rating.",
-      "format": "int32"
+      "description": "The final reputation changes with the employer, the target and the Mercenary Review Board.",
+      "$ref": "#/definitions/MissionReputationChange"
     },
     "experiencePerPilot": {
       "type": "integer",
@@ -297,13 +291,14 @@
         "Hidden"
       ]
     },
-    "ReputationChange": {
+    "MissionReputationChange": {
       "type": "object",
-      "description": "The reputation changes of a contract: of its success, as the negotiation shows them, or of a mission's outcome.",
+      "description": "A mission's reputation changes, which also move the Mercenary Review Board rating.",
       "additionalProperties": false,
       "required": [
         "employer",
-        "target"
+        "target",
+        "mercenaryReviewBoard"
       ],
       "properties": {
         "employer": {
@@ -320,6 +315,11 @@
             "null"
           ],
           "description": "The change, usually a loss, with the target; null when the target doesn't gain reputation.",
+          "format": "int32"
+        },
+        "mercenaryReviewBoard": {
+          "type": "integer",
+          "description": "The change of the Mercenary Review Board rating.",
           "format": "int32"
         }
       }
@@ -681,7 +681,7 @@
       "required": [
         "component",
         "location",
-        "used"
+        "shotsFired"
       ],
       "properties": {
         "component": {
@@ -692,7 +692,7 @@
           "description": "The location the box or weapon is mounted in.",
           "$ref": "#/definitions/ChassisLocations"
         },
-        "used": {
+        "shotsFired": {
           "type": "integer",
           "description": "The shots fired, also from a box destroyed since; the capacity is the catalog's capacity or internalAmmoCapacity.",
           "format": "int32"

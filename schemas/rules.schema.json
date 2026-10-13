@@ -10,6 +10,7 @@
     "trigger",
     "moraleLevels",
     "reputationLevels",
+    "mercenaryReviewBoardLevels",
     "skills",
     "spiritsLevels",
     "mechPartsPerMech",
@@ -44,6 +45,13 @@
       "description": "The reputation levels, which level refers to.",
       "items": {
         "$ref": "#/definitions/ReputationLevel"
+      }
+    },
+    "mercenaryReviewBoardLevels": {
+      "type": "array",
+      "description": "The Mercenary Review Board rating levels, which level refers to.",
+      "items": {
+        "$ref": "#/definitions/MercenaryReviewBoardLevel"
       }
     },
     "skills": {
@@ -146,12 +154,12 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "name",
+        "level",
         "startsAt",
-        "resolvePerTurn"
+        "resolvePerRound"
       ],
       "properties": {
-        "name": {
+        "level": {
           "type": "string",
           "description": "The level's name as the UI shows it, which level refers to."
         },
@@ -160,9 +168,9 @@
           "description": "The lowest company morale in the level.",
           "format": "int32"
         },
-        "resolvePerTurn": {
+        "resolvePerRound": {
           "type": "integer",
-          "description": "The morale level's share of the resolve gained per combat turn; the lance's own bonuses add to it.",
+          "description": "The morale level's share of the resolve gained per combat round; the lance's own bonuses add to it.",
           "format": "int32"
         }
       }
@@ -226,6 +234,38 @@
         "HATED",
         "DISLIKED"
       ]
+    },
+    "MercenaryReviewBoardLevel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "startsAt",
+        "maxHireableSkillTotal",
+        "contractReputationMultiplier"
+      ],
+      "properties": {
+        "level": {
+          "type": "integer",
+          "description": "The rating level, from 0, which level refers to.",
+          "format": "int32"
+        },
+        "startsAt": {
+          "type": "integer",
+          "description": "The lowest rating value in the level.",
+          "format": "int32"
+        },
+        "maxHireableSkillTotal": {
+          "type": "integer",
+          "description": "The highest skill total of a pilot the company can hire at this level.",
+          "format": "int32"
+        },
+        "contractReputationMultiplier": {
+          "type": "number",
+          "description": "Multiplies a contract's difficulty into the rating gained from it.",
+          "format": "float"
+        }
+      }
     },
     "SkillRules": {
       "type": "object",
@@ -1829,7 +1869,7 @@
           "description": "Whether only destroyed legs count for it."
         },
         "instabilityFromDamage": {
-          "description": "The share of the stability bar added when a location is damaged, on top of a weapon's own instability.",
+          "description": "The share of the stability bar added when a location is damaged, on top of a weapon's own stability damage.",
           "$ref": "#/definitions/InstabilityFromDamage"
         }
       }
@@ -1956,7 +1996,7 @@
     },
     "MeleeAttackRules": {
       "type": "object",
-      "description": "The melee rules; damage and instability are the chassis' in the catalog. A melee attack against a turret, a building, a prone or a shut-down mech always has the maximum hit chance.",
+      "description": "The melee rules; damage and stability damage are the chassis' in the catalog. A melee attack against a turret, a building, a prone or a shut-down mech always has the maximum hit chance.",
       "additionalProperties": false,
       "required": [
         "deathFromAboveToHit",
@@ -2400,7 +2440,7 @@
         "isAutoInspired",
         "inspiredEffects",
         "baselineGainPerRound",
-        "baselineGainMultiplier",
+        "baselineGainScalesWith",
         "addsMoraleLevelResolve",
         "addsUnitResolveBonuses",
         "onlyBiggestUnitResolveBonus",
@@ -2448,16 +2488,16 @@
         },
         "baselineGainPerRound": {
           "type": "integer",
-          "description": "Gained every round from the second, times the units baselineGainMultiplier counts.",
+          "description": "Gained every round from the second, times the units baselineGainScalesWith counts.",
           "format": "int32"
         },
-        "baselineGainMultiplier": {
-          "description": "What baselineGainPerRound is multiplied by.",
-          "$ref": "#/definitions/ResolveGainMultiplier"
+        "baselineGainScalesWith": {
+          "description": "What baselineGainPerRound is multiplied by the count of.",
+          "$ref": "#/definitions/ResolveGainScale"
         },
         "addsMoraleLevelResolve": {
           "type": "boolean",
-          "description": "Whether the company's morale level adds its resolve per turn (see resolvePerTurn)."
+          "description": "Whether the company's morale level adds its resolve per round (see resolvePerRound)."
         },
         "addsUnitResolveBonuses": {
           "type": "boolean",
@@ -2488,9 +2528,9 @@
         }
       }
     },
-    "ResolveGainMultiplier": {
+    "ResolveGainScale": {
       "type": "string",
-      "description": "What the baseline gain is multiplied by.",
+      "description": "What the baseline gain is multiplied by the count of.",
       "x-enumNames": [
         "None",
         "LivingUnits",
@@ -2994,7 +3034,6 @@
         "pilotsPerSystem",
         "roninChance",
         "generatedPilotHealth",
-        "mercenaryReviewBoardLevels",
         "moraleLimits",
         "maxPilotsPerBarracksPod",
         "maxMechsPerMechBayPod"
@@ -3002,7 +3041,7 @@
       "properties": {
         "costPerBaseSkillPoint": {
           "type": "number",
-          "description": "The hiring cost, before the system owner's reputation adjustment.",
+          "description": "The hiring price, before the system owner's reputation adjustment.",
           "format": "float"
         },
         "salaryPerBaseSkillPoint": {
@@ -3030,13 +3069,6 @@
           "description": "The health, the injuries they can take, of the pilots the game generates.",
           "format": "int32"
         },
-        "mercenaryReviewBoardLevels": {
-          "type": "array",
-          "description": "The rating levels, which level refers to.",
-          "items": {
-            "$ref": "#/definitions/MercenaryReviewBoardLevel"
-          }
-        },
         "moraleLimits": {
           "type": "array",
           "description": "Low company morale limits who can be hired.",
@@ -3053,38 +3085,6 @@
           "type": "integer",
           "description": "The mech bays each mech bay pod of the ship allows.",
           "format": "int32"
-        }
-      }
-    },
-    "MercenaryReviewBoardLevel": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "level",
-        "startsAt",
-        "maxHireableSkillTotal",
-        "contractReputationMultiplier"
-      ],
-      "properties": {
-        "level": {
-          "type": "integer",
-          "description": "The rating level, from 0, which level refers to.",
-          "format": "int32"
-        },
-        "startsAt": {
-          "type": "integer",
-          "description": "The lowest rating value in the level.",
-          "format": "int32"
-        },
-        "maxHireableSkillTotal": {
-          "type": "integer",
-          "description": "The highest skill total of a pilot the company can hire at this level.",
-          "format": "int32"
-        },
-        "contractReputationMultiplier": {
-          "type": "number",
-          "description": "Multiplies a contract's difficulty into the rating gained from it.",
-          "format": "float"
         }
       }
     },

@@ -284,9 +284,9 @@ internal static class CombatRulesReader
             // Team.CollectUnitBaseline.
             morale switch
             {
-                { MoraleBaselineMultiplyByActive: true } => ResolveGainMultiplier.LivingUnits,
-                { BaselineMultiplyByActiveElites: true } => ResolveGainMultiplier.LivingElitePilots,
-                _ => ResolveGainMultiplier.None
+                { MoraleBaselineMultiplyByActive: true } => ResolveGainScale.LivingUnits,
+                { BaselineMultiplyByActiveElites: true } => ResolveGainScale.LivingElitePilots,
+                _ => ResolveGainScale.None
             },
             morale.BaselineAddFromSimGame,
             morale.BaselineAddMoraleMods,
