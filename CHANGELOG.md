@@ -64,6 +64,49 @@ catalog.json (breaking).
   was named `Item.<definition type>.<component id>`, to `componentChanges[]` next to it: the
   `component` reference and the `count` of working copies added, negative for copies taken.
 
+## 0.72.1
+
+Changed: game-state.json, combat-state.json, combat-map.json, catalog.json.
+
+### game-state.json
+- Values corrected `contracts[].target.id` and `activeContract.target.id` of a story contract
+  that only travels: `INVALID_UNSET`, the name of the faction the game leaves unset, instead of
+  `""`.
+
+### combat-state.json
+- Values corrected `units.<id>.side.faction.id` and `buildingSides[].side.faction.id`:
+  `Player1sMercUnit` for the player's team instead of `""`.
+- Values corrected `units.<id>.pilot.name`: the generic enemy and turret pilots lose the game's
+  placeholder last name, "Elite Brawler" instead of "Elite Brawler NONE", "Automatic" instead of
+  "Automatic NONE".
+- Values corrected `damagedBuildings[].destroyedHexes[].elevation`: rounded to 0.1 m without the
+  float noise (208.2, not 208.1999969482422).
+- Values corrected `units.<id>.position`, `objectives[].beacon` and `zones[].center`: rounded to
+  0.1 m like the elevations.
+- Values corrected `units.<id>.facingDegrees`: rounded to 0.1°, from 0 to below 360.
+
+### combat-map.json
+- Values corrected `rows[].elevations[]`: rounded to 0.1 m without the float noise; code comparing
+  them for equality with other heights can now do so.
+- Values corrected `buildings[].position`: rounded to 0.1 m.
+- Values corrected `rows[].blockedSteps`: a step is open when the game's path nodes lead to the
+  neighbor's center through the two hexes and the two next to both, not only straight across, so
+  fewer steps are blocked; re-derive which hexes can be reached from where, and the routes and
+  islands drawn from them. The steps still approximate the game's pathing: where a unit's
+  movement in the combat state disagrees, the movement is right.
+
+### catalog.json
+- Removed `componentDefinitions.upgrades.TargetDummyMod`: the tutorial target dummies' upgrade,
+  which no mech outside the tutorial mounts.
+- Removed `componentDefinitions.ammunitionBoxes.Ammo_AmmunitionBox_Generic_Flamer`,
+  `AmmunitionBox_Flamer` and `Ammo_AmmunitionBox_Generic_SRMInferno`: the game's debug and
+  placeholder boxes for ammo the weapons carry themselves, which no store, salvage or mech has.
+- Meaning changed `componentDefinitions.weapons.<id>.ammoCategory` of the flamers and inferno
+  racks, the weapons with `internalAmmoCapacity`: their ammo category (`Flamer`, `Inferno Rack`)
+  instead of `null`. Such a weapon fires its own ammo first and then boxes of that category; the
+  catalog has none, so its ammo is still `internalAmmoCapacity`. Code that took a non-null
+  `ammoCategory` to mean the weapon needs boxes must check `internalAmmoCapacity` first.
+
 ## 0.72.0
 
 Changed: rules.json (breaking), catalog.json.

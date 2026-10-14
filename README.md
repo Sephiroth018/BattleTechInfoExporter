@@ -150,7 +150,8 @@ The last one describes the game rather than the career:
   was built from (see "Triggers").
 
   The tutorial's target dummies and target vehicles, the copies of stock mechs the game makes for unlocked skins (e.g.
-  the backers' Shadow Hawk-UMBRA) and the game's internal melee and AI weapons are left out, as are
+  the backers' Shadow Hawk-UMBRA), the game's internal melee and AI weapons and its debug ammo boxes for
+  flamers and infernos, which carry their own ammo, are left out, as are
   the game's role and other advisory texts, which often don't match the best way to use a mech.
 
 Every file starts with `modVersion`, `exportedAt` and the `trigger` of the export that last wrote
@@ -357,10 +358,12 @@ bit i is set when the step to the neighbor at `hexGrid.directions[i]` is blocked
 its chassis' or vehicle's pathing capabilities (`movement.pathingId` in the catalog), and the
 groups gather those that block the same steps; mechs and vehicles differ. A step is blocked as the
 game's pathing blocks it on slopes: too steep a grade between path nodes, too steep ground or a
-ledge in between. The game moves units over path nodes half a hex apart, so the step counts as
-blocked only when every two-node route to the neighbor is. Terrain move costs and units in the way
-aren't part of it; impassable terrain has its own legend character. A step to a hex that isn't
-listed is blocked too.
+ledge in between. The game moves units over path nodes half a hex apart and lets them pass any
+node, so the step counts as open when nodes lead from the hex's center to the neighbor's within the
+two hexes and the two next to both. The game also finds wider detours, so the steps are an
+approximation that can still block a little more than the game; the movement in the combat state
+is what the game allows. Terrain move costs and units in the way aren't part of it; impassable
+terrain has its own legend character. A step to a hex that isn't listed is blocked too.
 
 Each building has its id, name, position and max structure; the combat state lists the damaged
 ones. A dropship is a building only while it is landed: one that hovers to drop off units or

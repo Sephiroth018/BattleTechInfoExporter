@@ -73,14 +73,15 @@ internal sealed record WeaponDefinition : ComponentDefinition
     public string Category { get; }
 
     /// <summary>
-    ///     The ammo the weapon fires, as <see cref="AmmunitionBoxDefinition.AmmoCategory" /> names it; <c>null</c>
-    ///     when it needs none.
+    ///     The ammo the weapon fires, as <see cref="AmmunitionBoxDefinition.AmmoCategory" /> names it; a weapon with
+    ///     <see cref="InternalAmmoCapacity" /> fires its own ammo first and then any boxes of the category, which the
+    ///     catalog has none of; <c>null</c> when it needs no ammo.
     /// </summary>
     public string? AmmoCategory { get; }
 
     /// <summary>
-    ///     The shots a weapon that carries its own ammo instead of using ammo boxes, like a flamer, has per mission;
-    ///     <c>null</c> for every other weapon.
+    ///     The shots a weapon that carries its own ammo, like a flamer, has per mission; <c>null</c> for every other
+    ///     weapon.
     /// </summary>
     public int? InternalAmmoCapacity { get; }
 
