@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BattleTech;
@@ -25,12 +26,7 @@ internal static class MissionReader
             contract.State,
             contract.IsGoodFaithEffort,
             contract.TotalCombatRounds,
-            contract.MissionObjectiveResultList
-                .Select(objective => new ObjectiveResult(
-                    GameText.ToPlainText(objective.title),
-                    objective.isPrimary,
-                    objective.status))
-                .ToList(),
+            ReadObjectives(contract),
             contract.MoneyResults,
             // SimGameState.GetFinalReputationChange gives a faction that doesn't gain reputation no change.
             new MissionReputationChange(
@@ -93,6 +89,24 @@ internal static class MissionReader
     }
 
     // The unit's mech as it fought, which alone knows its ammo: Mech.ToMechDef copies no ammo but keeps the GUID.
+    // The report lists the contract objectives, each grouping the objectives the HUD showed, plus the HUD objectives
+    // with results of their own (Contract.GetRealMissionObjectiveResults); the grouping is the contract objective's.
+    private static List<ObjectiveResult> ReadObjectives(Contract contract)
+    {
+        var contractObjectives = contract.BattleTechGame.Combat.EncounterLayerData.contractObjectiveGameLogicList
+            .ToDictionary(contractObjective => contractObjective.GUID, StringComparer.Ordinal);
+        return contract.MissionObjectiveResultList
+            .Select(objective => new ObjectiveResult(
+                objective.guid,
+                contractObjectives.TryGetValue(objective.guid, out var contractObjective)
+                    ? contractObjective.objectiveRefList.Select(grouped => grouped.EncounterObjectGuid).ToList()
+                    : [objective.guid],
+                GameText.ToPlainText(objective.title),
+                objective.isPrimary,
+                objective.status))
+            .ToList();
+    }
+
     // The combat outlives the after-action report (MissionResults.ConfirmResults clears it after FinalizeSalvage),
     // so both writes of the outcome find it.
     private static Mech FindCombatMech(Contract contract, MechDef mech) =>

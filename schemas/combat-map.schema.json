@@ -285,7 +285,7 @@
         },
         "buildings": {
           "type": "array",
-          "description": "The index in buildings of the building on each hex, or null.",
+          "description": "The index in buildings of the building on each hex, or null; that entry's id is what the combat state refers to the building by.",
           "items": {
             "type": [
               "integer",

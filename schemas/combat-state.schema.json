@@ -760,7 +760,7 @@
       "properties": {
         "location": {
           "type": "string",
-          "description": "The game's name of the location (a mech's, vehicle's or turret's)."
+          "description": "The game's name of the location: a mech's as in location, a vehicle's as in location, or Structure for a turret's single location."
         },
         "armor": {
           "description": "The armor left, by side; only a mech's torso has a rear.",
@@ -921,7 +921,7 @@
         },
         "location": {
           "type": "string",
-          "description": "The game's name of the location it is mounted in."
+          "description": "The game's name of the location it is mounted in, as location."
         },
         "damageLevel": {
           "description": "The game's damage level, e.g. Functional or Destroyed.",
@@ -1337,7 +1337,7 @@
         },
         "type": {
           "type": "string",
-          "description": "The game's id of the zone type, e.g. regionDef_EvacZone."
+          "description": "The game's id of the zone's region definition, e.g. regionDef_EvacZone, which names what the zone is for."
         },
         "center": {
           "description": "The zone's center on the map.",

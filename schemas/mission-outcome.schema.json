@@ -255,11 +255,24 @@
       "description": "An objective as the after-action report lists it.",
       "additionalProperties": false,
       "required": [
+        "id",
+        "objectiveIds",
         "title",
         "isPrimary",
         "status"
       ],
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The game's id of the objective: a contract objective, which groups the objectives the HUD showed, or one of those where it has results of its own."
+        },
+        "objectiveIds": {
+          "type": "array",
+          "description": "The ids the combat state's id had for the objectives this one groups, also those the HUD didn't list; its own id alone where it is one of them.",
+          "items": {
+            "type": "string"
+          }
+        },
         "title": {
           "type": "string",
           "description": "The objective's title as plain text."
