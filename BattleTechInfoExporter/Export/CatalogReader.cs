@@ -81,7 +81,7 @@ internal static class CatalogReader
     // Also the copies of stock mechs AssetUnlocks.CreateCustomMechsForBase makes for unlocked skins, e.g.
     // UNLOCKED_chrPrfMech_shadowhawkBacker-UMBRA-SHD-2D: only their look differs.
     private static bool IsLeftOut(string id) =>
-        id.IndexOf(DummyIdPart, StringComparison.Ordinal) >= 0
+        id.IndexOf(DummyIdPart, StringComparison.OrdinalIgnoreCase) >= 0
         || id.IndexOf(TargetVehicleIdPart, StringComparison.Ordinal) >= 0
         || id.StartsWith(AssetUnlocks.UnlockedIdPrefix, StringComparison.Ordinal);
 

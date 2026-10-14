@@ -26,7 +26,7 @@ changes the format.
 
 ## 0.72.1
 
-Changed: game-state.json, combat-state.json, combat-map.json.
+Changed: game-state.json, combat-state.json, combat-map.json, catalog.json.
 
 ### game-state.json
 - Values corrected every faction reference to a faction without a definition: `id` is its
@@ -49,6 +49,10 @@ Changed: game-state.json, combat-state.json, combat-map.json.
 - Values corrected `rows[].elevations[]`: rounded to 0.1 m without the float noise; code comparing
   them for equality with other heights can now do so.
 - Values corrected `buildings[].position`: rounded to 0.1 m.
+
+### catalog.json
+- Removed `componentDefinitions.upgrades.TargetDummyMod`: the tutorial target dummies' upgrade,
+  which no mech outside the tutorial mounts.
 
 ## 0.72.0
 
