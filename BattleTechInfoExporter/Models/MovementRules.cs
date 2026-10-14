@@ -21,6 +21,7 @@ internal sealed record MovementRules(
     float PivotInPlaceThreshold,
     float HexWidth);
 
+/// <summary>The share of the distance a mech loses per leg, by the leg's damage.</summary>
 /// <param name="Penalized">The leg is damaged.</param>
 /// <param name="NonFunctional">The leg is damaged beyond use but not destroyed.</param>
 /// <param name="Destroyed">The leg is destroyed.</param>

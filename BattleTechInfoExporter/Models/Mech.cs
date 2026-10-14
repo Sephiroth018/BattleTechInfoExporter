@@ -5,8 +5,8 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     A mech in the mech bay, with its current loadout; each <see cref="Status" /> has a record with the fields of
-///     its own.
+///     A mech in the mech bay, with its current loadout; each value of <see cref="Status" /> has a record with the
+///     fields of its own.
 /// </summary>
 /// <param name="Id">The mech's own id, unique among the company's mechs.</param>
 /// <param name="Name">The mech's name, which the player can change in the mech lab.</param>
@@ -111,8 +111,8 @@ internal sealed record MechInMaintenance(
         ReadyOnDay);
 
 /// <summary>
-///     A mech's loadout with the tonnage, value and stats that follow from it; the chassis' limits are in the
-///     catalog's <see cref="ChassisDefinition" />.
+///     A mech's loadout with the tonnage, value and stats that follow from it; the chassis' limits are in
+///     <see cref="Catalog.ChassisDefinitions" />.
 /// </summary>
 /// <param name="UsedTonnage">The tonnage of the chassis, armor and components.</param>
 /// <param name="Value">The C-Bill value the game computes from the chassis, armor and components.</param>
@@ -135,6 +135,7 @@ internal abstract record MechLocationCondition(
     LocationArmor<Armor> Armor,
     float Structure);
 
+/// <summary>A body location of a mech in the mech bay, with its components.</summary>
 /// <param name="Components">The components mounted in the location, including the chassis' fixed ones.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechLocation(
@@ -143,6 +144,7 @@ internal sealed record MechLocation(
     float Structure,
     IReadOnlyList<MountedComponent> Components) : MechLocationCondition(Location, Armor, Structure);
 
+/// <summary>The armor of one side of a location.</summary>
 /// <param name="Current">
 ///     What is left after combat damage; refilled to <see cref="Assigned" /> after a mission unless the
 ///     location was destroyed.

@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
+/// <summary>The company's expenses, trade and debt, and the morale effects of failed missions.</summary>
 /// <param name="DaysPerReport">The days between financial reports, which deduct the expenses.</param>
 /// <param name="MechCostPerReport">The upkeep of each mech in a mech bay.</param>
 /// <param name="ShipMaintenance">The ship's own maintenance in each report's expenses.</param>
@@ -43,6 +44,7 @@ internal sealed record FinancesRules(
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ShipMaintenance(int Leopard, int Argo);
 
+/// <summary>What a spending level does.</summary>
 /// <param name="Level">The spending level, as the game names it, e.g. <c>Spartan</c>.</param>
 /// <param name="CostMultiplier">Multiplies the expenses of each report.</param>
 /// <param name="MoraleChange">Applied once when the level is confirmed at a report.</param>

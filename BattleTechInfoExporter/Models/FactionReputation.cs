@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
+/// <summary>The company's reputation with a faction, and its alliance with it.</summary>
 /// <param name="Faction">The faction the reputation is with.</param>
 /// <param name="Value">The reputation points with the faction, which <paramref name="Level" /> follows from.</param>
 /// <param name="Level">The reputation level, described in <see cref="Rules.ReputationLevels" />.</param>

@@ -21,6 +21,7 @@ internal sealed record EventRequirement(
     IReadOnlyList<string> ExcludedTags,
     IReadOnlyList<StatisticComparison> Comparisons);
 
+/// <summary>A comparison a statistic of the scope must pass.</summary>
 /// <param name="Statistic">The statistic's name, as the game names it; a statistic the scope doesn't have counts as 0.</param>
 /// <param name="Operator">How the statistic's value compares to <paramref name="Value" />.</param>
 /// <param name="Value">The value the statistic is compared to.</param>

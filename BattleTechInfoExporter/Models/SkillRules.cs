@@ -20,6 +20,7 @@ internal sealed record SkillRules(
     Skill<SkillLevel> Guts,
     Skill<SkillLevel> Tactics);
 
+/// <summary>A pilot skill's training table.</summary>
 /// <param name="Description">What the skill controls, as the barracks explains it.</param>
 /// <param name="Levels">The levels a pilot can train to; every pilot starts at level 1.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -33,6 +34,7 @@ internal sealed record Skill<TLevel>(string Description, IReadOnlyList<TLevel> L
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal record SkillLevel(int Level, int ExperienceCost, IReadOnlyList<SkillLevelAbility> Abilities);
 
+/// <summary>A level of the Gunnery skill.</summary>
 /// <param name="BaseHitChancePercent">
 ///     The hit chance of ranged attacks at this level, before the attack's modifiers.
 /// </param>
@@ -43,6 +45,7 @@ internal sealed record GunneryLevel(
     IReadOnlyList<SkillLevelAbility> Abilities,
     float BaseHitChancePercent) : SkillLevel(Level, ExperienceCost, Abilities);
 
+/// <summary>A level of the Piloting skill.</summary>
 /// <param name="BaseMeleeHitChancePercent">
 ///     The hit chance of melee attacks at this level, before the attack's modifiers.
 /// </param>
@@ -57,6 +60,7 @@ internal sealed record PilotingLevel(
     float BaseMeleeHitChancePercent,
     float MovementAfterStandingUpPercent) : SkillLevel(Level, ExperienceCost, Abilities);
 
+/// <summary>An ability a skill level unlocks.</summary>
 /// <param name="Ability">The ability, by its definition's id and name.</param>
 /// <param name="IsPrimary">A primary ability is chosen, a passive trait comes with the level.</param>
 /// <param name="Description">The game's description of the ability, as plain text.</param>

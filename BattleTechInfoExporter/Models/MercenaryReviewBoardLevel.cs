@@ -2,6 +2,7 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
+/// <summary>A level of the Mercenary Review Board rating, and what it allows.</summary>
 /// <param name="Level">The rating level, from 0, which <see cref="MercenaryReviewBoard.Level" /> refers to.</param>
 /// <param name="StartsAt">The lowest rating value in the level.</param>
 /// <param name="MaxHireableSkillTotal">The highest skill total of a pilot the company can hire at this level.</param>

@@ -3,13 +3,13 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     The stability rules of mechs. A mech's stability bar has <see cref="Levels" /> levels; a mech that reaches
+///     The stability rules of mechs. A mech's stability bar is divided into equal levels; a mech that reaches
 ///     <see cref="UnsteadyAbovePercent" /> of its stability is unsteady and loses its evasive pips, and an
 ///     unsteady mech that fills the bar is knocked down.
 /// </summary>
 /// <param name="UnsteadyAbovePercent">
-///     In percent of the stability bar; a mech's <c>UnsteadyThreshold</c> statistic starts at it, and the combat
-///     state's <see cref="MechStability.UnsteadyAbove" /> is its current value in points.
+///     In percent of the stability bar; a mech's <c>UnsteadyThreshold</c> statistic starts at it, and
+///     <see cref="MechStability.UnsteadyAbove" /> is its current value in points.
 /// </param>
 /// <param name="Levels">The number of equal levels the stability bar is divided into.</param>
 /// <param name="LevelsRecovered">
@@ -37,6 +37,7 @@ internal sealed record StabilityRules(
     bool OnlyLegsRaiseMinStability,
     InstabilityFromDamage InstabilityFromDamage);
 
+/// <summary>The levels of instability a mech's action this round removes.</summary>
 /// <param name="Stationary">When the mech moved less than a meter this round, or not at all.</param>
 /// <param name="Walked">When the mech moved without sprinting or jumping; a sprint recovers nothing.</param>
 /// <param name="Jumped">When the mech jumped.</param>
@@ -52,11 +53,13 @@ internal sealed record LevelsRecoveredByAction(
     int Braced,
     int Deferred);
 
+/// <summary>The levels of instability an action adds to the mech doing it.</summary>
 /// <param name="DeathFromAbove">When the mech's own jump attack makes it unsteady.</param>
 /// <param name="Falling">When the building the mech stands on is destroyed and it falls.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record LevelsAddedByAction(int DeathFromAbove, int Falling);
 
+/// <summary>The share of the stability bar added when a location is damaged, by the location and damage.</summary>
 /// <param name="SideTorsoDestroyed">Added when a side torso is destroyed.</param>
 /// <param name="CenterTorsoDamaged">Added when the center torso's damage reaches each of its two damage levels.</param>
 /// <param name="ArmDestroyed">Added when an arm is destroyed.</param>

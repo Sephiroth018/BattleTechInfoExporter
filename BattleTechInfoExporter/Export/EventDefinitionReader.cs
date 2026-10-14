@@ -86,15 +86,10 @@ internal static class EventDefinitionReader
     private static ResultAction ReadAction(DataManager dataManager, SimGameResultAction action) =>
         action.Type switch
         {
-            SimGameResultAction.ActionType.MechWarrior_Kill
-                or SimGameResultAction.ActionType.MechWarrior_Fire
-                or SimGameResultAction.ActionType.MechWarrior_Heal
-                or SimGameResultAction.ActionType.MechWarrior_AddInjury
-                or SimGameResultAction.ActionType.MechWarrior_SubtractInjury => new PilotOnlyAction(action.Type),
+            var type when PilotOnlyAction.Types.Contains(type) => new PilotOnlyAction(type),
             SimGameResultAction.ActionType.MechWarrior_SetTimeout => new SidelinePilotAction(ParseNumber(action)),
-            SimGameResultAction.ActionType.MechWarrior_AddInjuries
-                or SimGameResultAction.ActionType.MechWarrior_SubtractInjuries =>
-                new ChangeInjuriesAction(action.Type, ParseNumber(action)),
+            var type when ChangeInjuriesAction.Types.Contains(type) =>
+                new ChangeInjuriesAction(type, ParseNumber(action)),
             SimGameResultAction.ActionType.MechWarrior_Callsign => new RenamePilotAction(RequiredValue(action)),
             SimGameResultAction.ActionType.MechWarrior_AddHiring =>
                 new AddPilotForHireAction(PilotReader.ReferenceTo(dataManager, RequiredValue(action))),

@@ -29,6 +29,7 @@ internal sealed record MechDefinition(
     bool IsSalvageable,
     IReadOnlyList<MechLocationDefinition> Locations) : ICatalogEntry;
 
+/// <summary>A body location of a mech definition, with its armor and components.</summary>
 /// <param name="Location">The body location, e.g. <c>LeftTorso</c>.</param>
 /// <param name="Armor">The armor fitted.</param>
 /// <param name="Components">The components mounted in the location, in the game's order.</param>
@@ -38,6 +39,7 @@ internal sealed record MechLocationDefinition(
     LocationArmor<float> Armor,
     IReadOnlyList<LoadoutComponent> Components);
 
+/// <summary>A component of a mech definition's loadout.</summary>
 /// <param name="IsFixed">
 ///     Whether the component is part of the chassis: every mech of the chassis has it, and it can't be removed.
 /// </param>
