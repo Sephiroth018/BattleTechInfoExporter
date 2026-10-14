@@ -7,7 +7,8 @@ namespace BattleTechInfoExporter.Models;
 
 /// <summary>An event the game can show between missions: when it can come, and the options it offers.</summary>
 /// <param name="Name">
-///     The event's title; placeholders such as <c>{TGT_MW.Callsign}</c> stand for the pilots the game picks.
+///     The event's title as plain text; placeholders such as <c>{TGT_MW.Callsign}</c> stand for the pilots the game
+///     picks, and a switch on their gender is resolved to its default wording.
 /// </param>
 /// <param name="Scope">
 ///     What the event is about: the company, or a pilot it picks among those meeting
@@ -29,6 +30,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Options">The options the event offers, in the order it shows them.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record EventDefinition(
+    string Id,
     string Name,
     EventScope Scope,
     int Weight,
@@ -37,7 +39,7 @@ internal sealed record EventDefinition(
     EventRequirement? Requirements,
     IReadOnlyList<EventRequirement> AdditionalRequirements,
     IReadOnlyList<EventTarget> AdditionalTargets,
-    IReadOnlyList<EventOption> Options)
+    IReadOnlyList<EventOption> Options) : ICatalogEntry
 {
     /// <summary>Every requirement of the event, its targets, its options and their results.</summary>
     internal IEnumerable<EventRequirement> EnumerateRequirements() =>

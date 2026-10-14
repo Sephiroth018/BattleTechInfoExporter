@@ -12,7 +12,8 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="DamageDealt">Multiplies every unit's weapon damage, by weapon category.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record BiomeDefinition(
+    string Id,
     string Name,
     float HeatSinkMultiplier,
     int HeatPerRound,
-    DamageMultipliers DamageDealt);
+    DamageMultipliers DamageDealt) : ICatalogEntry;

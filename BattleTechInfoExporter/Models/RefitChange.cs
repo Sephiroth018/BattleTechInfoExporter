@@ -52,10 +52,9 @@ internal sealed record RepairComponentChange(
 internal abstract record LocationRefitChange(RefitChangeType Type, bool IsDone, ChassisLocations Location)
     : RefitChange(Type, IsDone);
 
-/// <param name="FrontArmor">The location's front armor after the change.</param>
-/// <param name="RearArmor">The location's rear armor after the change; <c>null</c> outside the torso.</param>
+/// <param name="Armor">The location's armor after the change, by side.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record ModifyArmorChange(bool IsDone, ChassisLocations Location, int FrontArmor, int? RearArmor)
+internal sealed record ModifyArmorChange(bool IsDone, ChassisLocations Location, LocationArmor<int> Armor)
     : LocationRefitChange(RefitChangeType.ModifyArmor, IsDone, Location);
 
 /// <param name="Structure">The structure points restored.</param>

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -47,10 +48,12 @@ internal static class GameStateReader
                 simGame.GetRawReputation(FactionEnumeration.GetMercenaryReviewBoardFactionValue()),
                 simGame.GetCurrentMRBLevel()),
             // The game models the Mercenary Review Board as a faction, but it isn't one; it has its own object.
-            FactionEnumeration.FactionList
-                .Where(faction => faction.DoesGainReputation && !faction.IsMercenaryReviewBoard)
-                .Select(faction => ReadReputation(simGame, faction))
-                .ToList(),
+            new SortedDictionary<string, FactionReputation>(
+                FactionEnumeration.FactionList
+                    .Where(faction => faction.DoesGainReputation && !faction.IsMercenaryReviewBoard)
+                    .Select(faction => ReadReputation(simGame, faction))
+                    .ToDictionary(reputation => reputation.Faction.Id, reputation => reputation),
+                StringComparer.Ordinal),
             simGame.MechTechSkill,
             ReadTemporaryChanges(simGame, SimGameState.COMPANYSTAT_MECHTECH),
             simGame.MedTechSkill,

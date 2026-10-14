@@ -16,28 +16,25 @@ internal static class EventDefinitionReader
     // trackers are never rolled (SimGameState.AttemptEvents), and no event has the morale tracker's type.
     private static readonly IReadOnlyList<EventScope> DrawnScopes = [EventScope.Company, EventScope.MechWarrior];
 
-    internal static SortedDictionary<string, EventDefinition> ReadEventDefinitions(DataManager dataManager)
-    {
-        var definitions = new SortedDictionary<string, EventDefinition>(StringComparer.Ordinal);
-        foreach (var definition in dataManager.SimGameEventDefs)
-        {
-            definitions.Add(definition.Key, ReadEventDefinition(dataManager, definition.Value));
-        }
-
-        return definitions;
-    }
+    internal static SortedDictionary<string, EventDefinition> ReadEventDefinitions(DataManager dataManager) =>
+        CatalogEntries.ById(
+            dataManager.SimGameEventDefs.Select(definition => ReadEventDefinition(dataManager, definition.Value)));
 
     // An event a forced event or the career names may be missing from the loaded events; its id stands in for the name.
     internal static DefinitionReference ReferenceTo(DataManager dataManager, string eventId) =>
         dataManager.SimGameEventDefs.TryGet(eventId, out var definition)
-            ? DefinitionReferences.ReferenceTo(definition.Description)
+            ? new DefinitionReference(definition.Description.Id, NameOf(definition))
             : new DefinitionReference(eventId, eventId);
+
+    // Plain, as the catalog entry's name, so a reference's name matches its entry's.
+    private static string NameOf(SimGameEventDef definition) => GameText.ToPlainText(definition.Description.Name);
 
     // SimGameEventTracker.IsEventValid checks an event's own requirements against the event's company or pilot, and a
     // target's against each candidate; every other requirement is checked against its own scope.
     private static EventDefinition ReadEventDefinition(DataManager dataManager, SimGameEventDef definition) =>
         new(
-            definition.Description.Name,
+            definition.Description.Id,
+            NameOf(definition),
             definition.Scope,
             definition.Weight,
             definition.OneTimeEvent,
@@ -56,7 +53,7 @@ internal static class EventDefinitionReader
     private static EventOption ReadOption(DataManager dataManager, SimGameEventOption option) =>
         new(
             option.Description.Id,
-            option.Description.Name,
+            GameText.ToPlainText(option.Description.Name),
             ReadRequirementList(option.RequirementList),
             (option.ResultSets ?? [])
             .Select(outcome => new EventOutcome(

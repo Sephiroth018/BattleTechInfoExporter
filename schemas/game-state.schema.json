@@ -243,9 +243,9 @@
           "$ref": "#/definitions/MercenaryReviewBoard"
         },
         "reputation": {
-          "type": "array",
-          "description": "The reputation with each faction that gains it, except the Mercenary Review Board.",
-          "items": {
+          "type": "object",
+          "description": "The reputation with each faction that gains it, keyed by faction id, except the Mercenary Review Board.",
+          "additionalProperties": {
             "$ref": "#/definitions/FactionReputation"
           }
         },
@@ -637,7 +637,7 @@
     },
     "MechReference": {
       "type": "object",
-      "description": "A mech in the mech bay: its own id, as in id, and its chassis name with the variant.",
+      "description": "A mech in the mech bay: its own id and name, as in id and name.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -883,9 +883,9 @@
         },
         "tags": {
           "type": "array",
-          "description": "The star system's tags, which the events' requirements check, also those its starmap panel doesn't show; named as the panel names them, by their id where the game has no name.",
+          "description": "The star system's tags, which the events' requirements check, also those its starmap panel doesn't show.",
           "items": {
-            "$ref": "#/definitions/DefinitionReference"
+            "type": "string"
           }
         },
         "biomes": {
@@ -1754,7 +1754,6 @@
       "required": [
         "location",
         "armor",
-        "rearArmor",
         "structure",
         "components"
       ],
@@ -1764,19 +1763,8 @@
           "$ref": "#/definitions/ChassisLocations"
         },
         "armor": {
-          "description": "The front armor, or the only armor outside the torso.",
-          "$ref": "#/definitions/Armor"
-        },
-        "rearArmor": {
-          "description": "null outside the torso, which alone has rear armor.",
-          "oneOf": [
-            {
-              "type": "null"
-            },
-            {
-              "$ref": "#/definitions/Armor"
-            }
-          ]
+          "description": "The armor left and fitted, by side.",
+          "$ref": "#/definitions/LocationArmorOfArmor"
         },
         "structure": {
           "type": "number",
@@ -1827,6 +1815,32 @@
         "Legs",
         "All"
       ]
+    },
+    "LocationArmorOfArmor": {
+      "type": "object",
+      "description": "A location's armor by side, in whatever a file measures armor in.",
+      "additionalProperties": false,
+      "required": [
+        "front",
+        "rear"
+      ],
+      "properties": {
+        "front": {
+          "description": "The front armor; outside the torso, the location's only armor.",
+          "$ref": "#/definitions/Armor"
+        },
+        "rear": {
+          "description": "null outside the torso, which alone has rear armor.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/Armor"
+            }
+          ]
+        }
+      }
     },
     "Armor": {
       "type": "object",
@@ -2050,8 +2064,7 @@
         "type",
         "isDone",
         "location",
-        "frontArmor",
-        "rearArmor"
+        "armor"
       ],
       "properties": {
         "location": {
@@ -2066,17 +2079,32 @@
           "type": "boolean",
           "description": "Whether the mech techs have finished the step; its change is then part of the mech."
         },
-        "frontArmor": {
+        "armor": {
+          "description": "The location's armor after the change, by side.",
+          "$ref": "#/definitions/LocationArmorOfInteger"
+        }
+      }
+    },
+    "LocationArmorOfInteger": {
+      "type": "object",
+      "description": "A location's armor by side, in whatever a file measures armor in.",
+      "additionalProperties": false,
+      "required": [
+        "front",
+        "rear"
+      ],
+      "properties": {
+        "front": {
           "type": "integer",
-          "description": "The location's front armor after the change.",
+          "description": "The front armor; outside the torso, the location's only armor.",
           "format": "int32"
         },
-        "rearArmor": {
+        "rear": {
           "type": [
             "integer",
             "null"
           ],
-          "description": "The location's rear armor after the change; null outside the torso.",
+          "description": "null outside the torso, which alone has rear armor.",
           "format": "int32"
         }
       }
@@ -3028,16 +3056,89 @@
       }
     },
     "OfferedContract": {
+      "type": "object",
       "description": "A contract the Command Center offers, as its contract list and details show it.",
-      "x-abstract": true,
-      "anyOf": [
-        {
-          "$ref": "#/definitions/LocalContract"
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "type",
+        "displayStyle",
+        "employer",
+        "target",
+        "difficulty",
+        "description",
+        "lanceLimits",
+        "biome",
+        "meetsReputation",
+        "negotiation",
+        "starSystem"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "The contract's description, as the contract details show it."
         },
-        {
-          "$ref": "#/definitions/TravelContract"
+        "lanceLimits": {
+          "description": "The limits on the lance the company can deploy on the mission.",
+          "$ref": "#/definitions/LanceLimits"
+        },
+        "biome": {
+          "description": "null where the game has no biome for the contract.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/DefinitionReference"
+            }
+          ]
+        },
+        "id": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "The contract's data file; null where the game keeps no reference to it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The contract's name, as the contract list shows it."
+        },
+        "type": {
+          "description": "The mission type, described in contractTypes.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "displayStyle": {
+          "description": "Whether it's a regular, story, restoration or flashpoint contract.",
+          "$ref": "#/definitions/ContractDisplayStyle"
+        },
+        "employer": {
+          "description": "The faction that hires the company.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "target": {
+          "description": "The faction the mission is fought against.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "difficulty": {
+          "type": "integer",
+          "description": "On the scale of maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
+          "format": "int32"
+        },
+        "meetsReputation": {
+          "type": "boolean",
+          "description": "Whether the reputation with the employer allows taking the contract; the list greys it out otherwise. Story, restoration and flashpoint contracts, and employers that don't gain reputation, are always allowed."
+        },
+        "negotiation": {
+          "description": "The terms the contract can be accepted with: negotiated or fixed.",
+          "$ref": "#/definitions/Negotiation"
+        },
+        "starSystem": {
+          "description": "The star system the mission is fought in, in full, as in star-systems.json, with the trip there: the current one, whose route is empty, or another the company travels to first.",
+          "$ref": "#/definitions/StarSystem"
         }
-      ]
+      }
     },
     "Negotiation": {
       "description": "The terms a contract can be accepted with; each canNegotiate has a record with the fields of its own.",
@@ -3131,176 +3232,6 @@
         "reputation": {
           "description": "The reputation changes when this share is left over for reputation.",
           "$ref": "#/definitions/ReputationChange"
-        }
-      }
-    },
-    "LocalContract": {
-      "type": "object",
-      "description": "An offered contract fought in the current star system.",
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "name",
-        "type",
-        "displayStyle",
-        "employer",
-        "target",
-        "difficulty",
-        "description",
-        "lanceLimits",
-        "biome",
-        "meetsReputation",
-        "negotiation",
-        "starSystem"
-      ],
-      "properties": {
-        "meetsReputation": {
-          "type": "boolean",
-          "description": "Whether the reputation with the employer allows taking the contract; the list greys it out otherwise. Story, restoration and flashpoint contracts, and employers that don't gain reputation, are always allowed."
-        },
-        "negotiation": {
-          "description": "The terms the contract can be accepted with: negotiated or fixed.",
-          "$ref": "#/definitions/Negotiation"
-        },
-        "description": {
-          "type": "string",
-          "description": "The contract's description, as the contract details show it."
-        },
-        "lanceLimits": {
-          "description": "The limits on the lance the company can deploy on the mission.",
-          "$ref": "#/definitions/LanceLimits"
-        },
-        "biome": {
-          "description": "null where the game has no biome for the contract.",
-          "oneOf": [
-            {
-              "type": "null"
-            },
-            {
-              "$ref": "#/definitions/DefinitionReference"
-            }
-          ]
-        },
-        "id": {
-          "type": [
-            "null",
-            "string"
-          ],
-          "description": "The contract's data file; null where the game keeps no reference to it."
-        },
-        "name": {
-          "type": "string",
-          "description": "The contract's name, as the contract list shows it."
-        },
-        "type": {
-          "description": "The mission type, described in contractTypes.",
-          "$ref": "#/definitions/DefinitionReference"
-        },
-        "displayStyle": {
-          "description": "Whether it's a regular, story, restoration or flashpoint contract.",
-          "$ref": "#/definitions/ContractDisplayStyle"
-        },
-        "employer": {
-          "description": "The faction that hires the company.",
-          "$ref": "#/definitions/DefinitionReference"
-        },
-        "target": {
-          "description": "The faction the mission is fought against.",
-          "$ref": "#/definitions/DefinitionReference"
-        },
-        "difficulty": {
-          "type": "integer",
-          "description": "On the scale of maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
-          "format": "int32"
-        },
-        "starSystem": {
-          "description": "The current star system.",
-          "$ref": "#/definitions/DefinitionReference"
-        }
-      }
-    },
-    "TravelContract": {
-      "type": "object",
-      "description": "An offered contract fought in another star system, which the company travels to first.",
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "name",
-        "type",
-        "displayStyle",
-        "employer",
-        "target",
-        "difficulty",
-        "description",
-        "lanceLimits",
-        "biome",
-        "meetsReputation",
-        "negotiation",
-        "starSystem"
-      ],
-      "properties": {
-        "meetsReputation": {
-          "type": "boolean",
-          "description": "Whether the reputation with the employer allows taking the contract; the list greys it out otherwise. Story, restoration and flashpoint contracts, and employers that don't gain reputation, are always allowed."
-        },
-        "negotiation": {
-          "description": "The terms the contract can be accepted with: negotiated or fixed.",
-          "$ref": "#/definitions/Negotiation"
-        },
-        "description": {
-          "type": "string",
-          "description": "The contract's description, as the contract details show it."
-        },
-        "lanceLimits": {
-          "description": "The limits on the lance the company can deploy on the mission.",
-          "$ref": "#/definitions/LanceLimits"
-        },
-        "biome": {
-          "description": "null where the game has no biome for the contract.",
-          "oneOf": [
-            {
-              "type": "null"
-            },
-            {
-              "$ref": "#/definitions/DefinitionReference"
-            }
-          ]
-        },
-        "id": {
-          "type": [
-            "null",
-            "string"
-          ],
-          "description": "The contract's data file; null where the game keeps no reference to it."
-        },
-        "name": {
-          "type": "string",
-          "description": "The contract's name, as the contract list shows it."
-        },
-        "type": {
-          "description": "The mission type, described in contractTypes.",
-          "$ref": "#/definitions/DefinitionReference"
-        },
-        "displayStyle": {
-          "description": "Whether it's a regular, story, restoration or flashpoint contract.",
-          "$ref": "#/definitions/ContractDisplayStyle"
-        },
-        "employer": {
-          "description": "The faction that hires the company.",
-          "$ref": "#/definitions/DefinitionReference"
-        },
-        "target": {
-          "description": "The faction the mission is fought against.",
-          "$ref": "#/definitions/DefinitionReference"
-        },
-        "difficulty": {
-          "type": "integer",
-          "description": "On the scale of maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
-          "format": "int32"
-        },
-        "starSystem": {
-          "description": "The star system the mission is fought in, in full, as in star-systems.json, with the trip there.",
-          "$ref": "#/definitions/StarSystem"
         }
       }
     },

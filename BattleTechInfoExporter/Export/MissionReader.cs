@@ -76,10 +76,9 @@ internal static class MissionReader
                 .Select(location => new DamagedLocation(
                     location,
                     MechReader.ReadArmor(mech, location),
-                    MechReader.ReadRearArmor(mech, location),
                     MechReader.ReadStructure(mech, location)))
-                .Where(damaged => damaged.Armor.Current < damaged.Armor.Assigned
-                                  || damaged.RearArmor?.Current < damaged.RearArmor?.Assigned
+                .Where(damaged => damaged.Armor.Front.Current < damaged.Armor.Front.Assigned
+                                  || damaged.Armor.Rear?.Current < damaged.Armor.Rear?.Assigned
                                   || mech.IsLocationDamaged(damaged.Location))
                 .ToList(),
             mech.Inventory

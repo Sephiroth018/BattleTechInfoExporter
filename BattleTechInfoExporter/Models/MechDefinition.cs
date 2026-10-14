@@ -20,13 +20,14 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Locations">The body locations, from head to legs.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechDefinition(
+    string Id,
     string Name,
     DefinitionReference Chassis,
     int Value,
     float UsedTonnage,
     MechStats Stats,
     bool IsSalvageable,
-    IReadOnlyList<MechLocationDefinition> Locations);
+    IReadOnlyList<MechLocationDefinition> Locations) : ICatalogEntry;
 
 /// <param name="Location">The body location, e.g. <c>LeftTorso</c>.</param>
 /// <param name="Armor">The armor fitted.</param>
@@ -34,7 +35,7 @@ internal sealed record MechDefinition(
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechLocationDefinition(
     ChassisLocations Location,
-    LocationArmor Armor,
+    LocationArmor<float> Armor,
     IReadOnlyList<LoadoutComponent> Components);
 
 /// <param name="IsFixed">

@@ -24,6 +24,55 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.68.0
+
+Changed: game-state.json (breaking), star-systems.json (breaking), mission-outcome.json (breaking),
+combat-state.json (breaking), catalog.json (breaking).
+
+### game-state.json
+- Meaning changed: every reference to a mech bay mech (a mech order's `workQueue[].target`,
+  `lastLance[].mech`, `financialReport.expectedExpenses.mechs[].mech`) carries the mech's name as
+  `mechs[].name` has it, no longer the chassis name with the variant. Re-derive a mech's chassis
+  from `mechs[].chassis`.
+- Type changed `mechs[].loadout.locations[].armor`, `mechs[].afterRefit.locations[].armor` and
+  `mechsAwaitingPlacement[].loadout.locations[].armor`: `{front: {current, assigned}, rear}` with
+  `rear` `null` outside the torso; `rearArmor` removed. Every file nests a location's armor as
+  `{front, rear}` now.
+- Type changed `mechs[].refit[]` steps of type `modifyArmor`: `frontArmor` and `rearArmor` replaced
+  by `armor: {front, rear}`.
+- Type changed `contracts[]`: one shape for every offered contract, with `starSystem` always the
+  full entry as in star-systems.json; the contract in the current system is the one whose
+  `starSystem.id` is `position.starSystem.id`, and its route is 0 days and 0 C-Bills.
+- Type changed `company.reputation`: an object keyed by faction id instead of a list; each entry
+  keeps its `faction` reference.
+
+### star-systems.json
+- Type changed `starSystems.<id>.tags[]`: bare tag ids, as on the company and the pilots, instead
+  of `{id, name}`.
+
+### mission-outcome.json
+- Type changed `lance[].damagedLocations[].armor`: `{front: {current, assigned}, rear}`;
+  `rearArmor` removed.
+- Meaning changed `lance[].mech.name`: the mech's name, as in game-state.json.
+
+### combat-state.json
+- Type changed `units.<id>.state.locations[].armor`: `{front, rear}` with `rear` `null` outside a
+  mech's torso; `rearArmor` removed.
+- Meaning changed `units.<id>.bayMech.name`: the mech's name, as in game-state.json.
+
+### catalog.json
+- Added `id` to every entry of every root object, as star-systems.json has it.
+- Type changed `vehicleDefinitions.<id>.locations[].armor` and `turretDefinitions.<id>.armor`:
+  `{front, rear}` with `rear` always `null`, as every other location's armor.
+- Type changed `vehicleDefinitions.<id>.locations[].components[]` and
+  `turretDefinitions.<id>.components[]`: `{component, isFixed}` entries as on mechs, all fixed,
+  instead of bare references.
+- Removed `componentDefinitions.<group>.<id>.bonuses`: UI texts restating the numbers.
+- Meaning changed `eventDefinitions.<id>.name` and `options[].name`: plain text, without formatting
+  tags, with a switch on a pilot's gender (`{TGT_MW.Gender?NonBinary:are|Default:is}`) resolved to
+  its default wording; the callsign and pronoun placeholders stay. Every reference to an event
+  (`forcedEvents[].event`, the game state's `events`) carries the same plain name.
+
 ## 0.67.0
 
 Changed: game-state.json (breaking), rules.json (breaking), mission-outcome.json,

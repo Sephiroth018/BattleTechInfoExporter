@@ -473,9 +473,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   story swaps a system's definition (`StarSystem_SetActiveDef`, e.g. when its owner changes); the
   inactive definitions give a consumer nothing and aren't exported. The full entry is repeated
   wherever a step needs it: in the game state `position.starSystem`, `position.travel.destination`,
-  the active contract's and each offered travel contract's (`TravelContract`) star system; an
-  offered contract in the current star system (`LocalContract`) and the other files refer to a star
-  system by its reference alone.
+  the active contract's and each offered contract's star system, the current one included, so
+  every contract has one shape; the other files refer to a star system by its reference alone.
 - **A route is the starmap's** (`RouteReader`) from the current system, its days and cost: `null`
   where the game finds no route, always for a system whose travel requirements aren't met. The
   current system's is 0 days and 0 C-Bills. Its days always include the whole leg from the current
@@ -545,8 +544,11 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **Phases and initiative are numbered as on the HUD** (`HudInitiative`), from 5 down to 1, never on
   the game's internal scale, where units act from 1 up: in the combat state, and in the rules'
   statistic changes to the initiative statistics, whose sign flips so a positive change acts earlier.
-- **Game texts are plain text** (`GameText`): descriptions and objective titles lose the
-  formatting tags (`<i>`, `<color=…>`) and tooltip links the game's UI renders. Names are left as they are.
+- **Game texts are plain text** (`GameText`): descriptions, objective titles and event titles and
+  options lose the formatting tags (`<i>`, `<color=…>`) and tooltip links the game's UI renders,
+  and a switch on a pilot's gender resolves to its default wording; the callsign and pronoun
+  placeholders stay. An event's references carry the same plain name as its catalog entry. Other
+  names are left as they are.
 - **Game enums keep the game's values** (e.g. `IN_SYSTEM`, `LIKED`); the UI shows the same. Our own
   enums are camelCase.
 - **JSON:** camelCase properties, compact (no indentation, since only tools read the files), `null`

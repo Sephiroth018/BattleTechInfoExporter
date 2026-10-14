@@ -40,7 +40,7 @@ internal static class MapReader
             .GroupBy(map => map.MapID, StringComparer.Ordinal)
             .Select(sameMaps => sameMaps.First());
 
-        var maps = new SortedDictionary<string, MapDefinition>(StringComparer.Ordinal);
+        var maps = new List<MapDefinition>();
         foreach (var map in playableMaps)
         {
             if (ReadTerrainCoverage(dataManager, map, terrains) is not { } terrainCoverage)
@@ -52,8 +52,8 @@ internal static class MapReader
                 .OrderBy(tag => tag, StringComparer.Ordinal)
                 .ToList();
             maps.Add(
-                map.MapID,
                 new MapDefinition(
+                    map.MapID,
                     map.FriendlyName,
                     DefinitionReferences.ReferenceTo(dataManager, (Biome.BIOMESKIN)map.BiomeSkinID),
                     tags,
@@ -61,7 +61,7 @@ internal static class MapReader
                     terrainCoverage));
         }
 
-        return maps;
+        return CatalogEntries.ById(maps);
     }
 
     /// <summary>The id the catalog keys the contract's map by, its MapID; the contract knows a map only by its path.</summary>

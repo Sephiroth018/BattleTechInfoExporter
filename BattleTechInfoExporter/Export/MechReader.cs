@@ -66,8 +66,7 @@ internal static class MechReader
         return null;
     }
 
-    internal static MechReference ReferenceToBayMech(MechDef mech) =>
-        new(mech.GUID, NameWithVariant(mech.Chassis));
+    internal static MechReference ReferenceToBayMech(MechDef mech) => new(mech.GUID, mech.Name);
 
     // Both dictionaries are keyed by the mech bay slot; a slot is in one of them at most.
     internal static List<Mech> ReadMechs(
@@ -170,19 +169,19 @@ internal static class MechReader
         return usedTonnage;
     }
 
-    internal static Armor ReadArmor(MechDef mech, ChassisLocations location)
+    internal static LocationArmor<Armor> ReadArmor(MechDef mech, ChassisLocations location)
     {
         var loadout = mech.GetLocationLoadoutDef(location);
-        return new Armor(Rounding.ToTenth(loadout.CurrentArmor), loadout.AssignedArmor);
+        return ArmorOf(
+            mech.GetChassisLocationDef(location),
+            new Armor(Rounding.ToTenth(loadout.CurrentArmor), loadout.AssignedArmor),
+            new Armor(Rounding.ToTenth(loadout.CurrentRearArmor), loadout.AssignedRearArmor));
     }
 
-    internal static Armor? ReadRearArmor(MechDef mech, ChassisLocations location)
-    {
-        var loadout = mech.GetLocationLoadoutDef(location);
-        return HasRearArmor(mech.GetChassisLocationDef(location))
-            ? new Armor(Rounding.ToTenth(loadout.CurrentRearArmor), loadout.AssignedRearArmor)
-            : null;
-    }
+    /// <summary>The location's armor by side; only the torso has a rear, so the rear value counts only there.</summary>
+    internal static LocationArmor<TSide> ArmorOf<TSide>(LocationDef location, TSide front, TSide rear)
+        where TSide : struct =>
+        new(front, HasRearArmor(location) ? rear : null);
 
     internal static float ReadStructure(MechDef mech, ChassisLocations location) =>
         Rounding.ToTenth(mech.GetLocationLoadoutDef(location).CurrentInternalStructure);
@@ -195,7 +194,6 @@ internal static class MechReader
         return new MechLocation(
             location,
             ReadArmor(mech, location),
-            ReadRearArmor(mech, location),
             ReadStructure(mech, location),
             ComponentsMountedIn(mech, location)
                 .Select(component => new MountedComponent(
@@ -223,8 +221,7 @@ internal static class MechReader
             WorkOrderEntry_ModifyMechArmor armor => new ModifyArmorChange(
                 step.IsMechLabComplete,
                 armor.Location,
-                armor.DesiredFrontArmor,
-                HasRearArmor(mech.GetChassisLocationDef(armor.Location)) ? armor.DesiredRearArmor : null),
+                ArmorOf(mech.GetChassisLocationDef(armor.Location), armor.DesiredFrontArmor, armor.DesiredRearArmor)),
             WorkOrderEntry_RepairMechStructure structure => new RepairStructureChange(
                 step.IsMechLabComplete,
                 structure.Location,

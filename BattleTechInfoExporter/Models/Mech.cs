@@ -127,24 +127,21 @@ internal sealed record MechLoadout(
 
 /// <summary>A mech location's armor and structure; the chassis' limits are in <see cref="ChassisDefinition" />.</summary>
 /// <param name="Location">The mech's body location.</param>
-/// <param name="Armor">The front armor, or the only armor outside the torso.</param>
-/// <param name="RearArmor"><c>null</c> outside the torso, which alone has rear armor.</param>
+/// <param name="Armor">The armor left and fitted, by side.</param>
 /// <param name="Structure">The structure left: below the chassis' when damaged, zero when destroyed.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal abstract record MechLocationCondition(
     ChassisLocations Location,
-    Armor Armor,
-    Armor? RearArmor,
+    LocationArmor<Armor> Armor,
     float Structure);
 
 /// <param name="Components">The components mounted in the location, including the chassis' fixed ones.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechLocation(
     ChassisLocations Location,
-    Armor Armor,
-    Armor? RearArmor,
+    LocationArmor<Armor> Armor,
     float Structure,
-    IReadOnlyList<MountedComponent> Components) : MechLocationCondition(Location, Armor, RearArmor, Structure);
+    IReadOnlyList<MountedComponent> Components) : MechLocationCondition(Location, Armor, Structure);
 
 /// <param name="Current">
 ///     What is left after combat damage; refilled to <see cref="Assigned" /> after a mission unless the
@@ -152,4 +149,4 @@ internal sealed record MechLocation(
 /// </param>
 /// <param name="Assigned">The armor fitted in the mech lab.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record Armor(float Current, float Assigned);
+internal readonly record struct Armor(float Current, float Assigned);

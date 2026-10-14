@@ -31,9 +31,9 @@ kept current. Three of them hold the career and are written together on every ca
   part already travelled; the position's travel has that leg's length and the day the leg under way
   ends, to correct them. The story swaps
   some systems' definitions, e.g. when a system's owner changes; the entry is always the active
-  one's. The game state repeats the entry of the current system, the travel destination, the
-  accepted and every offered travel contract's system; a contract offered in the current system
-  and the other files refer to a star system only by its id and name.
+  one's. The game state repeats the entry of the current system, the travel destination and the
+  accepted and every offered contract's system; the other files refer to a star system only by its
+  id and name.
 
 One more holds the latest mission:
 
@@ -82,7 +82,9 @@ The last one describes the game rather than the career:
     combat.
   - **Components:** every component's stats, the statistics it changes while mounted (e.g. a
     jump jet's jump distance, an upgrade's melee damage), and whether it can come as salvage; for
-    jump jets, the chassis tonnage range that can mount them.
+    jump jets, the chassis tonnage range that can mount them. They're grouped by the `type` every
+    component reference carries: `Weapon` in `weapons`, `AmmunitionBox` in `ammunitionBoxes`,
+    `HeatSink` in `heatSinks`, `JumpJet` in `jumpJets`, `Upgrade` in `upgrades`.
   - **Terrains:** what forest, water, rough ground, roads and the other terrains do to the units
     in them: move cost per unit type and weight class (`null` where impassable; open ground costs
     1.05 per meter), sprint multiplier, visibility, sensor range and signature, to-hit modifiers
@@ -114,9 +116,9 @@ The last one describes the game rather than the career:
     current star system, the commander or a pilot), the tags that must and mustn't be there and the
     statistic comparisons that must hold; a statistic the scope doesn't have counts as 0. The game
     state holds the company's and every pilot's tags and the statistics events compare, and
-    `star-systems.json` every star system's tags. Titles and option texts keep the game's placeholders
-    for the pilots it picks, e.g. `{TGT_MW.Callsign}`, and its formatting; the events' story texts
-    are left out.
+    `star-systems.json` every star system's tags. Titles and option texts are plain text that keeps the
+    game's placeholders for the pilots it picks, e.g. `{TGT_MW.Callsign}`, with a switch on their
+    gender resolved to its default wording; the events' story texts are left out.
 
     Once a day the game rolls for an event, except on the day the ship arrives at a star system and
     on days the story moves on. The chance rises with every roll that brings none and falls back once
@@ -187,8 +189,8 @@ The game state holds:
   included, plus price, salary and whether the company can hire them.
 - **Contracts:** the contracts the Command Center offers, each with its description and terms:
   fixed, or negotiable as the values at each slider position (pay and salvage together take at most 100 %,
-  exactly 100 % when the employer gains no reputation), and its star system: by reference in the
-  current system, in full, as in `star-systems.json`, with the route there for a travel contract;
+  exactly 100 % when the employer gains no reputation), and its star system in full, as in
+  `star-systems.json`, with the route there (0 days for the current system, which `position` names);
   plus the accepted travel contract until it's proceeded with, with its star system in full and
   the day of arrival while travelling to it. The game generates a system's contracts only when the contract screen first
   opens there; the mod generates them for the export when the game hasn't yet, the same way opening the
