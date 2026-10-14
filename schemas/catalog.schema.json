@@ -1246,7 +1246,7 @@
           ]
         },
         "target": {
-          "description": "Whose statistic changes: the unit with the ability or component (Creator) or the unit it targets.",
+          "description": "Whose statistic changes: the unit with the ability or component (Creator), the unit it targets (SingleTarget) or a group around it; always one the game acts on, where its data leaves it unset.",
           "$ref": "#/definitions/EffectTargetType"
         },
         "trigger": {
@@ -1985,8 +1985,11 @@
           "$ref": "#/definitions/TerrainMoveCosts"
         },
         "sprintMultiplier": {
-          "type": "number",
-          "description": "Multiplies the move cost when sprinting.",
+          "type": [
+            "null",
+            "number"
+          ],
+          "description": "Multiplies the move cost when sprinting; null where the terrain is impassable.",
           "format": "float"
         },
         "visibilityMultiplier": {
@@ -2910,14 +2913,14 @@
     },
     "ForcedEvent": {
       "type": "object",
-      "description": "An event a result schedules: from the daily roll minDaysWait on, each roll brings it with chance, and roll maxDaysWait always does.",
+      "description": "An event a result schedules: from the daily roll minDaysWait on, each roll brings it with chancePercent, and roll maxDaysWait always does.",
       "additionalProperties": false,
       "required": [
         "event",
         "scope",
         "minDaysWait",
         "maxDaysWait",
-        "chance",
+        "chancePercent",
         "keepsPilot"
       ],
       "properties": {
@@ -2939,9 +2942,9 @@
           "description": "The daily roll, counted from the next, that brings the event for sure.",
           "format": "int32"
         },
-        "chance": {
+        "chancePercent": {
           "type": "integer",
-          "description": "The chance per daily roll, in percent.",
+          "description": "The chance per daily roll, from 0 to 100.",
           "format": "int32"
         },
         "keepsPilot": {

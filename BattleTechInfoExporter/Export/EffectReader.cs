@@ -35,9 +35,20 @@ internal static class EffectReader
             ConvertInitiativeToHud(statistic, ReadValue(statistic)),
             ReadTargetCollection(statistic),
             ReadDuration(effect.durationData),
-            effect.targetingData.effectTargetType,
+            ReadTarget(effect.targetingData),
             effect.targetingData.effectTriggerType);
     }
+
+    // Mirrors EffectManager.GetTargetCombatantForEffect's default case for a target the data leaves unset: the
+    // unit hit for an effect on a hit or a weapon firing, the creator otherwise.
+    private static EffectTargetType ReadTarget(EffectTargetingData targeting) =>
+        targeting.effectTargetType switch
+        {
+            EffectTargetType.NotSet when targeting.effectTriggerType
+                is EffectTriggerType.OnHit or EffectTriggerType.OnWeaponFire => EffectTargetType.SingleTarget,
+            EffectTargetType.NotSet => EffectTargetType.Creator,
+            var target => target
+        };
 
     // The game parses modValue into the type modType names (StatisticEffect.SetupVariant); a type other than
     // these three keeps the game's text.

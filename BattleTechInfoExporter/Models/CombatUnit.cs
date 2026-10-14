@@ -82,8 +82,8 @@ internal sealed record CombatUnit(
 /// <param name="IsProne">Whether the mech has been knocked down; only mechs can be.</param>
 /// <param name="IsShutDown">Whether the unit is shut down, e.g. from overheating.</param>
 /// <param name="IsUnsteady">
-///     Whether the mech is unsteady, which it becomes at <see cref="StabilityRules.UnsteadyThresholdPercent" /> of
-///     its stability; only mechs can be.
+///     Whether the mech is unsteady: its instability rose above <see cref="MechStability.UnsteadyAbove" /> and
+///     hasn't fallen below since; only mechs can be.
 /// </param>
 /// <param name="Mech">What only a mech has; <c>null</c> for vehicles and turrets.</param>
 /// <param name="HasActivated">Whether the unit has finished its activation this round.</param>
@@ -113,12 +113,22 @@ internal sealed record CombatUnitState(
     int VigilanceCost);
 
 /// <param name="Heat">The mech's heat.</param>
-/// <param name="Stability">
-///     The instability taken, from 0 up, as the stability bar fills: the mech is unsteady at
-///     <see cref="StabilityRules.UnsteadyThresholdPercent" /> of its max and knocked down when the bar is full.
+/// <param name="Stability">The mech's stability bar.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record MechState(MechHeat Heat, MechStability Stability);
+
+/// <summary>A mech's stability as the HUD's stability bar shows it, with the thresholds it draws.</summary>
+/// <param name="Current">The instability taken, from 0 up, as the bar fills.</param>
+/// <param name="UnsteadyAbove">
+///     The instability above which the mech is unsteady and loses its evasive pips, after effects; the base is
+///     <see cref="StabilityRules.UnsteadyAbovePercent" /> of <see cref="MaxStability" />.
+/// </param>
+/// <param name="MaxStability">
+///     The instability at which the mech is knocked down: the chassis' stability, as its <c>MaxStability</c>
+///     statistic has it now.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record MechState(MechHeat Heat, float Stability);
+internal sealed record MechStability(float Current, float UnsteadyAbove, float MaxStability);
 
 /// <summary>A mech's heat as the HUD's heat bar shows it, with the thresholds it draws and the sinking it predicts.</summary>
 /// <param name="Current">The heat now.</param>

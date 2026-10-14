@@ -4,11 +4,12 @@ namespace BattleTechInfoExporter.Models;
 
 /// <summary>
 ///     The stability rules of mechs. A mech's stability bar has <see cref="Levels" /> levels; a mech that reaches
-///     <see cref="UnsteadyThresholdPercent" /> of its stability is unsteady and loses its evasive pips, and an
+///     <see cref="UnsteadyAbovePercent" /> of its stability is unsteady and loses its evasive pips, and an
 ///     unsteady mech that fills the bar is knocked down.
 /// </summary>
-/// <param name="UnsteadyThresholdPercent">
-///     In percent of the stability bar; a mech's <c>UnsteadyThreshold</c> statistic starts at it.
+/// <param name="UnsteadyAbovePercent">
+///     In percent of the stability bar; a mech's <c>UnsteadyThreshold</c> statistic starts at it, and the combat
+///     state's <see cref="MechStability.UnsteadyAbove" /> is its current value in points.
 /// </param>
 /// <param name="Levels">The number of equal levels the stability bar is divided into.</param>
 /// <param name="LevelsRecovered">
@@ -27,7 +28,7 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record StabilityRules(
-    int UnsteadyThresholdPercent,
+    int UnsteadyAbovePercent,
     int Levels,
     LevelsRecoveredByAction LevelsRecovered,
     LevelsAddedByAction LevelsAdded,

@@ -646,7 +646,7 @@
         },
         "isUnsteady": {
           "type": "boolean",
-          "description": "Whether the mech is unsteady, which it becomes at unsteadyThresholdPercent of its stability; only mechs can be."
+          "description": "Whether the mech is unsteady: its instability rose above unsteadyAbove and hasn't fallen below since; only mechs can be."
         },
         "mech": {
           "description": "What only a mech has; null for vehicles and turrets.",
@@ -826,9 +826,8 @@
           "$ref": "#/definitions/MechHeat"
         },
         "stability": {
-          "type": "number",
-          "description": "The instability taken, from 0 up, as the stability bar fills: the mech is unsteady at unsteadyThresholdPercent of its max and knocked down when the bar is full.",
-          "format": "float"
+          "description": "The mech's stability bar.",
+          "$ref": "#/definitions/MechStability"
         }
       }
     },
@@ -862,6 +861,33 @@
           "type": "integer",
           "description": "The heat at which the mech shuts down, after heat banks and effects; the base is in maxHeat.",
           "format": "int32"
+        }
+      }
+    },
+    "MechStability": {
+      "type": "object",
+      "description": "A mech's stability as the HUD's stability bar shows it, with the thresholds it draws.",
+      "additionalProperties": false,
+      "required": [
+        "current",
+        "unsteadyAbove",
+        "maxStability"
+      ],
+      "properties": {
+        "current": {
+          "type": "number",
+          "description": "The instability taken, from 0 up, as the bar fills.",
+          "format": "float"
+        },
+        "unsteadyAbove": {
+          "type": "number",
+          "description": "The instability above which the mech is unsteady and loses its evasive pips, after effects; the base is unsteadyAbovePercent of maxStability.",
+          "format": "float"
+        },
+        "maxStability": {
+          "type": "number",
+          "description": "The instability at which the mech is knocked down: the chassis' stability, as its MaxStability statistic has it now.",
+          "format": "float"
         }
       }
     },
