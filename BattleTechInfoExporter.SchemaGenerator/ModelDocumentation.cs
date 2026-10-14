@@ -10,19 +10,24 @@ using Newtonsoft.Json.Serialization;
 namespace BattleTechInfoExporter.SchemaGenerator;
 
 /// <summary>
-///     The descriptions of the models and their properties, from the mod's XML doc comments, as plain text that names
-///     what the JSON shows: a <c>see cref</c> to a property becomes its JSON name, one to an enum value the value written.
+///     The descriptions of the models and their properties in one export file's schema, from the mod's XML doc
+///     comments, as plain text that names what the JSON shows: a <c>see cref</c> to a property or type becomes where
+///     the file holds it, or the other file and the path there, one to an enum value the value written.
 /// </summary>
 internal sealed partial class ModelDocumentation
 {
+    private readonly Type _fileModel;
+    private readonly ExportFilePaths _paths;
     private readonly JsonSerializerSettings _serializerSettings;
 
-    internal ModelDocumentation(JsonSerializerSettings serializerSettings)
+    internal ModelDocumentation(JsonSerializerSettings serializerSettings, ExportFilePaths paths, Type fileModel)
     {
         _serializerSettings = serializerSettings;
+        _paths = paths;
+        _fileModel = fileModel;
     }
 
-    internal string? TypeDescription(Type type) => Render(type.GetXmlDocsElement()?.Element("summary"));
+    internal string? TypeDescription(Type type) => Render(type.GetXmlDocsElement()?.Element("summary"), type);
 
     /// <summary>
     ///     The property's record parameter, from the type itself up through its base types, so a derived record's
@@ -36,7 +41,7 @@ internal sealed partial class ModelDocumentation
             if (declaringType.GetXmlDocsElement()?.Elements("param")
                     .FirstOrDefault(candidate => (string?)candidate.Attribute("name") == propertyName) is { } parameter)
             {
-                return Render(parameter);
+                return Render(parameter, type);
             }
         }
 
@@ -44,37 +49,44 @@ internal sealed partial class ModelDocumentation
             type.GetProperty(propertyName)?.GetXmlDocsElement()?.Element("summary")
             ?? type.GetInterfaces()
                 .Select(implemented => implemented.GetProperty(propertyName)?.GetXmlDocsElement()?.Element("summary"))
-                .FirstOrDefault(summary => summary is not null));
+                .FirstOrDefault(summary => summary is not null),
+            type);
     }
 
-    private string? Render(XElement? documentation)
+    // The documented type is the model whose schema the description goes into.
+    private string? Render(XElement? documentation, Type documentedType)
     {
         if (documentation is null)
         {
             return null;
         }
 
-        var text = Whitespace().Replace(string.Concat(documentation.Nodes().Select(RenderNode)), " ").Trim();
+        var text = Whitespace()
+            .Replace(string.Concat(documentation.Nodes().Select(node => RenderNode(node, documentedType))), " ")
+            .Trim();
         return text.Length == 0 ? null : text;
     }
 
-    private string RenderNode(XNode node) =>
+    private string RenderNode(XNode node, Type documentedType) =>
         node switch
         {
             XText text => text.Value,
-            XElement { Name.LocalName: "see" } see when see.Attribute("cref") is { } cref => JsonName(cref.Value),
+            XElement { Name.LocalName: "see" } see when see.Attribute("cref") is { } cref =>
+                Target(cref.Value, documentedType),
             XElement { Name.LocalName: "see" } see when see.Attribute("langword") is { } word => word.Value,
             XElement { Name.LocalName: "paramref" } reference =>
                 ExportFile.PropertyNaming.GetPropertyName((string)reference.Attribute("name")!, false),
-            XElement element => string.Concat(element.Nodes().Select(RenderNode)),
+            XElement element => string.Concat(element.Nodes().Select(child => RenderNode(child, documentedType))),
             _ => string.Empty
         };
 
     /// <summary>
-    ///     A cref (<c>P:Namespace.Type.Member</c>) as the JSON shows it: a property by its JSON name, an enum value as
-    ///     written, a type by its name, which is also its schema definition's.
+    ///     A cref (<c>P:Namespace.Type.Member</c>) as the JSON shows it: an enum value as written; a property by its
+    ///     JSON name alone on the documented type, as the type itself or one it derives from has it, or on the root; a
+    ///     property or type elsewhere in this file by its owner's definition and JSON name (<c>Mech.id</c>); one in
+    ///     another file by that file and its path there (<c>rules.json moraleLevels</c>); anything else by its name.
     /// </summary>
-    private string JsonName(string cref)
+    private string Target(string cref, Type documentedType)
     {
         var kind = cref[0];
         var name = cref[2..].Split('(')[0];
@@ -87,12 +99,34 @@ internal sealed partial class ModelDocumentation
         {
             ('F', { IsEnum: true }) =>
                 JsonConvert.SerializeObject(Enum.Parse(type, memberName), _serializerSettings).Trim('"'),
-            ('P', not null) when _serializerSettings.ContractResolver!.ResolveContract(type) is JsonObjectContract
-                    contract
-                => contract.Properties.FirstOrDefault(property => property.UnderlyingName == memberName)?.PropertyName
-                   ?? memberName,
+            ('P', not null) when JsonNameOf(type, memberName) is { } jsonName =>
+                type.IsAssignableFrom(documentedType) ? jsonName : Location(type, jsonName),
+            ('T', not null) => Location(type, null),
             _ => memberName
         };
+    }
+
+    private string? JsonNameOf(Type owner, string propertyName) =>
+        _serializerSettings.ContractResolver!.ResolveContract(owner) is JsonObjectContract contract
+            ? contract.Properties.FirstOrDefault(property => property.UnderlyingName == propertyName)?.PropertyName
+            : null;
+
+    // A property, or a type where propertyName is null.
+    private string Location(Type owner, string? propertyName)
+    {
+        if (_paths.PathIn(_fileModel, owner) is { } path)
+        {
+            return path.Length == 0
+                ? propertyName ?? "the file's root"
+                : ExportFilePaths.Join(DefinitionNames.Of(owner), propertyName);
+        }
+
+        if (_paths.ShortestPath(owner) is var (fileName, otherPath))
+        {
+            return $"{fileName} {ExportFilePaths.Join(otherPath, propertyName)}".TrimEnd();
+        }
+
+        return propertyName ?? DefinitionNames.Of(owner);
     }
 
     [GeneratedRegex(@"\s+")]

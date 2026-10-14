@@ -126,7 +126,17 @@ internal abstract record ResultAction(SimGameResultAction.ActionType Type);
 ///     removing one injury.
 /// </summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record PilotOnlyAction(SimGameResultAction.ActionType Type) : ResultAction(Type);
+internal sealed record PilotOnlyAction(SimGameResultAction.ActionType Type) : ResultAction(Type)
+{
+    internal static IReadOnlyCollection<SimGameResultAction.ActionType> Types { get; } =
+    [
+        SimGameResultAction.ActionType.MechWarrior_Kill,
+        SimGameResultAction.ActionType.MechWarrior_Fire,
+        SimGameResultAction.ActionType.MechWarrior_Heal,
+        SimGameResultAction.ActionType.MechWarrior_AddInjury,
+        SimGameResultAction.ActionType.MechWarrior_SubtractInjury
+    ];
+}
 
 /// <summary>An action that sidelines the event's pilot for a while.</summary>
 /// <param name="Days">How many days the pilot is sidelined for.</param>
@@ -137,7 +147,14 @@ internal sealed record SidelinePilotAction(int Days)
 /// <summary>An action that adds injuries to or removes them from the event's pilot.</summary>
 /// <param name="Injuries">How many injuries the action adds or removes.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record ChangeInjuriesAction(SimGameResultAction.ActionType Type, int Injuries) : ResultAction(Type);
+internal sealed record ChangeInjuriesAction(SimGameResultAction.ActionType Type, int Injuries) : ResultAction(Type)
+{
+    internal static IReadOnlyCollection<SimGameResultAction.ActionType> Types { get; } =
+    [
+        SimGameResultAction.ActionType.MechWarrior_AddInjuries,
+        SimGameResultAction.ActionType.MechWarrior_SubtractInjuries
+    ];
+}
 
 /// <summary>An action that renames the event's pilot.</summary>
 /// <param name="Callsign">The pilot's new callsign, which also becomes their name.</param>

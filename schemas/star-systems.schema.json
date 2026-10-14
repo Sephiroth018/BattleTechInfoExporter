@@ -141,8 +141,8 @@
           }
         },
         "stores": {
-          "description": "The item collections each of the star system's stores draws its stock from on arrival, every entry of each once, by their ids in itemCollectionDefinitions. A store without any doesn't exist in the star system.",
-          "$ref": "#/definitions/ByStoreOfIReadOnlyListOfString"
+          "description": "The item collections each of the star system's stores draws its stock from on arrival, every entry of each once, by their ids in catalog.json itemCollectionDefinitions. A store without any doesn't exist in the star system.",
+          "$ref": "#/definitions/ByStoreOfStringList"
         },
         "contractEmployers": {
           "type": "array",
@@ -192,7 +192,7 @@
         }
       }
     },
-    "ByStoreOfIReadOnlyListOfString": {
+    "ByStoreOfStringList": {
       "type": "object",
       "description": "A value per store of a star system: its system store, faction store and black market.",
       "additionalProperties": false,
@@ -258,7 +258,7 @@
       "properties": {
         "days": {
           "type": "integer",
-          "description": "The days the trip takes from the current star system's planet, as the starmap shows them while the ship is there, with the whole leg to its jump point (jumpPointDays), also the part already travelled during a trip (see legEndsOnDay). 0 for the current star system.",
+          "description": "The days the trip takes from the current star system's planet, as the starmap shows them while the ship is there, with the whole leg to its jump point (game-state.json position.travel.jumpPointDays), also the part already travelled during a trip (see game-state.json position.travel.legEndsOnDay). 0 for the current star system.",
           "format": "int32"
         },
         "cost": {

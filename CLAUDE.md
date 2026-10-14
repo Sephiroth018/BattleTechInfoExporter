@@ -371,8 +371,9 @@ generator, `BattleTechInfoExporter.SchemaGenerator/` (net9.0, never shipped). Th
 and runs the generator on the built mod; it writes a JSON Schema per export file into `schemas/`
 (`ExportFileModels` checks the mod's `ExportFiles` lists every file, `ExportSchemaGenerator`
 generates them with the mod's own serializer settings, `ModelDocumentation` turns the models' doc
-comments into their descriptions), and fails the build when an exported property has no
-description. The mod grants it `InternalsVisibleTo` for the serializer settings, the one exception
+comments into their descriptions, rendering a cref as where the JSON holds its target
+(`ExportFilePaths`), and `GameEnums` describes the game's enums), and fails the build when a
+definition or an exported property has no description. The mod grants it `InternalsVisibleTo` for the serializer settings, the one exception
 to "its own test project only".
 
 In the mod, `ModEntryPoint` is the
@@ -540,7 +541,9 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **Every export file has a JSON Schema** (draft-04), `schemas/<file>.schema.json`, generated on
   every build, committed, and shipped in the mod folder's `schemas/`. Every property is required,
   since the mod writes them all, `null` included; an abstract record declared as a property's type
-  is `anyOf` its derived records. A change to the export format shows in the schemas' diff.
+  is `anyOf` its derived records, each listing its own values of the enum that tells them apart.
+  An enum lists only the values the mod writes. A change to the export format shows in the schemas'
+  diff.
 - **Every export file starts with `modVersion`, `exportedAt` and `trigger`** (`ExportFile`, which
   every file's model inherits), describing the export that last wrote it.
 - **Points in time are day numbers** on the game's `DaysPassed` scale (`company.daysPassed`), e.g.

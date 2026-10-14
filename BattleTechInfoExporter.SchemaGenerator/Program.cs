@@ -20,11 +20,13 @@ GameAssemblyResolver.Register(args[0]);
 var generator = new ExportSchemaGenerator();
 var schemas = ExportFileModels.All.Select(file => (file.FileName, Schema: generator.Generate(file.Model))).ToList();
 
-if (generator.UndescribedProperties.Count > 0)
+if (generator.Undescribed.Count > 0)
 {
-    foreach (var property in generator.UndescribedProperties)
+    foreach (var name in generator.Undescribed)
     {
-        Console.Error.WriteLine($"error : {property} has no description; add one to its model's XML doc comment");
+        Console.Error.WriteLine(
+            $"error : {name} has no description; add one to its model's XML doc comment, or a game enum's to "
+            + "GameEnums");
     }
 
     return 1;

@@ -36,7 +36,7 @@
       "$ref": "#/definitions/ExportTrigger"
     },
     "contract": {
-      "description": "The contract being fought, as in contract.",
+      "description": "The contract being fought, as in mission-outcome.json contract.",
       "$ref": "#/definitions/MissionContract"
     },
     "mapId": {
@@ -44,7 +44,7 @@
         "null",
         "string"
       ],
-      "description": "The map, keyed as in mapDefinitions; null where the map isn't in the game's metadata database, e.g. a story map."
+      "description": "The map, keyed as in catalog.json mapDefinitions; null where the map isn't in the game's metadata database, e.g. a story map."
     },
     "round": {
       "type": "integer",
@@ -53,16 +53,16 @@
     },
     "phase": {
       "type": "integer",
-      "description": "The current phase as the HUD numbers it, as initiative: units act from 5 down to 1.",
+      "description": "The current phase as the HUD numbers it, as CombatUnitState.initiative: units act from 5 down to 1.",
       "format": "int32"
     },
     "resolve": {
       "type": "integer",
-      "description": "The lance's resolve now; its limits are in resolve.",
+      "description": "The lance's resolve now; its limits are in rules.json combat.resolve.",
       "format": "int32"
     },
     "movementLegend": {
-      "description": "How to read the units' movement.",
+      "description": "How to read the units' CombatUnit.movement.",
       "$ref": "#/definitions/MovementLegend"
     },
     "units": {
@@ -95,14 +95,14 @@
     },
     "buildingSides": {
       "type": "array",
-      "description": "The buildings on a side, e.g. a base to destroy or defend, by their id in buildings and in the order of their ids; the others are on none. The mission's script can change a building's side during the battle.",
+      "description": "The buildings on a side, e.g. a base to destroy or defend, by their id in combat-map.json buildings and in the order of their ids; the others are on none. The mission's script can change a building's side during the battle.",
       "items": {
         "$ref": "#/definitions/BuildingSide"
       }
     },
     "damagedBuildings": {
       "type": "array",
-      "description": "The buildings of buildings below their max structure, destroyed ones included, in the order of their ids; the others are undamaged.",
+      "description": "The buildings of combat-map.json buildings below their max structure, destroyed ones included, in the order of their ids; the others are undamaged.",
       "items": {
         "$ref": "#/definitions/DamagedBuilding"
       }
@@ -192,7 +192,7 @@
           "description": "The contract's name, as the contract list shows it."
         },
         "type": {
-          "description": "The mission type, described in contractTypes.",
+          "description": "The mission type, described in rules.json contractTypes.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "displayStyle": {
@@ -209,7 +209,7 @@
         },
         "difficulty": {
           "type": "integer",
-          "description": "On the scale of maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
+          "description": "On the scale of rules.json reputationLevels[].maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
           "format": "int32"
         },
         "starSystem": {
@@ -239,6 +239,7 @@
     },
     "ContractDisplayStyle": {
       "type": "string",
+      "description": "Whether a contract is a regular, story, restoration or flashpoint contract.",
       "x-enumNames": [
         "INVALID_UNSET",
         "BaseCampaignNormal",
@@ -384,7 +385,7 @@
             "null",
             "string"
           ],
-          "description": "The terrain the unit stands in, keyed as in terrainDefinitions; null on open ground and when last seen."
+          "description": "The terrain the unit stands in, keyed as in catalog.json terrainDefinitions; null on open ground and when last seen."
         },
         "pilot": {
           "description": "The pilot, which the HUD names only at full.",
@@ -500,6 +501,7 @@
     },
     "WeightClass": {
       "type": "string",
+      "description": "A unit's weight class.",
       "x-enumNames": [
         "LIGHT",
         "MEDIUM",
@@ -515,7 +517,7 @@
     },
     "MechReference": {
       "type": "object",
-      "description": "A mech in the mech bay, by its own id and name there (mechs).",
+      "description": "A mech in the mech bay, by its own id and name there (game-state.json mechs).",
       "additionalProperties": false,
       "required": [
         "id",
@@ -549,7 +551,7 @@
         },
         "y": {
           "type": "number",
-          "description": "The elevation, on the scale of elevations.",
+          "description": "The elevation, on the scale of combat-map.json rows[].elevations.",
           "format": "float"
         },
         "z": {
@@ -619,14 +621,14 @@
         },
         "locations": {
           "type": "array",
-          "description": "The armor and structure left per location, in the game's order: a mech's from head to legs, a vehicle's from front to rear and turret, a turret's single one. The limits are in definition or bayMech.",
+          "description": "The armor and structure left per location, in the game's order: a mech's from head to legs, a vehicle's from front to rear and turret, a turret's single one. The limits are in CombatUnit.definition or CombatUnit.bayMech.",
           "items": {
             "$ref": "#/definitions/UnitLocation"
           }
         },
         "evasionPips": {
           "type": "integer",
-          "description": "The evasive pips the unit has, earned by moving (see EvasionRules).",
+          "description": "The evasive pips the unit has, earned by moving (see rules.json combat.evasion).",
           "format": "int32"
         },
         "guard": {
@@ -635,7 +637,7 @@
         },
         "isEntrenched": {
           "type": "boolean",
-          "description": "Whether the unit is entrenched, e.g. by bracing, until its next activation: weapons' stability damage against it is multiplied by entrenchedInstabilityMultiplier."
+          "description": "Whether the unit is entrenched, e.g. by bracing, until its next activation: weapons' stability damage against it is multiplied by rules.json combat.stability.entrenchedInstabilityMultiplier."
         },
         "isProne": {
           "type": "boolean",
@@ -647,7 +649,7 @@
         },
         "isUnsteady": {
           "type": "boolean",
-          "description": "Whether the mech is unsteady: its instability rose above unsteadyAbove and hasn't fallen below since; only mechs can be."
+          "description": "Whether the mech is unsteady: its instability rose above MechStability.unsteadyAbove and hasn't fallen below since; only mechs can be."
         },
         "mech": {
           "description": "What only a mech has; null for vehicles and turrets.",
@@ -708,6 +710,7 @@
     },
     "DeathMethod": {
       "type": "string",
+      "description": "How a unit was destroyed, as the game records it.",
       "x-enumNames": [
         "NOT_SET",
         "HeadDestruction",
@@ -761,11 +764,11 @@
       "properties": {
         "location": {
           "type": "string",
-          "description": "The game's name of the location: a mech's as in location, a vehicle's as in location, or Structure for a turret's single location."
+          "description": "The game's name of the location: a mech's as in catalog.json chassisDefinitions.*.locations[].location, a vehicle's as in catalog.json vehicleDefinitions.*.locations[].location, or Structure for a turret's single location."
         },
         "armor": {
           "description": "The armor left, by side; only a mech's torso has a rear.",
-          "$ref": "#/definitions/LocationArmorOfInteger"
+          "$ref": "#/definitions/LocationArmorOfInt32"
         },
         "structure": {
           "type": "integer",
@@ -774,7 +777,7 @@
         }
       }
     },
-    "LocationArmorOfInteger": {
+    "LocationArmorOfInt32": {
       "type": "object",
       "description": "A location's armor by side, in whatever a file measures armor in.",
       "additionalProperties": false,
@@ -870,12 +873,12 @@
         },
         "overheatsAbove": {
           "type": "integer",
-          "description": "The heat above which the mech overheats, after the pilot's Guts and effects; the base is in overheatsAbove.",
+          "description": "The heat above which the mech overheats, after the pilot's Guts and effects; the base is in rules.json combat.heat.overheatsAbove.",
           "format": "int32"
         },
         "maxHeat": {
           "type": "integer",
-          "description": "The heat at which the mech shuts down, after heat banks and effects; the base is in maxHeat.",
+          "description": "The heat at which the mech shuts down, after heat banks and effects; the base is in rules.json combat.heat.maxHeat.",
           "format": "int32"
         }
       }
@@ -897,7 +900,7 @@
         },
         "unsteadyAbove": {
           "type": "number",
-          "description": "The instability above which the mech is unsteady and loses its evasive pips, after effects; the base is unsteadyAbovePercent of maxStability.",
+          "description": "The instability above which the mech is unsteady and loses its evasive pips, after effects; the base is rules.json combat.stability.unsteadyAbovePercent of maxStability.",
           "format": "float"
         },
         "maxStability": {
@@ -924,7 +927,7 @@
         },
         "location": {
           "type": "string",
-          "description": "The game's name of the location it is mounted in, as location."
+          "description": "The game's name of the location it is mounted in, as UnitLocation.location."
         },
         "damageLevel": {
           "description": "The game's damage level, e.g. Functional or Destroyed.",
@@ -942,7 +945,7 @@
     },
     "ComponentReference": {
       "type": "object",
-      "description": "A component's definition, like DefinitionReference, with the type that tells which group of componentDefinitions holds it. Components compare by type first, then as every reference.",
+      "description": "A component's definition, like DefinitionReference, with the type that tells which group of catalog.json componentDefinitions holds it. Components compare by type first, then as every reference.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -959,13 +962,14 @@
           "description": "The name the UI shows."
         },
         "type": {
-          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in componentDefinitions.",
+          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in catalog.json componentDefinitions.",
           "$ref": "#/definitions/ComponentType"
         }
       }
     },
     "ComponentType": {
       "type": "string",
+      "description": "The game's kind of component, which names the component's group in catalog.json componentDefinitions.",
       "x-enumNames": [
         "NotSet",
         "Weapon",
@@ -989,6 +993,7 @@
     },
     "ComponentDamageLevel": {
       "type": "string",
+      "description": "How damaged a component is.",
       "x-enumNames": [
         "Functional",
         "Misaligned",
@@ -1026,7 +1031,7 @@
         },
         "health": {
           "type": "integer",
-          "description": "The injuries the pilot can take before being incapacitated, as in health.",
+          "description": "The injuries the pilot can take before being incapacitated, as in mission-outcome.json lance[].health.",
           "format": "int32"
         },
         "bonusHealth": {
@@ -1053,22 +1058,22 @@
       "properties": {
         "gunnery": {
           "type": "integer",
-          "description": "The Gunnery level, whose training table is gunnery.",
+          "description": "The Gunnery level, whose training table is rules.json skills.gunnery.",
           "format": "int32"
         },
         "piloting": {
           "type": "integer",
-          "description": "The Piloting level, whose training table is piloting.",
+          "description": "The Piloting level, whose training table is rules.json skills.piloting.",
           "format": "int32"
         },
         "guts": {
           "type": "integer",
-          "description": "The Guts level, whose training table is guts.",
+          "description": "The Guts level, whose training table is rules.json skills.guts.",
           "format": "int32"
         },
         "tactics": {
           "type": "integer",
-          "description": "The Tactics level, whose training table is tactics.",
+          "description": "The Tactics level, whose training table is rules.json skills.tactics.",
           "format": "int32"
         }
       }
@@ -1163,7 +1168,7 @@
     },
     "UnitMovement": {
       "type": "object",
-      "description": "The hexes a player's unit can end its move on, read from the game's own pathing, with the evasion it gets and the attacks it has there. A unit that has activated gets those of its next activation, from where it stands. Laid out in rows of characters, as MovementLegend explains, like rows, whose hexes give each hex's terrain and elevation.",
+      "description": "The hexes a player's unit can end its move on, read from the game's own pathing, with the evasion it gets and the attacks it has there. A unit that has activated gets those of its next activation, from where it stands. Laid out in rows of characters, as MovementLegend explains, like combat-map.json rows, whose hexes give each hex's terrain and elevation.",
       "additionalProperties": false,
       "required": [
         "targets",
@@ -1172,7 +1177,7 @@
       "properties": {
         "targets": {
           "type": "array",
-          "description": "The enemies at full by unit id, in the order of attacks.",
+          "description": "The enemies at full by unit id, in the order of MovementRow.attacks.",
           "items": {
             "type": "string"
           }
@@ -1212,7 +1217,7 @@
         },
         "walk": {
           "type": "string",
-          "description": "The evasion pips per hex as moves says."
+          "description": "The evasion pips per hex as MovementLegend.moves says."
         },
         "sprint": {
           "type": [
@@ -1234,7 +1239,7 @@
         },
         "attacks": {
           "type": "array",
-          "description": "Per entry of targets, the fire and side as fire and side say.",
+          "description": "Per entry of UnitMovement.targets, the fire and side as MovementLegend.fire and MovementLegend.side say.",
           "items": {
             "type": "string"
           }
@@ -1258,7 +1263,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The game's id of the objective, which objectiveIds refer to."
+          "description": "The game's id of the objective, which ObjectiveZone.objectiveIds refer to."
         },
         "title": {
           "type": "string",
@@ -1288,7 +1293,7 @@
         },
         "targetBuildingIds": {
           "type": "array",
-          "description": "The buildings it is about (to destroy or defend), by their id.",
+          "description": "The buildings it is about (to destroy or defend), by their combat-map.json buildings[].id.",
           "items": {
             "type": "string"
           }
@@ -1308,6 +1313,7 @@
     },
     "ObjectiveStatus": {
       "type": "string",
+      "description": "Where an objective stands.",
       "x-enumNames": [
         "Active",
         "Ignored",
@@ -1359,7 +1365,7 @@
         },
         "objectiveIds": {
           "type": "array",
-          "description": "The objectives the zone belongs to among objectives, as id; empty where it belongs only to objectives the HUD doesn't list.",
+          "description": "The objectives the zone belongs to among objectives, as CombatObjective.id; empty where it belongs only to objectives the HUD doesn't list.",
           "items": {
             "type": "string"
           }
@@ -1386,7 +1392,7 @@
         },
         "hexes": {
           "type": "array",
-          "description": "The hexes a unit standing on is crushed: those whose center cell the game marks, in the order of rows: a dropship's whole footprint, or the hex each drop pod lands on, one per unit of the lance.",
+          "description": "The hexes a unit standing on is crushed: those whose center cell the game marks, in the order of combat-map.json rows: a dropship's whole footprint, or the hex each drop pod lands on, one per unit of the lance.",
           "items": {
             "$ref": "#/definitions/HexCoordinates"
           }
@@ -1407,7 +1413,7 @@
     },
     "HexCoordinates": {
       "type": "object",
-      "description": "A hex of rows by its axial coordinates.",
+      "description": "A hex of combat-map.json rows by its axial coordinates.",
       "additionalProperties": false,
       "required": [
         "q",
@@ -1416,12 +1422,12 @@
       "properties": {
         "q": {
           "type": "integer",
-          "description": "The hex's axial q, as in hexGrid.",
+          "description": "The hex's axial q, as in combat-map.json hexGrid.",
           "format": "int32"
         },
         "r": {
           "type": "integer",
-          "description": "The hex's axial r, as in hexGrid.",
+          "description": "The hex's axial r, as in combat-map.json hexGrid.",
           "format": "int32"
         }
       }
@@ -1437,7 +1443,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The building's id in buildings."
+          "description": "The building's id in combat-map.json buildings."
         },
         "side": {
           "description": "Whose side the building is on, as a unit has it.",
@@ -1457,11 +1463,11 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The building's id in buildings."
+          "description": "The building's id in combat-map.json buildings."
         },
         "structure": {
           "type": "number",
-          "description": "The structure left; its max is in maxStructure.",
+          "description": "The structure left; its max is in combat-map.json buildings[].maxStructure.",
           "format": "float"
         },
         "destroyedHexes": {
@@ -1478,7 +1484,7 @@
     },
     "MapHex": {
       "type": "object",
-      "description": "A hex of rows as it is now.",
+      "description": "A hex of combat-map.json rows as it is now.",
       "additionalProperties": false,
       "required": [
         "q",
@@ -1489,17 +1495,17 @@
       "properties": {
         "q": {
           "type": "integer",
-          "description": "The hex's axial q, as in hexGrid.",
+          "description": "The hex's axial q, as in combat-map.json hexGrid.",
           "format": "int32"
         },
         "r": {
           "type": "integer",
-          "description": "The hex's axial r, as in hexGrid.",
+          "description": "The hex's axial r, as in combat-map.json hexGrid.",
           "format": "int32"
         },
         "elevation": {
           "type": "number",
-          "description": "As in elevations.",
+          "description": "As in combat-map.json rows[].elevations.",
           "format": "double"
         },
         "terrain": {
@@ -1507,7 +1513,7 @@
             "null",
             "string"
           ],
-          "description": "Keyed as in terrainDefinitions; null on open ground."
+          "description": "Keyed as in catalog.json terrainDefinitions; null on open ground."
         }
       }
     }
