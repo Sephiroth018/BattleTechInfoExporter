@@ -16,15 +16,21 @@ internal static class ItemCollectionReader
     internal static SortedDictionary<string, ItemCollectionDefinition> ReadItemCollectionDefinitions(
         DataManager dataManager) =>
         CatalogEntries.ById(
-            dataManager.ItemCollectionDefs.Select(collection => ReadItemCollection(dataManager, collection.Value)));
+            dataManager.ItemCollectionDefs.Select(collection =>
+                ReadItemCollection(dataManager, collection.Key, collection.Value)));
 
     // What a draw yields (ItemCollectionResultGenerator.GenerateItemCollection): an item, another collection drawn in
-    // turn, or nothing for an entry of type None, which still uses up the draw.
-    private static ItemCollectionDefinition ReadItemCollection(DataManager dataManager, ItemCollectionDef collection)
+    // turn, or nothing for an entry of type None, which still uses up the draw. The id is the one the game loads the
+    // collection under, which the stores and events refer to; the file's own id row can differ (the game's
+    // itemCollection_loot_eventHellOfADeal carries another collection's id).
+    private static ItemCollectionDefinition ReadItemCollection(
+        DataManager dataManager,
+        string id,
+        ItemCollectionDef collection)
     {
         var entries = collection.Entries.Where(entry => IsKnownType(collection, entry)).ToList();
         return new ItemCollectionDefinition(
-            collection.ID,
+            id,
             ReferencedEntries.Read(
                     entries.Where(entry => ShopItemReferences.IsComponent(entry.Type)),
                     entry => ShopItemReferences.TryReferenceToComponent(dataManager, entry.Type, entry.ID),
