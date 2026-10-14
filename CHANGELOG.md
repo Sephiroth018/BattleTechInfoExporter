@@ -24,6 +24,18 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.72.1
+
+Changed: combat-state.json, combat-map.json.
+
+### combat-state.json
+- Values corrected `damagedBuildings[].destroyedHexes[].elevation`: rounded to 0.1 m without the
+  float noise (208.2, not 208.1999969482422).
+
+### combat-map.json
+- Values corrected `rows[].elevations[]`: rounded to 0.1 m without the float noise; code comparing
+  them for equality with other heights can now do so.
+
 ## 0.72.0
 
 Changed: rules.json (breaking), catalog.json.

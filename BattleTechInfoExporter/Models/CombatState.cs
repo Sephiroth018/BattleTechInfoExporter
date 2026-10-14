@@ -96,7 +96,7 @@ internal sealed record DamagedBuilding(string Id, float Structure, IReadOnlyList
 ///     Keyed as in the catalog's <see cref="Catalog.TerrainDefinitions" />; <c>null</c> on open ground.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record MapHex(int Q, int R, double Elevation, string? Terrain);
+internal sealed record MapHex(int Q, int R, float Elevation, string? Terrain);
 
 /// <summary>A point on the map in meters: <see cref="Y" /> is the elevation.</summary>
 /// <param name="X">Along the map's x axis, 0 at the map's center.</param>

@@ -1494,7 +1494,7 @@
         "elevation": {
           "type": "number",
           "description": "As in elevations.",
-          "format": "double"
+          "format": "float"
         },
         "terrain": {
           "type": [

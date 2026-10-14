@@ -277,10 +277,10 @@
         },
         "elevations": {
           "type": "array",
-          "description": "The height in meters a unit standing on each hex is at, a building's roof where one stands.",
+          "description": "The height in meters a unit standing on each hex is at, a building's roof where one stands, to 0.1 m.",
           "items": {
             "type": "number",
-            "format": "double"
+            "format": "float"
           }
         },
         "buildings": {

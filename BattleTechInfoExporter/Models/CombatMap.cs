@@ -75,7 +75,7 @@ internal sealed record CombatBuilding(string Id, string Name, MapPosition Positi
 /// <param name="R">The axial <c>r</c> of every hex in the row.</param>
 /// <param name="Terrains">Each hex's terrain as a character of <see cref="CombatMap.Terrains" />.</param>
 /// <param name="Elevations">
-///     The height in meters a unit standing on each hex is at, a building's roof where one stands.
+///     The height in meters a unit standing on each hex is at, a building's roof where one stands, to 0.1 m.
 /// </param>
 /// <param name="Buildings">
 ///     The index in <see cref="CombatMap.Buildings" /> of the building on each hex, or <c>null</c>; that entry's
@@ -90,6 +90,6 @@ internal sealed record HexRow(
     int Q,
     int R,
     string Terrains,
-    IReadOnlyList<double> Elevations,
+    IReadOnlyList<float> Elevations,
     IReadOnlyList<int?> Buildings,
     IReadOnlyList<string> BlockedSteps);
