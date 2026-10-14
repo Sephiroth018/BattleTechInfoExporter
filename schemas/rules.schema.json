@@ -934,7 +934,7 @@
       "properties": {
         "count": {
           "type": "integer",
-          "description": "How many of its unit the change lasts, at least 1.",
+          "description": "How many activations, rounds, movements or phases, by its unit, the change lasts; at least 1.",
           "format": "int32"
         },
         "unit": {

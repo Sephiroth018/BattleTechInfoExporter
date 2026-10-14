@@ -72,7 +72,7 @@ internal sealed record WeaponCategoryFilter(string Value) : ComponentFilter(Comp
 internal sealed record AmmoCategoryFilter(string Value) : ComponentFilter(ComponentFilterKind.AmmoCategory);
 
 /// <summary>How long a statistic change lasts.</summary>
-/// <param name="Count">How many of its unit the change lasts, at least 1.</param>
+/// <param name="Count">How many activations, rounds, movements or phases, by its unit, the change lasts; at least 1.</param>
 /// <param name="Unit">What the duration counts.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record EffectDuration(int Count, EffectDurationUnit Unit);
