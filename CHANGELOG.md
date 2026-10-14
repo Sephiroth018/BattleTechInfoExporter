@@ -24,6 +24,22 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.71.0
+
+Changed: game-state.json, star-systems.json, catalog.json.
+
+### game-state.json
+- Added `contractEmployers[]` to every full star system entry (`position.starSystem`,
+  `position.travel.destination`, `activeContract.starSystem` and `contracts[].starSystem`), as in
+  star-systems.json.
+
+### star-systems.json
+- Added `starSystems.<id>.contractEmployers[]`: the factions that can hire the company for the
+  system's generated contracts, each `employer` with the `targets[]` it can hire it against there.
+
+### catalog.json
+- Added `factionDefinitions.<id>`, keyed by faction id: each faction's `allies[]` and `enemies[]`.
+
 ## 0.70.0
 
 Changed: game-state.json (breaking), star-systems.json.

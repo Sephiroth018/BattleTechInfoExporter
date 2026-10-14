@@ -24,7 +24,9 @@ kept current. Three of them hold the career and are written together on every ca
   show, which events check), the biomes its
   contracts can be fought in, the maps the game can put its contracts on (selected as the contract
   generator does, from its biomes and map tags), the item collections its system store, faction
-  store and black market draw their stock from (see the catalog), its difficulty, whether its travel requirements
+  store and black market draw their stock from (see the catalog), the factions that can hire the
+  company for its contracts, each with the factions it can hire it against there (its enemies among
+  the system's targets, without the company's allies and the factions the story has set aside), its difficulty, whether its travel requirements
   are met, and the route from the current system: the days and C-Bills the trip takes as the
   starmap shows them while the ship is in the system (0 for the current system, `null` where there
   is no route). During a trip the days stay those from the current system's planet, including the
@@ -61,10 +63,10 @@ Two more hold the running battle, and exist only while one runs:
 
 The last one describes the game rather than the career:
 
-- `catalog.json`: every chassis, mech, vehicle, turret, component, terrain, biome, map, event and
-  item collection the game has loaded, DLC included, keyed by id, so tools can judge what else
+- `catalog.json`: every chassis, mech, vehicle, turret, component, terrain, biome, map, event,
+  item collection and faction the game has loaded, DLC included, keyed by id, so tools can judge what else
   exists beyond what the career refers to, what a mission's enemies can do, what its ground does to
-  them, which events can come and where a mech or component can be bought.
+  them, which events can come, where a mech or component can be bought and who hires against whom.
   - **Chassis:** the frame: weight class, tonnage and bare tonnage, value, max jump jets, built-in heat
     dissipation, walk and sprint distance, the pathing capabilities it moves with (see "Combat
     map"), melee values before upgrades, and per location max
@@ -137,6 +139,9 @@ The last one describes the game rather than the career:
     (better "progression" tiers, the Restoration's mech parts) by swapping its definition, which
     the star system's entry follows. The game has no unlock dates in the campaign; the few DLC
     mechs that need a finished flashpoint aren't marked.
+  - **Factions:** each faction's allies and enemies. A faction hires the company against its
+    enemies where a star system lists them as targets, which `star-systems.json` spells out per
+    system; while the company is allied with a faction, that faction's enemies are the company's.
 
   The other files refer to the catalog's chassis, mechs and components by id instead
   of repeating their stats or limits, e.g. a location's max armor; a file and the catalog belong

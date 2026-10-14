@@ -3044,6 +3044,7 @@
         "biomes",
         "maps",
         "stores",
+        "contractEmployers",
         "difficulty",
         "canTravelTo",
         "route"
@@ -3085,6 +3086,13 @@
         "stores": {
           "description": "The item collections each of the star system's stores draws its stock from on arrival, every entry of each once, by their ids in the catalog's itemCollectionDefinitions. A store without any doesn't exist in the star system.",
           "$ref": "#/definitions/ByStoreOfIReadOnlyListOfString"
+        },
+        "contractEmployers": {
+          "type": "array",
+          "description": "The factions that can hire the company for the star system's generated contracts, sorted by name, each with the factions it can hire it against; a contract's own requirements can narrow them further. Story and flashpoint contracts name their own.",
+          "items": {
+            "$ref": "#/definitions/ContractEmployer"
+          }
         },
         "difficulty": {
           "type": "integer",
@@ -3137,6 +3145,27 @@
           "description": "The value for the black market.",
           "items": {
             "type": "string"
+          }
+        }
+      }
+    },
+    "ContractEmployer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "employer",
+        "targets"
+      ],
+      "properties": {
+        "employer": {
+          "description": "A faction that can hire the company in the star system.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "targets": {
+          "type": "array",
+          "description": "The factions it can hire the company against there, sorted by name: its enemies among the star system's targets, except the company's allies.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
           }
         }
       }
