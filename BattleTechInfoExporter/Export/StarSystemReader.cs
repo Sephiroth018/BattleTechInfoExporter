@@ -56,6 +56,7 @@ internal static class StarSystemReader
             definition.SupportedBiomes.Select(biome => biomes[biome]).OrderBy(biome => biome).ToList(),
             ReadPlayableMaps(definition, playableMaps),
             ReadStoreCollections(definition),
+            FactionReader.ReadContractEmployers(simGame, definition),
             // As the starmap's system panel shows it (SGSystemViewPopulator).
             simGame.GetNormalizedDifficulty(definition),
             canTravelTo,

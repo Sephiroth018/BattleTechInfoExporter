@@ -396,7 +396,8 @@ Folders:
   rules file's tables, with `AbilityReader` reading each ability, `CombatRulesReader` the combat
   constants and `CampaignRulesReader` the campaign constants; `EffectReader` reads the statistic
   changes of abilities, components, terrains and rules; `StarSystemReader` builds the star systems file from the starmap, with
-  `RouteReader` reading the route to a system as the starmap plans it; `MissionReader` builds the
+  `RouteReader` reading the route to a system as the starmap plans it and `FactionReader` which factions hire
+  against whom there; `MissionReader` builds the
   mission file's models from the completed contract; `CombatStateReader` builds the combat state
   file from the running battle, with `CombatUnitReader` reading each unit as the HUD shows it,
   `MovementReader` where each player unit can move, and `ObjectiveReader` the objectives and zones; `CombatMapReader` builds the combat map file from the
@@ -405,8 +406,9 @@ Folders:
   ones for the combat state; `CatalogReader` builds the catalog from the
   definitions the game has loaded, with `TerrainReader` reading the terrains and biomes from the
   design masks, `MapReader` the maps from the metadata database and their terrain data files,
-  `EventDefinitionReader` the events, which also makes the references to them, and
-  `ItemCollectionReader` the item collections the stores draw from; `EventStateReader`
+  `EventDefinitionReader` the events, which also makes the references to them,
+  `ItemCollectionReader` the item collections the stores draw from, and `FactionReader` the
+  factions' allies and enemies; `EventStateReader`
   builds the game state's events section, and `EventStatisticReader` the company's and the pilots'
   statistics the events compare.
   `DefinitionReferences` makes the
@@ -470,7 +472,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   each system's active definition, each entry holds its active definition's name, owner, tags,
   biomes, maps and the item collections its stores draw from (`stores`, by their ids in the
   catalog's `itemCollectionDefinitions`) next to what changes during a career (difficulty, travel
-  requirements, route). The
+  requirements, route, and the employers with their targets, `contractEmployers`, which the
+  company's alliances and the story's ignored factions narrow). The
   story swaps a system's definition (`StarSystem_SetActiveDef`, e.g. when its owner changes); the
   inactive definitions give a consumer nothing and aren't exported. The full entry is repeated
   wherever a step needs it: in the game state `position.starSystem`, `position.travel.destination`,
@@ -506,8 +509,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   (`hexGrid`). A hex is what a unit standing on it gets from the cell at its center (`MapHexReader`);
   blocked steps follow the game's path node steps (`HexStepReader`).
 - **The catalog is a file of its own that doesn't depend on the career:** `catalog.json`, with
-  every chassis, mech, vehicle, turret, component, terrain, biome, map, event and item collection
-  definition the game has loaded, rebuilt on a career load only when it's missing or stale: written by another mod version or with
+  every chassis, mech, vehicle, turret, component, terrain, biome, map, event, item collection and
+  faction definition the game has loaded, rebuilt on a career load only when it's missing or stale: written by another mod version or with
   another `sourceFingerprint`, the hash of the game's manifest entries for everything it reads (id,
   file and last write time). A change touching no file it reads (a DLL mod patching definitions in
   memory) isn't detected; deleting the file forces a rebuild. Vehicles' and turrets'
@@ -574,7 +577,7 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   ally in combat.
 - **Turret:** a fixed emplacement with a single location (`TurretDef`).
 - **Catalog:** the export of every chassis, mech, vehicle, turret, component, terrain, biome, map,
-  event and item collection definition the game has loaded (`catalog.json`).
+  event, item collection and faction definition the game has loaded (`catalog.json`).
 - **Item collection:** a weighted list the stores and rewards draw items from (`ItemCollectionDef`):
   components, whole mechs, mech parts or other collections, drawn in turn.
 - **Star system:** a system on the starmap (`StarSystem`). Never "location" (a mech's body
