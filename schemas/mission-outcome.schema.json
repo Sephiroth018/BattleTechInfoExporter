@@ -268,7 +268,7 @@
         },
         "objectiveIds": {
           "type": "array",
-          "description": "The ids the combat state's id had for the objectives this one groups, also those the HUD didn't list; its own id alone where it is one of them.",
+          "description": "The ids id had for the objectives this one groups, also those the HUD didn't list; its own id alone where it is one of them.",
           "items": {
             "type": "string"
           }
@@ -466,7 +466,7 @@
     },
     "MechReference": {
       "type": "object",
-      "description": "A mech in the mech bay: its own id and name, as in id and name.",
+      "description": "A mech in the mech bay, by its own id and name there (mechs).",
       "additionalProperties": false,
       "required": [
         "id",
@@ -506,6 +506,7 @@
     },
     "DamagedLocation": {
       "type": "object",
+      "description": "A body location that lost armor or structure in the mission, as it is after it.",
       "additionalProperties": false,
       "required": [
         "location",
@@ -592,6 +593,7 @@
     },
     "Armor": {
       "type": "object",
+      "description": "The armor of one side of a location.",
       "additionalProperties": false,
       "required": [
         "current",
@@ -612,6 +614,7 @@
     },
     "DamagedComponent": {
       "type": "object",
+      "description": "A component damaged or destroyed in the mission.",
       "additionalProperties": false,
       "required": [
         "component",
@@ -721,7 +724,7 @@
         },
         "shotsFired": {
           "type": "integer",
-          "description": "The shots fired, also from a box destroyed since; the capacity is the catalog's capacity or internalAmmoCapacity.",
+          "description": "The shots fired, also from a box destroyed since; the capacity is capacity or internalAmmoCapacity.",
           "format": "int32"
         }
       }
@@ -796,6 +799,7 @@
     },
     "StoredComponent": {
       "type": "object",
+      "description": "A stored component, described in the catalog.",
       "additionalProperties": false,
       "required": [
         "component",
@@ -821,6 +825,7 @@
     },
     "StoredMechParts": {
       "type": "object",
+      "description": "Stored parts of a mech, described in the catalog, from which the mech is assembled.",
       "additionalProperties": false,
       "required": [
         "mech",

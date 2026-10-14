@@ -152,6 +152,7 @@
     },
     "MoraleLevel": {
       "type": "object",
+      "description": "A level of the company's morale, and what it does in combat.",
       "additionalProperties": false,
       "required": [
         "level",
@@ -235,6 +236,7 @@
     },
     "MercenaryReviewBoardLevel": {
       "type": "object",
+      "description": "A level of the Mercenary Review Board rating, and what it allows.",
       "additionalProperties": false,
       "required": [
         "level",
@@ -308,6 +310,7 @@
     },
     "SkillOfGunneryLevel": {
       "type": "object",
+      "description": "A pilot skill's training table.",
       "additionalProperties": false,
       "required": [
         "description",
@@ -329,6 +332,7 @@
     },
     "GunneryLevel": {
       "type": "object",
+      "description": "A level of the Gunnery skill.",
       "additionalProperties": false,
       "required": [
         "level",
@@ -363,6 +367,7 @@
     },
     "SkillLevelAbility": {
       "type": "object",
+      "description": "An ability a skill level unlocks.",
       "additionalProperties": false,
       "required": [
         "ability",
@@ -610,6 +615,7 @@
     },
     "EffectTargetCollection": {
       "type": "object",
+      "description": "The pilot or the components of the unit whose statistic a change applies to.",
       "additionalProperties": false,
       "required": [
         "collection",
@@ -688,6 +694,7 @@
     },
     "AmmoCategoryFilter": {
       "type": "object",
+      "description": "A filter on the ammunition boxes' category.",
       "additionalProperties": false,
       "required": [
         "kind",
@@ -706,6 +713,7 @@
     },
     "WeaponCategoryFilter": {
       "type": "object",
+      "description": "A filter on the weapons' category.",
       "additionalProperties": false,
       "required": [
         "kind",
@@ -724,6 +732,7 @@
     },
     "WeaponSubTypeFilter": {
       "type": "object",
+      "description": "A filter on the weapons' sub type.",
       "additionalProperties": false,
       "required": [
         "kind",
@@ -839,6 +848,7 @@
     },
     "WeaponTypeFilter": {
       "type": "object",
+      "description": "A filter on the weapons' type.",
       "additionalProperties": false,
       "required": [
         "kind",
@@ -888,6 +898,7 @@
     },
     "EffectDuration": {
       "type": "object",
+      "description": "How long a statistic change lasts.",
       "additionalProperties": false,
       "required": [
         "count",
@@ -896,7 +907,7 @@
       "properties": {
         "count": {
           "type": "integer",
-          "description": "How many of unit the change lasts, at least 1.",
+          "description": "How many of its unit the change lasts, at least 1.",
           "format": "int32"
         },
         "unit": {
@@ -977,6 +988,7 @@
     },
     "SkillOfPilotingLevel": {
       "type": "object",
+      "description": "A pilot skill's training table.",
       "additionalProperties": false,
       "required": [
         "description",
@@ -998,6 +1010,7 @@
     },
     "PilotingLevel": {
       "type": "object",
+      "description": "A level of the Piloting skill.",
       "additionalProperties": false,
       "required": [
         "level",
@@ -1038,6 +1051,7 @@
     },
     "SkillOfSkillLevel": {
       "type": "object",
+      "description": "A pilot skill's training table.",
       "additionalProperties": false,
       "required": [
         "description",
@@ -1460,6 +1474,7 @@
     },
     "TargetWeightClassModifiers": {
       "type": "object",
+      "description": "The modifier for the target's size, by its kind and weight class.",
       "additionalProperties": false,
       "required": [
         "mech",
@@ -1483,6 +1498,7 @@
     },
     "ByWeightClassOfSingle": {
       "type": "object",
+      "description": "A value per weight class of the unit it applies to.",
       "additionalProperties": false,
       "required": [
         "light",
@@ -1546,6 +1562,7 @@
     },
     "AttackerWalkedModifiers": {
       "type": "object",
+      "description": "The modifier when the attacker walked this round, by its kind.",
       "additionalProperties": false,
       "required": [
         "mech",
@@ -1604,6 +1621,7 @@
     },
     "DamagedLocationModifiers": {
       "type": "object",
+      "description": "The modifier for a weapon in a damaged location, by the location's damage.",
       "additionalProperties": false,
       "required": [
         "penalized",
@@ -1675,6 +1693,7 @@
     },
     "EvasivePips": {
       "type": "object",
+      "description": "The evasive pips a move longer than a distance earns.",
       "additionalProperties": false,
       "required": [
         "moreThan",
@@ -1990,7 +2009,7 @@
     },
     "StabilityRules": {
       "type": "object",
-      "description": "The stability rules of mechs. A mech's stability bar has levels levels; a mech that reaches unsteadyAbovePercent of its stability is unsteady and loses its evasive pips, and an unsteady mech that fills the bar is knocked down.",
+      "description": "The stability rules of mechs. A mech's stability bar is divided into equal levels; a mech that reaches unsteadyAbovePercent of its stability is unsteady and loses its evasive pips, and an unsteady mech that fills the bar is knocked down.",
       "additionalProperties": false,
       "required": [
         "unsteadyAbovePercent",
@@ -2005,7 +2024,7 @@
       "properties": {
         "unsteadyAbovePercent": {
           "type": "integer",
-          "description": "In percent of the stability bar; a mech's UnsteadyThreshold statistic starts at it, and the combat state's unsteadyAbove is its current value in points.",
+          "description": "In percent of the stability bar; a mech's UnsteadyThreshold statistic starts at it, and unsteadyAbove is its current value in points.",
           "format": "int32"
         },
         "levels": {
@@ -2043,6 +2062,7 @@
     },
     "LevelsRecoveredByAction": {
       "type": "object",
+      "description": "The levels of instability a mech's action this round removes.",
       "additionalProperties": false,
       "required": [
         "stationary",
@@ -2087,6 +2107,7 @@
     },
     "LevelsAddedByAction": {
       "type": "object",
+      "description": "The levels of instability an action adds to the mech doing it.",
       "additionalProperties": false,
       "required": [
         "deathFromAbove",
@@ -2107,6 +2128,7 @@
     },
     "InstabilityFromDamage": {
       "type": "object",
+      "description": "The share of the stability bar added when a location is damaged, by the location and damage.",
       "additionalProperties": false,
       "required": [
         "sideTorsoDestroyed",
@@ -2462,6 +2484,7 @@
     },
     "ClusteredHitWeights": {
       "type": "object",
+      "description": "The multipliers of the location weights for the later hits of a weapon that fires several.",
       "additionalProperties": false,
       "required": [
         "sameLocation",
@@ -2711,6 +2734,7 @@
     },
     "ResolveEventThresholds": {
       "type": "object",
+      "description": "The shares, from 0 to 1, at which an attack's resolve events happen.",
       "additionalProperties": false,
       "required": [
         "majorityHit",
@@ -2835,6 +2859,7 @@
     },
     "ByWeightClassOfInteger": {
       "type": "object",
+      "description": "A value per weight class of the unit it applies to.",
       "additionalProperties": false,
       "required": [
         "light",
@@ -2905,6 +2930,7 @@
     },
     "LegDamagePenalties": {
       "type": "object",
+      "description": "The share of the distance a mech loses per leg, by the leg's damage.",
       "additionalProperties": false,
       "required": [
         "penalized",
@@ -3032,6 +3058,7 @@
     },
     "MechLabCost": {
       "type": "object",
+      "description": "What a kind of mech lab work costs.",
       "additionalProperties": false,
       "required": [
         "techPoints",
@@ -3052,6 +3079,7 @@
     },
     "MechLabCostMultipliers": {
       "type": "object",
+      "description": "Multipliers of a mech lab cost.",
       "additionalProperties": false,
       "required": [
         "techPoints",
@@ -3353,6 +3381,7 @@
     },
     "SalvageOutcome": {
       "type": "object",
+      "description": "What a mission's outcome does to its salvage.",
       "additionalProperties": false,
       "required": [
         "chance",
@@ -3373,6 +3402,7 @@
     },
     "SalvagePickWeights": {
       "type": "object",
+      "description": "The relative weights the salvage drawn at random is drawn from the pool by, per kind of item.",
       "additionalProperties": false,
       "required": [
         "weapon",
@@ -3399,6 +3429,7 @@
     },
     "RareSalvageSwaps": {
       "type": "object",
+      "description": "The chance of a salvaged component being swapped for a rarer one, by kind of component.",
       "additionalProperties": false,
       "required": [
         "weapons",
@@ -3417,7 +3448,7 @@
     },
     "RareSalvageSwap": {
       "type": "object",
-      "description": "The chance of a swap is the contract's difficulty plus the tier's ChanceOffset, divided by divisor; the very rare tier is rolled first.",
+      "description": "The chance of a swap is the contract's difficulty plus the tier's chanceOffset, divided by divisor; the very rare tier is rolled first.",
       "additionalProperties": false,
       "required": [
         "veryRare",
@@ -3442,6 +3473,7 @@
     },
     "RareSalvageTier": {
       "type": "object",
+      "description": "A tier of rarer components a salvaged component can be swapped for.",
       "additionalProperties": false,
       "required": [
         "rarities",
@@ -3465,6 +3497,7 @@
     },
     "FinancesRules": {
       "type": "object",
+      "description": "The company's expenses, trade and debt, and the morale effects of failed missions.",
       "additionalProperties": false,
       "required": [
         "daysPerReport",
@@ -3561,6 +3594,7 @@
     },
     "SpendingLevelRules": {
       "type": "object",
+      "description": "What a spending level does.",
       "additionalProperties": false,
       "required": [
         "level",
@@ -3796,6 +3830,7 @@
     },
     "AllianceRules": {
       "type": "object",
+      "description": "What allying with a faction takes and what breaking the alliance costs.",
       "additionalProperties": false,
       "required": [
         "reputationNeeded",

@@ -44,7 +44,7 @@
         "null",
         "string"
       ],
-      "description": "The map, keyed as in the catalog's mapDefinitions; null where the map isn't in the game's metadata database, e.g. a story map."
+      "description": "The map, keyed as in mapDefinitions; null where the map isn't in the game's metadata database, e.g. a story map."
     },
     "round": {
       "type": "integer",
@@ -58,7 +58,7 @@
     },
     "resolve": {
       "type": "integer",
-      "description": "The lance's resolve now; its limits are in rules.json's ResolveRules.",
+      "description": "The lance's resolve now; its limits are in resolve.",
       "format": "int32"
     },
     "movementLegend": {
@@ -384,7 +384,7 @@
             "null",
             "string"
           ],
-          "description": "The terrain the unit stands in, keyed as in the catalog's terrainDefinitions; null on open ground and when last seen."
+          "description": "The terrain the unit stands in, keyed as in terrainDefinitions; null on open ground and when last seen."
         },
         "pilot": {
           "description": "The pilot, which the HUD names only at full.",
@@ -515,7 +515,7 @@
     },
     "MechReference": {
       "type": "object",
-      "description": "A mech in the mech bay: its own id and name, as in id and name.",
+      "description": "A mech in the mech bay, by its own id and name there (mechs).",
       "additionalProperties": false,
       "required": [
         "id",
@@ -585,6 +585,7 @@
     },
     "CombatUnitState": {
       "type": "object",
+      "description": "A unit's condition as the HUD shows it, for a unit in full view.",
       "additionalProperties": false,
       "required": [
         "deathMethod",
@@ -829,6 +830,7 @@
     },
     "MechState": {
       "type": "object",
+      "description": "What only a mech's condition has: its heat and stability bars.",
       "additionalProperties": false,
       "required": [
         "heat",
@@ -907,6 +909,7 @@
     },
     "CombatComponent": {
       "type": "object",
+      "description": "A component mounted on a unit, with its condition in the battle.",
       "additionalProperties": false,
       "required": [
         "component",
@@ -1007,6 +1010,7 @@
     },
     "CombatPilotState": {
       "type": "object",
+      "description": "A unit's pilot's condition in the battle.",
       "additionalProperties": false,
       "required": [
         "injuries",
@@ -1049,28 +1053,29 @@
       "properties": {
         "gunnery": {
           "type": "integer",
-          "description": "The gunnery level, a level of gunnery.",
+          "description": "The Gunnery level, whose training table is gunnery.",
           "format": "int32"
         },
         "piloting": {
           "type": "integer",
-          "description": "The piloting level, a level of piloting.",
+          "description": "The Piloting level, whose training table is piloting.",
           "format": "int32"
         },
         "guts": {
           "type": "integer",
-          "description": "The guts level, a level of guts.",
+          "description": "The Guts level, whose training table is guts.",
           "format": "int32"
         },
         "tactics": {
           "type": "integer",
-          "description": "The tactics level, a level of tactics.",
+          "description": "The Tactics level, whose training table is tactics.",
           "format": "int32"
         }
       }
     },
     "CombatAbility": {
       "type": "object",
+      "description": "An ability a unit can activate, as its HUD button shows it.",
       "additionalProperties": false,
       "required": [
         "ability",
@@ -1283,7 +1288,7 @@
         },
         "targetBuildingIds": {
           "type": "array",
-          "description": "The buildings it is about (to destroy or defend), as id in buildings.",
+          "description": "The buildings it is about (to destroy or defend), by their id.",
           "items": {
             "type": "string"
           }
@@ -1442,6 +1447,7 @@
     },
     "DamagedBuilding": {
       "type": "object",
+      "description": "A building below its max structure, or destroyed.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -1501,7 +1507,7 @@
             "null",
             "string"
           ],
-          "description": "Keyed as in the catalog's terrainDefinitions; null on open ground."
+          "description": "Keyed as in terrainDefinitions; null on open ground."
         }
       }
     }

@@ -6,8 +6,8 @@ internal enum LineOfFireBlocking
     Clear,
 
     /// <summary>
-    ///     The game's obstructed line: direct fire is still possible, with the penalties of <c>rules.json</c>'s
-    ///     <see cref="LineOfFireRules" />.
+    ///     The game's obstructed line: direct fire is still possible, with the penalties of
+    ///     <see cref="CombatRules.LineOfFire" />.
     /// </summary>
     PartiallyBlocked,
 

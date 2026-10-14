@@ -7,8 +7,11 @@ namespace BattleTechInfoExporter.Models;
 
 /// <summary>An event the game can show between missions: when it can come, and the options it offers.</summary>
 /// <param name="Name">
-///     The event's title as plain text; placeholders such as <c>{TGT_MW.Callsign}</c> stand for the pilots the game
-///     picks, and a switch on their gender is resolved to its default wording.
+///     The event's title as plain text. Placeholders in braces stand for what the game picks, by its prefix:
+///     <c>TGT_MW</c> the event's pilot, <c>SCN_MW</c> and <c>TRT_MW</c> the second and third pilot,
+///     <c>COMMANDER</c> the commander, <c>SCN_UNIT</c> the mech and <c>TGT_SYSTEM</c> the current star system;
+///     after the dot what of it is shown, e.g. <c>{TGT_MW.Callsign}</c>, the pronoun <c>{TGT_MW.Subj}</c> or
+///     <c>{TGT_SYSTEM.Name}</c>. A switch on a pilot's gender is resolved to its default wording.
 /// </param>
 /// <param name="Scope">
 ///     What the event is about: the company, or a pilot it picks among those meeting
@@ -17,7 +20,8 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Weight">The event's draw weight among the events that can come.</param>
 /// <param name="IsOneTime">Whether the event comes at most once per career.</param>
 /// <param name="CanBeDrawn">
-///     Whether the daily event roll can draw the event; when false, only a <see cref="ForcedEvent" /> brings it.
+///     Whether the daily event roll can draw the event; when false, it comes only when another event's result
+///     schedules it.
 /// </param>
 /// <param name="Requirements">
 ///     What the event's company or pilot (<paramref name="Scope" />) must meet; <c>null</c> when nothing.
@@ -54,6 +58,7 @@ internal sealed record EventDefinition(
             .Concat(Options.SelectMany(option => option.Requirements));
 }
 
+/// <summary>Another pilot or a mech the event involves, besides its own company or pilot.</summary>
 /// <param name="Scope">The second pilot, the third pilot or a mech in the mech bay.</param>
 /// <param name="Requirements">What the pilot or mech must meet; <c>null</c> when any will do.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -76,6 +81,7 @@ internal sealed record EventOption(
     IReadOnlyList<EventRequirement> Requirements,
     IReadOnlyList<EventOutcome> Outcomes);
 
+/// <summary>One of the outcomes an option can lead to, drawn by weight.</summary>
 /// <param name="Weight">The outcome's draw weight among the option's outcomes.</param>
 /// <param name="Results">The changes the outcome makes, in order.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -108,7 +114,7 @@ internal sealed record EventResult(
     IReadOnlyList<ForcedEvent> ForcedEvents);
 
 /// <summary>
-///     What else a result does, about the event's pilot or the company; each kind of <see cref="Type" /> has a
+///     What else a result does, about the event's pilot or the company; each value of <see cref="Type" /> has a
 ///     record with the field it needs.
 /// </summary>
 /// <param name="Type">What the action does, e.g. <c>MechWarrior_SetTimeout</c> or <c>MechWarrior_Kill</c>.</param>

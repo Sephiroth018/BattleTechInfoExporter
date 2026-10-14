@@ -18,8 +18,7 @@ namespace BattleTechInfoExporter.Models;
 ///     they are in full view: neither blips nor destroyed enemies.
 /// </param>
 /// <param name="TargetBuildingIds">
-///     The buildings it is about (to destroy or defend), as <see cref="CombatBuilding.Id" /> in
-///     <see cref="CombatMap.Buildings" />.
+///     The buildings it is about (to destroy or defend), by their <see cref="CombatBuilding.Id" />.
 /// </param>
 /// <param name="Beacon">
 ///     Where the HUD draws the objective's beacon, 2 m above the ground, e.g. where the reinforcements it announces

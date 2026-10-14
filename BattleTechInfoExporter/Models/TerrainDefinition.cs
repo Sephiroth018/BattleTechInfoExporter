@@ -23,7 +23,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="SignatureMultiplier">Multiplies the signature of a unit in the terrain.</param>
 /// <param name="ToHitAgainstRanged">
 ///     The to-hit modifier of ranged attacks against a mech or vehicle in the terrain, not a turret; positive makes
-///     the attack harder, as in the rules' <c>combat.toHit</c>.
+///     the attack harder, as in <see cref="CombatRules.ToHit" />.
 /// </param>
 /// <param name="ToHitAgainstMelee">
 ///     The to-hit modifier of melee attacks against a mech or vehicle in the terrain, not a turret; positive makes
@@ -63,9 +63,9 @@ internal sealed record TerrainDefinition(
     IReadOnlyList<StatisticChange> StickyEffects) : ICatalogEntry;
 
 /// <summary>By the unit: a mech, a tracked vehicle or a wheeled vehicle, and its weight class.</summary>
-/// <param name="Mech">For mechs, by their weight class.</param>
-/// <param name="Tracked">For tracked vehicles, by their weight class.</param>
-/// <param name="Wheeled">For wheeled vehicles, by their weight class.</param>
+/// <param name="Mech">For mechs, by their weight class; <c>null</c> where they can't enter.</param>
+/// <param name="Tracked">For tracked vehicles, by their weight class; <c>null</c> where they can't enter.</param>
+/// <param name="Wheeled">For wheeled vehicles, by their weight class; <c>null</c> where they can't enter.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record TerrainMoveCosts(
     ByWeightClass<float?> Mech,
@@ -73,8 +73,8 @@ internal sealed record TerrainMoveCosts(
     ByWeightClass<float?> Wheeled);
 
 /// <summary>
-///     <see cref="All" /> and the weapon category's multiplier both apply; melee and jump attacks get only
-///     <see cref="All" />.
+///     The multiplier for every attack and the weapon category's both apply; melee and jump attacks get only
+///     the one for every attack.
 /// </summary>
 /// <param name="All">For every attack.</param>
 /// <param name="Support">For weapons of the <c>Support</c> <see cref="WeaponDefinition.Category" />.</param>
@@ -83,7 +83,7 @@ internal sealed record TerrainMoveCosts(
 /// <param name="Missile">For weapons of the <c>Missile</c> <see cref="WeaponDefinition.Category" />.</param>
 /// <param name="ByWeaponCategory">
 ///     The weapon category's multiplier keyed by every <see cref="WeaponDefinition.Category" /> the game knows, as
-///     the rules' <c>combat.weaponCategories</c> are; 1 for a category without one, such as <c>Melee</c>.
+///     <see cref="CombatRules.WeaponCategories" /> are; 1 for a category without one, such as <c>Melee</c>.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record DamageMultipliers(

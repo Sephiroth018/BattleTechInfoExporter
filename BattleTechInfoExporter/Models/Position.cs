@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
+/// <summary>Where the company's ship is, and where it's headed.</summary>
 /// <param name="StarSystem">
 ///     The star system the ship is in, in full, as in <c>star-systems.json</c>; while travelling, the one it left or,
 ///     once it has jumped, the last it jumped to.

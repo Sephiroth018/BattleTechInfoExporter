@@ -57,7 +57,7 @@ internal sealed record MissionContract(
 ///     those where it has results of its own.
 /// </param>
 /// <param name="ObjectiveIds">
-///     The ids the combat state's <see cref="CombatObjective.Id" /> had for the objectives this one groups, also
+///     The ids <see cref="CombatObjective.Id" /> had for the objectives this one groups, also
 ///     those the HUD didn't list; its own id alone where it is one of them.
 /// </param>
 /// <param name="Title">The objective's title as plain text.</param>
@@ -119,10 +119,12 @@ internal sealed record LanceUnitOutcome(
     IReadOnlyList<DamagedComponent> DamagedComponents,
     IReadOnlyList<AmmunitionUse> Ammunition);
 
+/// <summary>A body location that lost armor or structure in the mission, as it is after it.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record DamagedLocation(ChassisLocations Location, LocationArmor<Armor> Armor, float Structure)
     : MechLocationCondition(Location, Armor, Structure);
 
+/// <summary>A component damaged or destroyed in the mission.</summary>
 /// <param name="Location">The location it is mounted in.</param>
 /// <param name="DamageLevel">The game's damage level, e.g. <c>Penalized</c> or <c>Destroyed</c>.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -134,7 +136,7 @@ internal sealed record DamagedComponent(
 /// <summary>The shots a mech fired from an ammo box, or from a weapon that carries its own ammo.</summary>
 /// <param name="Location">The location the box or weapon is mounted in.</param>
 /// <param name="ShotsFired">
-///     The shots fired, also from a box destroyed since; the capacity is the catalog's
+///     The shots fired, also from a box destroyed since; the capacity is
 ///     <see cref="AmmunitionBoxDefinition.Capacity" /> or <see cref="WeaponDefinition.InternalAmmoCapacity" />.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

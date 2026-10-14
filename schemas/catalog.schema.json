@@ -37,7 +37,7 @@
     },
     "sourceFingerprint": {
       "type": "string",
-      "description": "A hash of the game's data the catalog was built from (CatalogSourceFingerprint); the catalog is rebuilt when it differs from the game's current data."
+      "description": "A hash of the game's data files the catalog was built from: of every one it reads, its id, file and last write time; the catalog is rebuilt when it differs from the game's current data."
     },
     "chassisDefinitions": {
       "type": "object",
@@ -292,7 +292,7 @@
         },
         "pathingId": {
           "type": "string",
-          "description": "The game's pathing capabilities the unit moves with, which decide the slopes it can climb, as in combat-map.json's pathingGroups."
+          "description": "The game's pathing capabilities the unit moves with, which decide the slopes it can climb, as in pathingGroups."
         }
       }
     },
@@ -350,6 +350,7 @@
     },
     "ChassisLocationDefinition": {
       "type": "object",
+      "description": "A body location of a chassis: its limits and hardpoints.",
       "additionalProperties": false,
       "required": [
         "location",
@@ -631,12 +632,12 @@
       "properties": {
         "walk": {
           "type": "number",
-          "description": "The chassis' walk distance (walk).",
+          "description": "The chassis' walk distance, as in walk.",
           "format": "float"
         },
         "sprint": {
           "type": "number",
-          "description": "The chassis' sprint distance (sprint).",
+          "description": "The chassis' sprint distance, as in sprint.",
           "format": "float"
         },
         "jump": {
@@ -648,6 +649,7 @@
     },
     "HeatStats": {
       "type": "object",
+      "description": "The heat dissipated, generated and tolerated.",
       "additionalProperties": false,
       "required": [
         "dissipation",
@@ -701,6 +703,7 @@
     },
     "RangeStats": {
       "type": "object",
+      "description": "The weapons' ranges.",
       "additionalProperties": false,
       "required": [
         "max",
@@ -721,6 +724,7 @@
     },
     "DurabilityStats": {
       "type": "object",
+      "description": "The armor and structure, and the damage taken from the mech's own jump attack.",
       "additionalProperties": false,
       "required": [
         "armor",
@@ -747,6 +751,7 @@
     },
     "MeleeStats": {
       "type": "object",
+      "description": "The damage of melee and jump attacks.",
       "additionalProperties": false,
       "required": [
         "damage",
@@ -773,6 +778,7 @@
     },
     "MechLocationDefinition": {
       "type": "object",
+      "description": "A body location of a mech definition, with its armor and components.",
       "additionalProperties": false,
       "required": [
         "location",
@@ -799,6 +805,7 @@
     },
     "LoadoutComponent": {
       "type": "object",
+      "description": "A component of a mech definition's loadout.",
       "additionalProperties": false,
       "required": [
         "component",
@@ -894,7 +901,7 @@
           "format": "float"
         },
         "movementType": {
-          "description": "How the vehicle moves, Tracked or Wheeled, which picks its row of TerrainMoveCosts.",
+          "description": "How the vehicle moves, Tracked or Wheeled, which picks its row of every terrain's moveCost.",
           "$ref": "#/definitions/VehicleMovementType"
         },
         "movement": {
@@ -927,6 +934,7 @@
     },
     "VehicleLocationDefinition": {
       "type": "object",
+      "description": "A location of a vehicle: its armor, structure and components.",
       "additionalProperties": false,
       "required": [
         "location",
@@ -1089,6 +1097,7 @@
     },
     "WeaponDefinition": {
       "type": "object",
+      "description": "A weapon: its damage, heat, ammunition and ranges.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -1152,7 +1161,7 @@
         },
         "category": {
           "type": "string",
-          "description": "The hardpoint kind the weapon needs, e.g. \"Ballistic\" or \"Support\", which also keys the rules' combat.weaponCategories."
+          "description": "The hardpoint kind the weapon needs, e.g. \"Ballistic\" or \"Support\", which also keys weaponCategories."
         },
         "ammoCategory": {
           "type": [
@@ -1205,7 +1214,7 @@
           "format": "int32"
         },
         "coil": {
-          "description": "How the COIL weapon gains from its mech's evasive pips, as the rules' combat.coil applies it; null for every other weapon.",
+          "description": "How the COIL weapon gains from its mech's evasive pips, as coil applies it; null for every other weapon.",
           "oneOf": [
             {
               "type": "null"
@@ -1221,7 +1230,7 @@
         },
         "accuracyModifier": {
           "type": "number",
-          "description": "The weapon's own to-hit modifier, which the hit chance adds to the others; positive makes the attack harder, as in the rules' combat.toHit.",
+          "description": "The weapon's own to-hit modifier, which the hit chance adds to the others; positive makes the attack harder, as in toHit.",
           "format": "float"
         },
         "criticalChanceMultiplier": {
@@ -1352,6 +1361,7 @@
     },
     "EffectTargetCollection": {
       "type": "object",
+      "description": "The pilot or the components of the unit whose statistic a change applies to.",
       "additionalProperties": false,
       "required": [
         "collection",
@@ -1430,6 +1440,7 @@
     },
     "AmmoCategoryFilter": {
       "type": "object",
+      "description": "A filter on the ammunition boxes' category.",
       "additionalProperties": false,
       "required": [
         "kind",
@@ -1448,6 +1459,7 @@
     },
     "WeaponCategoryFilter": {
       "type": "object",
+      "description": "A filter on the weapons' category.",
       "additionalProperties": false,
       "required": [
         "kind",
@@ -1466,6 +1478,7 @@
     },
     "WeaponSubTypeFilter": {
       "type": "object",
+      "description": "A filter on the weapons' sub type.",
       "additionalProperties": false,
       "required": [
         "kind",
@@ -1581,6 +1594,7 @@
     },
     "WeaponTypeFilter": {
       "type": "object",
+      "description": "A filter on the weapons' type.",
       "additionalProperties": false,
       "required": [
         "kind",
@@ -1630,6 +1644,7 @@
     },
     "EffectDuration": {
       "type": "object",
+      "description": "How long a statistic change lasts.",
       "additionalProperties": false,
       "required": [
         "count",
@@ -1638,7 +1653,7 @@
       "properties": {
         "count": {
           "type": "integer",
-          "description": "How many of unit the change lasts, at least 1.",
+          "description": "How many of its unit the change lasts, at least 1.",
           "format": "int32"
         },
         "unit": {
@@ -1719,6 +1734,7 @@
     },
     "CoilWeapon": {
       "type": "object",
+      "description": "How a COIL weapon gains from its mech's evasive pips.",
       "additionalProperties": false,
       "required": [
         "evasiveExponent",
@@ -1759,28 +1775,29 @@
         },
         "short": {
           "type": "number",
-          "description": "The end of the short bracket, from min, where rules.json's short applies.",
+          "description": "The end of the short bracket, from min, where short applies.",
           "format": "float"
         },
         "medium": {
           "type": "number",
-          "description": "The end of the medium bracket, from short, where rules.json's medium applies.",
+          "description": "The end of the medium bracket, from short, where medium applies.",
           "format": "float"
         },
         "long": {
           "type": "number",
-          "description": "The end of the long bracket, from medium, where rules.json's long applies.",
+          "description": "The end of the long bracket, from medium, where long applies.",
           "format": "float"
         },
         "max": {
           "type": "number",
-          "description": "The end of the maximum bracket, from long, where rules.json's maximum applies; the weapon can't fire beyond it.",
+          "description": "The end of the maximum bracket, from long, where maximum applies; the weapon can't fire beyond it.",
           "format": "float"
         }
       }
     },
     "AmmunitionBoxDefinition": {
       "type": "object",
+      "description": "An ammunition box, which feeds the weapons of its ammunition category.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -1841,6 +1858,7 @@
     },
     "HeatSinkDefinition": {
       "type": "object",
+      "description": "A heat sink, mounted on top of the engine's built-in ones.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -2072,7 +2090,7 @@
         },
         "toHitAgainstRanged": {
           "type": "number",
-          "description": "The to-hit modifier of ranged attacks against a mech or vehicle in the terrain, not a turret; positive makes the attack harder, as in the rules' combat.toHit.",
+          "description": "The to-hit modifier of ranged attacks against a mech or vehicle in the terrain, not a turret; positive makes the attack harder, as in toHit.",
           "format": "float"
         },
         "toHitAgainstMelee": {
@@ -2127,21 +2145,22 @@
       ],
       "properties": {
         "mech": {
-          "description": "For mechs, by their weight class.",
+          "description": "For mechs, by their weight class; null where they can't enter.",
           "$ref": "#/definitions/ByWeightClassOfNullableSingle"
         },
         "tracked": {
-          "description": "For tracked vehicles, by their weight class.",
+          "description": "For tracked vehicles, by their weight class; null where they can't enter.",
           "$ref": "#/definitions/ByWeightClassOfNullableSingle"
         },
         "wheeled": {
-          "description": "For wheeled vehicles, by their weight class.",
+          "description": "For wheeled vehicles, by their weight class; null where they can't enter.",
           "$ref": "#/definitions/ByWeightClassOfNullableSingle"
         }
       }
     },
     "ByWeightClassOfNullableSingle": {
       "type": "object",
+      "description": "A value per weight class of the unit it applies to.",
       "additionalProperties": false,
       "required": [
         "light",
@@ -2186,7 +2205,7 @@
     },
     "DamageMultipliers": {
       "type": "object",
-      "description": "all and the weapon category's multiplier both apply; melee and jump attacks get only all.",
+      "description": "The multiplier for every attack and the weapon category's both apply; melee and jump attacks get only the one for every attack.",
       "additionalProperties": false,
       "required": [
         "all",
@@ -2224,7 +2243,7 @@
         },
         "byWeaponCategory": {
           "type": "object",
-          "description": "The weapon category's multiplier keyed by every category the game knows, as the rules' combat.weaponCategories are; 1 for a category without one, such as Melee.",
+          "description": "The weapon category's multiplier keyed by every category the game knows, as weaponCategories are; 1 for a category without one, such as Melee.",
           "additionalProperties": {
             "type": "number",
             "format": "float"
@@ -2338,7 +2357,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The event's title as plain text; placeholders such as {TGT_MW.Callsign} stand for the pilots the game picks, and a switch on their gender is resolved to its default wording."
+          "description": "The event's title as plain text. Placeholders in braces stand for what the game picks, by its prefix: TGT_MW the event's pilot, SCN_MW and TRT_MW the second and third pilot, COMMANDER the commander, SCN_UNIT the mech and TGT_SYSTEM the current star system; after the dot what of it is shown, e.g. {TGT_MW.Callsign}, the pronoun {TGT_MW.Subj} or {TGT_SYSTEM.Name}. A switch on a pilot's gender is resolved to its default wording."
         },
         "scope": {
           "description": "What the event is about: the company, or a pilot it picks among those meeting requirements and without an event timeout.",
@@ -2355,7 +2374,7 @@
         },
         "canBeDrawn": {
           "type": "boolean",
-          "description": "Whether the daily event roll can draw the event; when false, only a ForcedEvent brings it."
+          "description": "Whether the daily event roll can draw the event; when false, it comes only when another event's result schedules it."
         },
         "requirements": {
           "description": "What the event's company or pilot (scope) must meet; null when nothing.",
@@ -2468,6 +2487,7 @@
     },
     "StatisticComparison": {
       "type": "object",
+      "description": "A comparison a statistic of the scope must pass.",
       "additionalProperties": false,
       "required": [
         "statistic",
@@ -2511,6 +2531,7 @@
     },
     "EventTarget": {
       "type": "object",
+      "description": "Another pilot or a mech the event involves, besides its own company or pilot.",
       "additionalProperties": false,
       "required": [
         "scope",
@@ -2571,6 +2592,7 @@
     },
     "EventOutcome": {
       "type": "object",
+      "description": "One of the outcomes an option can lead to, drawn by weight.",
       "additionalProperties": false,
       "required": [
         "weight",
@@ -2692,7 +2714,7 @@
       }
     },
     "ResultAction": {
-      "description": "What else a result does, about the event's pilot or the company; each kind of type has a record with the field it needs.",
+      "description": "What else a result does, about the event's pilot or the company; each value of type has a record with the field it needs.",
       "x-abstract": true,
       "anyOf": [
         {
@@ -3089,6 +3111,7 @@
     },
     "ComponentCollectionEntry": {
       "type": "object",
+      "description": "A component a draw from the collection can yield.",
       "additionalProperties": false,
       "required": [
         "component",
@@ -3117,6 +3140,7 @@
     },
     "MechCollectionEntry": {
       "type": "object",
+      "description": "A whole mech a draw from the collection can yield.",
       "additionalProperties": false,
       "required": [
         "mech",
@@ -3145,6 +3169,7 @@
     },
     "MechPartsCollectionEntry": {
       "type": "object",
+      "description": "Mech parts a draw from the collection can yield.",
       "additionalProperties": false,
       "required": [
         "mech",
@@ -3173,6 +3198,7 @@
     },
     "NestedCollectionEntry": {
       "type": "object",
+      "description": "Another collection a draw from the collection can yield, which is then drawn from in turn.",
       "additionalProperties": false,
       "required": [
         "collection",

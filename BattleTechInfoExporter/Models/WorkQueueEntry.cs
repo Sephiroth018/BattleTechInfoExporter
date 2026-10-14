@@ -4,8 +4,8 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     An entry of the timeline: a work order the company is waiting for. Each kind of <see cref="Type" /> has a
-///     record with the target it is about.
+///     An entry of the timeline: a work order the company is waiting for. Each group of <see cref="Type" /> values
+///     has a record with the target it is about.
 /// </summary>
 /// <param name="Type">The game's kind of work order, e.g. <c>MedLabHeal</c> or <c>FinancialReport</c>.</param>
 /// <param name="FinishesOnDay">The day it finishes, on the scale of <see cref="Company.DaysPassed" />.</param>

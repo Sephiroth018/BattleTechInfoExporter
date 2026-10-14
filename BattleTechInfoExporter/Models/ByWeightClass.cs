@@ -2,6 +2,7 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
+/// <summary>A value per weight class of the unit it applies to.</summary>
 /// <param name="Light">The value for light units.</param>
 /// <param name="Medium">The value for medium units.</param>
 /// <param name="Heavy">The value for heavy units.</param>

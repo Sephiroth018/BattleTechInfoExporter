@@ -22,6 +22,7 @@ internal sealed record ExpectedExpenses(
     IReadOnlyList<MechExpense> Mechs,
     IReadOnlyList<PilotExpense> Pilots);
 
+/// <summary>The ship's line of the expenses.</summary>
 /// <param name="Name">
 ///     The line's name on the finance screen: the Argo's operating costs, or the bank loan interest before the
 ///     company has the Argo.
@@ -29,14 +30,17 @@ internal sealed record ExpectedExpenses(
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ShipExpense(string Name, int Amount) : IExpense;
 
+/// <summary>A ship upgrade's line of the expenses.</summary>
 /// <param name="Upgrade">The ship upgrade whose upkeep the line is.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ShipUpgradeExpense(DefinitionReference Upgrade, int Amount) : IExpense;
 
+/// <summary>A mech's line of the expenses.</summary>
 /// <param name="Mech">The mech in the mech bay whose upkeep the line is.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechExpense(MechReference Mech, int Amount) : IExpense;
 
+/// <summary>A pilot's line of the expenses.</summary>
 /// <param name="Pilot">The pilot whose salary the line is.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record PilotExpense(PilotReference Pilot, int Amount) : IExpense;

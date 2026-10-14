@@ -9,7 +9,7 @@ namespace BattleTechInfoExporter.Models;
 /// </summary>
 /// <param name="Contract">The contract being fought, as in <see cref="MissionOutcome.Contract" />.</param>
 /// <param name="MapId">
-///     The map, keyed as in the catalog's <see cref="Catalog.MapDefinitions" />; <c>null</c> where the map isn't in
+///     The map, keyed as in <see cref="Catalog.MapDefinitions" />; <c>null</c> where the map isn't in
 ///     the game's metadata database, e.g. a story map.
 /// </param>
 /// <param name="Round">The combat round, counted from 1.</param>
@@ -17,7 +17,7 @@ namespace BattleTechInfoExporter.Models;
 ///     The current phase as the HUD numbers it, as <see cref="CombatUnitState.Initiative" />: units act from 5
 ///     down to 1.
 /// </param>
-/// <param name="Resolve">The lance's resolve now; its limits are in <c>rules.json</c>'s <see cref="ResolveRules" />.</param>
+/// <param name="Resolve">The lance's resolve now; its limits are in <see cref="CombatRules.Resolve" />.</param>
 /// <param name="MovementLegend">How to read the units' <see cref="CombatUnit.Movement" />.</param>
 /// <param name="Units">
 ///     Every unit the player knows of, keyed by the game's unit id: the player's and allied units, and the enemies
@@ -79,6 +79,7 @@ internal sealed record HexCoordinates(int Q, int R);
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record BuildingSide(string Id, TeamSide Side);
 
+/// <summary>A building below its max structure, or destroyed.</summary>
 /// <param name="Id">The building's id in <see cref="CombatMap.Buildings" />.</param>
 /// <param name="Structure">The structure left; its max is in <see cref="CombatBuilding.MaxStructure" />.</param>
 /// <param name="DestroyedHexes">
@@ -93,7 +94,7 @@ internal sealed record DamagedBuilding(string Id, float Structure, IReadOnlyList
 /// <param name="R">The hex's axial <c>r</c>, as in <see cref="CombatMap.HexGrid" />.</param>
 /// <param name="Elevation">As in <see cref="HexRow.Elevations" />.</param>
 /// <param name="Terrain">
-///     Keyed as in the catalog's <see cref="Catalog.TerrainDefinitions" />; <c>null</c> on open ground.
+///     Keyed as in <see cref="Catalog.TerrainDefinitions" />; <c>null</c> on open ground.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MapHex(int Q, int R, double Elevation, string? Terrain);

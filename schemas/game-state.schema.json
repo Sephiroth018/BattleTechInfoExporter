@@ -97,8 +97,8 @@
       "$ref": "#/definitions/Storage"
     },
     "stores": {
-      "description": "The current system's stores, each null if the system has none or the company can't use it: the system store unless the reputation with the system's owner is LOATHED, the faction store only while allied with its owner, the black market once the company has gained access to black markets. Their stock changes only on arrival in a system.",
-      "$ref": "#/definitions/ByStoreOfStore"
+      "description": "The current star system's stores, each null if the star system has none or the company can't use it. Their stock changes only on arrival in a star system.",
+      "$ref": "#/definitions/StarSystemStores"
     },
     "hiringHall": {
       "type": "array",
@@ -193,6 +193,7 @@
     },
     "Company": {
       "type": "object",
+      "description": "The player's mercenary company: its funds, morale, standing and staff.",
       "additionalProperties": false,
       "required": [
         "name",
@@ -312,6 +313,7 @@
     },
     "Morale": {
       "type": "object",
+      "description": "The company's morale and the level it falls in.",
       "additionalProperties": false,
       "required": [
         "value",
@@ -320,7 +322,7 @@
       "properties": {
         "value": {
           "type": "integer",
-          "description": "The company's morale, which startsAt compares with.",
+          "description": "The company's morale, which each level's startsAt is compared with.",
           "format": "int32"
         },
         "level": {
@@ -352,6 +354,7 @@
     },
     "FactionReputation": {
       "type": "object",
+      "description": "The company's reputation with a faction, and its alliance with it.",
       "additionalProperties": false,
       "required": [
         "faction",
@@ -477,6 +480,7 @@
     },
     "Spending": {
       "type": "object",
+      "description": "The company's spending level, which scales the expenses of each financial report and changes morale.",
       "additionalProperties": false,
       "required": [
         "level",
@@ -515,6 +519,7 @@
     },
     "SpendingOption": {
       "type": "object",
+      "description": "A spending level the company can choose, with what the next financial report deducts at it.",
       "additionalProperties": false,
       "required": [
         "level",
@@ -578,6 +583,7 @@
     },
     "ShipExpense": {
       "type": "object",
+      "description": "The ship's line of the expenses.",
       "additionalProperties": false,
       "required": [
         "name",
@@ -597,6 +603,7 @@
     },
     "ShipUpgradeExpense": {
       "type": "object",
+      "description": "A ship upgrade's line of the expenses.",
       "additionalProperties": false,
       "required": [
         "upgrade",
@@ -616,6 +623,7 @@
     },
     "MechExpense": {
       "type": "object",
+      "description": "A mech's line of the expenses.",
       "additionalProperties": false,
       "required": [
         "mech",
@@ -635,7 +643,7 @@
     },
     "MechReference": {
       "type": "object",
-      "description": "A mech in the mech bay: its own id and name, as in id and name.",
+      "description": "A mech in the mech bay, by its own id and name there (mechs).",
       "additionalProperties": false,
       "required": [
         "id",
@@ -654,6 +662,7 @@
     },
     "PilotExpense": {
       "type": "object",
+      "description": "A pilot's line of the expenses.",
       "additionalProperties": false,
       "required": [
         "pilot",
@@ -696,7 +705,7 @@
       }
     },
     "WorkQueueEntry": {
-      "description": "An entry of the timeline: a work order the company is waiting for. Each kind of type has a record with the target it is about.",
+      "description": "An entry of the timeline: a work order the company is waiting for. Each group of type values has a record with the target it is about.",
       "x-abstract": true,
       "anyOf": [
         {
@@ -931,6 +940,7 @@
     },
     "ShipUpgrade": {
       "type": "object",
+      "description": "A ship upgrade as the engineering screen shows it.",
       "additionalProperties": false,
       "required": [
         "upgrade",
@@ -1240,28 +1250,29 @@
       "properties": {
         "gunnery": {
           "type": "integer",
-          "description": "The gunnery level, a level of gunnery.",
+          "description": "The Gunnery level, whose training table is gunnery.",
           "format": "int32"
         },
         "piloting": {
           "type": "integer",
-          "description": "The piloting level, a level of piloting.",
+          "description": "The Piloting level, whose training table is piloting.",
           "format": "int32"
         },
         "guts": {
           "type": "integer",
-          "description": "The guts level, a level of guts.",
+          "description": "The Guts level, whose training table is guts.",
           "format": "int32"
         },
         "tactics": {
           "type": "integer",
-          "description": "The tactics level, a level of tactics.",
+          "description": "The Tactics level, whose training table is tactics.",
           "format": "int32"
         }
       }
     },
     "Experience": {
       "type": "object",
+      "description": "A pilot's experience points.",
       "additionalProperties": false,
       "required": [
         "unspent",
@@ -1296,6 +1307,7 @@
     },
     "Spirits": {
       "type": "object",
+      "description": "A pilot's spirits, which events raise and lower for a while.",
       "additionalProperties": false,
       "required": [
         "level",
@@ -1332,6 +1344,7 @@
     },
     "ServiceRecord": {
       "type": "object",
+      "description": "A pilot's career in the company, as the barracks shows it.",
       "additionalProperties": false,
       "required": [
         "missions",
@@ -1369,13 +1382,13 @@
         },
         "hiredOnDay": {
           "type": "integer",
-          "description": "On the scale of daysPassed.",
+          "description": "The day the pilot was hired, on the scale of daysPassed.",
           "format": "int32"
         }
       }
     },
     "Mech": {
-      "description": "A mech in the mech bay, with its current loadout; each status has a record with the fields of its own.",
+      "description": "A mech in the mech bay, with its current loadout; each value of status has a record with the fields of its own.",
       "x-abstract": true,
       "anyOf": [
         {
@@ -1405,7 +1418,7 @@
     },
     "MechLoadout": {
       "type": "object",
-      "description": "A mech's loadout with the tonnage, value and stats that follow from it; the chassis' limits are in the catalog's ChassisDefinition.",
+      "description": "A mech's loadout with the tonnage, value and stats that follow from it; the chassis' limits are in chassisDefinitions.",
       "additionalProperties": false,
       "required": [
         "usedTonnage",
@@ -1538,12 +1551,12 @@
       "properties": {
         "walk": {
           "type": "number",
-          "description": "The chassis' walk distance (walk).",
+          "description": "The chassis' walk distance, as in walk.",
           "format": "float"
         },
         "sprint": {
           "type": "number",
-          "description": "The chassis' sprint distance (sprint).",
+          "description": "The chassis' sprint distance, as in sprint.",
           "format": "float"
         },
         "jump": {
@@ -1555,6 +1568,7 @@
     },
     "HeatStats": {
       "type": "object",
+      "description": "The heat dissipated, generated and tolerated.",
       "additionalProperties": false,
       "required": [
         "dissipation",
@@ -1608,6 +1622,7 @@
     },
     "RangeStats": {
       "type": "object",
+      "description": "The weapons' ranges.",
       "additionalProperties": false,
       "required": [
         "max",
@@ -1628,6 +1643,7 @@
     },
     "DurabilityStats": {
       "type": "object",
+      "description": "The armor and structure, and the damage taken from the mech's own jump attack.",
       "additionalProperties": false,
       "required": [
         "armor",
@@ -1654,6 +1670,7 @@
     },
     "MeleeStats": {
       "type": "object",
+      "description": "The damage of melee and jump attacks.",
       "additionalProperties": false,
       "required": [
         "damage",
@@ -1680,6 +1697,7 @@
     },
     "MechLocation": {
       "type": "object",
+      "description": "A body location of a mech in the mech bay, with its components.",
       "additionalProperties": false,
       "required": [
         "location",
@@ -1774,6 +1792,7 @@
     },
     "Armor": {
       "type": "object",
+      "description": "The armor of one side of a location.",
       "additionalProperties": false,
       "required": [
         "current",
@@ -1963,7 +1982,7 @@
       }
     },
     "RefitChange": {
-      "description": "One step of a mech's queued refit; each type has a record with the fields of its own.",
+      "description": "One step of a mech's queued refit; each value of type has a record with the fields of its own.",
       "x-abstract": true,
       "anyOf": [
         {
@@ -2003,6 +2022,7 @@
     },
     "InstallComponentChange": {
       "type": "object",
+      "description": "A step that installs a component.",
       "additionalProperties": false,
       "required": [
         "type",
@@ -2036,6 +2056,7 @@
     },
     "ModifyArmorChange": {
       "type": "object",
+      "description": "A step that adds or removes a location's armor.",
       "additionalProperties": false,
       "required": [
         "type",
@@ -2088,6 +2109,7 @@
     },
     "RemoveComponentChange": {
       "type": "object",
+      "description": "A step that removes a component.",
       "additionalProperties": false,
       "required": [
         "type",
@@ -2121,6 +2143,7 @@
     },
     "RepairComponentChange": {
       "type": "object",
+      "description": "A step that repairs a component.",
       "additionalProperties": false,
       "required": [
         "type",
@@ -2161,6 +2184,7 @@
     },
     "RepairStructureChange": {
       "type": "object",
+      "description": "A step that repairs a location's structure.",
       "additionalProperties": false,
       "required": [
         "type",
@@ -2432,6 +2456,7 @@
     },
     "StoredComponent": {
       "type": "object",
+      "description": "A stored component, described in the catalog.",
       "additionalProperties": false,
       "required": [
         "component",
@@ -2465,7 +2490,7 @@
       ],
       "properties": {
         "chassis": {
-          "description": "The chassis, described in the catalog's chassisDefinitions.",
+          "description": "The chassis, described in chassisDefinitions.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "count": {
@@ -2477,6 +2502,7 @@
     },
     "StoredMechParts": {
       "type": "object",
+      "description": "Stored parts of a mech, described in the catalog, from which the mech is assembled.",
       "additionalProperties": false,
       "required": [
         "mech",
@@ -2494,9 +2520,9 @@
         }
       }
     },
-    "ByStoreOfStore": {
+    "StarSystemStores": {
       "type": "object",
-      "description": "A value per store of a star system: its system store, faction store and black market.",
+      "description": "The current star system's stores the company can use.",
       "additionalProperties": false,
       "required": [
         "system",
@@ -2505,7 +2531,7 @@
       ],
       "properties": {
         "system": {
-          "description": "The value for the system store.",
+          "description": "The system store; null where the star system has none or the reputation with its owner is LOATHED.",
           "oneOf": [
             {
               "type": "null"
@@ -2516,7 +2542,7 @@
           ]
         },
         "faction": {
-          "description": "The value for the faction store.",
+          "description": "The faction store; null where the star system has none or the company isn't allied with its owner.",
           "oneOf": [
             {
               "type": "null"
@@ -2527,7 +2553,7 @@
           ]
         },
         "blackMarket": {
-          "description": "The value for the black market.",
+          "description": "The black market; null where the star system has none or the company hasn't gained access to black markets.",
           "oneOf": [
             {
               "type": "null"
@@ -2541,6 +2567,7 @@
     },
     "Store": {
       "type": "object",
+      "description": "A store's stock and prices.",
       "additionalProperties": false,
       "required": [
         "faction",
@@ -2578,6 +2605,7 @@
     },
     "ComponentForSale": {
       "type": "object",
+      "description": "A component in stock, described in the catalog.",
       "additionalProperties": false,
       "required": [
         "component",
@@ -2635,6 +2663,7 @@
     },
     "MechPartsForSale": {
       "type": "object",
+      "description": "Mech parts in stock, described in the catalog.",
       "additionalProperties": false,
       "required": [
         "mech",
@@ -2885,6 +2914,7 @@
     },
     "MechSlotLimits": {
       "type": "object",
+      "description": "The tonnage limits of one mech slot of the lance.",
       "additionalProperties": false,
       "required": [
         "minTonnage",
@@ -2967,6 +2997,7 @@
     },
     "NegotiatedShares": {
       "type": "object",
+      "description": "The slider positions a contract's terms were negotiated at.",
       "additionalProperties": false,
       "required": [
         "payPercent",
@@ -2987,6 +3018,7 @@
     },
     "Salvage": {
       "type": "object",
+      "description": "The salvage of a contract, in items.",
       "additionalProperties": false,
       "required": [
         "total",
@@ -3084,7 +3116,7 @@
           }
         },
         "stores": {
-          "description": "The item collections each of the star system's stores draws its stock from on arrival, every entry of each once, by their ids in the catalog's itemCollectionDefinitions. A store without any doesn't exist in the star system.",
+          "description": "The item collections each of the star system's stores draws its stock from on arrival, every entry of each once, by their ids in itemCollectionDefinitions. A store without any doesn't exist in the star system.",
           "$ref": "#/definitions/ByStoreOfIReadOnlyListOfString"
         },
         "contractEmployers": {
@@ -3151,6 +3183,7 @@
     },
     "ContractEmployer": {
       "type": "object",
+      "description": "A faction that offers contracts in a star system, with the factions they can be against.",
       "additionalProperties": false,
       "required": [
         "employer",
@@ -3271,13 +3304,13 @@
           "$ref": "#/definitions/Negotiation"
         },
         "starSystem": {
-          "description": "The star system the mission is fought in, in full, as in star-systems.json, with the trip there: the current one, whose route is empty, or another the company travels to first.",
+          "description": "The star system the mission is fought in, in full, as in star-systems.json, with the trip there: the current one, whose route takes 0 days and costs 0 C-Bills, or another the company travels to first.",
           "$ref": "#/definitions/StarSystem"
         }
       }
     },
     "Negotiation": {
-      "description": "The terms a contract can be accepted with; each canNegotiate has a record with the fields of its own.",
+      "description": "The terms a contract can be accepted with; each value of canNegotiate has a record with the fields of its own.",
       "x-abstract": true,
       "anyOf": [
         {
@@ -3373,6 +3406,7 @@
     },
     "Position": {
       "type": "object",
+      "description": "Where the company's ship is, and where it's headed.",
       "additionalProperties": false,
       "required": [
         "starSystem",
@@ -3424,6 +3458,7 @@
     },
     "Travel": {
       "type": "object",
+      "description": "The trip the ship is on.",
       "additionalProperties": false,
       "required": [
         "destination",

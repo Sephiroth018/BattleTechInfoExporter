@@ -12,8 +12,8 @@ namespace BattleTechInfoExporter.Models;
 ///     career, so it only changes with the game's data.
 /// </summary>
 /// <param name="SourceFingerprint">
-///     A hash of the game's data the catalog was built from (<see cref="Export.CatalogSourceFingerprint" />); the
-///     catalog is rebuilt when it differs from the game's current data.
+///     A hash of the game's data files the catalog was built from: of every one it reads, its id, file and last
+///     write time; the catalog is rebuilt when it differs from the game's current data.
 /// </param>
 /// <param name="ChassisDefinitions">The chassis, keyed by chassis id.</param>
 /// <param name="MechDefinitions">The mechs, keyed by mech id.</param>

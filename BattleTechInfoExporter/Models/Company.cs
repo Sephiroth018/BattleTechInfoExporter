@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
+/// <summary>The player's mercenary company: its funds, morale, standing and staff.</summary>
 /// <param name="Name">The company's name, as the player chose it.</param>
 /// <param name="Dropship">The company's ship: the Leopard at the start, later the Argo.</param>
 /// <param name="DaysPassed">

@@ -21,7 +21,7 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="Stores">
 ///     The item collections each of the star system's stores draws its stock from on arrival, every entry of each
-///     once, by their ids in the catalog's <see cref="Catalog.ItemCollectionDefinitions" />. A store without any
+///     once, by their ids in <see cref="Catalog.ItemCollectionDefinitions" />. A store without any
 ///     doesn't exist in the star system.
 /// </param>
 /// <param name="ContractEmployers">

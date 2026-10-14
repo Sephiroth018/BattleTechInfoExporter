@@ -34,7 +34,7 @@
         "null",
         "string"
       ],
-      "description": "The map, keyed as in the catalog's mapDefinitions; null where the map isn't in the game's metadata database, e.g. a story map."
+      "description": "The map, keyed as in mapDefinitions; null where the map isn't in the game's metadata database, e.g. a story map."
     },
     "hexGrid": {
       "description": "How the hexes' axial coordinates map to positions in meters, and their neighbors.",
@@ -42,7 +42,7 @@
     },
     "terrains": {
       "type": "object",
-      "description": "The legend of terrains: each character's terrain, keyed as in the catalog's terrainDefinitions; . is open ground (null).",
+      "description": "The legend of terrains: each character's terrain, keyed as in terrainDefinitions; . is open ground (null).",
       "additionalProperties": {
         "type": [
           "null",
@@ -52,7 +52,7 @@
     },
     "pathingGroups": {
       "type": "array",
-      "description": "The groups of the game's pathing capabilities units move with (the catalog's pathingId) that block the same steps, by id; blockedSteps has an entry per group.",
+      "description": "The groups of the game's pathing capabilities units move with (pathingId) that block the same steps, by id; blockedSteps has an entry per group.",
       "items": {
         "type": "array",
         "items": {
