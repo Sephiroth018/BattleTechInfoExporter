@@ -74,6 +74,7 @@ internal sealed record RangeBandModifiers(
     float Long,
     float Maximum);
 
+/// <summary>The modifier for the target's size, by its kind and weight class.</summary>
 /// <param name="Mech">Against a mech, by its weight class.</param>
 /// <param name="Vehicle">Against a vehicle, by its weight class.</param>
 /// <param name="Turret">Against a turret, by its chassis' weight class.</param>
@@ -100,6 +101,7 @@ internal sealed record ElevationModifier(
     bool UsesMultipleLevels,
     bool AppliesPenalties);
 
+/// <summary>The modifier when the attacker walked this round, by its kind.</summary>
 /// <param name="Mech">For an attacking mech, by its weight class.</param>
 /// <param name="Vehicle">For an attacking vehicle.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -117,6 +119,7 @@ internal sealed record AttackerDamageModifiers(WeaponDamageModifiers Mech, Weapo
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record WeaponDamageModifiers(float DamagedWeapon, DamagedLocationModifiers WeaponInDamagedLocation);
 
+/// <summary>The modifier for a weapon in a damaged location, by the location's damage.</summary>
 /// <param name="Penalized">The location is damaged.</param>
 /// <param name="NonFunctional">The location is damaged beyond use.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

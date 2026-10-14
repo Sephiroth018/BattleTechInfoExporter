@@ -7,7 +7,8 @@ namespace BattleTechInfoExporter.Models;
 /// <summary>A vehicle with its chassis' data: its armor and loadout are fixed, as it fights in combat.</summary>
 /// <param name="Name">The name the combat HUD shows.</param>
 /// <param name="MovementType">
-///     How the vehicle moves, <c>Tracked</c> or <c>Wheeled</c>, which picks its row of <see cref="TerrainMoveCosts" />.
+///     How the vehicle moves, <c>Tracked</c> or <c>Wheeled</c>, which picks its row of every terrain's
+///     <see cref="TerrainDefinition.MoveCost" />.
 /// </param>
 /// <param name="Movement">The walk and sprint distances and the pathing.</param>
 /// <param name="Locations">The locations from front to rear, then the turret if the vehicle has one.</param>
@@ -21,6 +22,7 @@ internal sealed record VehicleDefinition(
     ChassisMovement Movement,
     IReadOnlyList<VehicleLocationDefinition> Locations) : UnitDefinition(Id, Name, WeightClass, Tonnage);
 
+/// <summary>A location of a vehicle: its armor, structure and components.</summary>
 /// <param name="Location">The location, e.g. <c>Front</c> or <c>Turret</c>.</param>
 /// <param name="Armor">The armor in combat, after the game's vehicle multiplier; a vehicle has no rear armor.</param>
 /// <param name="Structure">The internal structure in combat, after the game's vehicle multiplier.</param>

@@ -32,8 +32,8 @@ namespace BattleTechInfoExporter.Models;
 ///     which a blip's marker turns to at every level; <c>null</c> when last seen.
 /// </param>
 /// <param name="Terrain">
-///     The terrain the unit stands in, keyed as in the catalog's <see cref="Catalog.TerrainDefinitions" />, which a
-///     blip's position on the map shows; <c>null</c> on open ground and when last seen.
+///     The terrain the unit stands in, keyed as in <see cref="Catalog.TerrainDefinitions" />, which a blip's
+///     position on the map shows; <c>null</c> on open ground and when last seen.
 /// </param>
 /// <param name="Pilot">The pilot, which the HUD names only at <see cref="UnitVisibility.Full" />.</param>
 /// <param name="State">The unit's condition, shown at <see cref="UnitVisibility.Full" />.</param>
@@ -63,6 +63,7 @@ internal sealed record CombatUnit(
     IReadOnlyList<LineOfFire>? LinesOfFire,
     UnitMovement? Movement);
 
+/// <summary>A unit's condition as the HUD shows it, for a unit in full view.</summary>
 /// <param name="DeathMethod">
 ///     How the unit was destroyed, as the game records it (<see cref="BattleTech.DeathMethod" />), e.g.
 ///     <c>CenterTorsoDestruction</c>, <c>LegDestruction</c>, <c>PilotKilled</c> (also an incapacitated pilot),
@@ -114,6 +115,7 @@ internal sealed record CombatUnitState(
     IReadOnlyList<CombatAbility> Abilities,
     ResolveCosts? ResolveCosts);
 
+/// <summary>What only a mech's condition has: its heat and stability bars.</summary>
 /// <param name="Heat">The mech's heat.</param>
 /// <param name="Stability">The mech's stability bar.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -149,6 +151,7 @@ internal sealed record MechStability(float Current, float UnsteadyAbove, float M
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechHeat(int Current, int Dissipation, int OverheatsAbove, int MaxHeat);
 
+/// <summary>A unit's pilot's condition in the battle.</summary>
 /// <param name="Injuries">The injuries, including those from before the mission.</param>
 /// <param name="Health">
 ///     The injuries the pilot can take before being incapacitated, as in <see cref="LanceUnitOutcome.Health" />.
@@ -187,6 +190,7 @@ internal sealed record UnitLocation(string Location, LocationArmor<int> Armor, i
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Guard(int Level, bool IsBraced, bool HasCover, bool HasBulwark);
 
+/// <summary>A component mounted on a unit, with its condition in the battle.</summary>
 /// <param name="Location">The game's name of the location it is mounted in, as <see cref="UnitLocation.Location" />.</param>
 /// <param name="DamageLevel">The game's damage level, e.g. <c>Functional</c> or <c>Destroyed</c>.</param>
 /// <param name="ShotsLeft">
@@ -200,6 +204,7 @@ internal sealed record CombatComponent(
     ComponentDamageLevel DamageLevel,
     int? ShotsLeft) : ComponentEntry(Component), IDamageable;
 
+/// <summary>An ability a unit can activate, as its HUD button shows it.</summary>
 /// <param name="Ability">The ability, the pilot's or a mounted component's.</param>
 /// <param name="Cooldown">The unit's activations until the ability can be used again; 0 when ready.</param>
 /// <param name="UsesLeft">The uses left of an ability that can be used only so often; <c>null</c> without a limit.</param>

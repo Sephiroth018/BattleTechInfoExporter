@@ -30,6 +30,7 @@ internal sealed record StatisticChange(
     EffectTargetType Target,
     EffectTriggerType Trigger);
 
+/// <summary>The pilot or the components of the unit whose statistic a change applies to.</summary>
 /// <param name="Collection">
 ///     The pilot, the weapons, the ammunition boxes, one random working weapon or the strongest working weapon.
 /// </param>
@@ -48,25 +49,30 @@ internal sealed record EffectTargetCollection(StatisticEffectData.TargetCollecti
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal abstract record ComponentFilter(ComponentFilterKind Kind);
 
+/// <summary>A filter on the weapons' sub type.</summary>
 /// <param name="Value">The weapon sub type the weapons must have, e.g. <c>Melee</c> or <c>DFA</c>.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record WeaponSubTypeFilter(WeaponSubType Value) : ComponentFilter(ComponentFilterKind.WeaponSubType);
 
+/// <summary>A filter on the weapons' type.</summary>
 /// <param name="Value">The weapon type the weapons must have, e.g. <c>LRM</c> or <c>SRM</c>.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record WeaponTypeFilter(WeaponType Value) : ComponentFilter(ComponentFilterKind.WeaponType);
 
+/// <summary>A filter on the weapons' category.</summary>
 /// <param name="Value">The weapon category the weapons must have, as the catalog's weapons name theirs.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record WeaponCategoryFilter(string Value) : ComponentFilter(ComponentFilterKind.WeaponCategory);
 
+/// <summary>A filter on the ammunition boxes' category.</summary>
 /// <param name="Value">
 ///     The ammunition category the ammunition boxes must have, as the catalog's ammunition boxes name theirs.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record AmmoCategoryFilter(string Value) : ComponentFilter(ComponentFilterKind.AmmoCategory);
 
-/// <param name="Count">How many of <see cref="Unit" /> the change lasts, at least 1.</param>
+/// <summary>How long a statistic change lasts.</summary>
+/// <param name="Count">How many activations, rounds, movements or phases, by its unit, the change lasts; at least 1.</param>
 /// <param name="Unit">What the duration counts.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record EffectDuration(int Count, EffectDurationUnit Unit);

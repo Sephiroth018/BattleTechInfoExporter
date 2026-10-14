@@ -9,18 +9,18 @@ namespace BattleTechInfoExporter.Models;
 ///     and numbers instead of an object per hex, so the file stays small enough for an AI chat to read whole.
 /// </summary>
 /// <param name="MapId">
-///     The map's id in the game's metadata database, which keys the catalog's <see cref="Catalog.MapDefinitions" />;
-///     a map no star system's contracts are generated on, e.g. a story map, has no entry there. <c>null</c> where
-///     the map isn't in the metadata database.
+///     The map's id in the game's metadata database, which keys <see cref="Catalog.MapDefinitions" />; a map no
+///     star system's contracts are generated on, e.g. a story map, has no entry there. <c>null</c> where the map
+///     isn't in the metadata database.
 /// </param>
 /// <param name="HexGrid">How the hexes' axial coordinates map to positions in meters, and their neighbors.</param>
 /// <param name="Terrains">
-///     The legend of <see cref="HexRow.Terrains" />: each character's terrain, keyed as in the catalog's
+///     The legend of <see cref="HexRow.Terrains" />: each character's terrain, keyed as in
 ///     <see cref="Catalog.TerrainDefinitions" />; <c>.</c> is open ground (<c>null</c>).
 /// </param>
 /// <param name="PathingGroups">
-///     The groups of the game's pathing capabilities units move with (the catalog's
-///     <see cref="ChassisMovement.PathingId" />) that block the same steps, by id; <see cref="HexRow.BlockedSteps" />
+///     The groups of the game's pathing capabilities units move with
+///     (<see cref="ChassisMovement.PathingId" />) that block the same steps, by id; <see cref="HexRow.BlockedSteps" />
 ///     has an entry per group.
 /// </param>
 /// <param name="Buildings">

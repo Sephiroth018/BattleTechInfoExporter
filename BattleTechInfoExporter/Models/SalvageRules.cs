@@ -45,6 +45,7 @@ internal sealed record SalvageRules(
     float DestroyedMechRecoveryChance,
     bool AssembledMechsComeEquipped);
 
+/// <summary>What a mission's outcome does to its salvage.</summary>
 /// <param name="Chance">Multiplies the picks, as a 0-1 fraction.</param>
 /// <param name="ChanceLostPerMechDestroyed">
 ///     Taken off <see cref="Chance" /> for each of the company's mechs destroyed or whose pilot was incapacitated,
@@ -53,19 +54,21 @@ internal sealed record SalvageRules(
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record SalvageOutcome(float Chance, float ChanceLostPerMechDestroyed);
 
+/// <summary>The relative weights the salvage drawn at random is drawn from the pool by, per kind of item.</summary>
 /// <param name="Weapon">The weight of a weapon.</param>
 /// <param name="Component">The weight of any other component.</param>
 /// <param name="MechPart">The weight of a mech part.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record SalvagePickWeights(int Weapon, int Component, int MechPart);
 
+/// <summary>The chance of a salvaged component being swapped for a rarer one, by kind of component.</summary>
 /// <param name="Weapons">For weapons, which keep their kind.</param>
 /// <param name="Upgrades">For other components.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record RareSalvageSwaps(RareSalvageSwap Weapons, RareSalvageSwap Upgrades);
 
 /// <summary>
-///     The chance of a swap is the contract's difficulty plus the tier's <c>ChanceOffset</c>, divided by
+///     The chance of a swap is the contract's difficulty plus the tier's <c>chanceOffset</c>, divided by
 ///     <see cref="Divisor" />; the very rare tier is rolled first.
 /// </summary>
 /// <param name="VeryRare">The very rare tier, rolled first.</param>
@@ -77,6 +80,7 @@ internal sealed record RareSalvageSwaps(RareSalvageSwap Weapons, RareSalvageSwap
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record RareSalvageSwap(RareSalvageTier VeryRare, RareSalvageTier Rare, float Divisor);
 
+/// <summary>A tier of rarer components a salvaged component can be swapped for.</summary>
 /// <param name="Rarities">The rarities the swapped-in component is drawn from.</param>
 /// <param name="ChanceOffset">Added to the contract's difficulty before <see cref="RareSalvageSwap.Divisor" />.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

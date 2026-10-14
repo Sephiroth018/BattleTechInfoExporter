@@ -26,6 +26,7 @@ internal record ComponentDefinition(
     IReadOnlyList<StatisticChange> Effects,
     bool IsSalvageable) : ICatalogEntry;
 
+/// <summary>A weapon: its damage, heat, ammunition and ranges.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record WeaponDefinition : ComponentDefinition
 {
@@ -67,8 +68,8 @@ internal sealed record WeaponDefinition : ComponentDefinition
     }
 
     /// <summary>
-    ///     The hardpoint kind the weapon needs, e.g. "Ballistic" or "Support", which also keys the rules'
-    ///     <c>combat.weaponCategories</c>.
+    ///     The hardpoint kind the weapon needs, e.g. "Ballistic" or "Support", which also keys
+    ///     <see cref="CombatRules.WeaponCategories" />.
     /// </summary>
     public string Category { get; }
 
@@ -113,7 +114,7 @@ internal sealed record WeaponDefinition : ComponentDefinition
     public int HeatGenerated { get; }
 
     /// <summary>
-    ///     How the COIL weapon gains from its mech's evasive pips, as the rules' <c>combat.coil</c> applies it;
+    ///     How the COIL weapon gains from its mech's evasive pips, as <see cref="CombatRules.Coil" /> applies it;
     ///     <c>null</c> for every other weapon.
     /// </summary>
     public CoilWeapon? Coil { get; }
@@ -123,7 +124,7 @@ internal sealed record WeaponDefinition : ComponentDefinition
 
     /// <summary>
     ///     The weapon's own to-hit modifier, which the hit chance adds to the others; positive makes the attack harder,
-    ///     as in the rules' <c>combat.toHit</c>.
+    ///     as in <see cref="CombatRules.ToHit" />.
     /// </summary>
     public float AccuracyModifier { get; }
 
@@ -137,6 +138,7 @@ internal sealed record WeaponDefinition : ComponentDefinition
     public bool IsIndirectFireCapable { get; }
 }
 
+/// <summary>How a COIL weapon gains from its mech's evasive pips.</summary>
 /// <param name="EvasiveExponent">
 ///     The power of the evasive pips that multiplies the damage of one shot; 0 leaves the damage at its base.
 /// </param>
@@ -152,24 +154,23 @@ internal sealed record CoilWeapon(float EvasiveExponent, float? HeatDivisor);
 ///     The minimum range; closer, the weapon still fires, with <see cref="RangeBandModifiers.WithinMinimumRange" />.
 /// </param>
 /// <param name="Short">
-///     The end of the short bracket, from <see cref="Min" />, where <c>rules.json</c>'s
-///     <see cref="RangeBandModifiers.Short" /> applies.
+///     The end of the short bracket, from <see cref="Min" />, where <see cref="RangeBandModifiers.Short" /> applies.
 /// </param>
 /// <param name="Medium">
-///     The end of the medium bracket, from <see cref="Short" />, where <c>rules.json</c>'s
-///     <see cref="RangeBandModifiers.Medium" /> applies.
+///     The end of the medium bracket, from <see cref="Short" />, where <see cref="RangeBandModifiers.Medium" />
+///     applies.
 /// </param>
 /// <param name="Long">
-///     The end of the long bracket, from <see cref="Medium" />, where <c>rules.json</c>'s
-///     <see cref="RangeBandModifiers.Long" /> applies.
+///     The end of the long bracket, from <see cref="Medium" />, where <see cref="RangeBandModifiers.Long" /> applies.
 /// </param>
 /// <param name="Max">
-///     The end of the maximum bracket, from <see cref="Long" />, where <c>rules.json</c>'s
-///     <see cref="RangeBandModifiers.Maximum" /> applies; the weapon can't fire beyond it.
+///     The end of the maximum bracket, from <see cref="Long" />, where <see cref="RangeBandModifiers.Maximum" />
+///     applies; the weapon can't fire beyond it.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record WeaponRanges(float Min, float Short, float Medium, float Long, float Max);
 
+/// <summary>An ammunition box, which feeds the weapons of its ammunition category.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record AmmunitionBoxDefinition : ComponentDefinition
 {
@@ -186,6 +187,7 @@ internal sealed record AmmunitionBoxDefinition : ComponentDefinition
     public int Capacity { get; }
 }
 
+/// <summary>A heat sink, mounted on top of the engine's built-in ones.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record HeatSinkDefinition : ComponentDefinition
 {

@@ -55,7 +55,7 @@ internal abstract record ContractBriefing(
 /// <param name="Negotiation">The terms the contract can be accepted with: negotiated or fixed.</param>
 /// <param name="StarSystem">
 ///     The star system the mission is fought in, in full, as in <c>star-systems.json</c>, with the trip there: the
-///     current one, whose route is empty, or another the company travels to first.
+///     current one, whose route takes 0 days and costs 0 C-Bills, or another the company travels to first.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record OfferedContract(
@@ -101,8 +101,8 @@ internal sealed record ActiveContract(
     : ContractBriefing(Id, Name, Type, DisplayStyle, Employer, Target, Difficulty, Description, LanceLimits, Biome);
 
 /// <summary>
-///     The terms a contract can be accepted with; each <see cref="CanNegotiate" /> has a record with the fields of
-///     its own.
+///     The terms a contract can be accepted with; each value of <see cref="CanNegotiate" /> has a record with the
+///     fields of its own.
 /// </summary>
 /// <param name="CanNegotiate">
 ///     Whether the terms are negotiated with the sliders (<see cref="NegotiableTerms" />) or fixed
@@ -141,6 +141,7 @@ internal sealed record AcceptedTerms(
     Salvage Salvage,
     ReputationChange Reputation) : IContractTerms;
 
+/// <summary>The slider positions a contract's terms were negotiated at.</summary>
 /// <param name="PayPercent">The pay slider's position, from 0 to 100.</param>
 /// <param name="SalvagePercent">The salvage slider's position, from 0 to 100.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -158,6 +159,7 @@ internal sealed record NegotiatedShares(int PayPercent, int SalvagePercent);
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal record ReputationChange(int? Employer, int? Target);
 
+/// <summary>The salvage of a contract, in items.</summary>
 /// <param name="Total">The salvage the company gets, including the priority salvage.</param>
 /// <param name="Priority">The part of the salvage the company picks itself; the rest is assigned to it.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -175,6 +177,7 @@ internal sealed record LanceLimits(
     float? MaxTonnage,
     IReadOnlyList<MechSlotLimits>? Mechs);
 
+/// <summary>The tonnage limits of one mech slot of the lance.</summary>
 /// <param name="MinTonnage">The least tonnage of the mech in the slot; <c>null</c> without a limit.</param>
 /// <param name="MaxTonnage">The most tonnage of the mech in the slot; <c>null</c> without a limit.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

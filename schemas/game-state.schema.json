@@ -97,8 +97,8 @@
       "$ref": "#/definitions/Storage"
     },
     "stores": {
-      "description": "The current system's stores, each null if the system has none or the company can't use it: the system store unless the reputation with the system's owner is LOATHED, the faction store only while allied with its owner, the black market once the company has gained access to black markets. Their stock changes only on arrival in a system.",
-      "$ref": "#/definitions/ByStoreOfStore"
+      "description": "The current star system's stores, each null if the star system has none or the company can't use it. Their stock changes only on arrival in a star system.",
+      "$ref": "#/definitions/StarSystemStores"
     },
     "hiringHall": {
       "type": "array",
@@ -193,6 +193,7 @@
     },
     "Company": {
       "type": "object",
+      "description": "The player's mercenary company: its funds, morale, standing and staff.",
       "additionalProperties": false,
       "required": [
         "name",
@@ -230,7 +231,7 @@
           "description": "The in-game calendar date, as yyyy-MM-dd."
         },
         "morale": {
-          "description": "The company's morale, with its level in moraleLevels.",
+          "description": "The company's morale, with its level in rules.json moraleLevels.",
           "$ref": "#/definitions/Morale"
         },
         "funds": {
@@ -251,7 +252,7 @@
         },
         "mechTech": {
           "type": "integer",
-          "description": "The tech points the mech lab works a day (mechLab), including temporaryMechTechChanges.",
+          "description": "The tech points the mech lab works a day (rules.json campaign.mechLab), including temporaryMechTechChanges.",
           "format": "int32"
         },
         "temporaryMechTechChanges": {
@@ -263,7 +264,7 @@
         },
         "medTech": {
           "type": "integer",
-          "description": "The med tech skill, which adds heal points for each injured pilot a day (medBay), including temporaryMedTechChanges.",
+          "description": "The med tech skill, which adds heal points for each injured pilot a day (rules.json campaign.medBay), including temporaryMedTechChanges.",
           "format": "int32"
         },
         "temporaryMedTechChanges": {
@@ -287,7 +288,7 @@
         },
         "statistics": {
           "type": "object",
-          "description": "The company's statistics some event's requirements compare, keyed by the game's name, as they compare them; a statistic the company doesn't have is 0. The stored components' counts they compare are in the storage.",
+          "description": "The company's statistics some event's requirements compare, keyed by the game's name, as they compare them; a statistic the company doesn't have is 0. The stored components' counts they compare are in Storage.components.",
           "additionalProperties": {
             "type": "number",
             "format": "float"
@@ -297,6 +298,7 @@
     },
     "DropshipType": {
       "type": "string",
+      "description": "The company's ship: the Leopard, later the Argo.",
       "x-enumNames": [
         "INVALID_UNSET",
         "Leopard",
@@ -312,6 +314,7 @@
     },
     "Morale": {
       "type": "object",
+      "description": "The company's morale and the level it falls in.",
       "additionalProperties": false,
       "required": [
         "value",
@@ -320,12 +323,12 @@
       "properties": {
         "value": {
           "type": "integer",
-          "description": "The company's morale, which startsAt compares with.",
+          "description": "The company's morale, which each level's rules.json moraleLevels[].startsAt is compared with.",
           "format": "int32"
         },
         "level": {
           "type": "string",
-          "description": "The name of the current level in moraleLevels."
+          "description": "The name of the current level in rules.json moraleLevels."
         }
       }
     },
@@ -340,18 +343,19 @@
       "properties": {
         "value": {
           "type": "integer",
-          "description": "The rating value, which startsAt compares with.",
+          "description": "The rating value, which rules.json mercenaryReviewBoardLevels[].startsAt compares with.",
           "format": "int32"
         },
         "level": {
           "type": "integer",
-          "description": "The rating level, from 0, as in level.",
+          "description": "The rating level, from 0, as in rules.json mercenaryReviewBoardLevels[].level.",
           "format": "int32"
         }
       }
     },
     "FactionReputation": {
       "type": "object",
+      "description": "The company's reputation with a faction, and its alliance with it.",
       "additionalProperties": false,
       "required": [
         "faction",
@@ -372,7 +376,7 @@
           "format": "int32"
         },
         "level": {
-          "description": "The reputation level, described in reputationLevels.",
+          "description": "The reputation level, described in rules.json reputationLevels.",
           "$ref": "#/definitions/SimGameReputation"
         },
         "isAllied": {
@@ -410,6 +414,7 @@
     },
     "SimGameReputation": {
       "type": "string",
+      "description": "A reputation level, described in rules.json reputationLevels.",
       "x-enumNames": [
         "INDIFFERENT",
         "LIKED",
@@ -445,7 +450,7 @@
         },
         "endsOnDay": {
           "type": "integer",
-          "description": "The last day the change applies, on the scale of daysPassed; the game reverts it as the next day starts.",
+          "description": "The last day the change applies, on the scale of Company.daysPassed; the game reverts it as the next day starts.",
           "format": "int32"
         }
       }
@@ -462,7 +467,7 @@
       "properties": {
         "dueOnDay": {
           "type": "integer",
-          "description": "The day the report is due, on the scale of daysPassed.",
+          "description": "The day the report is due, on the scale of Company.daysPassed.",
           "format": "int32"
         },
         "spending": {
@@ -477,6 +482,7 @@
     },
     "Spending": {
       "type": "object",
+      "description": "The company's spending level, which scales the expenses of each financial report and changes morale.",
       "additionalProperties": false,
       "required": [
         "level",
@@ -498,6 +504,7 @@
     },
     "EconomyScale": {
       "type": "string",
+      "description": "A spending level, from the cheapest to the most generous.",
       "x-enumNames": [
         "Normal",
         "Generous",
@@ -515,6 +522,7 @@
     },
     "SpendingOption": {
       "type": "object",
+      "description": "A spending level the company can choose, with what the next financial report deducts at it.",
       "additionalProperties": false,
       "required": [
         "level",
@@ -522,12 +530,12 @@
       ],
       "properties": {
         "level": {
-          "description": "The spending level, whose cost multiplier and morale change SpendingLevelRules has.",
+          "description": "The spending level, whose cost multiplier and morale change rules.json campaign.finances.spendingLevels[] has.",
           "$ref": "#/definitions/EconomyScale"
         },
         "expectedExpenses": {
           "type": "integer",
-          "description": "The C-Bills the next report deducts at this level, as total does at the current one.",
+          "description": "The C-Bills the next report deducts at this level, as ExpectedExpenses.total does at the current one.",
           "format": "int32"
         }
       }
@@ -578,6 +586,7 @@
     },
     "ShipExpense": {
       "type": "object",
+      "description": "The ship's line of the expenses.",
       "additionalProperties": false,
       "required": [
         "name",
@@ -597,6 +606,7 @@
     },
     "ShipUpgradeExpense": {
       "type": "object",
+      "description": "A ship upgrade's line of the expenses.",
       "additionalProperties": false,
       "required": [
         "upgrade",
@@ -616,6 +626,7 @@
     },
     "MechExpense": {
       "type": "object",
+      "description": "A mech's line of the expenses.",
       "additionalProperties": false,
       "required": [
         "mech",
@@ -635,7 +646,7 @@
     },
     "MechReference": {
       "type": "object",
-      "description": "A mech in the mech bay: its own id and name, as in id and name.",
+      "description": "A mech in the mech bay, by its own id and name there (mechs).",
       "additionalProperties": false,
       "required": [
         "id",
@@ -654,6 +665,7 @@
     },
     "PilotExpense": {
       "type": "object",
+      "description": "A pilot's line of the expenses.",
       "additionalProperties": false,
       "required": [
         "pilot",
@@ -736,6 +748,7 @@
     },
     "WorkOrderType": {
       "type": "string",
+      "description": "The game's kind of work order on the timeline.",
       "x-enumNames": [
         "NotificationGeneric",
         "NotificationEvent",
@@ -801,7 +814,14 @@
       "properties": {
         "kind": {
           "description": "What the entry is about, which decides its other fields.",
-          "$ref": "#/definitions/WorkQueueEntryKind"
+          "enum": [
+            "financialReport"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/WorkQueueEntryKind"
+            }
+          ]
         },
         "type": {
           "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
@@ -809,7 +829,7 @@
         },
         "finishesOnDay": {
           "type": "integer",
-          "description": "The day it finishes, on the scale of daysPassed.",
+          "description": "The day it finishes, on the scale of Company.daysPassed.",
           "format": "int32"
         }
       }
@@ -827,7 +847,14 @@
       "properties": {
         "kind": {
           "description": "What the entry is about, which decides its other fields.",
-          "$ref": "#/definitions/WorkQueueEntryKind"
+          "enum": [
+            "mechLab"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/WorkQueueEntryKind"
+            }
+          ]
         },
         "type": {
           "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
@@ -835,7 +862,7 @@
         },
         "finishesOnDay": {
           "type": "integer",
-          "description": "The day it finishes, on the scale of daysPassed.",
+          "description": "The day it finishes, on the scale of Company.daysPassed.",
           "format": "int32"
         },
         "target": {
@@ -864,7 +891,14 @@
       "properties": {
         "kind": {
           "description": "What the entry is about, which decides its other fields.",
-          "$ref": "#/definitions/WorkQueueEntryKind"
+          "enum": [
+            "medBay"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/WorkQueueEntryKind"
+            }
+          ]
         },
         "type": {
           "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
@@ -872,7 +906,7 @@
         },
         "finishesOnDay": {
           "type": "integer",
-          "description": "The day it finishes, on the scale of daysPassed.",
+          "description": "The day it finishes, on the scale of Company.daysPassed.",
           "format": "int32"
         },
         "target": {
@@ -894,7 +928,14 @@
       "properties": {
         "kind": {
           "description": "What the entry is about, which decides its other fields.",
-          "$ref": "#/definitions/WorkQueueEntryKind"
+          "enum": [
+            "shipUpgrade"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/WorkQueueEntryKind"
+            }
+          ]
         },
         "type": {
           "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
@@ -902,11 +943,11 @@
         },
         "finishesOnDay": {
           "type": "integer",
-          "description": "The day it finishes, on the scale of daysPassed.",
+          "description": "The day it finishes, on the scale of Company.daysPassed.",
           "format": "int32"
         },
         "target": {
-          "description": "The ship upgrade, as in upgrades; null where the game can't resolve it.",
+          "description": "The ship upgrade, as in Ship.upgrades; null where the game can't resolve it.",
           "oneOf": [
             {
               "type": "null"
@@ -931,7 +972,14 @@
       "properties": {
         "kind": {
           "description": "What the entry is about, which decides its other fields.",
-          "$ref": "#/definitions/WorkQueueEntryKind"
+          "enum": [
+            "travel"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/WorkQueueEntryKind"
+            }
+          ]
         },
         "type": {
           "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
@@ -939,7 +987,7 @@
         },
         "finishesOnDay": {
           "type": "integer",
-          "description": "The day it finishes, on the scale of daysPassed.",
+          "description": "The day it finishes, on the scale of Company.daysPassed.",
           "format": "int32"
         },
         "target": {
@@ -974,6 +1022,7 @@
     },
     "ShipUpgrade": {
       "type": "object",
+      "description": "A ship upgrade as the engineering screen shows it.",
       "additionalProperties": false,
       "required": [
         "upgrade",
@@ -1022,7 +1071,7 @@
         },
         "upkeep": {
           "type": "integer",
-          "description": "What the upgrade adds to the expenses of each report once installed; an installed upgrade's line in shipUpgrades is the same.",
+          "description": "What the upgrade adds to the expenses of each report once installed; an installed upgrade's line in ExpectedExpenses.shipUpgrades is the same.",
           "format": "int32"
         },
         "installDays": {
@@ -1057,6 +1106,7 @@
     },
     "DropshipLocation": {
       "type": "string",
+      "description": "A room of the company's ship.",
       "x-enumFlags": true,
       "x-enumNames": [
         "UNKNOWN",
@@ -1176,12 +1226,12 @@
           "description": "The barracks title derived from the primary abilities, e.g. \"Recruit\" or \"Lancer\"."
         },
         "skills": {
-          "description": "The skill levels, whose effects skills lists per level.",
+          "description": "The skill levels, whose effects rules.json skills lists per level.",
           "$ref": "#/definitions/Skills"
         },
         "abilities": {
           "type": "array",
-          "description": "The primary abilities only, described in skills; the passive traits follow from the skill levels.",
+          "description": "The primary abilities only, described in rules.json skills; the passive traits follow from the skill levels.",
           "items": {
             "$ref": "#/definitions/DefinitionReference"
           }
@@ -1216,7 +1266,7 @@
             "integer",
             "null"
           ],
-          "description": "The day the pilot is ready again, on the scale of daysPassed; null when ready.",
+          "description": "The day the pilot is ready again, on the scale of Company.daysPassed; null when ready.",
           "format": "int32"
         },
         "spirits": {
@@ -1255,6 +1305,7 @@
     },
     "Gender": {
       "type": "string",
+      "description": "A pilot's gender, which picks the wording of the texts about them.",
       "x-enumNames": [
         "INVALID_UNSET",
         "None",
@@ -1283,28 +1334,29 @@
       "properties": {
         "gunnery": {
           "type": "integer",
-          "description": "The gunnery level, a level of gunnery.",
+          "description": "The Gunnery level, whose training table is rules.json skills.gunnery.",
           "format": "int32"
         },
         "piloting": {
           "type": "integer",
-          "description": "The piloting level, a level of piloting.",
+          "description": "The Piloting level, whose training table is rules.json skills.piloting.",
           "format": "int32"
         },
         "guts": {
           "type": "integer",
-          "description": "The guts level, a level of guts.",
+          "description": "The Guts level, whose training table is rules.json skills.guts.",
           "format": "int32"
         },
         "tactics": {
           "type": "integer",
-          "description": "The tactics level, a level of tactics.",
+          "description": "The Tactics level, whose training table is rules.json skills.tactics.",
           "format": "int32"
         }
       }
     },
     "Experience": {
       "type": "object",
+      "description": "A pilot's experience points.",
       "additionalProperties": false,
       "required": [
         "unspent",
@@ -1339,6 +1391,7 @@
     },
     "Spirits": {
       "type": "object",
+      "description": "A pilot's spirits, which events raise and lower for a while.",
       "additionalProperties": false,
       "required": [
         "level",
@@ -1346,7 +1399,7 @@
       ],
       "properties": {
         "level": {
-          "description": "The spirits level, whose effects are in spiritsLevels.",
+          "description": "The spirits level, whose effects are in rules.json spiritsLevels.",
           "$ref": "#/definitions/SpiritsLevel"
         },
         "endsOnDay": {
@@ -1354,7 +1407,7 @@
             "integer",
             "null"
           ],
-          "description": "The day high or low spirits end, on the scale of daysPassed; null for normal spirits and when the game sets no end.",
+          "description": "The day high or low spirits end, on the scale of Company.daysPassed; null for normal spirits and when the game sets no end.",
           "format": "int32"
         }
       }
@@ -1375,6 +1428,7 @@
     },
     "ServiceRecord": {
       "type": "object",
+      "description": "A pilot's career in the company, as the barracks shows it.",
       "additionalProperties": false,
       "required": [
         "missions",
@@ -1412,13 +1466,13 @@
         },
         "hiredOnDay": {
           "type": "integer",
-          "description": "On the scale of daysPassed.",
+          "description": "The day the pilot was hired, on the scale of Company.daysPassed.",
           "format": "int32"
         }
       }
     },
     "Mech": {
-      "description": "A mech in the mech bay, with its current loadout; each status has a record with the fields of its own.",
+      "description": "A mech in the mech bay, with its current loadout; each value of status has a record with the fields of its own.",
       "x-abstract": true,
       "anyOf": [
         {
@@ -1448,7 +1502,7 @@
     },
     "MechLoadout": {
       "type": "object",
-      "description": "A mech's loadout with the tonnage, value and stats that follow from it; the chassis' limits are in the catalog's ChassisDefinition.",
+      "description": "A mech's loadout with the tonnage, value and stats that follow from it; the chassis' limits are in catalog.json chassisDefinitions.",
       "additionalProperties": false,
       "required": [
         "usedTonnage",
@@ -1581,12 +1635,12 @@
       "properties": {
         "walk": {
           "type": "number",
-          "description": "The chassis' walk distance (walk).",
+          "description": "The chassis' walk distance, as in catalog.json chassisDefinitions.*.movement.walk.",
           "format": "float"
         },
         "sprint": {
           "type": "number",
-          "description": "The chassis' sprint distance (sprint).",
+          "description": "The chassis' sprint distance, as in catalog.json chassisDefinitions.*.movement.sprint.",
           "format": "float"
         },
         "jump": {
@@ -1598,6 +1652,7 @@
     },
     "HeatStats": {
       "type": "object",
+      "description": "The heat dissipated, generated and tolerated.",
       "additionalProperties": false,
       "required": [
         "dissipation",
@@ -1651,6 +1706,7 @@
     },
     "RangeStats": {
       "type": "object",
+      "description": "The weapons' ranges.",
       "additionalProperties": false,
       "required": [
         "max",
@@ -1671,6 +1727,7 @@
     },
     "DurabilityStats": {
       "type": "object",
+      "description": "The armor and structure, and the damage taken from the mech's own jump attack.",
       "additionalProperties": false,
       "required": [
         "armor",
@@ -1697,6 +1754,7 @@
     },
     "MeleeStats": {
       "type": "object",
+      "description": "The damage of melee and jump attacks.",
       "additionalProperties": false,
       "required": [
         "damage",
@@ -1723,6 +1781,7 @@
     },
     "MechLocation": {
       "type": "object",
+      "description": "A body location of a mech in the mech bay, with its components.",
       "additionalProperties": false,
       "required": [
         "location",
@@ -1755,6 +1814,7 @@
     },
     "ChassisLocations": {
       "type": "string",
+      "description": "A mech's body location.",
       "x-enumFlags": true,
       "x-enumNames": [
         "None",
@@ -1817,6 +1877,7 @@
     },
     "Armor": {
       "type": "object",
+      "description": "The armor of one side of a location.",
       "additionalProperties": false,
       "required": [
         "current",
@@ -1861,7 +1922,7 @@
     },
     "ComponentReference": {
       "type": "object",
-      "description": "A component's definition, like DefinitionReference, with the type that tells which group of componentDefinitions holds it. Components compare by type first, then as every reference.",
+      "description": "A component's definition, like DefinitionReference, with the type that tells which group of catalog.json componentDefinitions holds it. Components compare by type first, then as every reference.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -1878,13 +1939,14 @@
           "description": "The name the UI shows."
         },
         "type": {
-          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in componentDefinitions.",
+          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in catalog.json componentDefinitions.",
           "$ref": "#/definitions/ComponentType"
         }
       }
     },
     "ComponentType": {
       "type": "string",
+      "description": "The game's kind of component, which names the component's group in catalog.json componentDefinitions.",
       "x-enumNames": [
         "NotSet",
         "Weapon",
@@ -1908,6 +1970,7 @@
     },
     "ComponentDamageLevel": {
       "type": "string",
+      "description": "How damaged a component is.",
       "x-enumNames": [
         "Functional",
         "Misaligned",
@@ -1960,7 +2023,7 @@
           "description": "The mech's name, which the player can change in the mech lab."
         },
         "chassis": {
-          "description": "The mech's chassis, described in chassisDefinitions.",
+          "description": "The mech's chassis, described in catalog.json chassisDefinitions.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "bay": {
@@ -1975,7 +2038,14 @@
         },
         "status": {
           "description": "Whether the mech is free for use or held by the mech lab, which decides the mech's other fields.",
-          "$ref": "#/definitions/MechStatus"
+          "enum": [
+            "inMaintenance"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/MechStatus"
+            }
+          ]
         },
         "isFieldable": {
           "type": "boolean",
@@ -2006,7 +2076,7 @@
       }
     },
     "RefitChange": {
-      "description": "One step of a mech's queued refit; each type has a record with the fields of its own.",
+      "description": "One step of a mech's queued refit; each value of type has a record with the fields of its own.",
       "x-abstract": true,
       "anyOf": [
         {
@@ -2046,6 +2116,7 @@
     },
     "InstallComponentChange": {
       "type": "object",
+      "description": "A step that installs a component.",
       "additionalProperties": false,
       "required": [
         "type",
@@ -2065,7 +2136,14 @@
         },
         "type": {
           "description": "The kind of step, which decides the step's other fields.",
-          "$ref": "#/definitions/RefitChangeType"
+          "enum": [
+            "installComponent"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/RefitChangeType"
+            }
+          ]
         },
         "isDone": {
           "type": "boolean",
@@ -2079,6 +2157,7 @@
     },
     "ModifyArmorChange": {
       "type": "object",
+      "description": "A step that adds or removes a location's armor.",
       "additionalProperties": false,
       "required": [
         "type",
@@ -2093,7 +2172,14 @@
         },
         "type": {
           "description": "The kind of step, which decides the step's other fields.",
-          "$ref": "#/definitions/RefitChangeType"
+          "enum": [
+            "modifyArmor"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/RefitChangeType"
+            }
+          ]
         },
         "isDone": {
           "type": "boolean",
@@ -2101,11 +2187,11 @@
         },
         "armor": {
           "description": "The location's armor after the change, by side.",
-          "$ref": "#/definitions/LocationArmorOfInteger"
+          "$ref": "#/definitions/LocationArmorOfInt32"
         }
       }
     },
-    "LocationArmorOfInteger": {
+    "LocationArmorOfInt32": {
       "type": "object",
       "description": "A location's armor by side, in whatever a file measures armor in.",
       "additionalProperties": false,
@@ -2131,6 +2217,7 @@
     },
     "RemoveComponentChange": {
       "type": "object",
+      "description": "A step that removes a component.",
       "additionalProperties": false,
       "required": [
         "type",
@@ -2150,7 +2237,14 @@
         },
         "type": {
           "description": "The kind of step, which decides the step's other fields.",
-          "$ref": "#/definitions/RefitChangeType"
+          "enum": [
+            "removeComponent"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/RefitChangeType"
+            }
+          ]
         },
         "isDone": {
           "type": "boolean",
@@ -2164,6 +2258,7 @@
     },
     "RepairComponentChange": {
       "type": "object",
+      "description": "A step that repairs a component.",
       "additionalProperties": false,
       "required": [
         "type",
@@ -2183,7 +2278,14 @@
         },
         "type": {
           "description": "The kind of step, which decides the step's other fields.",
-          "$ref": "#/definitions/RefitChangeType"
+          "enum": [
+            "repairComponent"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/RefitChangeType"
+            }
+          ]
         },
         "isDone": {
           "type": "boolean",
@@ -2204,6 +2306,7 @@
     },
     "RepairStructureChange": {
       "type": "object",
+      "description": "A step that repairs a location's structure.",
       "additionalProperties": false,
       "required": [
         "type",
@@ -2218,7 +2321,14 @@
         },
         "type": {
           "description": "The kind of step, which decides the step's other fields.",
-          "$ref": "#/definitions/RefitChangeType"
+          "enum": [
+            "repairStructure"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/RefitChangeType"
+            }
+          ]
         },
         "isDone": {
           "type": "boolean",
@@ -2257,7 +2367,7 @@
           "description": "The mech's name, which the player can change in the mech lab."
         },
         "chassis": {
-          "description": "The mech's chassis, described in chassisDefinitions.",
+          "description": "The mech's chassis, described in catalog.json chassisDefinitions.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "bay": {
@@ -2272,7 +2382,14 @@
         },
         "status": {
           "description": "Whether the mech is free for use or held by the mech lab, which decides the mech's other fields.",
-          "$ref": "#/definitions/MechStatus"
+          "enum": [
+            "ready"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/MechStatus"
+            }
+          ]
         },
         "isFieldable": {
           "type": "boolean",
@@ -2354,7 +2471,7 @@
           "description": "The mech's name, which the player can change in the mech lab."
         },
         "chassis": {
-          "description": "The mech's chassis, described in chassisDefinitions.",
+          "description": "The mech's chassis, described in catalog.json chassisDefinitions.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "bay": {
@@ -2369,7 +2486,14 @@
         },
         "status": {
           "description": "Whether the mech is free for use or held by the mech lab, which decides the mech's other fields.",
-          "$ref": "#/definitions/MechStatus"
+          "enum": [
+            "readying"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/MechStatus"
+            }
+          ]
         },
         "isFieldable": {
           "type": "boolean",
@@ -2398,7 +2522,7 @@
       ],
       "properties": {
         "chassis": {
-          "description": "The mech's chassis, described in chassisDefinitions.",
+          "description": "The mech's chassis, described in catalog.json chassisDefinitions.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "loadout": {
@@ -2475,6 +2599,7 @@
     },
     "StoredComponent": {
       "type": "object",
+      "description": "A stored component, described in the catalog.",
       "additionalProperties": false,
       "required": [
         "component",
@@ -2508,7 +2633,7 @@
       ],
       "properties": {
         "chassis": {
-          "description": "The chassis, described in the catalog's chassisDefinitions.",
+          "description": "The chassis, described in catalog.json chassisDefinitions.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "count": {
@@ -2520,6 +2645,7 @@
     },
     "StoredMechParts": {
       "type": "object",
+      "description": "Stored parts of a mech, described in the catalog, from which the mech is assembled.",
       "additionalProperties": false,
       "required": [
         "mech",
@@ -2527,7 +2653,7 @@
       ],
       "properties": {
         "mech": {
-          "description": "The mech the parts assemble into, described in mechDefinitions.",
+          "description": "The mech the parts assemble into, described in catalog.json mechDefinitions.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "count": {
@@ -2537,9 +2663,9 @@
         }
       }
     },
-    "ByStoreOfStore": {
+    "StarSystemStores": {
       "type": "object",
-      "description": "A value per store of a star system: its system store, faction store and black market.",
+      "description": "The current star system's stores the company can use.",
       "additionalProperties": false,
       "required": [
         "system",
@@ -2548,7 +2674,7 @@
       ],
       "properties": {
         "system": {
-          "description": "The value for the system store.",
+          "description": "The system store; null where the star system has none or the reputation with its owner is LOATHED.",
           "oneOf": [
             {
               "type": "null"
@@ -2559,7 +2685,7 @@
           ]
         },
         "faction": {
-          "description": "The value for the faction store.",
+          "description": "The faction store; null where the star system has none or the company isn't allied with its owner.",
           "oneOf": [
             {
               "type": "null"
@@ -2570,7 +2696,7 @@
           ]
         },
         "blackMarket": {
-          "description": "The value for the black market.",
+          "description": "The black market; null where the star system has none or the company hasn't gained access to black markets.",
           "oneOf": [
             {
               "type": "null"
@@ -2584,6 +2710,7 @@
     },
     "Store": {
       "type": "object",
+      "description": "A store's stock and prices.",
       "additionalProperties": false,
       "required": [
         "faction",
@@ -2593,7 +2720,7 @@
       ],
       "properties": {
         "faction": {
-          "description": "The faction whose reputation sets the prices, by the price change in reputationLevels: for the system store the system's owner, for the faction store its owner (usually the system's owner too, and the faction the company must be allied with to use it), for the black market the pirates.",
+          "description": "The faction whose reputation sets the prices, by the price change in rules.json reputationLevels: for the system store the system's owner, for the faction store its owner (usually the system's owner too, and the faction the company must be allied with to use it), for the black market the pirates.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "components": {
@@ -2621,6 +2748,7 @@
     },
     "ComponentForSale": {
       "type": "object",
+      "description": "A component in stock, described in the catalog.",
       "additionalProperties": false,
       "required": [
         "component",
@@ -2658,7 +2786,7 @@
       ],
       "properties": {
         "mech": {
-          "description": "The mech, described in mechDefinitions.",
+          "description": "The mech, described in catalog.json mechDefinitions.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "count": {
@@ -2678,6 +2806,7 @@
     },
     "MechPartsForSale": {
       "type": "object",
+      "description": "Mech parts in stock, described in the catalog.",
       "additionalProperties": false,
       "required": [
         "mech",
@@ -2686,7 +2815,7 @@
       ],
       "properties": {
         "mech": {
-          "description": "The mech the parts assemble into, described in mechDefinitions.",
+          "description": "The mech the parts assemble into, described in catalog.json mechDefinitions.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "count": {
@@ -2755,12 +2884,12 @@
           "description": "The barracks title derived from the primary abilities, e.g. \"Recruit\" or \"Lancer\"."
         },
         "skills": {
-          "description": "The skill levels, whose effects skills lists per level.",
+          "description": "The skill levels, whose effects rules.json skills lists per level.",
           "$ref": "#/definitions/Skills"
         },
         "abilities": {
           "type": "array",
-          "description": "The primary abilities only, described in skills; the passive traits follow from the skill levels.",
+          "description": "The primary abilities only, described in rules.json skills; the passive traits follow from the skill levels.",
           "items": {
             "$ref": "#/definitions/DefinitionReference"
           }
@@ -2789,7 +2918,7 @@
         },
         "canHire": {
           "type": "boolean",
-          "description": "Whether the company's Mercenary Review Board rating and morale allow hiring the pilot; full barracks (maxPilots), travel and funds can block it as well."
+          "description": "Whether the company's Mercenary Review Board rating and morale allow hiring the pilot; full barracks (Company.maxPilots), travel and funds can block it as well."
         }
       }
     },
@@ -2844,7 +2973,7 @@
           "description": "The contract's name, as the contract list shows it."
         },
         "type": {
-          "description": "The mission type, described in contractTypes.",
+          "description": "The mission type, described in rules.json contractTypes.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "displayStyle": {
@@ -2861,7 +2990,7 @@
         },
         "difficulty": {
           "type": "integer",
-          "description": "On the scale of maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
+          "description": "On the scale of rules.json reputationLevels[].maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
           "format": "int32"
         },
         "terms": {
@@ -2873,7 +3002,7 @@
             "integer",
             "null"
           ],
-          "description": "While travelling to the star system, the day of arrival, as in arrivesOnDay; null otherwise.",
+          "description": "While travelling to the star system, the day of arrival, as in Travel.arrivesOnDay; null otherwise.",
           "format": "int32"
         },
         "starSystem": {
@@ -2928,6 +3057,7 @@
     },
     "MechSlotLimits": {
       "type": "object",
+      "description": "The tonnage limits of one mech slot of the lance.",
       "additionalProperties": false,
       "required": [
         "minTonnage",
@@ -2954,6 +3084,7 @@
     },
     "ContractDisplayStyle": {
       "type": "string",
+      "description": "Whether a contract is a regular, story, restoration or flashpoint contract.",
       "x-enumNames": [
         "INVALID_UNSET",
         "BaseCampaignNormal",
@@ -3010,6 +3141,7 @@
     },
     "NegotiatedShares": {
       "type": "object",
+      "description": "The slider positions a contract's terms were negotiated at.",
       "additionalProperties": false,
       "required": [
         "payPercent",
@@ -3030,6 +3162,7 @@
     },
     "Salvage": {
       "type": "object",
+      "description": "The salvage of a contract, in items.",
       "additionalProperties": false,
       "required": [
         "total",
@@ -3127,8 +3260,8 @@
           }
         },
         "stores": {
-          "description": "The item collections each of the star system's stores draws its stock from on arrival, every entry of each once, by their ids in the catalog's itemCollectionDefinitions, sorted. A store without any doesn't exist in the star system.",
-          "$ref": "#/definitions/ByStoreOfIReadOnlyListOfString"
+          "description": "The item collections each of the star system's stores draws its stock from on arrival, every entry of each once, by their ids in catalog.json itemCollectionDefinitions, sorted. A store without any doesn't exist in the star system.",
+          "$ref": "#/definitions/ByStoreOfStringList"
         },
         "contractEmployers": {
           "type": "array",
@@ -3159,7 +3292,7 @@
         }
       }
     },
-    "ByStoreOfIReadOnlyListOfString": {
+    "ByStoreOfStringList": {
       "type": "object",
       "description": "A value per store of a star system: its system store, faction store and black market.",
       "additionalProperties": false,
@@ -3194,6 +3327,7 @@
     },
     "ContractEmployer": {
       "type": "object",
+      "description": "A faction that offers contracts in a star system, with the factions they can be against.",
       "additionalProperties": false,
       "required": [
         "employer",
@@ -3224,7 +3358,7 @@
       "properties": {
         "days": {
           "type": "integer",
-          "description": "The days the trip takes from the current star system's planet, as the starmap shows them while the ship is there, with the whole leg to its jump point (jumpPointDays), also the part already travelled during a trip (see legEndsOnDay). 0 for the current star system.",
+          "description": "The days the trip takes from the current star system's planet, as the starmap shows them while the ship is there, with the whole leg to its jump point (Travel.jumpPointDays), also the part already travelled during a trip (see Travel.legEndsOnDay). 0 for the current star system.",
           "format": "int32"
         },
         "cost": {
@@ -3285,7 +3419,7 @@
           "description": "The contract's name, as the contract list shows it."
         },
         "type": {
-          "description": "The mission type, described in contractTypes.",
+          "description": "The mission type, described in rules.json contractTypes.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "displayStyle": {
@@ -3302,7 +3436,7 @@
         },
         "difficulty": {
           "type": "integer",
-          "description": "On the scale of maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
+          "description": "On the scale of rules.json reputationLevels[].maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
           "format": "int32"
         },
         "meetsReputation": {
@@ -3314,13 +3448,13 @@
           "$ref": "#/definitions/Negotiation"
         },
         "starSystem": {
-          "description": "The star system the mission is fought in, in full, as in star-systems.json, with the trip there: the current one, whose route is empty, or another the company travels to first.",
+          "description": "The star system the mission is fought in, in full, as in star-systems.json, with the trip there: the current one, whose route takes 0 days and costs 0 C-Bills, or another the company travels to first.",
           "$ref": "#/definitions/StarSystem"
         }
       }
     },
     "Negotiation": {
-      "description": "The terms a contract can be accepted with; each canNegotiate has a record with the fields of its own.",
+      "description": "The terms a contract can be accepted with; each value of canNegotiate has a record with the fields of its own.",
       "x-abstract": true,
       "anyOf": [
         {
@@ -3416,6 +3550,7 @@
     },
     "Position": {
       "type": "object",
+      "description": "Where the company's ship is, and where it's headed.",
       "additionalProperties": false,
       "required": [
         "starSystem",
@@ -3446,6 +3581,7 @@
     },
     "SimGameTravelStatus": {
       "type": "string",
+      "description": "Where the ship is on a trip, or in a star system.",
       "x-enumNames": [
         "IN_SYSTEM",
         "AT_JUMP_POINT",
@@ -3467,6 +3603,7 @@
     },
     "Travel": {
       "type": "object",
+      "description": "The trip the ship is on.",
       "additionalProperties": false,
       "required": [
         "destination",
@@ -3481,17 +3618,17 @@
         },
         "arrivesOnDay": {
           "type": "integer",
-          "description": "The day the ship arrives, on the scale of daysPassed.",
+          "description": "The day the ship arrives, on the scale of Company.daysPassed.",
           "format": "int32"
         },
         "jumpPointDays": {
           "type": "integer",
-          "description": "The days between the current star system's planet and its jump point, which every days from the current star system includes in full.",
+          "description": "The days between the current star system's planet and its jump point, which every Route.days from the current star system includes in full.",
           "format": "int32"
         },
         "legEndsOnDay": {
           "type": "integer",
-          "description": "The day the leg under way ends, on the scale of daysPassed: by travelStatus, the jump point is reached, a jump is done or, after the last jump, the planet is reached.",
+          "description": "The day the leg under way ends, on the scale of Company.daysPassed: by Position.travelStatus, the jump point is reached, a jump is done or, after the last jump, the planet is reached.",
           "format": "int32"
         }
       }
@@ -3558,12 +3695,12 @@
         },
         "earliestOnDay": {
           "type": "integer",
-          "description": "The first day the event can come, on the scale of daysPassed.",
+          "description": "The first day the event can come, on the scale of Company.daysPassed.",
           "format": "int32"
         },
         "latestOnDay": {
           "type": "integer",
-          "description": "The day the event comes for sure, on the scale of daysPassed.",
+          "description": "The day the event comes for sure, on the scale of Company.daysPassed.",
           "format": "int32"
         },
         "chancePercent": {

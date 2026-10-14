@@ -26,6 +26,7 @@ internal sealed record EventRequirement(
     IReadOnlyList<StatisticComparison> Comparisons,
     IReadOnlyList<ComponentComparison> ComponentComparisons);
 
+/// <summary>A comparison a statistic of the scope must pass.</summary>
 /// <param name="Statistic">The statistic's name, as the game names it; a statistic the scope doesn't have counts as 0.</param>
 /// <param name="Operator">How the statistic's value compares to <paramref name="Value" />.</param>
 /// <param name="Value">The value the statistic is compared to.</param>
@@ -33,7 +34,7 @@ internal sealed record EventRequirement(
 internal sealed record StatisticComparison(string Statistic, Operator Operator, float Value) : IComparison;
 
 /// <summary>
-///     A comparison of the company's working copies of a component in storage, as <c>game-state.json</c>'s
+///     A comparison of the company's working copies of a component in storage, as
 ///     <see cref="StoredComponent.Count" /> has them; a component not in storage counts as 0.
 /// </summary>
 /// <param name="Operator">How the count compares to <paramref name="Value" />.</param>

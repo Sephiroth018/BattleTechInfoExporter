@@ -37,9 +37,9 @@ internal record Pilot(
     IReadOnlyList<string> Tags);
 
 /// <summary>A pilot's skill levels, each from 1 to 10.</summary>
-/// <param name="Gunnery">The gunnery level, a level of <see cref="SkillRules.Gunnery" />.</param>
-/// <param name="Piloting">The piloting level, a level of <see cref="SkillRules.Piloting" />.</param>
-/// <param name="Guts">The guts level, a level of <see cref="SkillRules.Guts" />.</param>
-/// <param name="Tactics">The tactics level, a level of <see cref="SkillRules.Tactics" />.</param>
+/// <param name="Gunnery">The Gunnery level, whose training table is <see cref="SkillRules.Gunnery" />.</param>
+/// <param name="Piloting">The Piloting level, whose training table is <see cref="SkillRules.Piloting" />.</param>
+/// <param name="Guts">The Guts level, whose training table is <see cref="SkillRules.Guts" />.</param>
+/// <param name="Tactics">The Tactics level, whose training table is <see cref="SkillRules.Tactics" />.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Skills(int Gunnery, int Piloting, int Guts, int Tactics);

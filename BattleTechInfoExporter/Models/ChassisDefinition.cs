@@ -46,7 +46,7 @@ internal sealed record ChassisDefinition(
 /// </param>
 /// <param name="PathingId">
 ///     The game's pathing capabilities the unit moves with, which decide the slopes it can climb, as in
-///     <c>combat-map.json</c>'s <see cref="CombatMap.PathingGroups" />.
+///     <see cref="CombatMap.PathingGroups" />.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ChassisMovement(float Walk, float Sprint, string PathingId);
@@ -63,6 +63,7 @@ internal sealed record ChassisMelee(
     float DeathFromAboveDamage,
     float DeathFromAboveSelfDamage);
 
+/// <summary>A body location of a chassis: its limits and hardpoints.</summary>
 /// <param name="Location">The body location, e.g. <c>LeftTorso</c>.</param>
 /// <param name="MaxArmor">The most armor the location can take.</param>
 /// <param name="Structure">The location's internal structure.</param>

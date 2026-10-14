@@ -61,6 +61,7 @@ internal sealed record MechHitTables(
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CalledShotRules(int WeightMultiplier, float DegradePerHit);
 
+/// <summary>The multipliers of the location weights for the later hits of a weapon that fires several.</summary>
 /// <param name="SameLocation">For the location the first hit landed on.</param>
 /// <param name="AdjacentLocation">For the locations adjacent to the first hit's.</param>
 /// <param name="OtherLocation">For every other location.</param>

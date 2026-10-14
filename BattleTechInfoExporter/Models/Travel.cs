@@ -2,6 +2,7 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
+/// <summary>The trip the ship is on.</summary>
 /// <param name="Destination">
 ///     The star system the ship travels to, at the end of its route, in full, as in <c>star-systems.json</c>.
 /// </param>

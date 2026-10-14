@@ -12,6 +12,7 @@ namespace BattleTechInfoExporter.Models;
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Ship(IReadOnlyList<ShipUpgrade> Upgrades);
 
+/// <summary>A ship upgrade as the engineering screen shows it.</summary>
 /// <param name="Upgrade">The ship upgrade's id and name.</param>
 /// <param name="Status">Where the upgrade stands, as the engineering screen shows it.</param>
 /// <param name="Category">The engineering screen's group, e.g. "Mech Bay".</param>

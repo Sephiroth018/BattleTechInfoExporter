@@ -54,11 +54,13 @@ internal sealed record BarracksPilot : Pilot
     public IReadOnlyDictionary<string, float> Statistics { get; }
 }
 
+/// <summary>A pilot's experience points.</summary>
 /// <param name="Unspent">The experience points available to spend on skills.</param>
 /// <param name="Spent">The experience points already spent on skills.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Experience(int Unspent, int Spent);
 
+/// <summary>A pilot's spirits, which events raise and lower for a while.</summary>
 /// <param name="Level">The spirits level, whose effects are in <see cref="Rules.SpiritsLevels" />.</param>
 /// <param name="EndsOnDay">
 ///     The day high or low spirits end, on the scale of <see cref="Company.DaysPassed" />; <c>null</c> for normal
@@ -67,12 +69,13 @@ internal sealed record Experience(int Unspent, int Spent);
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Spirits(SpiritsLevel Level, int? EndsOnDay);
 
+/// <summary>A pilot's career in the company, as the barracks shows it.</summary>
 /// <param name="Missions">The missions the pilot has fought.</param>
 /// <param name="MechKills">The mechs the pilot has destroyed.</param>
 /// <param name="OtherKills">The other units the pilot has destroyed: vehicles and turrets.</param>
 /// <param name="Ejections">The missions the pilot ejected in.</param>
 /// <param name="LifetimeInjuries">The injuries the pilot has taken in missions, healed ones included.</param>
-/// <param name="HiredOnDay">On the scale of <see cref="Company.DaysPassed" />.</param>
+/// <param name="HiredOnDay">The day the pilot was hired, on the scale of <see cref="Company.DaysPassed" />.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ServiceRecord(
     int Missions,

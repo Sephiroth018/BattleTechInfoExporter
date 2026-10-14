@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Rules",
   "type": "object",
-  "description": "The root of rules.json: how the game works for this career, level tables that values in GameState refer to.",
+  "description": "The root of rules.json: how the game works for this career, level tables that values in game-state.json refer to.",
   "additionalProperties": false,
   "required": [
     "modVersion",
@@ -35,21 +35,21 @@
     },
     "moraleLevels": {
       "type": "array",
-      "description": "The morale levels, which level refers to.",
+      "description": "The morale levels, which game-state.json company.morale.level refers to.",
       "items": {
         "$ref": "#/definitions/MoraleLevel"
       }
     },
     "reputationLevels": {
       "type": "array",
-      "description": "The reputation levels, which level refers to.",
+      "description": "The reputation levels, which game-state.json company.reputation.*.level refers to.",
       "items": {
         "$ref": "#/definitions/ReputationLevel"
       }
     },
     "mercenaryReviewBoardLevels": {
       "type": "array",
-      "description": "The Mercenary Review Board rating levels, which level refers to.",
+      "description": "The Mercenary Review Board rating levels, which game-state.json company.mercenaryReviewBoard.level refers to.",
       "items": {
         "$ref": "#/definitions/MercenaryReviewBoardLevel"
       }
@@ -60,14 +60,14 @@
     },
     "spiritsLevels": {
       "type": "array",
-      "description": "The effects of each spirits level, which level refers to.",
+      "description": "The effects of each spirits level, which game-state.json pilots[].spirits.level refers to.",
       "items": {
         "$ref": "#/definitions/SpiritsLevelCosts"
       }
     },
     "mechPartsPerMech": {
       "type": "integer",
-      "description": "The StoredMechParts needed to assemble a mech.",
+      "description": "The game-state.json storage.mechParts[] needed to assemble a mech.",
       "format": "int32"
     },
     "contractTypes": {
@@ -152,6 +152,7 @@
     },
     "MoraleLevel": {
       "type": "object",
+      "description": "A level of the company's morale, and what it does in combat.",
       "additionalProperties": false,
       "required": [
         "level",
@@ -161,7 +162,7 @@
       "properties": {
         "level": {
           "type": "string",
-          "description": "The level's name as the UI shows it, which level refers to."
+          "description": "The level's name as the UI shows it, which game-state.json company.morale.level refers to."
         },
         "startsAt": {
           "type": "integer",
@@ -214,6 +215,7 @@
     },
     "SimGameReputation": {
       "type": "string",
+      "description": "A reputation level, described in rules.json reputationLevels.",
       "x-enumNames": [
         "INDIFFERENT",
         "LIKED",
@@ -235,6 +237,7 @@
     },
     "MercenaryReviewBoardLevel": {
       "type": "object",
+      "description": "A level of the Mercenary Review Board rating, and what it allows.",
       "additionalProperties": false,
       "required": [
         "level",
@@ -245,7 +248,7 @@
       "properties": {
         "level": {
           "type": "integer",
-          "description": "The rating level, from 0, which level refers to.",
+          "description": "The rating level, from 0, which game-state.json company.mercenaryReviewBoard.level refers to.",
           "format": "int32"
         },
         "startsAt": {
@@ -308,6 +311,7 @@
     },
     "SkillOfGunneryLevel": {
       "type": "object",
+      "description": "A pilot skill's training table.",
       "additionalProperties": false,
       "required": [
         "description",
@@ -329,6 +333,7 @@
     },
     "GunneryLevel": {
       "type": "object",
+      "description": "A level of the Gunnery skill.",
       "additionalProperties": false,
       "required": [
         "level",
@@ -363,6 +368,7 @@
     },
     "SkillLevelAbility": {
       "type": "object",
+      "description": "An ability a skill level unlocks.",
       "additionalProperties": false,
       "required": [
         "ability",
@@ -448,6 +454,7 @@
     },
     "ActivationTiming": {
       "type": "string",
+      "description": "When an ability takes effect, e.g. always or on command.",
       "x-enumNames": [
         "NotSet",
         "Passive",
@@ -465,8 +472,8 @@
     },
     "TargetingType": {
       "type": "string",
+      "description": "How an ability is aimed.",
       "x-enumNames": [
-        "NotSet",
         "ActorSelf",
         "ActorTarget",
         "SensorLock",
@@ -482,7 +489,6 @@
         "ActiveProbe"
       ],
       "enum": [
-        "NotSet",
         "ActorSelf",
         "ActorTarget",
         "SensorLock",
@@ -557,6 +563,7 @@
     },
     "StatOperation": {
       "type": "string",
+      "description": "How a statistic change applies its value to the statistic.",
       "x-enumNames": [
         "Set",
         "Int_Add",
@@ -610,6 +617,7 @@
     },
     "EffectTargetCollection": {
       "type": "object",
+      "description": "The pilot or the components of the unit whose statistic a change applies to.",
       "additionalProperties": false,
       "required": [
         "collection",
@@ -635,8 +643,8 @@
     },
     "TargetCollection": {
       "type": "string",
+      "description": "Which of a unit's parts a statistic change applies to: its pilot or a group of its components.",
       "x-enumNames": [
-        "NotSet",
         "Pilot",
         "Weapon",
         "AmmoBox",
@@ -644,7 +652,6 @@
         "StrongestWeapon"
       ],
       "enum": [
-        "NotSet",
         "Pilot",
         "Weapon",
         "AmmoBox",
@@ -688,6 +695,7 @@
     },
     "AmmoCategoryFilter": {
       "type": "object",
+      "description": "A filter on the ammunition boxes' category.",
       "additionalProperties": false,
       "required": [
         "kind",
@@ -696,7 +704,14 @@
       "properties": {
         "kind": {
           "description": "Which property of the components the filter compares, deciding the type of its value.",
-          "$ref": "#/definitions/ComponentFilterKind"
+          "enum": [
+            "ammoCategory"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/ComponentFilterKind"
+            }
+          ]
         },
         "value": {
           "type": "string",
@@ -706,6 +721,7 @@
     },
     "WeaponCategoryFilter": {
       "type": "object",
+      "description": "A filter on the weapons' category.",
       "additionalProperties": false,
       "required": [
         "kind",
@@ -714,7 +730,14 @@
       "properties": {
         "kind": {
           "description": "Which property of the components the filter compares, deciding the type of its value.",
-          "$ref": "#/definitions/ComponentFilterKind"
+          "enum": [
+            "weaponCategory"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/ComponentFilterKind"
+            }
+          ]
         },
         "value": {
           "type": "string",
@@ -724,6 +747,7 @@
     },
     "WeaponSubTypeFilter": {
       "type": "object",
+      "description": "A filter on the weapons' sub type.",
       "additionalProperties": false,
       "required": [
         "kind",
@@ -732,7 +756,14 @@
       "properties": {
         "kind": {
           "description": "Which property of the components the filter compares, deciding the type of its value.",
-          "$ref": "#/definitions/ComponentFilterKind"
+          "enum": [
+            "weaponSubType"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/ComponentFilterKind"
+            }
+          ]
         },
         "value": {
           "description": "The weapon sub type the weapons must have, e.g. Melee or DFA.",
@@ -742,8 +773,8 @@
     },
     "WeaponSubType": {
       "type": "string",
+      "description": "A weapon's sub type, e.g. a weapon model or a melee attack.",
       "x-enumNames": [
-        "NotSet",
         "AC2",
         "AC5",
         "AC10",
@@ -790,7 +821,6 @@
         "COILL"
       ],
       "enum": [
-        "NotSet",
         "AC2",
         "AC5",
         "AC10",
@@ -839,6 +869,7 @@
     },
     "WeaponTypeFilter": {
       "type": "object",
+      "description": "A filter on the weapons' type.",
       "additionalProperties": false,
       "required": [
         "kind",
@@ -847,7 +878,14 @@
       "properties": {
         "kind": {
           "description": "Which property of the components the filter compares, deciding the type of its value.",
-          "$ref": "#/definitions/ComponentFilterKind"
+          "enum": [
+            "weaponType"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/ComponentFilterKind"
+            }
+          ]
         },
         "value": {
           "description": "The weapon type the weapons must have, e.g. LRM or SRM.",
@@ -857,8 +895,8 @@
     },
     "WeaponType": {
       "type": "string",
+      "description": "A weapon's type, e.g. a weapon family or melee.",
       "x-enumNames": [
-        "NotSet",
         "Autocannon",
         "Gauss",
         "Laser",
@@ -872,7 +910,6 @@
         "COIL"
       ],
       "enum": [
-        "NotSet",
         "Autocannon",
         "Gauss",
         "Laser",
@@ -888,6 +925,7 @@
     },
     "EffectDuration": {
       "type": "object",
+      "description": "How long a statistic change lasts.",
       "additionalProperties": false,
       "required": [
         "count",
@@ -896,7 +934,7 @@
       "properties": {
         "count": {
           "type": "integer",
-          "description": "How many of unit the change lasts, at least 1.",
+          "description": "How many activations, rounds, movements or phases, by its unit, the change lasts; at least 1.",
           "format": "int32"
         },
         "unit": {
@@ -925,8 +963,8 @@
     },
     "EffectTargetType": {
       "type": "string",
+      "description": "Whose statistic a change applies to, relative to the unit with the ability or component.",
       "x-enumNames": [
-        "NotSet",
         "Creator",
         "SingleTarget",
         "LanceMatesWithinRange",
@@ -937,7 +975,6 @@
         "AllEnemies"
       ],
       "enum": [
-        "NotSet",
         "Creator",
         "SingleTarget",
         "LanceMatesWithinRange",
@@ -950,6 +987,7 @@
     },
     "EffectTriggerType": {
       "type": "string",
+      "description": "When the game makes a statistic change.",
       "x-enumNames": [
         "Passive",
         "OnActivation",
@@ -977,6 +1015,7 @@
     },
     "SkillOfPilotingLevel": {
       "type": "object",
+      "description": "A pilot skill's training table.",
       "additionalProperties": false,
       "required": [
         "description",
@@ -998,6 +1037,7 @@
     },
     "PilotingLevel": {
       "type": "object",
+      "description": "A level of the Piloting skill.",
       "additionalProperties": false,
       "required": [
         "level",
@@ -1038,6 +1078,7 @@
     },
     "SkillOfSkillLevel": {
       "type": "object",
+      "description": "A pilot skill's training table.",
       "additionalProperties": false,
       "required": [
         "description",
@@ -1281,7 +1322,7 @@
     },
     "ToHitRules": {
       "type": "object",
-      "description": "How an attack's hit chance follows from its difficulty: the base chance of the skill level (see baseHitChancePercent) loses difficultySteps per point of the summed modifiers, is rounded to roundedToPercent and clamped between minChancePercent and maxChancePercent.",
+      "description": "How an attack's hit chance follows from its difficulty: the base chance of the skill level (see GunneryLevel.baseHitChancePercent) loses difficultySteps per point of the summed modifiers, is rounded to roundedToPercent and clamped between minChancePercent and maxChancePercent.",
       "additionalProperties": false,
       "required": [
         "difficultySteps",
@@ -1460,6 +1501,7 @@
     },
     "TargetWeightClassModifiers": {
       "type": "object",
+      "description": "The modifier for the target's size, by its kind and weight class.",
       "additionalProperties": false,
       "required": [
         "mech",
@@ -1483,6 +1525,7 @@
     },
     "ByWeightClassOfSingle": {
       "type": "object",
+      "description": "A value per weight class of the unit it applies to.",
       "additionalProperties": false,
       "required": [
         "light",
@@ -1546,6 +1589,7 @@
     },
     "AttackerWalkedModifiers": {
       "type": "object",
+      "description": "The modifier when the attacker walked this round, by its kind.",
       "additionalProperties": false,
       "required": [
         "mech",
@@ -1604,6 +1648,7 @@
     },
     "DamagedLocationModifiers": {
       "type": "object",
+      "description": "The modifier for a weapon in a damaged location, by the location's damage.",
       "additionalProperties": false,
       "required": [
         "penalized",
@@ -1624,7 +1669,7 @@
     },
     "EvasionRules": {
       "type": "object",
-      "description": "How a unit earns evasive pips by moving and what each pip does to ranged attacks against it. A sensor lock strips pips (see evasivePipsStripped).",
+      "description": "How a unit earns evasive pips by moving and what each pip does to ranged attacks against it. A sensor lock strips pips (see SensorLockRules.evasivePipsStripped).",
       "additionalProperties": false,
       "required": [
         "pipsByDistanceMoved",
@@ -1652,7 +1697,7 @@
         },
         "weaponTypesAffected": {
           "type": "array",
-          "description": "The weapon types the pips apply to, by the game's names, where the weapon's category is affected too (isAffectedByEvasion).",
+          "description": "The weapon types the pips apply to, by the game's names, where the weapon's category is affected too (WeaponCategoryRules.isAffectedByEvasion).",
           "items": {
             "$ref": "#/definitions/WeaponType"
           }
@@ -1675,6 +1720,7 @@
     },
     "EvasivePips": {
       "type": "object",
+      "description": "The evasive pips a move longer than a distance earns.",
       "additionalProperties": false,
       "required": [
         "moreThan",
@@ -1825,7 +1871,7 @@
         },
         "isAffectedByEvasion": {
           "type": "boolean",
-          "description": "Whether the target's evasive pips apply to the category's attacks; the weapon's type must also be one of weaponTypesAffected."
+          "description": "Whether the target's evasive pips apply to the category's attacks; the weapon's type must also be one of EvasionRules.weaponTypesAffected."
         }
       }
     },
@@ -1852,6 +1898,7 @@
     },
     "StrayShotValidTargets": {
       "type": "string",
+      "description": "Which units a missed shot can hit instead.",
       "x-enumNames": [
         "ENEMIES_ONLY",
         "ENEMIES_AND_NEUTRAL",
@@ -1865,7 +1912,7 @@
     },
     "CoilRules": {
       "type": "object",
-      "description": "How a COIL weapon gains from its mech's evasive pips; the weapon's own values are its coil.",
+      "description": "How a COIL weapon gains from its mech's evasive pips; the weapon's own values are its catalog.json componentDefinitions.weapons.*.coil.",
       "additionalProperties": false,
       "required": [
         "multipliesShots",
@@ -1874,7 +1921,7 @@
       "properties": {
         "multipliesShots": {
           "type": "boolean",
-          "description": "Whether the pips multiply the shots fired, never below the base; when not, once the mech has moved this round and not sprinted, the damage of one shot is multiplied by the pips to the power of evasiveExponent, never below the base damage."
+          "description": "Whether the pips multiply the shots fired, never below the base; when not, once the mech has moved this round and not sprinted, the damage of one shot is multiplied by the pips to the power of catalog.json componentDefinitions.weapons.*.coil.evasiveExponent, never below the base damage."
         },
         "countsJumps": {
           "type": "boolean",
@@ -1990,7 +2037,7 @@
     },
     "StabilityRules": {
       "type": "object",
-      "description": "The stability rules of mechs. A mech's stability bar has levels levels; a mech that reaches unsteadyAbovePercent of its stability is unsteady and loses its evasive pips, and an unsteady mech that fills the bar is knocked down.",
+      "description": "The stability rules of mechs. A mech's stability bar is divided into equal levels; a mech that reaches unsteadyAbovePercent of its stability is unsteady and loses its evasive pips, and an unsteady mech that fills the bar is knocked down.",
       "additionalProperties": false,
       "required": [
         "unsteadyAbovePercent",
@@ -2005,7 +2052,7 @@
       "properties": {
         "unsteadyAbovePercent": {
           "type": "integer",
-          "description": "In percent of the stability bar; a mech's UnsteadyThreshold statistic starts at it, and the combat state's unsteadyAbove is its current value in points.",
+          "description": "In percent of the stability bar; a mech's UnsteadyThreshold statistic starts at it, and combat-state.json units.*.state.mech.stability.unsteadyAbove is its current value in points.",
           "format": "int32"
         },
         "levels": {
@@ -2043,6 +2090,7 @@
     },
     "LevelsRecoveredByAction": {
       "type": "object",
+      "description": "The levels of instability a mech's action this round removes.",
       "additionalProperties": false,
       "required": [
         "stationary",
@@ -2087,6 +2135,7 @@
     },
     "LevelsAddedByAction": {
       "type": "object",
+      "description": "The levels of instability an action adds to the mech doing it.",
       "additionalProperties": false,
       "required": [
         "deathFromAbove",
@@ -2107,6 +2156,7 @@
     },
     "InstabilityFromDamage": {
       "type": "object",
+      "description": "The share of the stability bar added when a location is damaged, by the location and damage.",
       "additionalProperties": false,
       "required": [
         "sideTorsoDestroyed",
@@ -2163,7 +2213,7 @@
     },
     "MeleeAttackRules": {
       "type": "object",
-      "description": "The melee rules; damage and stability damage are the chassis' in the catalog. A melee attack against a turret, a building, a prone or a shut-down mech always has the maximum hit chance. The damage against vehicles and turrets is multiplied by the Melee weapon category's (see weaponCategories).",
+      "description": "The melee rules; damage and stability damage are the chassis' in the catalog. A melee attack against a turret, a building, a prone or a shut-down mech always has the maximum hit chance. The damage against vehicles and turrets is multiplied by the Melee weapon category's (see CombatRules.weaponCategories).",
       "additionalProperties": false,
       "required": [
         "deathFromAboveToHit",
@@ -2225,7 +2275,7 @@
         },
         "vehicle": {
           "description": "The weights of a vehicle's locations.",
-          "$ref": "#/definitions/HitTablesOfOfVehicleChassisLocations"
+          "$ref": "#/definitions/HitTablesOfVehicleChassisLocations"
         },
         "calledShot": {
           "description": "How a called shot raises the chosen location's weight.",
@@ -2316,6 +2366,7 @@
     },
     "ArmorLocation": {
       "type": "string",
+      "description": "A mech's armor location, the torso's front and rear apart.",
       "x-enumFlags": true,
       "x-enumNames": [
         "None",
@@ -2348,7 +2399,7 @@
         "Invalid"
       ]
     },
-    "HitTablesOfOfVehicleChassisLocations": {
+    "HitTablesOfVehicleChassisLocations": {
       "type": "object",
       "description": "The hit tables of a kind of unit, by the direction the attack comes from.",
       "additionalProperties": false,
@@ -2415,6 +2466,7 @@
     },
     "VehicleChassisLocations": {
       "type": "string",
+      "description": "A vehicle's location.",
       "x-enumFlags": true,
       "x-enumNames": [
         "None",
@@ -2462,6 +2514,7 @@
     },
     "ClusteredHitWeights": {
       "type": "object",
+      "description": "The multipliers of the location weights for the later hits of a weapon that fires several.",
       "additionalProperties": false,
       "required": [
         "sameLocation",
@@ -2664,7 +2717,7 @@
         },
         "addsMoraleLevelResolve": {
           "type": "boolean",
-          "description": "Whether the company's morale level adds its resolve per round (see resolvePerRound)."
+          "description": "Whether the company's morale level adds its resolve per round (see MoraleLevel.resolvePerRound)."
         },
         "addsUnitResolveBonuses": {
           "type": "boolean",
@@ -2711,6 +2764,7 @@
     },
     "ResolveEventThresholds": {
       "type": "object",
+      "description": "The shares, from 0 to 1, at which an attack's resolve events happen.",
       "additionalProperties": false,
       "required": [
         "majorityHit",
@@ -2764,7 +2818,7 @@
       "properties": {
         "enemyDestroyed": {
           "description": "By the enemy's weight class; a turret counts as light.",
-          "$ref": "#/definitions/ByWeightClassOfInteger"
+          "$ref": "#/definitions/ByWeightClassOfInt32"
         },
         "enemyDestroyedInMelee": {
           "type": "integer",
@@ -2803,22 +2857,22 @@
         },
         "enemyMinorArmorDamage": {
           "type": "integer",
-          "description": "For taking off more than minorArmorDamage of an enemy's armor.",
+          "description": "For taking off more than ResolveEventThresholds.minorArmorDamage of an enemy's armor.",
           "format": "int32"
         },
         "enemyMajorArmorDamage": {
           "type": "integer",
-          "description": "For taking off more than majorArmorDamage of an enemy's armor, instead of enemyMinorArmorDamage; counted for every enemy the attack damages so.",
+          "description": "For taking off more than ResolveEventThresholds.majorArmorDamage of an enemy's armor, instead of enemyMinorArmorDamage; counted for every enemy the attack damages so.",
           "format": "int32"
         },
         "majorityHit": {
           "type": "integer",
-          "description": "For an attack of which more than majorityHit of the shots hit.",
+          "description": "For an attack of which more than ResolveEventThresholds.majorityHit of the shots hit.",
           "format": "int32"
         },
         "majorityMiss": {
           "type": "integer",
-          "description": "For an attack of which less than majorityMiss of the shots hit, when the attack changes the lance's resolve in no other way.",
+          "description": "For an attack of which less than ResolveEventThresholds.majorityMiss of the shots hit, when the attack changes the lance's resolve in no other way.",
           "format": "int32"
         },
         "objectiveCompleted": {
@@ -2833,8 +2887,9 @@
         }
       }
     },
-    "ByWeightClassOfInteger": {
+    "ByWeightClassOfInt32": {
       "type": "object",
+      "description": "A value per weight class of the unit it applies to.",
       "additionalProperties": false,
       "required": [
         "light",
@@ -2905,6 +2960,7 @@
     },
     "LegDamagePenalties": {
       "type": "object",
+      "description": "The share of the distance a mech loses per leg, by the leg's damage.",
       "additionalProperties": false,
       "required": [
         "penalized",
@@ -2980,7 +3036,7 @@
     },
     "MechLabRules": {
       "type": "object",
-      "description": "What mech lab work costs. The mech lab works through its orders one at a time, paying the company's mechTech tech points a day, so an order takes its tech points divided by that, rounded up, at least a day.",
+      "description": "What mech lab work costs. The mech lab works through its orders one at a time, paying the company's game-state.json company.mechTech tech points a day, so an order takes its tech points divided by that, rounded up, at least a day.",
       "additionalProperties": false,
       "required": [
         "structureRepair",
@@ -3032,6 +3088,7 @@
     },
     "MechLabCost": {
       "type": "object",
+      "description": "What a kind of mech lab work costs.",
       "additionalProperties": false,
       "required": [
         "techPoints",
@@ -3052,6 +3109,7 @@
     },
     "MechLabCostMultipliers": {
       "type": "object",
+      "description": "Multipliers of a mech lab cost.",
       "additionalProperties": false,
       "required": [
         "techPoints",
@@ -3121,7 +3179,7 @@
     },
     "MedBayRules": {
       "type": "object",
-      "description": "How long healing takes: a pilot's injuries cost heal points, and the med bay pays healPointsBase plus healPointsPerMedTech times the company's medTech a day to each injured pilot.",
+      "description": "How long healing takes: a pilot's injuries cost heal points, and the med bay pays healPointsBase plus healPointsPerMedTech times the company's game-state.json company.medTech a day to each injured pilot.",
       "additionalProperties": false,
       "required": [
         "healPointsBase",
@@ -3139,7 +3197,7 @@
         },
         "healPointsPerMedTech": {
           "type": "integer",
-          "description": "The heal points added per point of medTech.",
+          "description": "The heal points added per point of game-state.json company.medTech.",
           "format": "int32"
         },
         "injuryCost": {
@@ -3353,6 +3411,7 @@
     },
     "SalvageOutcome": {
       "type": "object",
+      "description": "What a mission's outcome does to its salvage.",
       "additionalProperties": false,
       "required": [
         "chance",
@@ -3373,6 +3432,7 @@
     },
     "SalvagePickWeights": {
       "type": "object",
+      "description": "The relative weights the salvage drawn at random is drawn from the pool by, per kind of item.",
       "additionalProperties": false,
       "required": [
         "weapon",
@@ -3399,6 +3459,7 @@
     },
     "RareSalvageSwaps": {
       "type": "object",
+      "description": "The chance of a salvaged component being swapped for a rarer one, by kind of component.",
       "additionalProperties": false,
       "required": [
         "weapons",
@@ -3417,7 +3478,7 @@
     },
     "RareSalvageSwap": {
       "type": "object",
-      "description": "The chance of a swap is the contract's difficulty plus the tier's ChanceOffset, divided by divisor; the very rare tier is rolled first.",
+      "description": "The chance of a swap is the contract's difficulty plus the tier's chanceOffset, divided by divisor; the very rare tier is rolled first.",
       "additionalProperties": false,
       "required": [
         "veryRare",
@@ -3442,6 +3503,7 @@
     },
     "RareSalvageTier": {
       "type": "object",
+      "description": "A tier of rarer components a salvaged component can be swapped for.",
       "additionalProperties": false,
       "required": [
         "rarities",
@@ -3458,13 +3520,14 @@
         },
         "chanceOffset": {
           "type": "number",
-          "description": "Added to the contract's difficulty before divisor.",
+          "description": "Added to the contract's difficulty before RareSalvageSwap.divisor.",
           "format": "float"
         }
       }
     },
     "FinancesRules": {
       "type": "object",
+      "description": "The company's expenses, trade and debt, and the morale effects of failed missions.",
       "additionalProperties": false,
       "required": [
         "daysPerReport",
@@ -3496,7 +3559,7 @@
         },
         "spendingLevels": {
           "type": "array",
-          "description": "The spending levels, which level refers to.",
+          "description": "The spending levels, which game-state.json financialReport.spending.level refers to.",
           "items": {
             "$ref": "#/definitions/SpendingLevelRules"
           }
@@ -3561,6 +3624,7 @@
     },
     "SpendingLevelRules": {
       "type": "object",
+      "description": "What a spending level does.",
       "additionalProperties": false,
       "required": [
         "level",
@@ -3586,6 +3650,7 @@
     },
     "EconomyScale": {
       "type": "string",
+      "description": "A spending level, from the cheapest to the most generous.",
       "x-enumNames": [
         "Normal",
         "Generous",
@@ -3603,7 +3668,7 @@
     },
     "ContractRules": {
       "type": "object",
-      "description": "How contracts are generated, paid and rewarded. A contract's pay is payPerDifficulty times the mission type's payMultiplier times a scale of its difficulty (the sum of 1 / (0.4 n) for n from 1 to the difficulty, less 1.5), varied by up to payVariance either way and rounded to thousands.",
+      "description": "How contracts are generated, paid and rewarded. A contract's pay is payPerDifficulty times the mission type's ContractTypeDescription.payMultiplier times a scale of its difficulty (the sum of 1 / (0.4 n) for n from 1 to the difficulty, less 1.5), varied by up to payVariance either way and rounded to thousands.",
       "additionalProperties": false,
       "required": [
         "payPerDifficulty",
@@ -3796,6 +3861,7 @@
     },
     "AllianceRules": {
       "type": "object",
+      "description": "What allying with a faction takes and what breaking the alliance costs.",
       "additionalProperties": false,
       "required": [
         "reputationNeeded",

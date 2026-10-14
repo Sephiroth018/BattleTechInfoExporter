@@ -36,6 +36,7 @@ internal sealed record EvasionRules(
     float VehiclePipMultiplier,
     bool CanVehiclesBeEvasive);
 
+/// <summary>The evasive pips a move longer than a distance earns.</summary>
 /// <param name="MoreThan">The distance in meters the unit has to exceed.</param>
 /// <param name="Pips">The pips the unit gets for it.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

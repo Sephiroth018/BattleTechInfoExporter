@@ -167,7 +167,7 @@
           "description": "The contract's name, as the contract list shows it."
         },
         "type": {
-          "description": "The mission type, described in contractTypes.",
+          "description": "The mission type, described in rules.json contractTypes.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "displayStyle": {
@@ -184,7 +184,7 @@
         },
         "difficulty": {
           "type": "integer",
-          "description": "On the scale of maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
+          "description": "On the scale of rules.json reputationLevels[].maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
           "format": "int32"
         },
         "starSystem": {
@@ -214,6 +214,7 @@
     },
     "ContractDisplayStyle": {
       "type": "string",
+      "description": "Whether a contract is a regular, story, restoration or flashpoint contract.",
       "x-enumNames": [
         "INVALID_UNSET",
         "BaseCampaignNormal",
@@ -233,6 +234,7 @@
     },
     "ContractState": {
       "type": "string",
+      "description": "Where a contract stands, or how its mission ended.",
       "x-enumNames": [
         "Negotiable",
         "Finalized",
@@ -268,7 +270,7 @@
         },
         "objectiveIds": {
           "type": "array",
-          "description": "Never empty: the ids the combat state's id had for the objectives this one groups, also those the HUD didn't list; its own id alone where it is one of them or groups none.",
+          "description": "Never empty: the ids combat-state.json objectives[].id had for the objectives this one groups, also those the HUD didn't list; its own id alone where it is one of them or groups none.",
           "items": {
             "type": "string"
           }
@@ -289,6 +291,7 @@
     },
     "ObjectiveStatus": {
       "type": "string",
+      "description": "Where an objective stands.",
       "x-enumNames": [
         "Active",
         "Ignored",
@@ -404,10 +407,10 @@
         },
         "isMechLost": {
           "type": "boolean",
-          "description": "Whether the mech was destroyed and not recovered; its surviving components are in automatic."
+          "description": "Whether the mech was destroyed and not recovered; its surviving components are in MissionSalvage.automatic."
         },
         "repair": {
-          "description": "What repairing the mech's damage in the mech bay would take, as for a mech bay mech's repair; null without damage and for a lost mech.",
+          "description": "What repairing the mech's damage in the mech bay would take, as for a mech bay mech's game-state.json mechs[].repair; null without damage and for a lost mech.",
           "oneOf": [
             {
               "type": "null"
@@ -466,7 +469,7 @@
     },
     "MechReference": {
       "type": "object",
-      "description": "A mech in the mech bay: its own id and name, as in id and name.",
+      "description": "A mech in the mech bay, by its own id and name there (game-state.json mechs).",
       "additionalProperties": false,
       "required": [
         "id",
@@ -506,6 +509,7 @@
     },
     "DamagedLocation": {
       "type": "object",
+      "description": "A body location that lost armor or structure in the mission, as it is after it.",
       "additionalProperties": false,
       "required": [
         "location",
@@ -530,6 +534,7 @@
     },
     "ChassisLocations": {
       "type": "string",
+      "description": "A mech's body location.",
       "x-enumFlags": true,
       "x-enumNames": [
         "None",
@@ -592,6 +597,7 @@
     },
     "Armor": {
       "type": "object",
+      "description": "The armor of one side of a location.",
       "additionalProperties": false,
       "required": [
         "current",
@@ -612,6 +618,7 @@
     },
     "DamagedComponent": {
       "type": "object",
+      "description": "A component damaged or destroyed in the mission.",
       "additionalProperties": false,
       "required": [
         "component",
@@ -635,7 +642,7 @@
     },
     "ComponentReference": {
       "type": "object",
-      "description": "A component's definition, like DefinitionReference, with the type that tells which group of componentDefinitions holds it. Components compare by type first, then as every reference.",
+      "description": "A component's definition, like DefinitionReference, with the type that tells which group of catalog.json componentDefinitions holds it. Components compare by type first, then as every reference.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -652,13 +659,14 @@
           "description": "The name the UI shows."
         },
         "type": {
-          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in componentDefinitions.",
+          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in catalog.json componentDefinitions.",
           "$ref": "#/definitions/ComponentType"
         }
       }
     },
     "ComponentType": {
       "type": "string",
+      "description": "The game's kind of component, which names the component's group in catalog.json componentDefinitions.",
       "x-enumNames": [
         "NotSet",
         "Weapon",
@@ -682,6 +690,7 @@
     },
     "ComponentDamageLevel": {
       "type": "string",
+      "description": "How damaged a component is.",
       "x-enumNames": [
         "Functional",
         "Misaligned",
@@ -721,7 +730,7 @@
         },
         "shotsFired": {
           "type": "integer",
-          "description": "The shots fired, also from a box destroyed since; the capacity is the catalog's capacity or internalAmmoCapacity.",
+          "description": "The shots fired, also from a box destroyed since; the capacity is catalog.json componentDefinitions.ammunitionBoxes.*.capacity or catalog.json componentDefinitions.weapons.*.internalAmmoCapacity.",
           "format": "int32"
         }
       }
@@ -771,7 +780,7 @@
     },
     "SalvageItems": {
       "type": "object",
-      "description": "Salvage items, counted like Storage, where they end up.",
+      "description": "Salvage items, counted like game-state.json storage, where they end up.",
       "additionalProperties": false,
       "required": [
         "components",
@@ -780,7 +789,7 @@
       "properties": {
         "components": {
           "type": "array",
-          "description": "Their damagedCount is 0: the game generates no damaged salvage.",
+          "description": "Their StoredComponent.damagedCount is 0: the game generates no damaged salvage.",
           "items": {
             "$ref": "#/definitions/StoredComponent"
           }
@@ -796,6 +805,7 @@
     },
     "StoredComponent": {
       "type": "object",
+      "description": "A stored component, described in the catalog.",
       "additionalProperties": false,
       "required": [
         "component",
@@ -821,6 +831,7 @@
     },
     "StoredMechParts": {
       "type": "object",
+      "description": "Stored parts of a mech, described in the catalog, from which the mech is assembled.",
       "additionalProperties": false,
       "required": [
         "mech",
@@ -828,7 +839,7 @@
       ],
       "properties": {
         "mech": {
-          "description": "The mech the parts assemble into, described in mechDefinitions.",
+          "description": "The mech the parts assemble into, described in catalog.json mechDefinitions.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "count": {

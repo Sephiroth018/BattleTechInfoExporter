@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
+/// <summary>The player's mercenary company: its funds, morale, standing and staff.</summary>
 /// <param name="Name">The company's name, as the player chose it.</param>
 /// <param name="Dropship">The company's ship: the Leopard at the start, later the Argo.</param>
 /// <param name="DaysPassed">
@@ -31,7 +32,8 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Tags">The company's tags, sorted, which the events' requirements check.</param>
 /// <param name="Statistics">
 ///     The company's statistics some event's requirements compare, keyed by the game's name, as they compare them; a
-///     statistic the company doesn't have is 0. The stored components' counts they compare are in the storage.
+///     statistic the company doesn't have is 0. The stored components' counts they compare are in
+///     <see cref="Storage.Components" />.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Company(

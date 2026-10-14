@@ -24,18 +24,22 @@ internal sealed record ItemCollectionDefinition(
     IReadOnlyList<NestedCollectionEntry> Collections,
     int EmptyWeight) : ICatalogEntry;
 
+/// <summary>A component a draw from the collection can yield.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ComponentCollectionEntry(ComponentReference Component, int? Count, int Weight)
     : ComponentEntry(Component), IItemCollectionItem;
 
+/// <summary>A whole mech a draw from the collection can yield.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechCollectionEntry(DefinitionReference Mech, int? Count, int Weight)
     : MechEntry(Mech), IItemCollectionItem;
 
+/// <summary>Mech parts a draw from the collection can yield.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechPartsCollectionEntry(DefinitionReference Mech, int? Count, int Weight)
     : MechPartsEntry(Mech), IItemCollectionItem;
 
+/// <summary>Another collection a draw from the collection can yield, which is then drawn from in turn.</summary>
 /// <param name="Collection">The collection drawn from, by its id in <see cref="Catalog.ItemCollectionDefinitions" />.</param>
 /// <param name="Draws">
 ///     The draws from the collection, each by weight and with the same entry possible again; <c>null</c>: every

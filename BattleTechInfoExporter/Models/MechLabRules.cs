@@ -31,11 +31,13 @@ internal sealed record MechLabRules(
     int ReadyMechTechPoints,
     float CancelRefundShare);
 
+/// <summary>What a kind of mech lab work costs.</summary>
 /// <param name="TechPoints">The tech points the work takes, per the unit its use names.</param>
 /// <param name="CBills">The C-Bills the work costs, per the same unit.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechLabCost(float TechPoints, float CBills);
 
+/// <summary>Multipliers of a mech lab cost.</summary>
 /// <param name="TechPoints">Multiplies the tech points.</param>
 /// <param name="CBills">Multiplies the C-Bills.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
