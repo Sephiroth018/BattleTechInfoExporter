@@ -296,7 +296,7 @@
         },
         "blockedSteps": {
           "type": "array",
-          "description": "Per entry of pathingGroups, the steps to neighbors its units can't take on slopes, one character per hex as blockedStepsFormula says.",
+          "description": "Per entry of pathingGroups, the steps to neighbors its units can't take on slopes, one character per hex as blockedStepsFormula says: an approximation of the game's pathing that may block a step a detour through farther hexes allows, where movement is exact.",
           "items": {
             "type": "string"
           }

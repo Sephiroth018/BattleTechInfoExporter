@@ -49,6 +49,11 @@ Changed: game-state.json, combat-state.json, combat-map.json, catalog.json.
 - Values corrected `rows[].elevations[]`: rounded to 0.1 m without the float noise; code comparing
   them for equality with other heights can now do so.
 - Values corrected `buildings[].position`: rounded to 0.1 m.
+- Values corrected `rows[].blockedSteps`: a step is open when the game's path nodes lead to the
+  neighbor's center through the two hexes and the two next to both, not only straight across, so
+  fewer steps are blocked; re-derive which hexes can be reached from where, and the routes and
+  islands drawn from them. The steps still approximate the game's pathing: where a unit's
+  movement in the combat state disagrees, the movement is right.
 
 ### catalog.json
 - Removed `componentDefinitions.upgrades.TargetDummyMod`: the tutorial target dummies' upgrade,
