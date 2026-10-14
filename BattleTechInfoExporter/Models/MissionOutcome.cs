@@ -52,13 +52,26 @@ internal sealed record MissionContract(
     : ContractIdentity(Id, Name, Type, DisplayStyle, Employer, Target, Difficulty);
 
 /// <summary>An objective as the after-action report lists it.</summary>
+/// <param name="Id">
+///     The game's id of the objective: a contract objective, which groups the objectives the HUD showed, or one of
+///     those where it has results of its own.
+/// </param>
+/// <param name="ObjectiveIds">
+///     The ids the combat state's <see cref="CombatObjective.Id" /> had for the objectives this one groups, also
+///     those the HUD didn't list; its own id alone where it is one of them.
+/// </param>
 /// <param name="Title">The objective's title as plain text.</param>
 /// <param name="IsPrimary">Whether the after-action report lists it as a primary objective.</param>
 /// <param name="Status">
 ///     The objective's game status, e.g. <c>Succeeded</c>, <c>Failed</c>, or <c>Active</c> for one left unresolved.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record ObjectiveResult(string Title, bool IsPrimary, ObjectiveStatus Status);
+internal sealed record ObjectiveResult(
+    string Id,
+    IReadOnlyList<string> ObjectiveIds,
+    string Title,
+    bool IsPrimary,
+    ObjectiveStatus Status);
 
 /// <summary>A mech and its pilot after the mission.</summary>
 /// <param name="Pilot">The pilot who fought in the mech.</param>

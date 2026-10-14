@@ -39,7 +39,10 @@ internal sealed record CombatObjective(
 
 /// <summary>A zone drawn on the map, e.g. a capture or evacuation zone.</summary>
 /// <param name="Id">The game's id of the zone.</param>
-/// <param name="Type">The game's id of the zone type, e.g. <c>regionDef_EvacZone</c>.</param>
+/// <param name="Type">
+///     The game's id of the zone's region definition, e.g. <c>regionDef_EvacZone</c>, which names what the zone is
+///     for.
+/// </param>
 /// <param name="Center">The zone's center on the map.</param>
 /// <param name="Radius">
 ///     The radius of the hexagon the HUD draws; whether a unit is inside is decided per map cell, which this only

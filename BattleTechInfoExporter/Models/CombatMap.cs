@@ -74,7 +74,10 @@ internal sealed record CombatBuilding(string Id, string Name, MapPosition Positi
 /// <param name="Elevations">
 ///     The height in meters a unit standing on each hex is at, a building's roof where one stands.
 /// </param>
-/// <param name="Buildings">The index in <see cref="CombatMap.Buildings" /> of the building on each hex, or <c>null</c>.</param>
+/// <param name="Buildings">
+///     The index in <see cref="CombatMap.Buildings" /> of the building on each hex, or <c>null</c>; that entry's
+///     <see cref="CombatBuilding.Id" /> is what the combat state refers to the building by.
+/// </param>
 /// <param name="BlockedSteps">
 ///     Per entry of <see cref="CombatMap.PathingGroups" />, the steps to neighbors its units can't take on slopes, one
 ///     character per hex as <see cref="HexGridLayout.BlockedStepsFormula" /> says.

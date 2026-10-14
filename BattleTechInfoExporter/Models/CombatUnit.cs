@@ -163,7 +163,11 @@ internal sealed record MechHeat(int Current, int Dissipation, int OverheatsAbove
 internal sealed record CombatPilotState(int Injuries, int Health, int BonusHealth, Skills Skills);
 
 /// <summary>A location's armor and structure left, in whole points as the paper doll shows them.</summary>
-/// <param name="Location">The game's name of the location (a mech's, vehicle's or turret's).</param>
+/// <param name="Location">
+///     The game's name of the location: a mech's as in <see cref="ChassisLocationDefinition.Location" />, a
+///     vehicle's as in <see cref="VehicleLocationDefinition.Location" />, or <c>Structure</c> for a turret's single
+///     location.
+/// </param>
 /// <param name="Armor">The armor left, by side; only a mech's torso has a rear.</param>
 /// <param name="Structure">The structure left; 0 once the location is destroyed.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -181,7 +185,7 @@ internal sealed record UnitLocation(string Location, LocationArmor<int> Armor, i
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Guard(int Level, bool IsBraced, bool HasCover, bool HasBulwark);
 
-/// <param name="Location">The game's name of the location it is mounted in.</param>
+/// <param name="Location">The game's name of the location it is mounted in, as <see cref="UnitLocation.Location" />.</param>
 /// <param name="DamageLevel">The game's damage level, e.g. <c>Functional</c> or <c>Destroyed</c>.</param>
 /// <param name="ShotsLeft">
 ///     The shots left in an ammunition box, or in a weapon that carries its own; <c>null</c> for other components.

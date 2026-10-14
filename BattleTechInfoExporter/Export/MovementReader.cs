@@ -47,7 +47,7 @@ internal static class MovementReader
             [AttackDirection.ToProne] = new('P', "a prone target, hit anywhere")
         };
 
-    private static readonly AttackCode TurretSide = new('.', "a turret, which has a single location");
+    private static readonly AttackCode TurretSide = new('T', "a turret, which has a single location");
 
     internal static readonly MovementLegend Legend = new(
         $"one character per hex: the evasion pips a move ending there gives; {NotReachedCharacter} where the move "

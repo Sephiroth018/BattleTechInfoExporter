@@ -24,6 +24,20 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.69.0
+
+Changed: mission-outcome.json, combat-state.json (breaking).
+
+### mission-outcome.json
+- Added `objectives[].id`, the game's id of the objective as the after-action report lists it, and
+  `objectives[].objectiveIds`, the ids combat-state.json's `objectives[].id` had for the objectives
+  it groups, so the two files' objectives can be matched.
+
+### combat-state.json
+- Values corrected `units.<id>.movement.rows[].attacks[]`: a turret's side is `T` instead of `.`;
+  `movementLegend.side` lists it. Re-derive which hexes a move reaches where `..` was read as
+  unreachable.
+
 ## 0.68.0
 
 Changed: game-state.json (breaking), star-systems.json (breaking), mission-outcome.json (breaking),
