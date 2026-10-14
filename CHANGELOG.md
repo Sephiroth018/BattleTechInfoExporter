@@ -36,6 +36,9 @@ Changed: game-state.json, combat-state.json, combat-map.json.
 ### combat-state.json
 - Values corrected `units.<id>.side.faction.id` and `buildingSides[].side.faction.id`:
   `Player1sMercUnit` for the player's team instead of `""`.
+- Values corrected `units.<id>.pilot.name`: the generic enemy and turret pilots lose the game's
+  placeholder last name, "Elite Brawler" instead of "Elite Brawler NONE", "Automatic" instead of
+  "Automatic NONE".
 - Values corrected `damagedBuildings[].destroyedHexes[].elevation`: rounded to 0.1 m without the
   float noise (208.2, not 208.1999969482422).
 - Values corrected `units.<id>.position`, `objectives[].beacon` and `zones[].center`: rounded to
