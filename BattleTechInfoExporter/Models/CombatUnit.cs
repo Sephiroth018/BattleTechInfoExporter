@@ -28,7 +28,8 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="BayMech">The player's mech in <c>game-state.json</c>, whose loadout holds its assigned armor.</param>
 /// <param name="Position">Where the unit is, or was last detected at for <see cref="UnitVisibility.LastSeen" />.</param>
 /// <param name="FacingDegrees">
-///     The direction the unit faces, in degrees clockwise from the map's +Z axis; <c>null</c> when last seen.
+///     The direction the unit faces, in degrees clockwise from the map's +Z axis, from 0 to below 360 and to 0.1°;
+///     <c>null</c> when last seen.
 /// </param>
 /// <param name="Terrain">
 ///     The terrain the unit stands in, keyed as in the catalog's <see cref="Catalog.TerrainDefinitions" />;

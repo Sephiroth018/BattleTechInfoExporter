@@ -37,6 +37,8 @@ internal sealed record VisibilityRules(
 /// <param name="EvasivePipsStripped">The evasive pips the target loses; 0 when a sensor lock strips none.</param>
 /// <param name="TargetEffects">
 ///     The statistic changes the target gets, one entry per application of a change the game applies repeatedly.
+///     The change of -999 to <c>GhostEffectStacks</c> removes all of the target's stealth pips from ECM, however
+///     many it has: the game counts them only above 0.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record SensorLockRules(int EvasivePipsStripped, IReadOnlyList<StatisticChange> TargetEffects);

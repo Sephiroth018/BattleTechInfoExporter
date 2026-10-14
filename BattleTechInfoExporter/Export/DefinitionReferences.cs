@@ -14,8 +14,10 @@ internal static class DefinitionReferences
     internal static DefinitionReference ReferenceTo(BaseDescriptionDef description) =>
         new(description.Id, description.Name);
 
+    // A faction without a definition, e.g. the player's Player1sMercUnit, is keyed by its enumeration name instead.
     internal static DefinitionReference ReferenceTo(FactionValue faction) =>
-        new(faction.FactionDefID, FactionNames.Format(faction));
+        new(string.IsNullOrEmpty(faction.FactionDefID) ? faction.Name : faction.FactionDefID,
+            FactionNames.Format(faction));
 
     // A data-driven enum value, e.g. a contract type or a ship upgrade category, by its name and its UI name.
     internal static DefinitionReference ReferenceTo(EnumValue value) =>
