@@ -19,13 +19,19 @@ internal static class FactionReader
                 .OfType<FactionDefinition>());
 
     // A definition whose faction isn't in the enumeration is never used by the game (SimGameState.GetFactionDef finds
-    // factions by their enumeration name).
+    // factions by their enumeration name). One whose faction names another definition (FactionValue.FactionDefID),
+    // like faction_AuriganBetrayers, whose faction names the Directorate's, is one no reference leads to.
     private static FactionDefinition? ReadFactionDefinition(FactionDef faction)
     {
         var value = faction.FactionValue;
         if (value.IsInvalidUnset)
         {
             ModLog.Logger.LogWarning($"Left out faction definition {faction.ID}: its faction isn't in the enumeration");
+            return null;
+        }
+
+        if (value.FactionDefID != faction.ID)
+        {
             return null;
         }
 
