@@ -341,7 +341,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
         },
         "name": {
           "type": "string",
@@ -836,7 +836,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
         },
         "name": {
           "type": "string",
@@ -1173,14 +1173,14 @@
             "null",
             "string"
           ],
-          "description": "The ammo the weapon fires, as AmmunitionBoxDefinition.ammoCategory names it; null when it needs none."
+          "description": "The ammo the weapon fires, as AmmunitionBoxDefinition.ammoCategory names it; a weapon with internalAmmoCapacity fires its own ammo first and then any boxes of the category, which the catalog has none of; null when it needs no ammo."
         },
         "internalAmmoCapacity": {
           "type": [
             "integer",
             "null"
           ],
-          "description": "The shots a weapon that carries its own ammo instead of using ammo boxes, like a flamer, has per mission; null for every other weapon.",
+          "description": "The shots a weapon that carries its own ammo, like a flamer, has per mission; null for every other weapon.",
           "format": "int32"
         },
         "damage": {
@@ -2869,7 +2869,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
         },
         "name": {
           "type": "string",

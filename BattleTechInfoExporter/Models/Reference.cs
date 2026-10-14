@@ -9,7 +9,8 @@ namespace BattleTechInfoExporter.Models;
 ///     keeps in no meaningful order, is ordered the same way.
 /// </summary>
 /// <param name="Id">
-///     The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay
+///     The id it's referred to by: for a definition its id from the game's data files, or its name in the game's
+///     enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay
 ///     or a pilot the game's own id of it.
 /// </param>
 /// <param name="Name">The name the UI shows.</param>

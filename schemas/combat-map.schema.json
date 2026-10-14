@@ -233,7 +233,7 @@
       "properties": {
         "x": {
           "type": "number",
-          "description": "Along the map's x axis, 0 at the map's center.",
+          "description": "Along the map's x axis, 0 at the map's center, to 0.1 m.",
           "format": "float"
         },
         "y": {
@@ -243,7 +243,7 @@
         },
         "z": {
           "type": "number",
-          "description": "Along the map's z axis, 0 at the map's center.",
+          "description": "Along the map's z axis, 0 at the map's center, to 0.1 m.",
           "format": "float"
         }
       }
@@ -277,10 +277,10 @@
         },
         "elevations": {
           "type": "array",
-          "description": "The height in meters a unit standing on each hex is at, a building's roof where one stands.",
+          "description": "The height in meters a unit standing on each hex is at, a building's roof where one stands, to 0.1 m.",
           "items": {
             "type": "number",
-            "format": "double"
+            "format": "float"
           }
         },
         "buildings": {
@@ -296,7 +296,7 @@
         },
         "blockedSteps": {
           "type": "array",
-          "description": "Per entry of pathingGroups, the steps to neighbors its units can't take on slopes, one character per hex as HexGridLayout.blockedStepsFormula says.",
+          "description": "Per entry of pathingGroups, the steps to neighbors its units can't take on slopes, one character per hex as HexGridLayout.blockedStepsFormula says: an approximation of the game's pathing that may block a step a detour through farther hexes allows; a player unit's combat-state.json units.*.movement is exact for its current turn.",
           "items": {
             "type": "string"
           }
