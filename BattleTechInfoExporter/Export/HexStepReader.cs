@@ -46,6 +46,7 @@ internal sealed class HexStepReader
                 .SelectMany(hex => HexNodes.Select(node => Offset(NodeOf(hex), node)))))
         .ToList();
 
+    // Every node step is shared by several routes, hexes and directions.
     private readonly Dictionary<((int X, int Z) From, (int X, int Z) To), bool> _blockedNodeSteps = new();
 
     private readonly CombatGameState _combat;
@@ -53,7 +54,7 @@ internal sealed class HexStepReader
     // Checks the ledges between two nodes, in both directions, as a grid of the group's units does.
     private readonly PathNodeGrid _ledgeChecker;
 
-    // Every node step is shared by several routes, hexes and directions; the ledge check is the costly part.
+    // The ledge check is the costly part.
     private readonly Dictionary<((int X, int Z) From, (int X, int Z) To), bool> _ledgesBetweenNodes = new();
     private readonly Dictionary<(int X, int Z), (Vector3 Position, MapTerrainDataCell Cell)> _nodes = new();
 
@@ -108,7 +109,8 @@ internal sealed class HexStepReader
     private bool CanReach((int X, int Z) start, (int X, int Z) end, HashSet<(int X, int Z)> routeNodes)
     {
         var reached = new HashSet<(int X, int Z)> { start };
-        var open = new Queue<(int X, int Z)>(reached);
+        var open = new Queue<(int X, int Z)>();
+        open.Enqueue(start);
         while (open.Count > 0)
         {
             var from = open.Dequeue();

@@ -152,9 +152,9 @@ internal static class PilotReader
         simGame.GetTemporaryTagLength(pilot, tag) is var days and > 0 ? simGame.DaysPassed + days : null;
 
     // The game's data gives pilots without a last name, such as the generic enemy and turret pilots, NONE instead.
-    private static string FullName(HumanDescriptionDef pilot) =>
-        $"{pilot.FirstName} {(pilot.LastName == NoLastName ? string.Empty : pilot.LastName)}".Trim()
-            is { Length: > 0 } fullName
-            ? fullName
-            : pilot.Name;
+    private static string FullName(HumanDescriptionDef pilot)
+    {
+        var lastName = pilot.LastName == NoLastName ? string.Empty : pilot.LastName;
+        return $"{pilot.FirstName} {lastName}".Trim() is { Length: > 0 } fullName ? fullName : pilot.Name;
+    }
 }
