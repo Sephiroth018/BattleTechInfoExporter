@@ -428,10 +428,7 @@ Folders:
   `ExportFileWriter` and the clock.
 
 The version is `Major.Minor.Patch.Build`, computed by the build from git (`ComputeBuildVersion` in
-`Directory.Build.targets`): the newest release tag reachable from HEAD, bumped by the type of the
-first-parent commits since it (see "Versioning"), with the build number counting those commits:
-with a bump from 0, so a PR's merge commit on `main` is build 0; without one the tagged commit is
-build 0, so a commit after a release never shares its version. The same target fails the build when
+`Directory.Build.targets`, an inline task; see "Versioning"). The same target fails the build when
 `CHANGELOG.md`'s newest heading is older than that version. The build stamps the version into the
 DLL and generates `mod.json` from it and the description, author, repository URL and supported game
 version in `Directory.Build.props`.
@@ -715,12 +712,20 @@ Semantic versioning on the first three parts, never set by hand: the build deriv
 from the newest release tag reachable from HEAD and the conventional type of the first-parent
 commits since it (see "Structure"). A `!` after the type and issue (`feat(#12)!:`) is a breaking change to
 the exported JSON, whose consumers must adapt: major. `feat`, new data, files or triggers: minor.
-`fix` and `refactor`: patch. `docs`, `chore` and `test` don't bump. The highest bump among the
+`fix` and `refactor`: patch. `docs`, `chore` and `test` don't bump. The highest bump among a PR's
 commits wins. On `main` the only commit since the last release is a PR's merge commit, so the PR
 title's type is the bump, and the PR carries no version number at all: two parallel PRs never
 collide, and the second to merge gets the next number from the first's tag; only its changelog
 heading moves on (see "Changelog"). A branch's build shows the number its PR would get from the
-tags it can see; one that hasn't merged `main` since a release computes from an older tag. While
+tags it can see; one that hasn't merged `main` since a release computes from an older tag. A PR
+stacked on other open PRs computes as if they were released first, bottom up: their remote
+branches, those whose tips HEAD contains and `main` doesn't, split the commits into one bump per
+PR. Until the stacked branch merges a lower PR's newest commits, or merges `main` once that PR is
+released and its branch deleted, it computes the two as one release. The build number counts the
+first-parent commits since the newest release on HEAD's first-parent chain: with a bump from 0, so
+a PR's merge commit on `main` is build 0; without one the tagged commit is build 0, so a commit
+after a release never shares its version. Every commit on a branch raises its version, also once a
+lower PR is released, so a deployed build that isn't the branch's latest shows a lower one. While
 the export format is still being worked out, versions stay at 0.x and a breaking format change
 bumps only the minor version; 1.0.0 marks the format as settled. Issues name the part their change
 bumps (major, minor or patch) and the PR title's type applies it. Every bump adds its entry to
