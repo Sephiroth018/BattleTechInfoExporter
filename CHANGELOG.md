@@ -64,6 +64,17 @@ catalog.json (breaking).
   was named `Item.<definition type>.<component id>`, to `componentChanges[]` next to it: the
   `component` reference and the `count` of working copies added, negative for copies taken.
 
+## 0.72.2
+
+Changed: mission-outcome.json.
+
+### mission-outcome.json
+- Values corrected `trigger` and `salvage.received`: the file is written again once the salvage is
+  final, as `salvageChosen` with the salvage received; from 0.69.0 on it kept the write from the
+  mission's end, and `salvage.received` stayed `null`.
+- Values corrected `objectives[].objectiveIds`: a contract objective that groups no others has its
+  own id alone instead of an empty list; the list is never empty.
+
 ## 0.72.1
 
 Changed: game-state.json, combat-state.json, combat-map.json, catalog.json.

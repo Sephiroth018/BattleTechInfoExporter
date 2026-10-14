@@ -11,14 +11,9 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>Builds the mission file's models from a contract the game has completed.</summary>
 internal static class MissionReader
 {
-    // Contract.CompleteContract has filled in every value read here, and nothing changes until the contract is
-    // resolved, except the salvage: FinalizeSalvage moves the chosen items into SalvageResults, so the offer comes
-    // from the caller.
-    internal static MissionOutcome ReadOutcome(
-        SimGameState simGame,
-        Contract contract,
-        SalvageOffer offer,
-        IReadOnlyList<SalvageDef>? received)
+    // Read once Contract.CompleteContract has filled in every value read here, while the battle still exists: nothing
+    // changes until the contract is resolved, except the salvage (WithSalvageReceived).
+    internal static MissionOutcome ReadOutcome(SimGameState simGame, Contract contract)
     {
         var (employer, target) = ContractReader.ReadFactions(contract);
         return new MissionOutcome(
@@ -37,13 +32,24 @@ internal static class MissionReader
             contract.PlayerUnitResults
                 .Select(unit => ReadLanceUnit(simGame, contract, unit))
                 .ToList(),
+            // Before the choice, SalvageResults holds only the components recovered from the company's lost mechs.
             new MissionSalvage(
                 contract.FinalSalvageCount,
                 contract.FinalPrioritySalvageCount,
-                ReadSalvageItems(simGame, offer.Pool),
-                ReadSalvageItems(simGame, offer.Automatic),
-                received is null ? null : ReadSalvageItems(simGame, received)));
+                ReadSalvageItems(simGame, contract.GetPotentialSalvage()),
+                ReadSalvageItems(simGame, contract.SalvageResults),
+                null));
     }
+
+    // Contract.FinalizeSalvage has moved the priority and the random salvage into SalvageResults.
+    internal static MissionOutcome WithSalvageReceived(
+        SimGameState simGame,
+        Contract contract,
+        MissionOutcome outcome) =>
+        outcome with
+        {
+            Salvage = outcome.Salvage with { Received = ReadSalvageItems(simGame, contract.SalvageResults) }
+        };
 
     // The unit's mech and pilot are copies taken from combat (Mech.ToMechDef keeps the mech bay's GUID); the pilot's
     // kills count this mission only, as Pilot.InitStats resets them when combat starts.
@@ -88,9 +94,9 @@ internal static class MissionReader
             ReadAmmunitionUse(FindCombatMech(contract, mech)));
     }
 
-    // The unit's mech as it fought, which alone knows its ammo: Mech.ToMechDef copies no ammo but keeps the GUID.
     // The report lists the contract objectives, each grouping the objectives the HUD showed, plus the HUD objectives
-    // with results of their own (Contract.GetRealMissionObjectiveResults); the grouping is the contract objective's.
+    // with results of their own (Contract.GetRealMissionObjectiveResults); the grouping is the contract objective's,
+    // where it groups any: some story contracts leave it empty.
     private static List<ObjectiveResult> ReadObjectives(Contract contract)
     {
         var contractObjectives = contract.BattleTechGame.Combat.EncounterLayerData.contractObjectiveGameLogicList
@@ -99,6 +105,7 @@ internal static class MissionReader
             .Select(objective => new ObjectiveResult(
                 objective.guid,
                 contractObjectives.TryGetValue(objective.guid, out var contractObjective)
+                && contractObjective.objectiveRefList.Count > 0
                     ? contractObjective.objectiveRefList.Select(grouped => grouped.EncounterObjectGuid).ToList()
                     : [objective.guid],
                 GameText.ToPlainText(objective.title),
@@ -107,8 +114,7 @@ internal static class MissionReader
             .ToList();
     }
 
-    // The combat outlives the after-action report (MissionResults.ConfirmResults clears it after FinalizeSalvage),
-    // so both writes of the outcome find it.
+    // The unit's mech as it fought, which alone knows its ammo: Mech.ToMechDef copies no ammo but keeps the GUID.
     private static Mech FindCombatMech(Contract contract, MechDef mech) =>
         contract.BattleTechGame.Combat.AllMechs.Single(combatMech => combatMech.MechDef.GUID == mech.GUID);
 

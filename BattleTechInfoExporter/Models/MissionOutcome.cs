@@ -57,8 +57,8 @@ internal sealed record MissionContract(
 ///     those where it has results of its own.
 /// </param>
 /// <param name="ObjectiveIds">
-///     The ids the combat state's <see cref="CombatObjective.Id" /> had for the objectives this one groups, also
-///     those the HUD didn't list; its own id alone where it is one of them.
+///     Never empty: the ids the combat state's <see cref="CombatObjective.Id" /> had for the objectives this one
+///     groups, also those the HUD didn't list; its own id alone where it is one of them or groups none.
 /// </param>
 /// <param name="Title">The objective's title as plain text.</param>
 /// <param name="IsPrimary">Whether the after-action report lists it as a primary objective.</param>
