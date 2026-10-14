@@ -149,7 +149,8 @@ The last one describes the game rather than the career:
   was built from (see "Triggers").
 
   The tutorial's target dummies and target vehicles, the copies of stock mechs the game makes for unlocked skins (e.g.
-  the backers' Shadow Hawk-UMBRA) and the game's internal melee and AI weapons are left out, as are
+  the backers' Shadow Hawk-UMBRA), the game's internal melee and AI weapons and its debug ammo boxes for
+  flamers and infernos, which carry their own ammo, are left out, as are
   the game's role and other advisory texts, which often don't match the best way to use a mech.
 
 Every file starts with `modVersion`, `exportedAt` and the `trigger` of the export that last wrote

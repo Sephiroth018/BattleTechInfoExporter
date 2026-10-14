@@ -53,6 +53,14 @@ Changed: game-state.json, combat-state.json, combat-map.json, catalog.json.
 ### catalog.json
 - Removed `componentDefinitions.upgrades.TargetDummyMod`: the tutorial target dummies' upgrade,
   which no mech outside the tutorial mounts.
+- Removed `componentDefinitions.ammunitionBoxes.Ammo_AmmunitionBox_Generic_Flamer`,
+  `AmmunitionBox_Flamer` and `Ammo_AmmunitionBox_Generic_SRMInferno`: the game's debug and
+  placeholder boxes for ammo the weapons carry themselves, which no store, salvage or mech has.
+- Meaning changed `componentDefinitions.weapons.<id>.ammoCategory` of the flamers and inferno
+  racks, the weapons with `internalAmmoCapacity`: their ammo category (`Flamer`, `Inferno Rack`)
+  instead of `null`. Such a weapon fires its own ammo first and then boxes of that category; the
+  catalog has none, so its ammo is still `internalAmmoCapacity`. Code that took a non-null
+  `ammoCategory` to mean the weapon needs boxes must check `internalAmmoCapacity` first.
 
 ## 0.72.0
 

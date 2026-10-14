@@ -240,13 +240,18 @@ internal static class CatalogReader
         new(movement.MaxWalkDistance, movement.MaxSprintDistance, pathingId);
 
     // Every component type, keyed by id, without the dummies' and the game's internal weapons: the melee and jump
-    // attacks and the AI's imaginary laser, which aren't mounted (MechDef.CreateMeleeWeaponRefs).
+    // attacks and the AI's imaginary laser, which aren't mounted (MechDef.CreateMeleeWeaponRefs). Also without the
+    // boxes of ammo the weapons carry themselves: debug and placeholder boxes ("Flamers should have internal ammo
+    // only", AmmunitionBox_Flamer) that no store, salvage or mech uses.
     private static IEnumerable<KeyValuePair<string, MechComponentDef>> ReadComponents(DataManager dataManager) =>
         dataManager.WeaponDefs
             .Where(weapon => weapon.Value.WeaponSubType is not (WeaponSubType.Melee or WeaponSubType.DFA
                 or WeaponSubType.AIImaginary))
             .Select(AsComponent)
-            .Concat(dataManager.AmmoBoxDefs.Select(AsComponent))
+            .Concat(dataManager.AmmoBoxDefs
+                .Where(box => !(dataManager.AmmoDefs.TryGet(box.Value.AmmoID, out var ammo)
+                                && ammo.AmmoCategoryValue.UsesInternalAmmo))
+                .Select(AsComponent))
             .Concat(dataManager.HeatSinkDefs.Select(AsComponent))
             .Concat(dataManager.JumpJetDefs.Select(AsComponent))
             .Concat(dataManager.UpgradeDefs.Select(AsComponent))
@@ -325,9 +330,7 @@ internal static class CatalogReader
         new(
             ReadComponent(weapon),
             weapon.WeaponCategoryValue.FriendlyName,
-            weapon.AmmoCategoryValue.Is_NotSet || weapon.AmmoCategoryValue.UsesInternalAmmo
-                ? null
-                : weapon.AmmoCategoryValue.FriendlyName,
+            weapon.AmmoCategoryValue.Is_NotSet ? null : weapon.AmmoCategoryValue.FriendlyName,
             weapon.AmmoCategoryValue.UsesInternalAmmo ? weapon.StartingAmmoCapacity : null,
             weapon.Damage,
             weapon.StructureDamage,

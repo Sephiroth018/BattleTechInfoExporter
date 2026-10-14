@@ -1159,14 +1159,14 @@
             "null",
             "string"
           ],
-          "description": "The ammo the weapon fires, as ammoCategory names it; null when it needs none."
+          "description": "The ammo the weapon fires, as ammoCategory names it; a weapon with internalAmmoCapacity fires its own ammo first and then any boxes of the category, which the catalog has none of; null when it needs no ammo."
         },
         "internalAmmoCapacity": {
           "type": [
             "integer",
             "null"
           ],
-          "description": "The shots a weapon that carries its own ammo instead of using ammo boxes, like a flamer, has per mission; null for every other weapon.",
+          "description": "The shots a weapon that carries its own ammo, like a flamer, has per mission; null for every other weapon.",
           "format": "int32"
         },
         "damage": {
