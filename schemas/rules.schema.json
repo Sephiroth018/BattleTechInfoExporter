@@ -1132,15 +1132,11 @@
       "description": "The combat effect of a pilot's spirits: the resolve their mech's Precision Strike and Vigilance cost.",
       "additionalProperties": false,
       "required": [
-        "level",
         "precisionStrikeCost",
-        "vigilanceCost"
+        "vigilanceCost",
+        "level"
       ],
       "properties": {
-        "level": {
-          "description": "The pilot's spirits level the costs apply at.",
-          "$ref": "#/definitions/SpiritsLevel"
-        },
         "precisionStrikeCost": {
           "type": "integer",
           "description": "The resolve a Precision Strike costs.",
@@ -1150,6 +1146,10 @@
           "type": "integer",
           "description": "The resolve Vigilance costs.",
           "format": "int32"
+        },
+        "level": {
+          "description": "The pilot's spirits level the costs apply at.",
+          "$ref": "#/definitions/SpiritsLevel"
         }
       }
     },
@@ -1682,7 +1682,7 @@
       "properties": {
         "pipsByDistanceMoved": {
           "type": "array",
-          "description": "The pips for moving more than a distance; a jump adds one, and the unit's own maximum caps them.",
+          "description": "The pips for moving more than a distance; a jump adds one, also in place, and the unit's own maximum caps them. A mech moving more than 12 m then gets its EvasivePipsGainedAdditional statistic on top, past the cap.",
           "items": {
             "$ref": "#/definitions/EvasivePips"
           }

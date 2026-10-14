@@ -28,12 +28,12 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="BayMech">The player's mech in <c>game-state.json</c>, whose loadout holds its assigned armor.</param>
 /// <param name="Position">Where the unit is, or was last detected at for <see cref="UnitVisibility.LastSeen" />.</param>
 /// <param name="FacingDegrees">
-///     The direction the unit faces, in degrees clockwise from the map's +Z axis, from 0 to below 360 and to 0.1°;
-///     <c>null</c> when last seen.
+///     The direction the unit faces, in degrees clockwise from the map's +Z axis, from 0 to below 360 and to 0.1°,
+///     which a blip's marker turns to at every level; <c>null</c> when last seen.
 /// </param>
 /// <param name="Terrain">
-///     The terrain the unit stands in, keyed as in <see cref="Catalog.TerrainDefinitions" />;
-///     <c>null</c> on open ground and when last seen.
+///     The terrain the unit stands in, keyed as in <see cref="Catalog.TerrainDefinitions" />, which a blip's
+///     position on the map shows; <c>null</c> on open ground and when last seen.
 /// </param>
 /// <param name="Pilot">The pilot, which the HUD names only at <see cref="UnitVisibility.Full" />.</param>
 /// <param name="State">The unit's condition, shown at <see cref="UnitVisibility.Full" />.</param>
@@ -93,8 +93,10 @@ internal sealed record CombatUnit(
 /// <param name="Components">Every component mounted, in the game's order.</param>
 /// <param name="Pilot">The pilot's condition; <c>null</c> without a pilot.</param>
 /// <param name="Abilities">The pilot's and components' abilities that can be activated, with their cooldowns.</param>
-/// <param name="PrecisionStrikeCost">The resolve a Precision Strike costs the unit now, which its pilot's morale changes.</param>
-/// <param name="VigilanceCost">The resolve Vigilance costs the unit now.</param>
+/// <param name="ResolveCosts">
+///     What Precision Strike and Vigilance cost the unit now, which its pilot's spirits change; <c>null</c> for the
+///     units not in the player's lance, which spend no resolve.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatUnitState(
     DeathMethod? DeathMethod,
@@ -111,8 +113,7 @@ internal sealed record CombatUnitState(
     IReadOnlyList<CombatComponent> Components,
     CombatPilotState? Pilot,
     IReadOnlyList<CombatAbility> Abilities,
-    int PrecisionStrikeCost,
-    int VigilanceCost);
+    ResolveCosts? ResolveCosts);
 
 /// <summary>What only a mech's condition has: its heat and stability bars.</summary>
 /// <param name="Heat">The mech's heat.</param>

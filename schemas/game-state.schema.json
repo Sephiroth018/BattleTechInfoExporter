@@ -288,7 +288,7 @@
         },
         "statistics": {
           "type": "object",
-          "description": "The company's statistics some event's requirements compare, keyed by the game's name, as they compare them; a statistic the company doesn't have is 0.",
+          "description": "The company's statistics some event's requirements compare, keyed by the game's name, as they compare them; a statistic the company doesn't have is 0. The stored components' counts they compare are in Storage.components.",
           "additionalProperties": {
             "type": "number",
             "format": "float"
@@ -708,7 +708,7 @@
       }
     },
     "WorkQueueEntry": {
-      "description": "An entry of the timeline: a work order the company is waiting for. Each group of type values has a record with the target it is about.",
+      "description": "An entry of the timeline: a work order the company is waiting for. Each kind has a record with the target it is about.",
       "x-abstract": true,
       "anyOf": [
         {
@@ -726,6 +726,24 @@
         {
           "$ref": "#/definitions/TravelOrder"
         }
+      ]
+    },
+    "WorkQueueEntryKind": {
+      "type": "string",
+      "description": "What a work queue entry is about, which decides the entry's other fields.",
+      "x-enumNames": [
+        "MechLab",
+        "MedBay",
+        "Travel",
+        "ShipUpgrade",
+        "FinancialReport"
+      ],
+      "enum": [
+        "mechLab",
+        "medBay",
+        "travel",
+        "shipUpgrade",
+        "financialReport"
       ]
     },
     "WorkOrderType": {
@@ -789,10 +807,22 @@
       "description": "The next financial report, of type FinancialReport, which is about nothing in particular.",
       "additionalProperties": false,
       "required": [
+        "kind",
         "type",
         "finishesOnDay"
       ],
       "properties": {
+        "kind": {
+          "description": "What the entry is about, which decides its other fields.",
+          "enum": [
+            "financialReport"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/WorkQueueEntryKind"
+            }
+          ]
+        },
         "type": {
           "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
           "$ref": "#/definitions/WorkOrderType"
@@ -809,11 +839,23 @@
       "description": "A mech lab order, of the MechLab… types.",
       "additionalProperties": false,
       "required": [
+        "kind",
         "type",
         "finishesOnDay",
         "target"
       ],
       "properties": {
+        "kind": {
+          "description": "What the entry is about, which decides its other fields.",
+          "enum": [
+            "mechLab"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/WorkQueueEntryKind"
+            }
+          ]
+        },
         "type": {
           "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
           "$ref": "#/definitions/WorkOrderType"
@@ -841,11 +883,23 @@
       "description": "A med bay order, of type MedLabHeal.",
       "additionalProperties": false,
       "required": [
+        "kind",
         "type",
         "finishesOnDay",
         "target"
       ],
       "properties": {
+        "kind": {
+          "description": "What the entry is about, which decides its other fields.",
+          "enum": [
+            "medBay"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/WorkQueueEntryKind"
+            }
+          ]
+        },
         "type": {
           "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
           "$ref": "#/definitions/WorkOrderType"
@@ -866,11 +920,23 @@
       "description": "A ship upgrade being installed, of the ArgoUpgrade… types.",
       "additionalProperties": false,
       "required": [
+        "kind",
         "type",
         "finishesOnDay",
         "target"
       ],
       "properties": {
+        "kind": {
+          "description": "What the entry is about, which decides its other fields.",
+          "enum": [
+            "shipUpgrade"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/WorkQueueEntryKind"
+            }
+          ]
+        },
         "type": {
           "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
           "$ref": "#/definitions/WorkOrderType"
@@ -898,11 +964,23 @@
       "description": "A trip, of the Travel… types.",
       "additionalProperties": false,
       "required": [
+        "kind",
         "type",
         "finishesOnDay",
         "target"
       ],
       "properties": {
+        "kind": {
+          "description": "What the entry is about, which decides its other fields.",
+          "enum": [
+            "travel"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/definitions/WorkQueueEntryKind"
+            }
+          ]
+        },
         "type": {
           "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
           "$ref": "#/definitions/WorkOrderType"
@@ -3182,7 +3260,7 @@
           }
         },
         "stores": {
-          "description": "The item collections each of the star system's stores draws its stock from on arrival, every entry of each once, by their ids in catalog.json itemCollectionDefinitions. A store without any doesn't exist in the star system.",
+          "description": "The item collections each of the star system's stores draws its stock from on arrival, every entry of each once, by their ids in catalog.json itemCollectionDefinitions, sorted. A store without any doesn't exist in the star system.",
           "$ref": "#/definitions/ByStoreOfStringList"
         },
         "contractEmployers": {

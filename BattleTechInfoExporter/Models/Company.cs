@@ -32,7 +32,8 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Tags">The company's tags, sorted, which the events' requirements check.</param>
 /// <param name="Statistics">
 ///     The company's statistics some event's requirements compare, keyed by the game's name, as they compare them; a
-///     statistic the company doesn't have is 0.
+///     statistic the company doesn't have is 0. The stored components' counts they compare are in
+///     <see cref="Storage.Components" />.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Company(

@@ -24,6 +24,54 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.73.0
+
+Changed: game-state.json (breaking), rules.json, star-systems.json, combat-state.json
+(breaking), catalog.json (breaking).
+
+### game-state.json (breaking)
+- Added `workQueue[].kind`: what the entry is about (`mechLab`, `medBay`, `travel`, `shipUpgrade`
+  or `financialReport`), which decides its `target`, instead of the game's `type`.
+- Values corrected in every full star system entry's `stores` (see star-systems.json).
+- Removed the `Item.<definition type>.<component id>` keys from `company.statistics`: the
+  requirements comparing a stored component's count name the component now (see catalog.json),
+  and compare `storage.components[].count`, 0 for a component not in storage.
+
+### rules.json
+- Meaning changed `combat.evasion.pipsByDistanceMoved`: stated that a jump in place gets the
+  jump's pip, and that a mech moving more than 12 m gets its `EvasivePipsGainedAdditional`
+  statistic on top, past its cap; re-derive the pips of mechs whose abilities raise that
+  statistic.
+
+### star-systems.json
+- Values corrected `starSystems.<id>.stores.system[]`, `faction[]` and `blackMarket[]`: sorted
+  ordinally like every other list; some systems kept their data's order.
+
+### combat-state.json (breaking)
+- Moved `units.<id>.state.precisionStrikeCost` and `vigilanceCost` to
+  `units.<id>.state.resolveCosts`, which is `null` for every unit not in the player's lance:
+  enemies and allies spend no resolve.
+- Meaning changed `units.<id>.facingDegrees` and `terrain`: stated that blips have them at every
+  level, as the blip's marker shows them.
+- Meaning changed `mapId`: a map no star system's contracts are generated on, e.g. a story map,
+  has an id but no entry in the catalog's `mapDefinitions`.
+- Meaning changed `movementLegend.moves`: a digit can exceed the rules' evasion table, a jump in
+  place gives one pip, and an attack is `..` only at a hex no move reaches.
+
+### combat-map.json
+- Meaning changed `mapId`, as in combat-state.json.
+
+### catalog.json (breaking)
+- Moved the company results' changes to a stored component's count from
+  `eventDefinitions.<id>.options[].outcomes[].results[].statisticChanges[]`, where the statistic
+  was named `Item.<definition type>.<component id>`, to `componentChanges[]` next to it: the
+  `component` reference and the `count` of working copies added, negative for copies taken.
+- Moved the company requirements' comparisons of a stored component's count from `comparisons[]`
+  to `componentComparisons[]` next to it, in `eventDefinitions.<id>.requirements`,
+  `additionalRequirements[]`, `additionalTargets[].requirements`, `options[].requirements[]` and
+  `options[].outcomes[].results[].requirements`: the `component` reference, the `operator` and
+  the `value`, compared with the working copies in storage.
+
 ## 0.72.2
 
 Changed: mission-outcome.json.

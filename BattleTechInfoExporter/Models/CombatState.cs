@@ -9,8 +9,9 @@ namespace BattleTechInfoExporter.Models;
 /// </summary>
 /// <param name="Contract">The contract being fought, as in <see cref="MissionOutcome.Contract" />.</param>
 /// <param name="MapId">
-///     The map, keyed as in <see cref="Catalog.MapDefinitions" />; <c>null</c> where the map isn't in
-///     the game's metadata database, e.g. a story map.
+///     The map's id in the game's metadata database, which keys <see cref="Catalog.MapDefinitions" />; a map no
+///     star system's contracts are generated on, e.g. a story map, has no entry there. <c>null</c> where the map
+///     isn't in the metadata database.
 /// </param>
 /// <param name="Round">The combat round, counted from 1.</param>
 /// <param name="Phase">

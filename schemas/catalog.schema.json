@@ -2487,7 +2487,8 @@
         "scope",
         "requiredTags",
         "excludedTags",
-        "comparisons"
+        "comparisons",
+        "componentComparisons"
       ],
       "properties": {
         "scope": {
@@ -2510,9 +2511,16 @@
         },
         "comparisons": {
           "type": "array",
-          "description": "The statistic values that must all hold.",
+          "description": "The statistic values that must all hold, apart from the stored components' counts in componentComparisons.",
           "items": {
             "$ref": "#/definitions/StatisticComparison"
+          }
+        },
+        "componentComparisons": {
+          "type": "array",
+          "description": "The stored components' counts that must all hold.",
+          "items": {
+            "$ref": "#/definitions/ComponentComparison"
           }
         }
       }
@@ -2561,6 +2569,31 @@
         "LessThanOrEqual",
         "GreaterThanOrEqual"
       ]
+    },
+    "ComponentComparison": {
+      "type": "object",
+      "description": "A comparison of the company's working copies of a component in storage, as game-state.json storage.components[].count has them; a component not in storage counts as 0.",
+      "additionalProperties": false,
+      "required": [
+        "component",
+        "operator",
+        "value"
+      ],
+      "properties": {
+        "component": {
+          "description": "The component, by the id its definition is keyed by.",
+          "$ref": "#/definitions/ComponentReference"
+        },
+        "operator": {
+          "description": "How the count compares to value.",
+          "$ref": "#/definitions/Operator"
+        },
+        "value": {
+          "type": "number",
+          "description": "The count it is compared to.",
+          "format": "float"
+        }
+      }
     },
     "EventTarget": {
       "type": "object",
@@ -2656,6 +2689,7 @@
         "addedTags",
         "removedTags",
         "statisticChanges",
+        "componentChanges",
         "durationDays",
         "actions",
         "forcedEvents"
@@ -2692,9 +2726,16 @@
         },
         "statisticChanges": {
           "type": "array",
-          "description": "The statistics changed; a boolean statistic's value as 1 or 0, as the requirements compare it.",
+          "description": "The statistics changed, apart from the stored components' counts in componentChanges; a boolean statistic's value as 1 or 0, as the requirements compare it.",
           "items": {
             "$ref": "#/definitions/CareerStatisticChange"
+          }
+        },
+        "componentChanges": {
+          "type": "array",
+          "description": "The components added to or taken from the company's storage.",
+          "items": {
+            "$ref": "#/definitions/ComponentChange"
           }
         },
         "durationDays": {
@@ -2702,7 +2743,7 @@
             "integer",
             "null"
           ],
-          "description": "How many days the tag and statistic changes last before the game reverts them; null when they last.",
+          "description": "How many days the tag, statistic and component changes last before the game reverts them; null when they last.",
           "format": "int32"
         },
         "actions": {
@@ -2743,6 +2784,26 @@
         "isSet": {
           "type": "boolean",
           "description": "Whether the change sets the statistic to value instead of adding it."
+        }
+      }
+    },
+    "ComponentChange": {
+      "type": "object",
+      "description": "A change to how many copies of a component the company keeps in storage.",
+      "additionalProperties": false,
+      "required": [
+        "component",
+        "count"
+      ],
+      "properties": {
+        "component": {
+          "description": "The component, by the id its definition is keyed by.",
+          "$ref": "#/definitions/ComponentReference"
+        },
+        "count": {
+          "type": "integer",
+          "description": "The working copies added; negative for copies taken.",
+          "format": "int32"
         }
       }
     },

@@ -44,7 +44,7 @@
         "null",
         "string"
       ],
-      "description": "The map, keyed as in catalog.json mapDefinitions; null where the map isn't in the game's metadata database, e.g. a story map."
+      "description": "The map's id in the game's metadata database, which keys catalog.json mapDefinitions; a map no star system's contracts are generated on, e.g. a story map, has no entry there. null where the map isn't in the metadata database."
     },
     "round": {
       "type": "integer",
@@ -377,7 +377,7 @@
             "null",
             "number"
           ],
-          "description": "The direction the unit faces, in degrees clockwise from the map's +Z axis, from 0 to below 360 and to 0.1°; null when last seen.",
+          "description": "The direction the unit faces, in degrees clockwise from the map's +Z axis, from 0 to below 360 and to 0.1°, which a blip's marker turns to at every level; null when last seen.",
           "format": "float"
         },
         "terrain": {
@@ -385,7 +385,7 @@
             "null",
             "string"
           ],
-          "description": "The terrain the unit stands in, keyed as in catalog.json terrainDefinitions; null on open ground and when last seen."
+          "description": "The terrain the unit stands in, keyed as in catalog.json terrainDefinitions, which a blip's position on the map shows; null on open ground and when last seen."
         },
         "pilot": {
           "description": "The pilot, which the HUD names only at full.",
@@ -604,8 +604,7 @@
         "components",
         "pilot",
         "abilities",
-        "precisionStrikeCost",
-        "vigilanceCost"
+        "resolveCosts"
       ],
       "properties": {
         "deathMethod": {
@@ -696,15 +695,16 @@
             "$ref": "#/definitions/CombatAbility"
           }
         },
-        "precisionStrikeCost": {
-          "type": "integer",
-          "description": "The resolve a Precision Strike costs the unit now, which its pilot's morale changes.",
-          "format": "int32"
-        },
-        "vigilanceCost": {
-          "type": "integer",
-          "description": "The resolve Vigilance costs the unit now.",
-          "format": "int32"
+        "resolveCosts": {
+          "description": "What Precision Strike and Vigilance cost the unit now, which its pilot's spirits change; null for the units not in the player's lance, which spend no resolve.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/ResolveCosts"
+            }
+          ]
         }
       }
     },
@@ -1103,6 +1103,27 @@
             "null"
           ],
           "description": "The uses left of an ability that can be used only so often; null without a limit.",
+          "format": "int32"
+        }
+      }
+    },
+    "ResolveCosts": {
+      "type": "object",
+      "description": "The resolve a mech's Precision Strike and Vigilance cost.",
+      "additionalProperties": false,
+      "required": [
+        "precisionStrikeCost",
+        "vigilanceCost"
+      ],
+      "properties": {
+        "precisionStrikeCost": {
+          "type": "integer",
+          "description": "The resolve a Precision Strike costs.",
+          "format": "int32"
+        },
+        "vigilanceCost": {
+          "type": "integer",
+          "description": "The resolve Vigilance costs.",
           "format": "int32"
         }
       }

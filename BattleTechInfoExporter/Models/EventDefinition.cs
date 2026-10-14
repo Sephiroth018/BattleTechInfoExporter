@@ -95,10 +95,13 @@ internal sealed record EventOutcome(int Weight, IReadOnlyList<EventResult> Resul
 /// <param name="AddedTags">The tags added.</param>
 /// <param name="RemovedTags">The tags removed.</param>
 /// <param name="StatisticChanges">
-///     The statistics changed; a boolean statistic's value as 1 or 0, as the requirements compare it.
+///     The statistics changed, apart from the stored components' counts in <paramref name="ComponentChanges" />; a
+///     boolean statistic's value as 1 or 0, as the requirements compare it.
 /// </param>
+/// <param name="ComponentChanges">The components added to or taken from the company's storage.</param>
 /// <param name="DurationDays">
-///     How many days the tag and statistic changes last before the game reverts them; <c>null</c> when they last.
+///     How many days the tag, statistic and component changes last before the game reverts them; <c>null</c> when
+///     they last.
 /// </param>
 /// <param name="Actions">What else the result does, e.g. kill or dismiss the pilot.</param>
 /// <param name="ForcedEvents">The events the result schedules.</param>
@@ -109,9 +112,15 @@ internal sealed record EventResult(
     IReadOnlyList<string> AddedTags,
     IReadOnlyList<string> RemovedTags,
     IReadOnlyList<CareerStatisticChange> StatisticChanges,
+    IReadOnlyList<ComponentChange> ComponentChanges,
     int? DurationDays,
     IReadOnlyList<ResultAction> Actions,
     IReadOnlyList<ForcedEvent> ForcedEvents);
+
+/// <summary>A change to how many copies of a component the company keeps in storage.</summary>
+/// <param name="Count">The working copies added; negative for copies taken.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record ComponentChange(ComponentReference Component, int Count) : ComponentEntry(Component);
 
 /// <summary>
 ///     What else a result does, about the event's pilot or the company; each value of <see cref="Type" /> has a

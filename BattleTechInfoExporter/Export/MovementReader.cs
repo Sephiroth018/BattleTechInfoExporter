@@ -49,9 +49,11 @@ internal static class MovementReader
 
     private static readonly AttackCode TurretSide = new('T', "a turret, which has a single location");
 
+    // Mech.GetEvasivePipsResult adds a pip for any jump, and the EvasivePipsGainedAdditional statistic past the cap.
     internal static readonly MovementLegend Legend = new(
-        $"one character per hex: the evasion pips a move ending there gives; {NotReachedCharacter} where the move "
-        + $"doesn't reach it, an attack there is {NotReachedAttack} then",
+        $"one character per hex: the evasion pips a move ending there gives, which abilities can raise above the "
+        + $"rules' table, and a jump in place gives one; {NotReachedCharacter} where the move doesn't reach the hex. "
+        + $"An attack is {NotReachedAttack} at a hex no move reaches",
         ReadLegend(FireCodes.Values),
         ReadLegend(SideCodes.Values.Append(TurretSide)));
 

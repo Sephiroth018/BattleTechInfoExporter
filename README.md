@@ -111,12 +111,15 @@ The last one describes the game rather than the career:
     whether it comes only once, whether the daily roll can draw it (otherwise only another event's
     result schedules it), its requirements, the other pilots or mech it involves, and its options.
     Each option has its requirements and its outcomes, drawn by weight, and each outcome its results:
-    tags added and removed, statistics changed, how many days the changes last before the game
+    tags added and removed, statistics changed, components added to or taken from storage, how
+    many days the changes last before the game
     reverts them (`null` when they last), actions such as killing, dismissing or sidelining the
     pilot, each with only the field its kind needs (the days, the injuries, the pilot, the item
     collection), and the events it schedules. A requirement names the scope it checks (the company, the
     current star system, the commander or a pilot), the tags that must and mustn't be there and the
-    statistic comparisons that must hold; a statistic the scope doesn't have counts as 0. The game
+    statistic comparisons that must hold; a statistic the scope doesn't have counts as 0. A
+    comparison of a stored component's count names the component and compares the working copies
+    in storage. The game
     state holds the company's and every pilot's tags and the statistics events compare, and
     `star-systems.json` every star system's tags. Titles and option texts are plain text that keeps the
     game's placeholders for the pilots it picks, e.g. `{TGT_MW.Callsign}`, with a switch on their
@@ -166,7 +169,7 @@ The game state holds:
   to them for a time and the day each ends, the reputation with every faction, and the tags and
   statistics events check.
 - **Work queue:** the timeline's entries in order, each with the day it finishes and, by the
-  entry's type, its `target`: the mech, pilot, destination or ship upgrade it applies to; the
+  entry's `kind`, its `target`: the mech, pilot, destination or ship upgrade it applies to; the
   financial report has none.
 - **Ship:** the Argo's upgrades the engineering screen shows, each installed, installing,
   available or locked, with its required upgrades, price, upkeep, installation days and effects in
@@ -270,12 +273,13 @@ it stands in by its catalog id (`null` on open ground). What else it carries fol
   that carry their own, the pilot's injuries, health and bonus health left (which takes hits before they
   become injuries) and skills as the game computes with them now, effects included, together under
   `pilot`, which is `null` for a unit without one, the abilities that can be activated with their cooldowns and uses left,
-  and what Precision Strike and Vigilance cost it now. A Sensor Lock brings an enemy into full view
+  and, for the player's units, what Precision Strike and Vigilance cost them now. A Sensor Lock brings an enemy into full view
   for the player's whole side, and allied units' sensors count for the player. An enemy in sight
   but hidden by ECM counts as in full view, although the HUD hides its pilot, heat, stability and
   initiative and it can't be targeted until spotted well enough or sensor locked.
-- **Sensor blips:** the position and as much as the HUD shows: nothing more at the lowest level,
-  the kind of unit at the next, and its tonnage, or a turret's weight class, at the highest.
+- **Sensor blips:** the position, facing and terrain there, as the blip's marker shows them, and as
+  much as the HUD shows: nothing more at the lowest level, the kind of unit at the next, and its
+  tonnage, or a turret's weight class, at the highest.
 - **Enemies out of sensor range:** where the player's side last detected them, without facing or
   terrain, until they are seen again.
 - **Destroyed units,** enemies included, stay listed in full view, as their wrecks are on the map,

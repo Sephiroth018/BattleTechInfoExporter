@@ -43,10 +43,12 @@ internal static class EventDefinitionReader
             definition.PublishState == SimGameEventDef.EventPublishState.PUBLISHED
             && definition.EventType == SimGameEventDef.SimEventType.NORMAL
             && DrawnScopes.Contains(definition.Scope),
-            ReadRequirement(definition.Requirements, definition.Scope),
-            ReadRequirementList(definition.AdditionalRequirements),
+            ReadRequirement(dataManager, definition.Requirements, definition.Scope),
+            ReadRequirementList(dataManager, definition.AdditionalRequirements),
             (definition.AdditionalObjects ?? [])
-            .Select(target => new EventTarget(target.Scope, ReadRequirement(target.Requirements, target.Scope)))
+            .Select(target => new EventTarget(
+                target.Scope,
+                ReadRequirement(dataManager, target.Requirements, target.Scope)))
             .ToList(),
             definition.Options.Select(option => ReadOption(dataManager, option)).ToList());
 
@@ -54,20 +56,33 @@ internal static class EventDefinitionReader
         new(
             option.Description.Id,
             GameText.ToPlainText(option.Description.Name),
-            ReadRequirementList(option.RequirementList),
+            ReadRequirementList(dataManager, option.RequirementList),
             (option.ResultSets ?? [])
             .Select(outcome => new EventOutcome(
                 outcome.Weight,
                 (outcome.Results ?? []).Select(result => ReadResult(dataManager, result)).ToList()))
             .ToList());
 
-    private static EventResult ReadResult(DataManager dataManager, SimGameEventResult result) =>
-        new(
+    private static EventResult ReadResult(DataManager dataManager, SimGameEventResult result)
+    {
+        var statisticChanges = (result.Stats ?? [])
+            .Select(ReadStatisticChange)
+            .OfType<CareerStatisticChange>()
+            .Select(change => (Statistic: change, Component: ReadComponentChange(dataManager, result.Scope, change)))
+            .ToList();
+        return new EventResult(
             result.Scope,
-            result.Requirements is { } requirement ? ReadRequirement(requirement, requirement.Scope) : null,
+            result.Requirements is { } requirement
+                ? ReadRequirement(dataManager, requirement, requirement.Scope)
+                : null,
             ReadTags(result.AddedTags),
             ReadTags(result.RemovedTags),
-            (result.Stats ?? []).Select(ReadStatisticChange).OfType<CareerStatisticChange>().ToList(),
+            statisticChanges.Where(change => change.Component is null).Select(change => change.Statistic).ToList(),
+            statisticChanges
+                .Select(change => change.Component)
+                .OfType<ComponentChange>()
+                .OrderBy(change => change.Component)
+                .ToList(),
             // SimGameState.ApplySimGameEventResult tracks a result as temporary only with a duration.
             result.TemporaryResult && result.ResultDuration > 0 ? result.ResultDuration : null,
             (result.Actions ?? []).Select(action => ReadAction(dataManager, action)).ToList(),
@@ -80,6 +95,28 @@ internal static class EventDefinitionReader
                 forcedEvent.Probability,
                 forcedEvent.RetainPilot))
             .ToList());
+    }
+
+    // A change that sets the count adds no copies, so it stays a statistic.
+    private static ComponentChange? ReadComponentChange(
+        DataManager dataManager,
+        EventScope scope,
+        CareerStatisticChange change) =>
+        !change.IsSet && ReadCountedComponent(dataManager, scope, change.Statistic) is { } component
+            ? new ComponentChange(component, (int)change.Value)
+            : null;
+
+    // Events change and compare a stored item's count like any other company statistic. A count of damaged copies or
+    // of something other than a component stays a statistic.
+    private static ComponentReference? ReadCountedComponent(
+        DataManager dataManager,
+        EventScope scope,
+        string statisticName) =>
+        scope == EventScope.Company
+        && ItemCountStatistic.TryParse(statisticName) is { IsDamaged: false } statistic
+        && Enum.TryParse<BattleTechResourceType>(statistic.Type, out var resourceType)
+            ? ComponentReferences.FindReferenceTo(dataManager, resourceType, statistic.Id)
+            : null;
 
     // Each kind's value as SimGameState.ApplySimGameEventResult reads it: the kill, dismiss, heal and single injury
     // actions act on the event's pilot and ignore their value. Only the base game's event actions are known.
@@ -126,21 +163,35 @@ internal static class EventDefinitionReader
     }
 
     // An empty requirement is met by anything (RequirementDef.HasRequirement), so it's left out.
-    private static EventRequirement? ReadRequirement(RequirementDef? requirement, EventScope scope) =>
-        requirement is null || !requirement.HasRequirement()
-            ? null
-            : new EventRequirement(
-                scope,
-                ReadTags(requirement.RequirementTags),
-                ReadTags(requirement.ExclusionTags),
-                (requirement.RequirementComparisons ?? [])
-                .Select(comparison => new StatisticComparison(comparison.obj, comparison.op, comparison.val))
-                .ToList());
+    private static EventRequirement? ReadRequirement(
+        DataManager dataManager,
+        RequirementDef? requirement,
+        EventScope scope)
+    {
+        if (requirement is null || !requirement.HasRequirement())
+        {
+            return null;
+        }
 
-    private static List<EventRequirement> ReadRequirementList(IEnumerable<RequirementDef>? requirements) =>
+        var comparisons = (requirement.RequirementComparisons ?? [])
+            .Select(comparison => ReadCountedComponent(dataManager, scope, comparison.obj) is { } component
+                ? (IComparison)new ComponentComparison(component, comparison.op, comparison.val)
+                : new StatisticComparison(comparison.obj, comparison.op, comparison.val))
+            .ToList();
+        return new EventRequirement(
+            scope,
+            ReadTags(requirement.RequirementTags),
+            ReadTags(requirement.ExclusionTags),
+            comparisons.OfType<StatisticComparison>().ToList(),
+            comparisons.OfType<ComponentComparison>().OrderBy(comparison => comparison.Component).ToList());
+    }
+
+    private static List<EventRequirement> ReadRequirementList(
+        DataManager dataManager,
+        IEnumerable<RequirementDef>? requirements) =>
         (requirements ?? [])
         .Where(requirement => requirement is not null)
-        .Select(requirement => ReadRequirement(requirement, requirement.Scope))
+        .Select(requirement => ReadRequirement(dataManager, requirement, requirement.Scope))
         .OfType<EventRequirement>()
         .ToList();
 

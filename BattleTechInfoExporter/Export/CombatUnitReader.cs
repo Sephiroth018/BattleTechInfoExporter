@@ -127,10 +127,11 @@ internal static class CombatUnitReader
                 isLastSeen
                     ? combat.LocalPlayerTeam.VisibilityCache.previouslyDetectedEnemyLocations[actor]
                     : actor.CurrentPosition),
+            // A blip's marker takes the unit's rotation at every level (PilotableActorRepresentation.updateBlips).
             isLastSeen ? null : ReadFacingDegrees(actor),
             isLastSeen ? null : actor.occupiedDesignMask?.Id,
             isSighted && actor.GetPilot() is { } pilot ? PilotReader.ReferenceTo(pilot) : null,
-            isSighted ? ReadState(actor) : null,
+            isSighted ? ReadState(actor, isPlayers) : null,
             targets is null ? null : ReadLinesOfFire(actor, targets),
             isPlayers && targets is not null ? MovementReader.Read(actor, targets) : null);
     }
@@ -182,7 +183,7 @@ internal static class CombatUnitReader
     private static float ReadFacingDegrees(AbstractActor actor) =>
         Rounding.ToTenth(actor.CurrentRotation.eulerAngles.y) % 360f;
 
-    private static CombatUnitState ReadState(AbstractActor actor)
+    private static CombatUnitState ReadState(AbstractActor actor, bool isPlayers)
     {
         var mech = actor as Mech;
         var pilot = actor.GetPilot();
@@ -204,8 +205,7 @@ internal static class CombatUnitReader
                 ? null
                 : new CombatPilotState(pilot.Injuries, pilot.Health, pilot.BonusHealth, PilotReader.ReadSkills(pilot)),
             ReadAbilities(actor),
-            actor.OffensivePushCost,
-            actor.DefensivePushCost);
+            isPlayers ? new ResolveCosts(actor.OffensivePushCost, actor.DefensivePushCost) : null);
     }
 
     // What the heat bar (CombatHUDHeatDisplay) draws, and the dissipation Mech.ApplyHeatSinks subtracts: the heat

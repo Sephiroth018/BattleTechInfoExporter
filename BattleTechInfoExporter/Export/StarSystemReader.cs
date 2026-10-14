@@ -64,12 +64,16 @@ internal static class StarSystemReader
     }
 
     // The stores draw from the active definition's collections (StarSystem.SetNewStarSystemDef resets them on a swap).
-    // A definition without a store has null instead of an empty list (Shop.Initialize checks both).
+    // A definition without a store has null instead of an empty list (Shop.Initialize checks both). Each store draws
+    // from every collection, so their order doesn't matter.
     private static ByStore<IReadOnlyList<string>> ReadStoreCollections(StarSystemDef definition) =>
         new(
-            definition.SystemShopItems ?? [],
-            definition.FactionShopItems ?? [],
-            definition.BlackMarketShopItems ?? []);
+            SortCollections(definition.SystemShopItems),
+            SortCollections(definition.FactionShopItems),
+            SortCollections(definition.BlackMarketShopItems));
+
+    private static List<string> SortCollections(IEnumerable<string>? collections) =>
+        (collections ?? []).OrderBy(collection => collection, StringComparer.Ordinal).ToList();
 
     // The query takes the tag sets and biomes as sets (SQL IN), so their order doesn't change its result.
     private static List<DefinitionReference> ReadPlayableMaps(
