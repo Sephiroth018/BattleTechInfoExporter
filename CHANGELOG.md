@@ -29,9 +29,9 @@ changes the format.
 Changed: game-state.json, combat-state.json, combat-map.json, catalog.json.
 
 ### game-state.json
-- Values corrected every faction reference to a faction without a definition: `id` is its
-  enumeration name instead of `""`, e.g. `INVALID_UNSET` for the target of a story contract that
-  only travels.
+- Values corrected `contracts[].target.id` and `activeContract.target.id` of a story contract
+  that only travels: `INVALID_UNSET`, the name of the faction the game leaves unset, instead of
+  `""`.
 
 ### combat-state.json
 - Values corrected `units.<id>.side.faction.id` and `buildingSides[].side.faction.id`:

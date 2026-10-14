@@ -148,11 +148,17 @@ internal sealed class HexStepReader
     }
 
     // As PathNodeGrid.GetTerrainModifiedCost without the terrain's cost: too steep a grade or cell, or a ledge
-    // between the nodes.
+    // between the nodes. A step leaving the map's cells is blocked, as PathNodeGrid.FindBlockerBetween treats one
+    // starting outside them, whose check would otherwise read past the cells.
     private bool ReadIsStepBlocked((int X, int Z) from, (int X, int Z) to)
     {
         var (fromPosition, _) = NodeAt(from);
         var (toPosition, toCell) = NodeAt(to);
+        if (!_combat.MapMetaData.IsWithinBounds(fromPosition) || !_combat.MapMetaData.IsWithinBounds(toPosition))
+        {
+            return true;
+        }
+
         var distance = Vector2.Distance(
             new Vector2(fromPosition.x, fromPosition.z),
             new Vector2(toPosition.x, toPosition.z));
