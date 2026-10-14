@@ -26,8 +26,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="AttackerStoodUp">When the attacker stood up this round.</param>
 /// <param name="AttackerOverheated">When the attacking mech is overheated.</param>
 /// <param name="ArmMountedWeapon">For a mech's ranged weapon mounted in an arm.</param>
-/// <param name="DamagedWeapon">For a mech's weapon damaged by a critical hit but not destroyed.</param>
-/// <param name="WeaponInDamagedLocation">For a weapon in a damaged location of a mech.</param>
+/// <param name="AttackerDamage">For damage to the attacker's weapon or the location it's mounted in.</param>
 /// <param name="PrecisionStrike">For an attack made with Precision Strike.</param>
 /// <param name="MechFiringArcDegrees">
 ///     How far to either side of its facing a mech can fire without turning; a turret's arc is in the catalog.
@@ -50,8 +49,7 @@ internal sealed record ToHitRules(
     float AttackerStoodUp,
     float AttackerOverheated,
     float ArmMountedWeapon,
-    float DamagedWeapon,
-    DamagedLocationModifiers WeaponInDamagedLocation,
+    AttackerDamageModifiers AttackerDamage,
     float PrecisionStrike,
     float MechFiringArcDegrees,
     int TurretGunnery);
@@ -106,6 +104,18 @@ internal sealed record ElevationModifier(
 /// <param name="Vehicle">For an attacking vehicle.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record AttackerWalkedModifiers(ByWeightClass<float> Mech, float Vehicle);
+
+/// <summary>Turrets get none.</summary>
+/// <param name="Mech">For an attacking mech.</param>
+/// <param name="Vehicle">For an attacking vehicle.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record AttackerDamageModifiers(WeaponDamageModifiers Mech, WeaponDamageModifiers Vehicle);
+
+/// <summary>Both apply when the weapon is damaged and its location too.</summary>
+/// <param name="DamagedWeapon">For a weapon damaged by a critical hit but not destroyed.</param>
+/// <param name="WeaponInDamagedLocation">For a weapon in a damaged location.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record WeaponDamageModifiers(float DamagedWeapon, DamagedLocationModifiers WeaponInDamagedLocation);
 
 /// <param name="Penalized">The location is damaged.</param>
 /// <param name="NonFunctional">The location is damaged beyond use.</param>

@@ -415,7 +415,8 @@ Folders:
   store or item collection holds, by the game's shop item type; a reference
   with a naming rule of its own is made by the reader that owns it. `ReferencedEntries` builds the
   lists of entries that refer to a definition, leaving out what has none, `GameText` makes every exported game text plain,
-  and `HudInitiative` numbers phases and initiative as the HUD does.
+  `HudInitiative` numbers phases and initiative as the HUD does, and `WeaponCategories` keys tables by
+  weapon category.
   `ExportFileWriter` replaces, deletes and reads the header of the files in the mod's `exports/`
   folder, by file name and text, knowing no model.
 - `Models/`: immutable records, one per JSON object, and the mod's own enums. The records are
@@ -531,7 +532,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   `rules.json`): a constant the game never reads, reads only in code nothing calls, or reads only
   for presentation or the AI is left out, so a consumer never plans around a number that does
   nothing. A value the game hardcodes but a tool computes with (a rounding, a limit) is exported
-  next to the constants; a rule it hardcodes with conditions is stated in the README.
+  next to the constants; a rule it hardcodes with conditions is stated in the description of the
+  value it affects, never in the README, which isn't shipped.
 - **Every export file has a JSON Schema** (draft-04), `schemas/<file>.schema.json`, generated on
   every build, committed, and shipped in the mod folder's `schemas/`. Every property is required,
   since the mod writes them all, `null` included; an abstract record declared as a property's type

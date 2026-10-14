@@ -216,14 +216,13 @@ data.
 
 The rules' `combat` object holds the combat constants the game's code reads, named by what they
 are: to-hit modifiers (positive makes an attack harder, negative is a bonus), evasion, guard levels
-and the damage they cut, line of fire, heat, stability, injuries, melee, critical hits, hit location
-weights by attack direction, visibility and sensor locks, resolve and movement penalties. Values
-the game hardcodes but a tool computes with are exported next to the constants, e.g. the rounding
-and limits of the hit chance in `toHit`; rules it hardcodes with conditions are stated here: a melee
-attack on a turret, a building, a prone or a shut-down mech always has the maximum hit chance; a
-sensor blip shows the unit's type from Tactics 4 and its details from 7. Constants the game never
-reads, reads only in code nothing calls, or reads only for animation, sound, tooltips or the AI are
-left out, as are the melee damage multipliers the game ignores in favour of the chassis' own values.
+and the damage they cut, line of fire, damage multipliers by weapon category and target, stray
+shots, COIL weapons, heat, stability, injuries, melee, critical hits, hit location weights by attack
+direction, visibility and sensor locks, resolve and movement penalties. Values the game hardcodes
+but a tool computes with are exported next to the constants, e.g. the rounding and limits of the hit
+chance in `toHit`; rules it hardcodes with conditions are stated in the schema descriptions of the
+values they affect. Constants the game never reads, reads only in code nothing calls, or reads only
+for animation, sound, tooltips or the AI are left out.
 
 The rules' `campaign` object holds the campaign constants the game's code reads, as the career's
 difficulty settings adjust them: mech lab costs in tech points and C-Bills (an order takes its tech

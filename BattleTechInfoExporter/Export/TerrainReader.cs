@@ -17,6 +17,9 @@ internal static class TerrainReader
     // DesignMaskDef's default move cost, which no unit's movement reaches a single meter of.
     private const float ImpassableMoveCost = 9999.9f;
 
+    // A category without a multiplier of its own gets only the mask's multiplier for all damage.
+    private const float NoCategoryMultiplier = 1;
+
     private static readonly IReadOnlyList<Biome.BIOMESKIN> AllBiomes =
         Enum.GetValues(typeof(Biome.BIOMESKIN)).Cast<Biome.BIOMESKIN>().ToList();
 
@@ -97,7 +100,8 @@ internal static class TerrainReader
             mask.heatSinkMultiplier,
             mask.heatPerTurn,
             ReadDamageDealt(mask),
-            new DamageMultipliers(
+            // AbstractActor.GetAdjustedDamage.
+            ReadDamageMultipliers(
                 mask.allDamageTakenMultiplier,
                 mask.antipersonnelDamageTakenMultiplier,
                 mask.energyDamageTakenMultiplier,
@@ -115,12 +119,34 @@ internal static class TerrainReader
     private static BiomeDefinition ReadBiome(DefinitionReference biome, DesignMaskDef mask) =>
         new(biome.Id, biome.Name, mask.heatSinkMultiplier, mask.heatPerTurn, ReadDamageDealt(mask));
 
-    // Weapon.GetMaskDamageMultiplier picks the category by the weapon category's DesignMaskString.
+    // Weapon.GetMaskDamageMultiplier.
     private static DamageMultipliers ReadDamageDealt(DesignMaskDef mask) =>
-        new(
+        ReadDamageMultipliers(
             mask.allDamageDealtMultiplier,
             mask.antipersonnelDamageDealtMultiplier,
             mask.energyDamageDealtMultiplier,
             mask.ballisticDamageDealtMultiplier,
             mask.missileDamageDealtMultiplier);
+
+    // The game picks a weapon category's multiplier by its DesignMaskString; Melee and AMS match none.
+    private static DamageMultipliers ReadDamageMultipliers(
+        float all,
+        float support,
+        float energy,
+        float ballistic,
+        float missile) =>
+        new(
+            all,
+            support,
+            energy,
+            ballistic,
+            missile,
+            WeaponCategories.ByName(category => category.DesignMaskString switch
+            {
+                "Support" => support,
+                "Energy" => energy,
+                "Ballistic" => ballistic,
+                "Missile" => missile,
+                _ => NoCategoryMultiplier
+            }));
 }

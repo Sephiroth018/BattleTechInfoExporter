@@ -329,11 +329,13 @@ internal static class CatalogReader
                 : weapon.AmmoCategoryValue.FriendlyName,
             weapon.AmmoCategoryValue.UsesInternalAmmo ? weapon.StartingAmmoCapacity : null,
             weapon.Damage,
+            weapon.StructureDamage,
             weapon.Instability,
             weapon.ShotsWhenFired,
             weapon.ProjectilesPerShot,
             weapon.HeatDamage,
             weapon.HeatGenerated,
+            weapon.Type == WeaponType.COIL ? ReadCoil(weapon) : null,
             new WeaponRanges(
                 weapon.MinRange,
                 weapon.ShortRange,
@@ -344,6 +346,13 @@ internal static class CatalogReader
             weapon.CriticalChanceMultiplier,
             weapon.RefireModifier,
             weapon.IndirectFireCapable);
+
+    // Weapon.GetCOILDamageFromEvasivePips leaves the damage at its base without an exponent, as an exponent of 0
+    // does; Weapon.HeatGenerated keeps the weapon's heat without a divisor.
+    private static CoilWeapon ReadCoil(WeaponDef weapon) =>
+        new(
+            weapon.GetAdditionalData("EvasiveExponent")?.Value<float>() ?? 0,
+            weapon.GetAdditionalData("HeatDivisor")?.Value<float>());
 
     private static AmmunitionBoxDefinition ReadAmmunitionBox(DataManager dataManager, AmmunitionBoxDef ammunitionBox) =>
         new(ReadComponent(ammunitionBox), ReadAmmoCategory(dataManager, ammunitionBox), ammunitionBox.Capacity);

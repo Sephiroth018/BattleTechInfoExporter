@@ -1177,13 +1177,17 @@
     },
     "CombatRules": {
       "type": "object",
-      "description": "The combat rules: the constants behind to-hit, evasion, cover, heat, stability, melee, hit locations, visibility, resolve and movement. A to-hit modifier is added to the attack's difficulty: positive makes the shot harder, negative is a bonus.",
+      "description": "The combat rules: the constants behind to-hit, evasion, cover, damage, heat, stability, melee, hit locations, visibility, resolve and movement. A to-hit modifier is added to the attack's difficulty: positive makes the shot harder, negative is a bonus.",
       "additionalProperties": false,
       "required": [
         "toHit",
         "evasion",
         "guard",
         "lineOfFire",
+        "damage",
+        "weaponCategories",
+        "strayShots",
+        "coil",
         "heat",
         "stability",
         "injuries",
@@ -1210,6 +1214,32 @@
         "lineOfFire": {
           "description": "How cover between attacker and target affects ranged attacks.",
           "$ref": "#/definitions/LineOfFireRules"
+        },
+        "damage": {
+          "description": "The damage multipliers that apply regardless of the target.",
+          "$ref": "#/definitions/DamageRules"
+        },
+        "weaponCategories": {
+          "type": "object",
+          "description": "By the weapon category's name, as the catalog's weapons name theirs; Melee is the melee and jump attacks'.",
+          "additionalProperties": {
+            "$ref": "#/definitions/WeaponCategoryRules"
+          }
+        },
+        "strayShots": {
+          "description": "What a missed shot can hit instead; null when misses hit nothing.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/StrayShotRules"
+            }
+          ]
+        },
+        "coil": {
+          "description": "How COIL weapons gain from the attacker's evasive pips.",
+          "$ref": "#/definitions/CoilRules"
         },
         "heat": {
           "description": "The heat rules of mechs.",
@@ -1269,8 +1299,7 @@
         "attackerStoodUp",
         "attackerOverheated",
         "armMountedWeapon",
-        "damagedWeapon",
-        "weaponInDamagedLocation",
+        "attackerDamage",
         "precisionStrike",
         "mechFiringArcDegrees",
         "turretGunnery"
@@ -1348,14 +1377,9 @@
           "description": "For a mech's ranged weapon mounted in an arm.",
           "format": "float"
         },
-        "damagedWeapon": {
-          "type": "number",
-          "description": "For a mech's weapon damaged by a critical hit but not destroyed.",
-          "format": "float"
-        },
-        "weaponInDamagedLocation": {
-          "description": "For a weapon in a damaged location of a mech.",
-          "$ref": "#/definitions/DamagedLocationModifiers"
+        "attackerDamage": {
+          "description": "For damage to the attacker's weapon or the location it's mounted in.",
+          "$ref": "#/definitions/AttackerDamageModifiers"
         },
         "precisionStrike": {
           "type": "number",
@@ -1539,6 +1563,45 @@
         }
       }
     },
+    "AttackerDamageModifiers": {
+      "type": "object",
+      "description": "Turrets get none.",
+      "additionalProperties": false,
+      "required": [
+        "mech",
+        "vehicle"
+      ],
+      "properties": {
+        "mech": {
+          "description": "For an attacking mech.",
+          "$ref": "#/definitions/WeaponDamageModifiers"
+        },
+        "vehicle": {
+          "description": "For an attacking vehicle.",
+          "$ref": "#/definitions/WeaponDamageModifiers"
+        }
+      }
+    },
+    "WeaponDamageModifiers": {
+      "type": "object",
+      "description": "Both apply when the weapon is damaged and its location too.",
+      "additionalProperties": false,
+      "required": [
+        "damagedWeapon",
+        "weaponInDamagedLocation"
+      ],
+      "properties": {
+        "damagedWeapon": {
+          "type": "number",
+          "description": "For a weapon damaged by a critical hit but not destroyed.",
+          "format": "float"
+        },
+        "weaponInDamagedLocation": {
+          "description": "For a weapon in a damaged location.",
+          "$ref": "#/definitions/DamagedLocationModifiers"
+        }
+      }
+    },
     "DamagedLocationModifiers": {
       "type": "object",
       "additionalProperties": false,
@@ -1567,6 +1630,7 @@
         "pipsByDistanceMoved",
         "modifierByPips",
         "weaponTypesAffected",
+        "pipsStrippedPerAttack",
         "vehiclePipMultiplier",
         "canVehiclesBeEvasive"
       ],
@@ -1588,10 +1652,15 @@
         },
         "weaponTypesAffected": {
           "type": "array",
-          "description": "The weapon types the pips apply to, by the game's names.",
+          "description": "The weapon types the pips apply to, by the game's names, where the weapon's category is affected too (isAffectedByEvasion).",
           "items": {
             "$ref": "#/definitions/WeaponType"
           }
+        },
+        "pipsStrippedPerAttack": {
+          "type": "integer",
+          "description": "The pips every unit an attack affects loses when the attack ends, hit or miss: the target and any unit a missed shot hits.",
+          "format": "int32"
         },
         "vehiclePipMultiplier": {
           "type": "number",
@@ -1626,7 +1695,7 @@
     },
     "GuardRules": {
       "type": "object",
-      "description": "How guard levels reduce damage: bracing, Bulwark and cover from terrain each add a level. Attacks from behind, melee and breaching shots ignore them.",
+      "description": "How guard levels reduce damage: bracing, Bulwark and cover from terrain each add a level. Attacks from behind, melee and breaching shots ignore them. They don't reduce stability damage.",
       "additionalProperties": false,
       "required": [
         "damageMultiplierByLevel",
@@ -1678,12 +1747,12 @@
       "properties": {
         "obstructedToHit": {
           "type": "number",
-          "description": "The to-hit modifier of an obstructed line of fire.",
+          "description": "The to-hit modifier of an obstructed line of fire; not against a building.",
           "format": "float"
         },
         "obstructedDamageMultiplier": {
           "type": "number",
-          "description": "Multiplies the damage through an obstructed line of fire.",
+          "description": "Multiplies the damage through an obstructed line of fire; not against a building.",
           "format": "float"
         },
         "indirectFireToHit": {
@@ -1693,7 +1762,7 @@
         },
         "indirectFireDamageMultiplier": {
           "type": "number",
-          "description": "Multiplies the damage of indirect fire.",
+          "description": "Multiplies the damage of indirect fire; not against a building.",
           "format": "float"
         },
         "clearRatio": {
@@ -1710,6 +1779,106 @@
           "type": "number",
           "description": "Units in the way alone can't lower the share below this.",
           "format": "float"
+        }
+      }
+    },
+    "DamageRules": {
+      "type": "object",
+      "description": "The damage multipliers that apply regardless of the target. A building takes none of the cover, terrain and damage reduction multipliers, which apply only to units.",
+      "additionalProperties": false,
+      "required": [
+        "globalMultiplier",
+        "artilleryAgainstBuildingsMultiplier"
+      ],
+      "properties": {
+        "globalMultiplier": {
+          "type": "number",
+          "description": "Multiplies the damage and structure damage of every weapon, melee and jump attacks and mortars included; not of artillery strikes.",
+          "format": "float"
+        },
+        "artilleryAgainstBuildingsMultiplier": {
+          "type": "number",
+          "description": "Multiplies the damage artillery strikes and mortars deal to a building.",
+          "format": "float"
+        }
+      }
+    },
+    "WeaponCategoryRules": {
+      "type": "object",
+      "description": "What a weapon category's attacks do against units of each kind.",
+      "additionalProperties": false,
+      "required": [
+        "vehicleDamageMultiplier",
+        "turretDamageMultiplier",
+        "isAffectedByEvasion"
+      ],
+      "properties": {
+        "vehicleDamageMultiplier": {
+          "type": "number",
+          "description": "Multiplies the damage and structure damage the category's hits deal to a vehicle.",
+          "format": "float"
+        },
+        "turretDamageMultiplier": {
+          "type": "number",
+          "description": "Multiplies the damage and structure damage the category's hits deal to a turret.",
+          "format": "float"
+        },
+        "isAffectedByEvasion": {
+          "type": "boolean",
+          "description": "Whether the target's evasive pips apply to the category's attacks; the weapon's type must also be one of weaponTypesAffected."
+        }
+      }
+    },
+    "StrayShotRules": {
+      "type": "object",
+      "description": "A missed ranged shot hits the first building in its path within the weapon's maximum range instead, or a unit where unitsHit allows; never the attacker, and the target only when it's a building.",
+      "additionalProperties": false,
+      "required": [
+        "unitsHit"
+      ],
+      "properties": {
+        "unitsHit": {
+          "description": "Which units a missed shot can hit, from the attacker's side: ENEMIES_ONLY, ENEMIES_AND_NEUTRAL or EVERYONE; null when it hits only buildings.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/StrayShotValidTargets"
+            }
+          ]
+        }
+      }
+    },
+    "StrayShotValidTargets": {
+      "type": "string",
+      "x-enumNames": [
+        "ENEMIES_ONLY",
+        "ENEMIES_AND_NEUTRAL",
+        "EVERYONE"
+      ],
+      "enum": [
+        "ENEMIES_ONLY",
+        "ENEMIES_AND_NEUTRAL",
+        "EVERYONE"
+      ]
+    },
+    "CoilRules": {
+      "type": "object",
+      "description": "How a COIL weapon gains from its mech's evasive pips; the weapon's own values are its coil.",
+      "additionalProperties": false,
+      "required": [
+        "multipliesShots",
+        "countsJumps"
+      ],
+      "properties": {
+        "multipliesShots": {
+          "type": "boolean",
+          "description": "Whether the pips multiply the shots fired, never below the base; when not, once the mech has moved this round and not sprinted, the damage of one shot is multiplied by the pips to the power of evasiveExponent, never below the base damage."
+        },
+        "countsJumps": {
+          "type": "boolean",
+          "description": "Whether the pips count after a jump; when not, a jump leaves the weapon at its base."
         }
       }
     },
@@ -1994,7 +2163,7 @@
     },
     "MeleeAttackRules": {
       "type": "object",
-      "description": "The melee rules; damage and stability damage are the chassis' in the catalog. A melee attack against a turret, a building, a prone or a shut-down mech always has the maximum hit chance.",
+      "description": "The melee rules; damage and stability damage are the chassis' in the catalog. A melee attack against a turret, a building, a prone or a shut-down mech always has the maximum hit chance. The damage against vehicles and turrets is multiplied by the Melee weapon category's (see weaponCategories).",
       "additionalProperties": false,
       "required": [
         "deathFromAboveToHit",
