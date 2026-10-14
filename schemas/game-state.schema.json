@@ -287,7 +287,7 @@
         },
         "statistics": {
           "type": "object",
-          "description": "The company's statistics some event's requirements compare, keyed by the game's name, as they compare them; a statistic the company doesn't have is 0.",
+          "description": "The company's statistics some event's requirements compare, keyed by the game's name, as they compare them; a statistic the company doesn't have is 0. The stored components' counts they compare are in the storage.",
           "additionalProperties": {
             "type": "number",
             "format": "float"

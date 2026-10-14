@@ -43,10 +43,12 @@ internal static class EventDefinitionReader
             definition.PublishState == SimGameEventDef.EventPublishState.PUBLISHED
             && definition.EventType == SimGameEventDef.SimEventType.NORMAL
             && DrawnScopes.Contains(definition.Scope),
-            ReadRequirement(definition.Requirements, definition.Scope),
-            ReadRequirementList(definition.AdditionalRequirements),
+            ReadRequirement(dataManager, definition.Requirements, definition.Scope),
+            ReadRequirementList(dataManager, definition.AdditionalRequirements),
             (definition.AdditionalObjects ?? [])
-            .Select(target => new EventTarget(target.Scope, ReadRequirement(target.Requirements, target.Scope)))
+            .Select(target => new EventTarget(
+                target.Scope,
+                ReadRequirement(dataManager, target.Requirements, target.Scope)))
             .ToList(),
             definition.Options.Select(option => ReadOption(dataManager, option)).ToList());
 
@@ -54,7 +56,7 @@ internal static class EventDefinitionReader
         new(
             option.Description.Id,
             GameText.ToPlainText(option.Description.Name),
-            ReadRequirementList(option.RequirementList),
+            ReadRequirementList(dataManager, option.RequirementList),
             (option.ResultSets ?? [])
             .Select(outcome => new EventOutcome(
                 outcome.Weight,
@@ -70,7 +72,9 @@ internal static class EventDefinitionReader
             .ToList();
         return new EventResult(
             result.Scope,
-            result.Requirements is { } requirement ? ReadRequirement(requirement, requirement.Scope) : null,
+            result.Requirements is { } requirement
+                ? ReadRequirement(dataManager, requirement, requirement.Scope)
+                : null,
             ReadTags(result.AddedTags),
             ReadTags(result.RemovedTags),
             statisticChanges.Where(change => change.Component is null).Select(change => change.Statistic).ToList(),
@@ -93,18 +97,25 @@ internal static class EventDefinitionReader
             .ToList());
     }
 
-    // An event result adds to a stored item's count like to any other company statistic. A count that is set, of
-    // damaged copies or of something other than a component stays a statistic.
+    // A count that is set stays a statistic.
     private static ComponentChange? ReadComponentChange(
         DataManager dataManager,
         EventScope scope,
         CareerStatisticChange change) =>
-        scope == EventScope.Company
-        && !change.IsSet
-        && ItemCountStatistic.TryParse(change.Statistic) is { IsDamaged: false } statistic
-        && Enum.TryParse<BattleTechResourceType>(statistic.Type, out var resourceType)
-        && ComponentReferences.FindReferenceTo(dataManager, resourceType, statistic.Id) is { } component
+        !change.IsSet && ReadCountedComponent(dataManager, scope, change.Statistic) is { } component
             ? new ComponentChange(component, (int)change.Value)
+            : null;
+
+    // Events change and compare a stored item's count like any other company statistic. A count of damaged copies or
+    // of something other than a component stays a statistic.
+    private static ComponentReference? ReadCountedComponent(
+        DataManager dataManager,
+        EventScope scope,
+        string statisticName) =>
+        scope == EventScope.Company
+        && ItemCountStatistic.TryParse(statisticName) is { IsDamaged: false } statistic
+        && Enum.TryParse<BattleTechResourceType>(statistic.Type, out var resourceType)
+            ? ComponentReferences.FindReferenceTo(dataManager, resourceType, statistic.Id)
             : null;
 
     // Each kind's value as SimGameState.ApplySimGameEventResult reads it: the kill, dismiss, heal and single injury
@@ -157,21 +168,35 @@ internal static class EventDefinitionReader
     }
 
     // An empty requirement is met by anything (RequirementDef.HasRequirement), so it's left out.
-    private static EventRequirement? ReadRequirement(RequirementDef? requirement, EventScope scope) =>
-        requirement is null || !requirement.HasRequirement()
-            ? null
-            : new EventRequirement(
-                scope,
-                ReadTags(requirement.RequirementTags),
-                ReadTags(requirement.ExclusionTags),
-                (requirement.RequirementComparisons ?? [])
-                .Select(comparison => new StatisticComparison(comparison.obj, comparison.op, comparison.val))
-                .ToList());
+    private static EventRequirement? ReadRequirement(
+        DataManager dataManager,
+        RequirementDef? requirement,
+        EventScope scope)
+    {
+        if (requirement is null || !requirement.HasRequirement())
+        {
+            return null;
+        }
 
-    private static List<EventRequirement> ReadRequirementList(IEnumerable<RequirementDef>? requirements) =>
+        var comparisons = (requirement.RequirementComparisons ?? [])
+            .Select(comparison => ReadCountedComponent(dataManager, scope, comparison.obj) is { } component
+                ? (IComparison)new ComponentComparison(component, comparison.op, comparison.val)
+                : new StatisticComparison(comparison.obj, comparison.op, comparison.val))
+            .ToList();
+        return new EventRequirement(
+            scope,
+            ReadTags(requirement.RequirementTags),
+            ReadTags(requirement.ExclusionTags),
+            comparisons.OfType<StatisticComparison>().ToList(),
+            comparisons.OfType<ComponentComparison>().OrderBy(comparison => comparison.Component).ToList());
+    }
+
+    private static List<EventRequirement> ReadRequirementList(
+        DataManager dataManager,
+        IEnumerable<RequirementDef>? requirements) =>
         (requirements ?? [])
         .Where(requirement => requirement is not null)
-        .Select(requirement => ReadRequirement(requirement, requirement.Scope))
+        .Select(requirement => ReadRequirement(dataManager, requirement, requirement.Scope))
         .OfType<EventRequirement>()
         .ToList();
 

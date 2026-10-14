@@ -26,13 +26,16 @@ changes the format.
 
 ## 0.73.0
 
-Changed: game-state.json, rules.json, star-systems.json, combat-state.json (breaking),
-catalog.json (breaking).
+Changed: game-state.json (breaking), rules.json, star-systems.json, combat-state.json
+(breaking), catalog.json (breaking).
 
-### game-state.json
+### game-state.json (breaking)
 - Added `workQueue[].kind`: what the entry is about (`mechLab`, `medBay`, `travel`, `shipUpgrade`
   or `financialReport`), which decides its `target`, instead of the game's `type`.
 - Values corrected in every full star system entry's `stores` (see star-systems.json).
+- Removed the `Item.<definition type>.<component id>` keys from `company.statistics`: the
+  requirements comparing a stored component's count name the component now (see catalog.json),
+  and compare `storage.components[].count`, 0 for a component not in storage.
 
 ### rules.json
 - Meaning changed `combat.evasion.pipsByDistanceMoved`: stated that a jump in place gets the
@@ -63,6 +66,9 @@ catalog.json (breaking).
   `eventDefinitions.<id>.options[].outcomes[].results[].statisticChanges[]`, where the statistic
   was named `Item.<definition type>.<component id>`, to `componentChanges[]` next to it: the
   `component` reference and the `count` of working copies added, negative for copies taken.
+- Moved the company requirements' comparisons of a stored component's count from every
+  requirement's `comparisons[]` to `componentComparisons[]` next to it: the `component`
+  reference, the `operator` and the `value`, compared with the working copies in storage.
 
 ## 0.72.2
 

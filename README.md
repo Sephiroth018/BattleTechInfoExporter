@@ -117,7 +117,9 @@ The last one describes the game rather than the career:
     pilot, each with only the field its kind needs (the days, the injuries, the pilot, the item
     collection), and the events it schedules. A requirement names the scope it checks (the company, the
     current star system, the commander or a pilot), the tags that must and mustn't be there and the
-    statistic comparisons that must hold; a statistic the scope doesn't have counts as 0. The game
+    statistic comparisons that must hold; a statistic the scope doesn't have counts as 0. A
+    comparison of a stored component's count names the component and compares the working copies
+    in storage. The game
     state holds the company's and every pilot's tags and the statistics events compare, and
     `star-systems.json` every star system's tags. Titles and option texts are plain text that keeps the
     game's placeholders for the pilots it picks, e.g. `{TGT_MW.Callsign}`, with a switch on their
