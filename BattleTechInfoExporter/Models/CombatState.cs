@@ -99,8 +99,8 @@ internal sealed record DamagedBuilding(string Id, float Structure, IReadOnlyList
 internal sealed record MapHex(int Q, int R, float Elevation, string? Terrain);
 
 /// <summary>A point on the map in meters: <see cref="Y" /> is the elevation.</summary>
-/// <param name="X">Along the map's x axis, 0 at the map's center.</param>
+/// <param name="X">Along the map's x axis, 0 at the map's center, to 0.1 m.</param>
 /// <param name="Y">The elevation, on the scale of <see cref="HexRow.Elevations" />.</param>
-/// <param name="Z">Along the map's z axis, 0 at the map's center.</param>
+/// <param name="Z">Along the map's z axis, 0 at the map's center, to 0.1 m.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MapPosition(float X, float Y, float Z);

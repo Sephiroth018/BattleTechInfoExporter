@@ -233,7 +233,7 @@
       "properties": {
         "x": {
           "type": "number",
-          "description": "Along the map's x axis, 0 at the map's center.",
+          "description": "Along the map's x axis, 0 at the map's center, to 0.1 m.",
           "format": "float"
         },
         "y": {
@@ -243,7 +243,7 @@
         },
         "z": {
           "type": "number",
-          "description": "Along the map's z axis, 0 at the map's center.",
+          "description": "Along the map's z axis, 0 at the map's center, to 0.1 m.",
           "format": "float"
         }
       }

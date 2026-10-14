@@ -31,10 +31,14 @@ Changed: combat-state.json, combat-map.json.
 ### combat-state.json
 - Values corrected `damagedBuildings[].destroyedHexes[].elevation`: rounded to 0.1 m without the
   float noise (208.2, not 208.1999969482422).
+- Values corrected `units.<id>.position`, `objectives[].beacon` and `zones[].center`: rounded to
+  0.1 m like the elevations.
+- Values corrected `units.<id>.facingDegrees`: rounded to 0.1°, from 0 to below 360.
 
 ### combat-map.json
 - Values corrected `rows[].elevations[]`: rounded to 0.1 m without the float noise; code comparing
   them for equality with other heights can now do so.
+- Values corrected `buildings[].position`: rounded to 0.1 m.
 
 ## 0.72.0
 

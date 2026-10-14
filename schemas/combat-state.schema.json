@@ -376,7 +376,7 @@
             "null",
             "number"
           ],
-          "description": "The direction the unit faces, in degrees clockwise from the map's +Z axis; null when last seen.",
+          "description": "The direction the unit faces, in degrees clockwise from the map's +Z axis, from 0 to below 360 and to 0.1°; null when last seen.",
           "format": "float"
         },
         "terrain": {
@@ -544,7 +544,7 @@
       "properties": {
         "x": {
           "type": "number",
-          "description": "Along the map's x axis, 0 at the map's center.",
+          "description": "Along the map's x axis, 0 at the map's center, to 0.1 m.",
           "format": "float"
         },
         "y": {
@@ -554,7 +554,7 @@
         },
         "z": {
           "type": "number",
-          "description": "Along the map's z axis, 0 at the map's center.",
+          "description": "Along the map's z axis, 0 at the map's center, to 0.1 m.",
           "format": "float"
         }
       }
