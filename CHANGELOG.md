@@ -66,9 +66,11 @@ Changed: game-state.json (breaking), rules.json, star-systems.json, combat-state
   `eventDefinitions.<id>.options[].outcomes[].results[].statisticChanges[]`, where the statistic
   was named `Item.<definition type>.<component id>`, to `componentChanges[]` next to it: the
   `component` reference and the `count` of working copies added, negative for copies taken.
-- Moved the company requirements' comparisons of a stored component's count from every
-  requirement's `comparisons[]` to `componentComparisons[]` next to it: the `component`
-  reference, the `operator` and the `value`, compared with the working copies in storage.
+- Moved the company requirements' comparisons of a stored component's count from `comparisons[]`
+  to `componentComparisons[]` next to it, in `eventDefinitions.<id>.requirements`,
+  `additionalRequirements[]`, `additionalTargets[].requirements`, `options[].requirements[]` and
+  `options[].outcomes[].results[].requirements`: the `component` reference, the `operator` and
+  the `value`, compared with the working copies in storage.
 
 ## 0.72.2
 
