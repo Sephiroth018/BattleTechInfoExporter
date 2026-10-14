@@ -26,11 +26,16 @@ changes the format.
 
 ## 0.73.0
 
-Changed: game-state.json, catalog.json (breaking).
+Changed: game-state.json, star-systems.json, catalog.json (breaking).
 
 ### game-state.json
 - Added `workQueue[].kind`: what the entry is about (`mechLab`, `medBay`, `travel`, `shipUpgrade`
   or `financialReport`), which decides its `target`, instead of the game's `type`.
+- Values corrected in every full star system entry's `stores` (see star-systems.json).
+
+### star-systems.json
+- Values corrected `starSystems.<id>.stores.system[]`, `faction[]` and `blackMarket[]`: sorted
+  ordinally like every other list; some systems kept their data's order.
 
 ### catalog.json (breaking)
 - Moved the company results' changes to a stored component's count from

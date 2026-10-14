@@ -141,7 +141,7 @@
           }
         },
         "stores": {
-          "description": "The item collections each of the star system's stores draws its stock from on arrival, every entry of each once, by their ids in the catalog's itemCollectionDefinitions. A store without any doesn't exist in the star system.",
+          "description": "The item collections each of the star system's stores draws its stock from on arrival, every entry of each once, by their ids in the catalog's itemCollectionDefinitions, sorted. A store without any doesn't exist in the star system.",
           "$ref": "#/definitions/ByStoreOfIReadOnlyListOfString"
         },
         "contractEmployers": {
