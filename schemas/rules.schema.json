@@ -2587,7 +2587,7 @@
         },
         "targetEffects": {
           "type": "array",
-          "description": "The statistic changes the target gets, one entry per application of a change the game applies repeatedly.",
+          "description": "The statistic changes the target gets, one entry per application of a change the game applies repeatedly. The change of -999 to GhostEffectStacks removes all of the target's stealth pips from ECM, however many it has: the game counts them only above 0.",
           "items": {
             "$ref": "#/definitions/StatisticChange"
           }
