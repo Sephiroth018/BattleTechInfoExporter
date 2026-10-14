@@ -85,39 +85,58 @@ internal static class MechReader
         int slot,
         MechDef mech)
     {
-        var chassis = mech.Chassis;
         var workOrder = simGame.GetWorkOrderEntryForMech(mech);
-        // A readying mech's work order has no steps: it is the readying itself.
-        var refitOrder = workOrder is WorkOrderEntry_ReadyMech ? null : workOrder;
         // MechBayRowGroupWidget.SetData fills each bay row with this many slots.
         var slotsPerBay = simGame.Constants.Story.MaxMechsPerPod;
-        return new Mech(
-            mech.GUID,
-            mech.Name,
-            ReferenceTo(chassis),
-            slot / slotsPerBay + 1,
-            slot % slotsPerBay + 1,
-            workOrder switch
-            {
-                null => MechStatus.Ready,
-                WorkOrderEntry_ReadyMech => MechStatus.Readying,
-                _ => MechStatus.InMaintenance
-            },
-            // SimGameState.GetWorkOrderEntryForMech finds the order among the queue's own entries.
-            workOrder is null ? null : mechLabFinishingDays[workOrder],
-            workOrder is null ? MechRepair.Estimate(simGame, mech) : null,
-            ReadRefit(simGame, mech, refitOrder),
-            MechValidationRules.ValidateMechCanBeFielded(simGame, mech),
-            // The mech lab validates at this level, against the mech's work order (MechLabPanel).
-            MechValidationRules.ValidateMechDef(MechValidationLevel.MechLab, simGame.DataManager, mech, workOrder)
-                .Values
-                .SelectMany(problems => problems)
-                .Select(problem => problem.ToString())
-                .ToList(),
-            ReadLoadout(mech),
-            refitOrder is null
-                ? null
-                : ReadLoadout(MechRefit.CopyWithPendingSteps(simGame, mech, refitOrder)));
+        var bay = slot / slotsPerBay + 1;
+        var position = slot % slotsPerBay + 1;
+        var chassis = ReferenceTo(mech.Chassis);
+        var isFieldable = MechValidationRules.ValidateMechCanBeFielded(simGame, mech);
+        // The mech lab validates at this level, against the mech's work order (MechLabPanel).
+        var problems = MechValidationRules
+            .ValidateMechDef(MechValidationLevel.MechLab, simGame.DataManager, mech, workOrder)
+            .Values
+            .SelectMany(locationProblems => locationProblems)
+            .Select(problem => problem.ToString())
+            .ToList();
+        var loadout = ReadLoadout(mech);
+        // SimGameState.GetWorkOrderEntryForMech finds the order among the queue's own entries.
+        return workOrder switch
+        {
+            null => new ReadyMech(
+                mech.GUID,
+                mech.Name,
+                chassis,
+                bay,
+                position,
+                isFieldable,
+                problems,
+                loadout,
+                MechRepair.Estimate(simGame, mech)),
+            // A readying mech's work order has no steps: it is the readying itself.
+            WorkOrderEntry_ReadyMech => new ReadyingMech(
+                mech.GUID,
+                mech.Name,
+                chassis,
+                bay,
+                position,
+                isFieldable,
+                problems,
+                loadout,
+                mechLabFinishingDays[workOrder]),
+            _ => new MechInMaintenance(
+                mech.GUID,
+                mech.Name,
+                chassis,
+                bay,
+                position,
+                isFieldable,
+                problems,
+                loadout,
+                mechLabFinishingDays[workOrder],
+                ReadRefit(simGame, mech, workOrder),
+                ReadLoadout(MechRefit.CopyWithPendingSteps(simGame, mech, workOrder)))
+        };
     }
 
     // The interrupt queue shows its first entry as curPopup and holds the rest in popups, in display order
@@ -183,11 +202,11 @@ internal static class MechReader
                 .ToList());
     }
 
-    private static List<RefitChange>? ReadRefit(
+    private static List<RefitChange> ReadRefit(
         SimGameState simGame,
         MechDef mech,
-        WorkOrderEntry_MechLab? refitOrder) =>
-        refitOrder?.SubEntries
+        WorkOrderEntry_MechLab refitOrder) =>
+        refitOrder.SubEntries
             // SimGameState.UpdateMechLabWorkQueue relies on the same.
             .Cast<WorkOrderEntry_MechLab>()
             .Select(step => ReadRefitChange(simGame, mech, step))

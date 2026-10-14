@@ -73,11 +73,7 @@ internal static class EventDefinitionReader
             (result.Stats ?? []).Select(ReadStatisticChange).OfType<CareerStatisticChange>().ToList(),
             // SimGameState.ApplySimGameEventResult tracks a result as temporary only with a duration.
             result.TemporaryResult && result.ResultDuration > 0 ? result.ResultDuration : null,
-            (result.Actions ?? [])
-            .Select(action => new ResultAction(
-                action.Type,
-                string.IsNullOrEmpty(action.value) ? null : action.value))
-            .ToList(),
+            (result.Actions ?? []).Select(action => ReadAction(dataManager, action)).ToList(),
             (result.ForceEvents ?? [])
             .Select(forcedEvent => new ForcedEvent(
                 ReferenceTo(dataManager, forcedEvent.EventID),
@@ -87,6 +83,37 @@ internal static class EventDefinitionReader
                 forcedEvent.Probability,
                 forcedEvent.RetainPilot))
             .ToList());
+
+    // Each kind's value as SimGameState.ApplySimGameEventResult reads it: the kill, dismiss, heal and single injury
+    // actions act on the event's pilot and ignore their value. Only the base game's event actions are known.
+    private static ResultAction ReadAction(DataManager dataManager, SimGameResultAction action) =>
+        action.Type switch
+        {
+            SimGameResultAction.ActionType.MechWarrior_Kill
+                or SimGameResultAction.ActionType.MechWarrior_Fire
+                or SimGameResultAction.ActionType.MechWarrior_Heal
+                or SimGameResultAction.ActionType.MechWarrior_AddInjury
+                or SimGameResultAction.ActionType.MechWarrior_SubtractInjury => new PilotOnlyAction(action.Type),
+            SimGameResultAction.ActionType.MechWarrior_SetTimeout => new SidelinePilotAction(ParseNumber(action)),
+            SimGameResultAction.ActionType.MechWarrior_AddInjuries
+                or SimGameResultAction.ActionType.MechWarrior_SubtractInjuries =>
+                new ChangeInjuriesAction(action.Type, ParseNumber(action)),
+            SimGameResultAction.ActionType.MechWarrior_Callsign => new RenamePilotAction(RequiredValue(action)),
+            SimGameResultAction.ActionType.MechWarrior_AddHiring =>
+                new AddPilotForHireAction(PilotReader.ReferenceTo(dataManager, RequiredValue(action))),
+            SimGameResultAction.ActionType.System_ShowRewards => new RewardAction(RequiredValue(action)),
+            SimGameResultAction.ActionType.System_AddFlashpoint => new AddFlashpointAction(RequiredValue(action)),
+            _ => throw new InvalidOperationException($"Unknown event action {action.Type} with value {action.value}")
+        };
+
+    private static int ParseNumber(SimGameResultAction action) =>
+        int.Parse(RequiredValue(action), NumberStyles.Integer, CultureInfo.InvariantCulture);
+
+    // The game skips an action of these kinds without a value; the base game's data always sets it.
+    private static string RequiredValue(SimGameResultAction action) =>
+        string.IsNullOrEmpty(action.value)
+            ? throw new InvalidOperationException($"Event action {action.Type} has no value")
+            : action.value;
 
     // The value is already resolved from its constant, e.g. [rep_gain_small]. A boolean is 1 or 0, as
     // SimGameState.MeetsStatRequirements compares it; a text can't be compared, so it's left out.

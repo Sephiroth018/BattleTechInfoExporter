@@ -102,13 +102,55 @@ internal sealed record EventResult(
     IReadOnlyList<ResultAction> Actions,
     IReadOnlyList<ForcedEvent> ForcedEvents);
 
+/// <summary>
+///     What else a result does, about the event's pilot or the company; each kind of <see cref="Type" /> has a
+///     record with the field it needs.
+/// </summary>
 /// <param name="Type">What the action does, e.g. <c>MechWarrior_SetTimeout</c> or <c>MechWarrior_Kill</c>.</param>
-/// <param name="Value">
-///     What the action needs, as the game's data gives it, e.g. the timeout's days or the hired pilot's id;
-///     <c>null</c> when it needs nothing.
-/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record ResultAction(SimGameResultAction.ActionType Type, string? Value);
+internal abstract record ResultAction(SimGameResultAction.ActionType Type);
+
+/// <summary>
+///     An action that needs only the event's pilot and no value: killing, dismissing or healing them, or adding or
+///     removing one injury.
+/// </summary>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record PilotOnlyAction(SimGameResultAction.ActionType Type) : ResultAction(Type);
+
+/// <summary>An action that sidelines the event's pilot for a while.</summary>
+/// <param name="Days">How many days the pilot is sidelined for.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record SidelinePilotAction(int Days)
+    : ResultAction(SimGameResultAction.ActionType.MechWarrior_SetTimeout);
+
+/// <summary>An action that adds injuries to or removes them from the event's pilot.</summary>
+/// <param name="Injuries">How many injuries the action adds or removes.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record ChangeInjuriesAction(SimGameResultAction.ActionType Type, int Injuries) : ResultAction(Type);
+
+/// <summary>An action that renames the event's pilot.</summary>
+/// <param name="Callsign">The pilot's new callsign, which also becomes their name.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record RenamePilotAction(string Callsign)
+    : ResultAction(SimGameResultAction.ActionType.MechWarrior_Callsign);
+
+/// <summary>An action that adds a pilot to the current star system's hiring hall.</summary>
+/// <param name="Pilot">The pilot added.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record AddPilotForHireAction(PilotReference Pilot)
+    : ResultAction(SimGameResultAction.ActionType.MechWarrior_AddHiring);
+
+/// <summary>An action that rewards the company with a draw from an item collection.</summary>
+/// <param name="ItemCollection">The collection drawn from, keyed as in <see cref="Catalog.ItemCollectionDefinitions" />.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record RewardAction(string ItemCollection)
+    : ResultAction(SimGameResultAction.ActionType.System_ShowRewards);
+
+/// <summary>An action that makes a flashpoint available.</summary>
+/// <param name="Flashpoint">The flashpoint's id in the game's data.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record AddFlashpointAction(string Flashpoint)
+    : ResultAction(SimGameResultAction.ActionType.System_AddFlashpoint);
 
 /// <summary>
 ///     An event a result schedules: from the daily roll <paramref name="MinDaysWait" /> on, each roll brings it with

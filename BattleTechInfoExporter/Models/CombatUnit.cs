@@ -12,10 +12,15 @@ namespace BattleTechInfoExporter.Models;
 ///     <see cref="UnitVisibility.LastSeen" />.
 /// </param>
 /// <param name="Tonnage">
-///     A blip's tonnage, which the HUD shows at <see cref="UnitVisibility.BlipMaximum" /> for mechs and vehicles;
-///     otherwise <c>null</c>, as the definition has it.
+///     The unit's tonnage, in tons; <c>null</c> where the HUD doesn't tell: for a blip below
+///     <see cref="UnitVisibility.BlipMaximum" />, a turret blip, which shows its weight class instead, and when
+///     last seen.
 /// </param>
-/// <param name="WeightClass">A blip's weight class, which the HUD shows instead of the tonnage for turrets.</param>
+/// <param name="WeightClass">
+///     The unit's weight class; <c>null</c> where the HUD doesn't tell: for a blip below
+///     <see cref="UnitVisibility.BlipMaximum" />, a mech or vehicle blip, which shows its tonnage instead, and when
+///     last seen.
+/// </param>
 /// <param name="Definition">
 ///     The mech, vehicle or turret in the catalog, which holds its armor and loadout; <c>null</c> for the player's
 ///     mechs, which have <see cref="BayMech" /> instead, and for units out of full view.

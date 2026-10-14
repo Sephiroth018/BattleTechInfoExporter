@@ -331,11 +331,11 @@
             "null",
             "number"
           ],
-          "description": "A blip's tonnage, which the HUD shows at blipMaximum for mechs and vehicles; otherwise null, as the definition has it.",
+          "description": "The unit's tonnage, in tons; null where the HUD doesn't tell: for a blip below blipMaximum, a turret blip, which shows its weight class instead, and when last seen.",
           "format": "float"
         },
         "weightClass": {
-          "description": "A blip's weight class, which the HUD shows instead of the tonnage for turrets.",
+          "description": "The unit's weight class; null where the HUD doesn't tell: for a blip below blipMaximum, a mech or vehicle blip, which shows its tonnage instead, and when last seen.",
           "oneOf": [
             {
               "type": "null"

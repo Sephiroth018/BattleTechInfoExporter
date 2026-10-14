@@ -17,26 +17,37 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record HitTables(
-    HitTablesOf<ArmorLocation> Mech,
+    MechHitTables Mech,
     HitTablesOf<VehicleChassisLocations> Vehicle,
     CalledShotRules CalledShot,
     ClusteredHitWeights ClusteredHits);
 
+/// <summary>The hit tables of a kind of unit, by the direction the attack comes from.</summary>
 /// <param name="FromFront">The weight of each location for an attack from the front.</param>
 /// <param name="FromLeft">The weight of each location for an attack from the left.</param>
 /// <param name="FromRight">The weight of each location for an attack from the right.</param>
 /// <param name="FromBack">The weight of each location for an attack from behind.</param>
-/// <param name="Prone"><c>null</c> for vehicles, which can't be prone.</param>
 /// <param name="Artillery">The locations an artillery strike or mortar hits, each with its own damage.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record HitTablesOf<TLocation>(
+internal record HitTablesOf<TLocation>(
     IReadOnlyDictionary<TLocation, int> FromFront,
     IReadOnlyDictionary<TLocation, int> FromLeft,
     IReadOnlyDictionary<TLocation, int> FromRight,
     IReadOnlyDictionary<TLocation, int> FromBack,
-    IReadOnlyDictionary<TLocation, int>? Prone,
     IReadOnlyList<TLocation> Artillery)
     where TLocation : notnull;
+
+/// <summary>A mech's hit tables, which a vehicle's lack: a mech can be prone.</summary>
+/// <param name="Prone">The weight of each location for an attack on a prone mech, from any side.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record MechHitTables(
+    IReadOnlyDictionary<ArmorLocation, int> FromFront,
+    IReadOnlyDictionary<ArmorLocation, int> FromLeft,
+    IReadOnlyDictionary<ArmorLocation, int> FromRight,
+    IReadOnlyDictionary<ArmorLocation, int> FromBack,
+    IReadOnlyList<ArmorLocation> Artillery,
+    IReadOnlyDictionary<ArmorLocation, int> Prone)
+    : HitTablesOf<ArmorLocation>(FromFront, FromLeft, FromRight, FromBack, Artillery);
 
 /// <summary>
 ///     A called shot multiplies the chosen location's weight by <see cref="WeightMultiplier" /> times the pilot's own

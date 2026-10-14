@@ -1313,51 +1313,23 @@
       "additionalProperties": false,
       "required": [
         "collection",
-        "weaponSubType",
-        "weaponType",
-        "weaponCategory",
-        "ammoCategory"
+        "filter"
       ],
       "properties": {
         "collection": {
           "description": "The pilot, the weapons, the ammunition boxes, one random working weapon or the strongest working weapon.",
           "$ref": "#/definitions/TargetCollection"
         },
-        "weaponSubType": {
-          "description": "Only weapons of this sub type; null when not filtered by it.",
+        "filter": {
+          "description": "Which of the weapons or ammunition boxes; null for all of them, and always for the pilot, the random and the strongest weapon.",
           "oneOf": [
             {
               "type": "null"
             },
             {
-              "$ref": "#/definitions/WeaponSubType"
+              "$ref": "#/definitions/ComponentFilter"
             }
           ]
-        },
-        "weaponType": {
-          "description": "Only weapons of this type; null when not filtered by it.",
-          "oneOf": [
-            {
-              "type": "null"
-            },
-            {
-              "$ref": "#/definitions/WeaponType"
-            }
-          ]
-        },
-        "weaponCategory": {
-          "type": [
-            "null",
-            "string"
-          ],
-          "description": "The weapon category, as the catalog's weapons name theirs."
-        },
-        "ammoCategory": {
-          "type": [
-            "null",
-            "string"
-          ],
-          "description": "The ammunition category, as the catalog's ammunition boxes name theirs."
         }
       }
     },
@@ -1379,6 +1351,94 @@
         "SingleRandomWeapon",
         "StrongestWeapon"
       ]
+    },
+    "ComponentFilter": {
+      "description": "The one property the game filters the components by; the game's data can name several, of which only the first in ComponentFilterKind's order counts. Each kind has a record with its value's type.",
+      "x-abstract": true,
+      "anyOf": [
+        {
+          "$ref": "#/definitions/AmmoCategoryFilter"
+        },
+        {
+          "$ref": "#/definitions/WeaponCategoryFilter"
+        },
+        {
+          "$ref": "#/definitions/WeaponSubTypeFilter"
+        },
+        {
+          "$ref": "#/definitions/WeaponTypeFilter"
+        }
+      ]
+    },
+    "ComponentFilterKind": {
+      "type": "string",
+      "description": "The property of a component an effect's filter compares, in the order the game checks them.",
+      "x-enumNames": [
+        "WeaponSubType",
+        "WeaponType",
+        "WeaponCategory",
+        "AmmoCategory"
+      ],
+      "enum": [
+        "weaponSubType",
+        "weaponType",
+        "weaponCategory",
+        "ammoCategory"
+      ]
+    },
+    "AmmoCategoryFilter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "value"
+      ],
+      "properties": {
+        "kind": {
+          "description": "Which property of the components the filter compares, deciding the type of its value.",
+          "$ref": "#/definitions/ComponentFilterKind"
+        },
+        "value": {
+          "type": "string",
+          "description": "The ammunition category the ammunition boxes must have, as the catalog's ammunition boxes name theirs."
+        }
+      }
+    },
+    "WeaponCategoryFilter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "value"
+      ],
+      "properties": {
+        "kind": {
+          "description": "Which property of the components the filter compares, deciding the type of its value.",
+          "$ref": "#/definitions/ComponentFilterKind"
+        },
+        "value": {
+          "type": "string",
+          "description": "The weapon category the weapons must have, as the catalog's weapons name theirs."
+        }
+      }
+    },
+    "WeaponSubTypeFilter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "value"
+      ],
+      "properties": {
+        "kind": {
+          "description": "Which property of the components the filter compares, deciding the type of its value.",
+          "$ref": "#/definitions/ComponentFilterKind"
+        },
+        "value": {
+          "description": "The weapon sub type the weapons must have, e.g. Melee or DFA.",
+          "$ref": "#/definitions/WeaponSubType"
+        }
+      }
     },
     "WeaponSubType": {
       "type": "string",
@@ -1476,6 +1536,24 @@
         "COILM",
         "COILL"
       ]
+    },
+    "WeaponTypeFilter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "value"
+      ],
+      "properties": {
+        "kind": {
+          "description": "Which property of the components the filter compares, deciding the type of its value.",
+          "$ref": "#/definitions/ComponentFilterKind"
+        },
+        "value": {
+          "description": "The weapon type the weapons must have, e.g. LRM or SRM.",
+          "$ref": "#/definitions/WeaponType"
+        }
+      }
     },
     "WeaponType": {
       "type": "string",
@@ -2529,25 +2607,31 @@
       }
     },
     "ResultAction": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "type",
-        "value"
-      ],
-      "properties": {
-        "type": {
-          "description": "What the action does, e.g. MechWarrior_SetTimeout or MechWarrior_Kill.",
-          "$ref": "#/definitions/ActionType"
+      "description": "What else a result does, about the event's pilot or the company; each kind of type has a record with the field it needs.",
+      "x-abstract": true,
+      "anyOf": [
+        {
+          "$ref": "#/definitions/AddFlashpointAction"
         },
-        "value": {
-          "type": [
-            "null",
-            "string"
-          ],
-          "description": "What the action needs, as the game's data gives it, e.g. the timeout's days or the hired pilot's id; null when it needs nothing."
+        {
+          "$ref": "#/definitions/AddPilotForHireAction"
+        },
+        {
+          "$ref": "#/definitions/ChangeInjuriesAction"
+        },
+        {
+          "$ref": "#/definitions/PilotOnlyAction"
+        },
+        {
+          "$ref": "#/definitions/RenamePilotAction"
+        },
+        {
+          "$ref": "#/definitions/RewardAction"
+        },
+        {
+          "$ref": "#/definitions/SidelinePilotAction"
         }
-      }
+      ]
     },
     "ActionType": {
       "type": "string",
@@ -2669,6 +2753,160 @@
         "MechWarrior_SubtractInjury",
         "System_AddFlashpoint"
       ]
+    },
+    "AddFlashpointAction": {
+      "type": "object",
+      "description": "An action that makes a flashpoint available.",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "flashpoint"
+      ],
+      "properties": {
+        "type": {
+          "description": "What the action does, e.g. MechWarrior_SetTimeout or MechWarrior_Kill.",
+          "$ref": "#/definitions/ActionType"
+        },
+        "flashpoint": {
+          "type": "string",
+          "description": "The flashpoint's id in the game's data."
+        }
+      }
+    },
+    "AddPilotForHireAction": {
+      "type": "object",
+      "description": "An action that adds a pilot to the current star system's hiring hall.",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "pilot"
+      ],
+      "properties": {
+        "type": {
+          "description": "What the action does, e.g. MechWarrior_SetTimeout or MechWarrior_Kill.",
+          "$ref": "#/definitions/ActionType"
+        },
+        "pilot": {
+          "description": "The pilot added.",
+          "$ref": "#/definitions/PilotReference"
+        }
+      }
+    },
+    "PilotReference": {
+      "type": "object",
+      "description": "A pilot: their id, full name without callsign, and callsign.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "callsign"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name the UI shows."
+        },
+        "callsign": {
+          "type": "string",
+          "description": "The pilot's callsign, which isn't part of name."
+        }
+      }
+    },
+    "ChangeInjuriesAction": {
+      "type": "object",
+      "description": "An action that adds injuries to or removes them from the event's pilot.",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "injuries"
+      ],
+      "properties": {
+        "type": {
+          "description": "What the action does, e.g. MechWarrior_SetTimeout or MechWarrior_Kill.",
+          "$ref": "#/definitions/ActionType"
+        },
+        "injuries": {
+          "type": "integer",
+          "description": "How many injuries the action adds or removes.",
+          "format": "int32"
+        }
+      }
+    },
+    "PilotOnlyAction": {
+      "type": "object",
+      "description": "An action that needs only the event's pilot and no value: killing, dismissing or healing them, or adding or removing one injury.",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "description": "What the action does, e.g. MechWarrior_SetTimeout or MechWarrior_Kill.",
+          "$ref": "#/definitions/ActionType"
+        }
+      }
+    },
+    "RenamePilotAction": {
+      "type": "object",
+      "description": "An action that renames the event's pilot.",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "callsign"
+      ],
+      "properties": {
+        "type": {
+          "description": "What the action does, e.g. MechWarrior_SetTimeout or MechWarrior_Kill.",
+          "$ref": "#/definitions/ActionType"
+        },
+        "callsign": {
+          "type": "string",
+          "description": "The pilot's new callsign, which also becomes their name."
+        }
+      }
+    },
+    "RewardAction": {
+      "type": "object",
+      "description": "An action that rewards the company with a draw from an item collection.",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "itemCollection"
+      ],
+      "properties": {
+        "type": {
+          "description": "What the action does, e.g. MechWarrior_SetTimeout or MechWarrior_Kill.",
+          "$ref": "#/definitions/ActionType"
+        },
+        "itemCollection": {
+          "type": "string",
+          "description": "The collection drawn from, keyed as in itemCollectionDefinitions."
+        }
+      }
+    },
+    "SidelinePilotAction": {
+      "type": "object",
+      "description": "An action that sidelines the event's pilot for a while.",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "days"
+      ],
+      "properties": {
+        "type": {
+          "description": "What the action does, e.g. MechWarrior_SetTimeout or MechWarrior_Kill.",
+          "$ref": "#/definitions/ActionType"
+        },
+        "days": {
+          "type": "integer",
+          "description": "How many days the pilot is sidelined for.",
+          "format": "int32"
+        }
+      }
     },
     "ForcedEvent": {
       "type": "object",

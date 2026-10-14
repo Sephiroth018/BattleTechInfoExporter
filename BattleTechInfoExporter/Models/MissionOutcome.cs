@@ -84,7 +84,7 @@ internal sealed record ObjectiveResult(string Title, bool IsPrimary, ObjectiveSt
 /// </param>
 /// <param name="Repair">
 ///     What repairing the mech's damage in the mech bay would take, as for a mech bay mech's
-///     <see cref="Mech.Repair" />; <c>null</c> without damage and for a lost mech.
+///     <see cref="ReadyMech.Repair" />; <c>null</c> without damage and for a lost mech.
 /// </param>
 /// <param name="DamagedLocations">The locations that lost armor or structure, from head to legs.</param>
 /// <param name="DamagedComponents">The components damaged or destroyed.</param>

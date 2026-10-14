@@ -109,7 +109,8 @@ The last one describes the game rather than the career:
     Each option has its requirements and its outcomes, drawn by weight, and each outcome its results:
     tags added and removed, statistics changed, how many days the changes last before the game
     reverts them (`null` when they last), actions such as killing, dismissing or sidelining the
-    pilot, and the events it schedules. A requirement names the scope it checks (the company, the
+    pilot, each with only the field its kind needs (the days, the injuries, the pilot, the item
+    collection), and the events it schedules. A requirement names the scope it checks (the company, the
     current star system, the commander or a pilot), the tags that must and mustn't be there and the
     statistic comparisons that must hold; a statistic the scope doesn't have counts as 0. The game
     state holds the company's and every pilot's tags and the statistics events compare, and
@@ -171,10 +172,10 @@ The game state holds:
   a jump, or reaching the planet after the last jump).
 - **Pilots:** the commander and the roster with all their relevant stats, and the tags and
   statistics events check.
-- **Mechs:** the mech bay's mechs with their status, the day they're ready, loadout, armor and
-  performance summary; a mech in a refit also carries the refit's steps, each with only the fields
-  its type uses, and what it will be once the refit is done, and
-  a damaged mech the mech lab isn't working on the days and C-Bills its repair would take.
+- **Mechs:** the mech bay's mechs with their status, loadout, armor and performance summary, each
+  with only the fields its status uses: a mech the mech lab holds carries the day it's ready, one
+  in a refit also the refit's steps, each with only the fields its type uses, and what it will be
+  once the refit is done, and a ready mech the days and C-Bills repairing its damage would take.
 - **Mechs awaiting placement:** new mechs the game asks to place, store or scrap because every mech
   bay is full, with the loadout they come with.
 - **Last lance:** the mechs and pilots last sent on a mission, the only assignment of pilots to
@@ -184,8 +185,8 @@ The game state holds:
   and prices; what they can carry follows from the catalog's item collections.
 - **Hiring hall:** the current system's pilots for hire, like the roster's pilots, their tags
   included, plus hiring cost, salary and whether the company can hire them.
-- **Contracts:** the contracts the Command Center offers, each with its description and terms,
-  and the negotiation as the values at each slider position (pay and salvage together take at most 100 %,
+- **Contracts:** the contracts the Command Center offers, each with its description and terms:
+  fixed, or negotiable as the values at each slider position (pay and salvage together take at most 100 %,
   exactly 100 % when the employer gains no reputation), and its star system: by reference in the
   current system, in full, as in `star-systems.json`, with the route there for a travel contract;
   plus the accepted travel contract until it's proceeded with, with its star system in full and
@@ -247,7 +248,8 @@ Every unit has its side (its team's faction and its allegiance: player, ally, en
 meters (`y` is the elevation), facing in degrees clockwise from the map's +Z axis and the terrain
 it stands in by its catalog id (`null` on open ground). What else it carries follows the HUD:
 
-- **The player's and allied units, and enemies in full view:** the mech, vehicle or turret, by its
+- **The player's and allied units, and enemies in full view:** the kind of unit, its tonnage and
+  weight class, the mech, vehicle or turret, by its
   catalog id, or, for the player's own mechs, by their mech bay id in the game state, which holds
   their assigned armor; the pilot; and the state: armor front and rear and structure left per
   location in whole points as the paper doll shows them (cut off, a remainder below 1 shown as 1), evasion pips, the guard level with its sources (braced, cover, Bulwark), entrenched,

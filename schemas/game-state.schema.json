@@ -1445,107 +1445,19 @@
       }
     },
     "Mech": {
-      "type": "object",
-      "description": "A mech in the mech bay, with its current loadout; the changes still queued in the mech lab are in refit.",
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "name",
-        "chassis",
-        "bay",
-        "position",
-        "status",
-        "readyOnDay",
-        "repair",
-        "refit",
-        "isFieldable",
-        "problems",
-        "loadout",
-        "afterRefit"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "The mech's own id, unique among the company's mechs."
+      "description": "A mech in the mech bay, with its current loadout; each status has a record with the fields of its own.",
+      "x-abstract": true,
+      "anyOf": [
+        {
+          "$ref": "#/definitions/MechInMaintenance"
         },
-        "name": {
-          "type": "string",
-          "description": "The mech's name, which the player can change in the mech lab."
+        {
+          "$ref": "#/definitions/ReadyMech"
         },
-        "chassis": {
-          "description": "The mech's chassis, described in chassisDefinitions.",
-          "$ref": "#/definitions/DefinitionReference"
-        },
-        "bay": {
-          "type": "integer",
-          "description": "The mech bay row, counted from 1, as the mech bay shows it.",
-          "format": "int32"
-        },
-        "position": {
-          "type": "integer",
-          "description": "The position in the bay row, counted from 1.",
-          "format": "int32"
-        },
-        "status": {
-          "description": "Whether the mech is free for use or held by the mech lab.",
-          "$ref": "#/definitions/MechStatus"
-        },
-        "readyOnDay": {
-          "type": [
-            "integer",
-            "null"
-          ],
-          "description": "The day the mech lab finishes its work order, as in workQueue; null when ready.",
-          "format": "int32"
-        },
-        "repair": {
-          "description": "What repairing the mech's damage in the mech bay would take; null without damage and unless ready.",
-          "oneOf": [
-            {
-              "type": "null"
-            },
-            {
-              "$ref": "#/definitions/RepairEstimate"
-            }
-          ]
-        },
-        "refit": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "description": "The steps of the mech's mech lab work order, in order; finished steps are already part of the loadout. null without a work order and while readying.",
-          "items": {
-            "$ref": "#/definitions/RefitChange"
-          }
-        },
-        "isFieldable": {
-          "type": "boolean",
-          "description": "Whether the mech can be taken on a mission, as the lance configuration decides."
-        },
-        "problems": {
-          "type": "array",
-          "description": "The loadout problems the mech lab warns about, e.g. missing ammo, in the game's words.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "loadout": {
-          "description": "The current loadout, as the mech bay shows it.",
-          "$ref": "#/definitions/MechLoadout"
-        },
-        "afterRefit": {
-          "description": "The loadout once every step of refit is finished, as the mech lab shows it. null without a work order and while readying.",
-          "oneOf": [
-            {
-              "type": "null"
-            },
-            {
-              "$ref": "#/definitions/MechLoadout"
-            }
-          ]
+        {
+          "$ref": "#/definitions/ReadyingMech"
         }
-      }
+      ]
     },
     "MechStatus": {
       "type": "string",
@@ -1560,296 +1472,6 @@
         "readying",
         "inMaintenance"
       ]
-    },
-    "RepairEstimate": {
-      "type": "object",
-      "description": "What the mech bay's Repair would take if ordered now, as its confirmation shows it.",
-      "additionalProperties": false,
-      "required": [
-        "days",
-        "cost"
-      ],
-      "properties": {
-        "days": {
-          "type": "integer",
-          "description": "The days the mech lab needs for the repair alone; it works on one order at a time, so an order queued behind others finishes later.",
-          "format": "int32"
-        },
-        "cost": {
-          "type": "integer",
-          "description": "The C-Bills the repair costs.",
-          "format": "int32"
-        }
-      }
-    },
-    "RefitChange": {
-      "description": "One step of a mech's queued refit; each type has a record with the fields of its own.",
-      "x-abstract": true,
-      "anyOf": [
-        {
-          "$ref": "#/definitions/InstallComponentChange"
-        },
-        {
-          "$ref": "#/definitions/ModifyArmorChange"
-        },
-        {
-          "$ref": "#/definitions/RemoveComponentChange"
-        },
-        {
-          "$ref": "#/definitions/RepairComponentChange"
-        },
-        {
-          "$ref": "#/definitions/RepairStructureChange"
-        }
-      ]
-    },
-    "RefitChangeType": {
-      "type": "string",
-      "description": "The kind of a refit step.",
-      "x-enumNames": [
-        "InstallComponent",
-        "RemoveComponent",
-        "RepairComponent",
-        "ModifyArmor",
-        "RepairStructure"
-      ],
-      "enum": [
-        "installComponent",
-        "removeComponent",
-        "repairComponent",
-        "modifyArmor",
-        "repairStructure"
-      ]
-    },
-    "InstallComponentChange": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "type",
-        "isDone",
-        "component",
-        "damageLevel",
-        "location"
-      ],
-      "properties": {
-        "component": {
-          "description": "The component the step installs, removes or repairs.",
-          "$ref": "#/definitions/ComponentReference"
-        },
-        "damageLevel": {
-          "description": "The component's damage level when the step was ordered.",
-          "$ref": "#/definitions/ComponentDamageLevel"
-        },
-        "type": {
-          "description": "The kind of step, which decides the step's other fields.",
-          "$ref": "#/definitions/RefitChangeType"
-        },
-        "isDone": {
-          "type": "boolean",
-          "description": "Whether the mech techs have finished the step; its change is then part of the mech."
-        },
-        "location": {
-          "description": "Where the component goes.",
-          "$ref": "#/definitions/ChassisLocations"
-        }
-      }
-    },
-    "ComponentDamageLevel": {
-      "type": "string",
-      "x-enumNames": [
-        "Functional",
-        "Misaligned",
-        "Penalized",
-        "NonFunctional",
-        "Destroyed",
-        "Installing",
-        "InstallingNonFunctional"
-      ],
-      "enum": [
-        "Functional",
-        "Misaligned",
-        "Penalized",
-        "NonFunctional",
-        "Destroyed",
-        "Installing",
-        "InstallingNonFunctional"
-      ]
-    },
-    "ChassisLocations": {
-      "type": "string",
-      "x-enumFlags": true,
-      "x-enumNames": [
-        "None",
-        "Head",
-        "LeftArm",
-        "LeftTorso",
-        "CenterTorso",
-        "RightTorso",
-        "Torso",
-        "RightArm",
-        "Arms",
-        "MainBody",
-        "LeftLeg",
-        "RightLeg",
-        "Legs",
-        "All"
-      ],
-      "enum": [
-        "None",
-        "Head",
-        "LeftArm",
-        "LeftTorso",
-        "CenterTorso",
-        "RightTorso",
-        "Torso",
-        "RightArm",
-        "Arms",
-        "MainBody",
-        "LeftLeg",
-        "RightLeg",
-        "Legs",
-        "All"
-      ]
-    },
-    "ModifyArmorChange": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "type",
-        "isDone",
-        "location",
-        "frontArmor",
-        "rearArmor"
-      ],
-      "properties": {
-        "location": {
-          "description": "The mech location whose armor or structure the step changes.",
-          "$ref": "#/definitions/ChassisLocations"
-        },
-        "type": {
-          "description": "The kind of step, which decides the step's other fields.",
-          "$ref": "#/definitions/RefitChangeType"
-        },
-        "isDone": {
-          "type": "boolean",
-          "description": "Whether the mech techs have finished the step; its change is then part of the mech."
-        },
-        "frontArmor": {
-          "type": "integer",
-          "description": "The location's front armor after the change.",
-          "format": "int32"
-        },
-        "rearArmor": {
-          "type": [
-            "integer",
-            "null"
-          ],
-          "description": "The location's rear armor after the change; null outside the torso.",
-          "format": "int32"
-        }
-      }
-    },
-    "RemoveComponentChange": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "type",
-        "isDone",
-        "component",
-        "damageLevel",
-        "location"
-      ],
-      "properties": {
-        "component": {
-          "description": "The component the step installs, removes or repairs.",
-          "$ref": "#/definitions/ComponentReference"
-        },
-        "damageLevel": {
-          "description": "The component's damage level when the step was ordered.",
-          "$ref": "#/definitions/ComponentDamageLevel"
-        },
-        "type": {
-          "description": "The kind of step, which decides the step's other fields.",
-          "$ref": "#/definitions/RefitChangeType"
-        },
-        "isDone": {
-          "type": "boolean",
-          "description": "Whether the mech techs have finished the step; its change is then part of the mech."
-        },
-        "location": {
-          "description": "Where the component comes from.",
-          "$ref": "#/definitions/ChassisLocations"
-        }
-      }
-    },
-    "RepairComponentChange": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "type",
-        "isDone",
-        "component",
-        "damageLevel",
-        "location"
-      ],
-      "properties": {
-        "component": {
-          "description": "The component the step installs, removes or repairs.",
-          "$ref": "#/definitions/ComponentReference"
-        },
-        "damageLevel": {
-          "description": "The component's damage level when the step was ordered.",
-          "$ref": "#/definitions/ComponentDamageLevel"
-        },
-        "type": {
-          "description": "The kind of step, which decides the step's other fields.",
-          "$ref": "#/definitions/RefitChangeType"
-        },
-        "isDone": {
-          "type": "boolean",
-          "description": "Whether the mech techs have finished the step; its change is then part of the mech."
-        },
-        "location": {
-          "description": "Where the component is mounted; null for one in storage.",
-          "oneOf": [
-            {
-              "type": "null"
-            },
-            {
-              "$ref": "#/definitions/ChassisLocations"
-            }
-          ]
-        }
-      }
-    },
-    "RepairStructureChange": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "type",
-        "isDone",
-        "location",
-        "structure"
-      ],
-      "properties": {
-        "location": {
-          "description": "The mech location whose armor or structure the step changes.",
-          "$ref": "#/definitions/ChassisLocations"
-        },
-        "type": {
-          "description": "The kind of step, which decides the step's other fields.",
-          "$ref": "#/definitions/RefitChangeType"
-        },
-        "isDone": {
-          "type": "boolean",
-          "description": "Whether the mech techs have finished the step; its change is then part of the mech."
-        },
-        "structure": {
-          "type": "integer",
-          "description": "The structure points restored.",
-          "format": "int32"
-        }
-      }
     },
     "MechLoadout": {
       "type": "object",
@@ -2170,6 +1792,42 @@
         }
       }
     },
+    "ChassisLocations": {
+      "type": "string",
+      "x-enumFlags": true,
+      "x-enumNames": [
+        "None",
+        "Head",
+        "LeftArm",
+        "LeftTorso",
+        "CenterTorso",
+        "RightTorso",
+        "Torso",
+        "RightArm",
+        "Arms",
+        "MainBody",
+        "LeftLeg",
+        "RightLeg",
+        "Legs",
+        "All"
+      ],
+      "enum": [
+        "None",
+        "Head",
+        "LeftArm",
+        "LeftTorso",
+        "CenterTorso",
+        "RightTorso",
+        "Torso",
+        "RightArm",
+        "Arms",
+        "MainBody",
+        "LeftLeg",
+        "RightLeg",
+        "Legs",
+        "All"
+      ]
+    },
     "Armor": {
       "type": "object",
       "additionalProperties": false,
@@ -2211,6 +1869,474 @@
         "isFixed": {
           "type": "boolean",
           "description": "Whether it's part of the chassis: every mech of the chassis has it, and it can't be removed."
+        }
+      }
+    },
+    "ComponentDamageLevel": {
+      "type": "string",
+      "x-enumNames": [
+        "Functional",
+        "Misaligned",
+        "Penalized",
+        "NonFunctional",
+        "Destroyed",
+        "Installing",
+        "InstallingNonFunctional"
+      ],
+      "enum": [
+        "Functional",
+        "Misaligned",
+        "Penalized",
+        "NonFunctional",
+        "Destroyed",
+        "Installing",
+        "InstallingNonFunctional"
+      ]
+    },
+    "MechInMaintenance": {
+      "type": "object",
+      "description": "A mech being repaired or refitted; the changes still queued are in refit.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "chassis",
+        "bay",
+        "position",
+        "status",
+        "isFieldable",
+        "problems",
+        "loadout",
+        "readyOnDay",
+        "refit",
+        "afterRefit"
+      ],
+      "properties": {
+        "readyOnDay": {
+          "type": "integer",
+          "description": "The day the mech lab finishes the work order, as in workQueue.",
+          "format": "int32"
+        },
+        "id": {
+          "type": "string",
+          "description": "The mech's own id, unique among the company's mechs."
+        },
+        "name": {
+          "type": "string",
+          "description": "The mech's name, which the player can change in the mech lab."
+        },
+        "chassis": {
+          "description": "The mech's chassis, described in chassisDefinitions.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "bay": {
+          "type": "integer",
+          "description": "The mech bay row, counted from 1, as the mech bay shows it.",
+          "format": "int32"
+        },
+        "position": {
+          "type": "integer",
+          "description": "The position in the bay row, counted from 1.",
+          "format": "int32"
+        },
+        "status": {
+          "description": "Whether the mech is free for use or held by the mech lab, which decides the mech's other fields.",
+          "$ref": "#/definitions/MechStatus"
+        },
+        "isFieldable": {
+          "type": "boolean",
+          "description": "Whether the mech can be taken on a mission, as the lance configuration decides."
+        },
+        "problems": {
+          "type": "array",
+          "description": "The loadout problems the mech lab warns about, e.g. missing ammo, in the game's words.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "loadout": {
+          "description": "The current loadout, as the mech bay shows it.",
+          "$ref": "#/definitions/MechLoadout"
+        },
+        "refit": {
+          "type": "array",
+          "description": "The steps of the mech's work order, in order; finished steps are already part of the loadout.",
+          "items": {
+            "$ref": "#/definitions/RefitChange"
+          }
+        },
+        "afterRefit": {
+          "description": "The loadout once every step of refit is finished, as the mech lab shows it.",
+          "$ref": "#/definitions/MechLoadout"
+        }
+      }
+    },
+    "RefitChange": {
+      "description": "One step of a mech's queued refit; each type has a record with the fields of its own.",
+      "x-abstract": true,
+      "anyOf": [
+        {
+          "$ref": "#/definitions/InstallComponentChange"
+        },
+        {
+          "$ref": "#/definitions/ModifyArmorChange"
+        },
+        {
+          "$ref": "#/definitions/RemoveComponentChange"
+        },
+        {
+          "$ref": "#/definitions/RepairComponentChange"
+        },
+        {
+          "$ref": "#/definitions/RepairStructureChange"
+        }
+      ]
+    },
+    "RefitChangeType": {
+      "type": "string",
+      "description": "The kind of a refit step.",
+      "x-enumNames": [
+        "InstallComponent",
+        "RemoveComponent",
+        "RepairComponent",
+        "ModifyArmor",
+        "RepairStructure"
+      ],
+      "enum": [
+        "installComponent",
+        "removeComponent",
+        "repairComponent",
+        "modifyArmor",
+        "repairStructure"
+      ]
+    },
+    "InstallComponentChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "isDone",
+        "component",
+        "damageLevel",
+        "location"
+      ],
+      "properties": {
+        "component": {
+          "description": "The component the step installs, removes or repairs.",
+          "$ref": "#/definitions/ComponentReference"
+        },
+        "damageLevel": {
+          "description": "The component's damage level when the step was ordered.",
+          "$ref": "#/definitions/ComponentDamageLevel"
+        },
+        "type": {
+          "description": "The kind of step, which decides the step's other fields.",
+          "$ref": "#/definitions/RefitChangeType"
+        },
+        "isDone": {
+          "type": "boolean",
+          "description": "Whether the mech techs have finished the step; its change is then part of the mech."
+        },
+        "location": {
+          "description": "Where the component goes.",
+          "$ref": "#/definitions/ChassisLocations"
+        }
+      }
+    },
+    "ModifyArmorChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "isDone",
+        "location",
+        "frontArmor",
+        "rearArmor"
+      ],
+      "properties": {
+        "location": {
+          "description": "The mech location whose armor or structure the step changes.",
+          "$ref": "#/definitions/ChassisLocations"
+        },
+        "type": {
+          "description": "The kind of step, which decides the step's other fields.",
+          "$ref": "#/definitions/RefitChangeType"
+        },
+        "isDone": {
+          "type": "boolean",
+          "description": "Whether the mech techs have finished the step; its change is then part of the mech."
+        },
+        "frontArmor": {
+          "type": "integer",
+          "description": "The location's front armor after the change.",
+          "format": "int32"
+        },
+        "rearArmor": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The location's rear armor after the change; null outside the torso.",
+          "format": "int32"
+        }
+      }
+    },
+    "RemoveComponentChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "isDone",
+        "component",
+        "damageLevel",
+        "location"
+      ],
+      "properties": {
+        "component": {
+          "description": "The component the step installs, removes or repairs.",
+          "$ref": "#/definitions/ComponentReference"
+        },
+        "damageLevel": {
+          "description": "The component's damage level when the step was ordered.",
+          "$ref": "#/definitions/ComponentDamageLevel"
+        },
+        "type": {
+          "description": "The kind of step, which decides the step's other fields.",
+          "$ref": "#/definitions/RefitChangeType"
+        },
+        "isDone": {
+          "type": "boolean",
+          "description": "Whether the mech techs have finished the step; its change is then part of the mech."
+        },
+        "location": {
+          "description": "Where the component comes from.",
+          "$ref": "#/definitions/ChassisLocations"
+        }
+      }
+    },
+    "RepairComponentChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "isDone",
+        "component",
+        "damageLevel",
+        "location"
+      ],
+      "properties": {
+        "component": {
+          "description": "The component the step installs, removes or repairs.",
+          "$ref": "#/definitions/ComponentReference"
+        },
+        "damageLevel": {
+          "description": "The component's damage level when the step was ordered.",
+          "$ref": "#/definitions/ComponentDamageLevel"
+        },
+        "type": {
+          "description": "The kind of step, which decides the step's other fields.",
+          "$ref": "#/definitions/RefitChangeType"
+        },
+        "isDone": {
+          "type": "boolean",
+          "description": "Whether the mech techs have finished the step; its change is then part of the mech."
+        },
+        "location": {
+          "description": "Where the component is mounted; null for one in storage.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/ChassisLocations"
+            }
+          ]
+        }
+      }
+    },
+    "RepairStructureChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "isDone",
+        "location",
+        "structure"
+      ],
+      "properties": {
+        "location": {
+          "description": "The mech location whose armor or structure the step changes.",
+          "$ref": "#/definitions/ChassisLocations"
+        },
+        "type": {
+          "description": "The kind of step, which decides the step's other fields.",
+          "$ref": "#/definitions/RefitChangeType"
+        },
+        "isDone": {
+          "type": "boolean",
+          "description": "Whether the mech techs have finished the step; its change is then part of the mech."
+        },
+        "structure": {
+          "type": "integer",
+          "description": "The structure points restored.",
+          "format": "int32"
+        }
+      }
+    },
+    "ReadyMech": {
+      "type": "object",
+      "description": "A mech free for use.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "chassis",
+        "bay",
+        "position",
+        "status",
+        "isFieldable",
+        "problems",
+        "loadout",
+        "repair"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The mech's own id, unique among the company's mechs."
+        },
+        "name": {
+          "type": "string",
+          "description": "The mech's name, which the player can change in the mech lab."
+        },
+        "chassis": {
+          "description": "The mech's chassis, described in chassisDefinitions.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "bay": {
+          "type": "integer",
+          "description": "The mech bay row, counted from 1, as the mech bay shows it.",
+          "format": "int32"
+        },
+        "position": {
+          "type": "integer",
+          "description": "The position in the bay row, counted from 1.",
+          "format": "int32"
+        },
+        "status": {
+          "description": "Whether the mech is free for use or held by the mech lab, which decides the mech's other fields.",
+          "$ref": "#/definitions/MechStatus"
+        },
+        "isFieldable": {
+          "type": "boolean",
+          "description": "Whether the mech can be taken on a mission, as the lance configuration decides."
+        },
+        "problems": {
+          "type": "array",
+          "description": "The loadout problems the mech lab warns about, e.g. missing ammo, in the game's words.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "loadout": {
+          "description": "The current loadout, as the mech bay shows it.",
+          "$ref": "#/definitions/MechLoadout"
+        },
+        "repair": {
+          "description": "What repairing the mech's damage in the mech bay would take; null without damage.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/RepairEstimate"
+            }
+          ]
+        }
+      }
+    },
+    "RepairEstimate": {
+      "type": "object",
+      "description": "What the mech bay's Repair would take if ordered now, as its confirmation shows it.",
+      "additionalProperties": false,
+      "required": [
+        "days",
+        "cost"
+      ],
+      "properties": {
+        "days": {
+          "type": "integer",
+          "description": "The days the mech lab needs for the repair alone; it works on one order at a time, so an order queued behind others finishes later.",
+          "format": "int32"
+        },
+        "cost": {
+          "type": "integer",
+          "description": "The C-Bills the repair costs.",
+          "format": "int32"
+        }
+      }
+    },
+    "ReadyingMech": {
+      "type": "object",
+      "description": "A mech being readied from a stored chassis.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "chassis",
+        "bay",
+        "position",
+        "status",
+        "isFieldable",
+        "problems",
+        "loadout",
+        "readyOnDay"
+      ],
+      "properties": {
+        "readyOnDay": {
+          "type": "integer",
+          "description": "The day the mech lab finishes the work order, as in workQueue.",
+          "format": "int32"
+        },
+        "id": {
+          "type": "string",
+          "description": "The mech's own id, unique among the company's mechs."
+        },
+        "name": {
+          "type": "string",
+          "description": "The mech's name, which the player can change in the mech lab."
+        },
+        "chassis": {
+          "description": "The mech's chassis, described in chassisDefinitions.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "bay": {
+          "type": "integer",
+          "description": "The mech bay row, counted from 1, as the mech bay shows it.",
+          "format": "int32"
+        },
+        "position": {
+          "type": "integer",
+          "description": "The position in the bay row, counted from 1.",
+          "format": "int32"
+        },
+        "status": {
+          "description": "Whether the mech is free for use or held by the mech lab, which decides the mech's other fields.",
+          "$ref": "#/definitions/MechStatus"
+        },
+        "isFieldable": {
+          "type": "boolean",
+          "description": "Whether the mech can be taken on a mission, as the lance configuration decides."
+        },
+        "problems": {
+          "type": "array",
+          "description": "The loadout problems the mech lab warns about, e.g. missing ammo, in the game's words.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "loadout": {
+          "description": "The current loadout, as the mech bay shows it.",
+          "$ref": "#/definitions/MechLoadout"
         }
       }
     },
@@ -2692,7 +2818,7 @@
         },
         "terms": {
           "description": "The terms the contract was accepted with.",
-          "$ref": "#/definitions/NegotiationOption"
+          "$ref": "#/definitions/AcceptedTerms"
         },
         "arrivesOnDay": {
           "type": [
@@ -2797,32 +2923,27 @@
         "HeavyMetalFlashpointCampaign"
       ]
     },
-    "NegotiationOption": {
+    "AcceptedTerms": {
       "type": "object",
+      "description": "The terms a contract was accepted with.",
       "additionalProperties": false,
       "required": [
-        "payShare",
-        "salvageShare",
+        "shares",
         "pay",
         "salvage",
         "reputation"
       ],
       "properties": {
-        "payShare": {
-          "type": [
-            "integer",
-            "null"
-          ],
-          "description": "The pay slider's position in percent; null for fixed terms.",
-          "format": "int32"
-        },
-        "salvageShare": {
-          "type": [
-            "integer",
-            "null"
-          ],
-          "description": "The salvage slider's position in percent; null for fixed terms.",
-          "format": "int32"
+        "shares": {
+          "description": "The slider positions the terms were negotiated at; null for fixed terms.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/NegotiatedShares"
+            }
+          ]
         },
         "pay": {
           "type": "integer",
@@ -2836,6 +2957,26 @@
         "reputation": {
           "description": "The reputation changes when the contract succeeds.",
           "$ref": "#/definitions/ReputationChange"
+        }
+      }
+    },
+    "NegotiatedShares": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pay",
+        "salvage"
+      ],
+      "properties": {
+        "pay": {
+          "type": "integer",
+          "description": "The pay slider's position in percent.",
+          "format": "int32"
+        },
+        "salvage": {
+          "type": "integer",
+          "description": "The salvage slider's position in percent.",
+          "format": "int32"
         }
       }
     },
@@ -2899,39 +3040,66 @@
       ]
     },
     "Negotiation": {
+      "description": "The terms a contract can be accepted with; each canNegotiate has a record with the fields of its own.",
+      "x-abstract": true,
+      "anyOf": [
+        {
+          "$ref": "#/definitions/FixedTerms"
+        },
+        {
+          "$ref": "#/definitions/NegotiableTerms"
+        }
+      ]
+    },
+    "FixedTerms": {
       "type": "object",
-      "description": "The contract's terms.",
+      "description": "The terms of a contract that can't be negotiated.",
       "additionalProperties": false,
       "required": [
         "canNegotiate",
-        "valuesByShare",
-        "fixedTerms"
+        "pay",
+        "salvage",
+        "reputation"
       ],
       "properties": {
         "canNegotiate": {
           "type": "boolean",
-          "description": "Whether the terms are negotiated with the sliders (valuesByShare) or fixed (fixedTerms)."
+          "description": "Whether the terms are negotiated with the sliders (NegotiableTerms) or fixed (FixedTerms)."
+        },
+        "pay": {
+          "type": "integer",
+          "description": "The pay in C-Bills.",
+          "format": "int32"
+        },
+        "salvage": {
+          "description": "The salvage the company gets.",
+          "$ref": "#/definitions/Salvage"
+        },
+        "reputation": {
+          "description": "The reputation changes when the contract succeeds.",
+          "$ref": "#/definitions/ReputationChange"
+        }
+      }
+    },
+    "NegotiableTerms": {
+      "type": "object",
+      "description": "The terms of a contract negotiated with the sliders.",
+      "additionalProperties": false,
+      "required": [
+        "canNegotiate",
+        "valuesByShare"
+      ],
+      "properties": {
+        "canNegotiate": {
+          "type": "boolean",
+          "description": "Whether the terms are negotiated with the sliders (NegotiableTerms) or fixed (FixedTerms)."
         },
         "valuesByShare": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "description": "The values at each slider position; null when the contract can't be negotiated. A row is not a deal: the pay comes from the row at the pay share, the salvage from the row at the salvage share and the reputation from the row at the share left over.",
+          "type": "array",
+          "description": "The values at each slider position. A row is not a deal: the pay comes from the row at the pay share, the salvage from the row at the salvage share and the reputation from the row at the share left over.",
           "items": {
             "$ref": "#/definitions/ValuesAtShare"
           }
-        },
-        "fixedTerms": {
-          "description": "The terms of a contract that can't be negotiated; null otherwise.",
-          "oneOf": [
-            {
-              "type": "null"
-            },
-            {
-              "$ref": "#/definitions/NegotiationOption"
-            }
-          ]
         }
       }
     },

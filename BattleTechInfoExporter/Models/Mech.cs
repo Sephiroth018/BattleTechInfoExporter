@@ -5,49 +5,110 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     A mech in the mech bay, with its current loadout; the changes still queued in the mech lab are in
-///     <see cref="Refit" />.
+///     A mech in the mech bay, with its current loadout; each <see cref="Status" /> has a record with the fields of
+///     its own.
 /// </summary>
 /// <param name="Id">The mech's own id, unique among the company's mechs.</param>
 /// <param name="Name">The mech's name, which the player can change in the mech lab.</param>
 /// <param name="Chassis">The mech's chassis, described in <see cref="Catalog.ChassisDefinitions" />.</param>
 /// <param name="Bay">The mech bay row, counted from 1, as the mech bay shows it.</param>
 /// <param name="Position">The position in the bay row, counted from 1.</param>
-/// <param name="Status">Whether the mech is free for use or held by the mech lab.</param>
-/// <param name="ReadyOnDay">
-///     The day the mech lab finishes its work order, as in <see cref="GameState.WorkQueue" />; <c>null</c> when
-///     <see cref="MechStatus.Ready" />.
-/// </param>
-/// <param name="Repair">
-///     What repairing the mech's damage in the mech bay would take; <c>null</c> without damage and unless
-///     <see cref="MechStatus.Ready" />.
-/// </param>
-/// <param name="Refit">
-///     The steps of the mech's mech lab work order, in order; finished steps are already part of the loadout.
-///     <c>null</c> without a work order and while readying.
+/// <param name="Status">
+///     Whether the mech is free for use or held by the mech lab, which decides the mech's other fields.
 /// </param>
 /// <param name="IsFieldable">Whether the mech can be taken on a mission, as the lance configuration decides.</param>
 /// <param name="Problems">The loadout problems the mech lab warns about, e.g. missing ammo, in the game's words.</param>
 /// <param name="Loadout">The current loadout, as the mech bay shows it.</param>
-/// <param name="AfterRefit">
-///     The loadout once every step of <see cref="Refit" /> is finished, as the mech lab shows it. <c>null</c>
-///     without a work order and while readying.
-/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record Mech(
+internal abstract record Mech(
     string Id,
     string Name,
     DefinitionReference Chassis,
     int Bay,
     int Position,
     MechStatus Status,
-    int? ReadyOnDay,
-    RepairEstimate? Repair,
-    IReadOnlyList<RefitChange>? Refit,
+    bool IsFieldable,
+    IReadOnlyList<string> Problems,
+    MechLoadout Loadout);
+
+/// <summary>A mech free for use.</summary>
+/// <param name="Repair">
+///     What repairing the mech's damage in the mech bay would take; <c>null</c> without damage.
+/// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record ReadyMech(
+    string Id,
+    string Name,
+    DefinitionReference Chassis,
+    int Bay,
+    int Position,
     bool IsFieldable,
     IReadOnlyList<string> Problems,
     MechLoadout Loadout,
-    MechLoadout? AfterRefit);
+    RepairEstimate? Repair)
+    : Mech(Id, Name, Chassis, Bay, Position, MechStatus.Ready, IsFieldable, Problems, Loadout);
+
+/// <summary>A mech the mech lab holds for a work order.</summary>
+/// <param name="ReadyOnDay">The day the mech lab finishes the work order, as in <see cref="GameState.WorkQueue" />.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal abstract record MechInMechLab(
+    string Id,
+    string Name,
+    DefinitionReference Chassis,
+    int Bay,
+    int Position,
+    MechStatus Status,
+    bool IsFieldable,
+    IReadOnlyList<string> Problems,
+    MechLoadout Loadout,
+    int ReadyOnDay)
+    : Mech(Id, Name, Chassis, Bay, Position, Status, IsFieldable, Problems, Loadout);
+
+/// <summary>A mech being readied from a stored chassis.</summary>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record ReadyingMech(
+    string Id,
+    string Name,
+    DefinitionReference Chassis,
+    int Bay,
+    int Position,
+    bool IsFieldable,
+    IReadOnlyList<string> Problems,
+    MechLoadout Loadout,
+    int ReadyOnDay)
+    : MechInMechLab(Id, Name, Chassis, Bay, Position, MechStatus.Readying, IsFieldable, Problems, Loadout, ReadyOnDay);
+
+/// <summary>A mech being repaired or refitted; the changes still queued are in <see cref="Refit" />.</summary>
+/// <param name="Refit">
+///     The steps of the mech's work order, in order; finished steps are already part of the loadout.
+/// </param>
+/// <param name="AfterRefit">
+///     The loadout once every step of <see cref="Refit" /> is finished, as the mech lab shows it.
+/// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record MechInMaintenance(
+    string Id,
+    string Name,
+    DefinitionReference Chassis,
+    int Bay,
+    int Position,
+    bool IsFieldable,
+    IReadOnlyList<string> Problems,
+    MechLoadout Loadout,
+    int ReadyOnDay,
+    IReadOnlyList<RefitChange> Refit,
+    MechLoadout AfterRefit)
+    : MechInMechLab(
+        Id,
+        Name,
+        Chassis,
+        Bay,
+        Position,
+        MechStatus.InMaintenance,
+        IsFieldable,
+        Problems,
+        Loadout,
+        ReadyOnDay);
 
 /// <summary>
 ///     A mech's loadout with the tonnage, value and stats that follow from it; the chassis' limits are in the
