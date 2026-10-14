@@ -696,7 +696,7 @@
       }
     },
     "WorkQueueEntry": {
-      "description": "An entry of the timeline: a work order the company is waiting for. Each kind of type has a record with the target it is about.",
+      "description": "An entry of the timeline: a work order the company is waiting for. Each kind has a record with the target it is about.",
       "x-abstract": true,
       "anyOf": [
         {
@@ -714,6 +714,24 @@
         {
           "$ref": "#/definitions/TravelOrder"
         }
+      ]
+    },
+    "WorkQueueEntryKind": {
+      "type": "string",
+      "description": "What a work queue entry is about, which decides the entry's other fields.",
+      "x-enumNames": [
+        "MechLab",
+        "MedBay",
+        "Travel",
+        "ShipUpgrade",
+        "FinancialReport"
+      ],
+      "enum": [
+        "mechLab",
+        "medBay",
+        "travel",
+        "shipUpgrade",
+        "financialReport"
       ]
     },
     "WorkOrderType": {
@@ -776,10 +794,15 @@
       "description": "The next financial report, of type FinancialReport, which is about nothing in particular.",
       "additionalProperties": false,
       "required": [
+        "kind",
         "type",
         "finishesOnDay"
       ],
       "properties": {
+        "kind": {
+          "description": "What the entry is about, which decides its other fields.",
+          "$ref": "#/definitions/WorkQueueEntryKind"
+        },
         "type": {
           "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
           "$ref": "#/definitions/WorkOrderType"
@@ -796,11 +819,16 @@
       "description": "A mech lab order, of the MechLab… types.",
       "additionalProperties": false,
       "required": [
+        "kind",
         "type",
         "finishesOnDay",
         "target"
       ],
       "properties": {
+        "kind": {
+          "description": "What the entry is about, which decides its other fields.",
+          "$ref": "#/definitions/WorkQueueEntryKind"
+        },
         "type": {
           "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
           "$ref": "#/definitions/WorkOrderType"
@@ -828,11 +856,16 @@
       "description": "A med bay order, of type MedLabHeal.",
       "additionalProperties": false,
       "required": [
+        "kind",
         "type",
         "finishesOnDay",
         "target"
       ],
       "properties": {
+        "kind": {
+          "description": "What the entry is about, which decides its other fields.",
+          "$ref": "#/definitions/WorkQueueEntryKind"
+        },
         "type": {
           "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
           "$ref": "#/definitions/WorkOrderType"
@@ -853,11 +886,16 @@
       "description": "A ship upgrade being installed, of the ArgoUpgrade… types.",
       "additionalProperties": false,
       "required": [
+        "kind",
         "type",
         "finishesOnDay",
         "target"
       ],
       "properties": {
+        "kind": {
+          "description": "What the entry is about, which decides its other fields.",
+          "$ref": "#/definitions/WorkQueueEntryKind"
+        },
         "type": {
           "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
           "$ref": "#/definitions/WorkOrderType"
@@ -885,11 +923,16 @@
       "description": "A trip, of the Travel… types.",
       "additionalProperties": false,
       "required": [
+        "kind",
         "type",
         "finishesOnDay",
         "target"
       ],
       "properties": {
+        "kind": {
+          "description": "What the entry is about, which decides its other fields.",
+          "$ref": "#/definitions/WorkQueueEntryKind"
+        },
         "type": {
           "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
           "$ref": "#/definitions/WorkOrderType"

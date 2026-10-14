@@ -24,6 +24,14 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.73.0
+
+Changed: game-state.json.
+
+### game-state.json
+- Added `workQueue[].kind`: what the entry is about (`mechLab`, `medBay`, `travel`, `shipUpgrade`
+  or `financialReport`), which decides its `target`, instead of the game's `type`.
+
 ## 0.72.0
 
 Changed: rules.json (breaking), catalog.json.

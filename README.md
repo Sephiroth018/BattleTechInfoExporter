@@ -165,7 +165,7 @@ The game state holds:
   to them for a time and the day each ends, the reputation with every faction, and the tags and
   statistics events check.
 - **Work queue:** the timeline's entries in order, each with the day it finishes and, by the
-  entry's type, its `target`: the mech, pilot, destination or ship upgrade it applies to; the
+  entry's `kind`, its `target`: the mech, pilot, destination or ship upgrade it applies to; the
   financial report has none.
 - **Ship:** the Argo's upgrades the engineering screen shows, each installed, installing,
   available or locked, with its required upgrades, price, upkeep, installation days and effects in
