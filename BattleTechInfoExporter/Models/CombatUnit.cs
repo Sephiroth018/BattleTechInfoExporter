@@ -28,11 +28,12 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="BayMech">The player's mech in <c>game-state.json</c>, whose loadout holds its assigned armor.</param>
 /// <param name="Position">Where the unit is, or was last detected at for <see cref="UnitVisibility.LastSeen" />.</param>
 /// <param name="FacingDegrees">
-///     The direction the unit faces, in degrees clockwise from the map's +Z axis; <c>null</c> when last seen.
+///     The direction the unit faces, in degrees clockwise from the map's +Z axis, which a blip's marker turns to at
+///     every level; <c>null</c> when last seen.
 /// </param>
 /// <param name="Terrain">
-///     The terrain the unit stands in, keyed as in the catalog's <see cref="Catalog.TerrainDefinitions" />;
-///     <c>null</c> on open ground and when last seen.
+///     The terrain the unit stands in, keyed as in the catalog's <see cref="Catalog.TerrainDefinitions" />, which a
+///     blip's position on the map shows; <c>null</c> on open ground and when last seen.
 /// </param>
 /// <param name="Pilot">The pilot, which the HUD names only at <see cref="UnitVisibility.Full" />.</param>
 /// <param name="State">The unit's condition, shown at <see cref="UnitVisibility.Full" />.</param>

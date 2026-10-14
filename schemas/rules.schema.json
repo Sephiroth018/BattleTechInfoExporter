@@ -1637,7 +1637,7 @@
       "properties": {
         "pipsByDistanceMoved": {
           "type": "array",
-          "description": "The pips for moving more than a distance; a jump adds one, and the unit's own maximum caps them.",
+          "description": "The pips for moving more than a distance; a jump adds one, also in place, and the unit's own maximum caps them. A mech moving more than 12 m then gets its EvasivePipsGainedAdditional statistic on top, past the cap.",
           "items": {
             "$ref": "#/definitions/EvasivePips"
           }

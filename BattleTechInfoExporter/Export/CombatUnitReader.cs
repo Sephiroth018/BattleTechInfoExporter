@@ -127,6 +127,7 @@ internal static class CombatUnitReader
                 isLastSeen
                     ? combat.LocalPlayerTeam.VisibilityCache.previouslyDetectedEnemyLocations[actor]
                     : actor.CurrentPosition),
+            // A blip's marker takes the unit's rotation at every level (PilotableActorRepresentation.updateBlips).
             isLastSeen ? null : actor.CurrentRotation.eulerAngles.y,
             isLastSeen ? null : actor.occupiedDesignMask?.Id,
             isSighted && actor.GetPilot() is { } pilot ? PilotReader.ReferenceTo(pilot) : null,

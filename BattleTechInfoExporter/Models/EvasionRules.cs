@@ -9,7 +9,9 @@ namespace BattleTechInfoExporter.Models;
 ///     strips pips (see <see cref="SensorLockRules.EvasivePipsStripped" />).
 /// </summary>
 /// <param name="PipsByDistanceMoved">
-///     The pips for moving more than a distance; a jump adds one, and the unit's own maximum caps them.
+///     The pips for moving more than a distance; a jump adds one, also in place, and the unit's own maximum caps
+///     them. A mech moving more than 12 m then gets its <c>EvasivePipsGainedAdditional</c> statistic on top, past
+///     the cap.
 /// </param>
 /// <param name="ModifierByPips">
 ///     The to-hit modifier by the number of pips, from one pip up; each pip beyond the last entry adds the
