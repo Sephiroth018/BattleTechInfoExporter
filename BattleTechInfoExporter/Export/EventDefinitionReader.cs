@@ -97,7 +97,7 @@ internal static class EventDefinitionReader
             .ToList());
     }
 
-    // A count that is set stays a statistic.
+    // A change that sets the count adds no copies, so it stays a statistic.
     private static ComponentChange? ReadComponentChange(
         DataManager dataManager,
         EventScope scope,
