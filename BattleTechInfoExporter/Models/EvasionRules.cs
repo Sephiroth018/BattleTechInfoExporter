@@ -15,7 +15,14 @@ namespace BattleTechInfoExporter.Models;
 ///     The to-hit modifier by the number of pips, from one pip up; each pip beyond the last entry adds the
 ///     difference of the last two.
 /// </param>
-/// <param name="WeaponTypesAffected">The weapon types the pips apply to, by the game's names.</param>
+/// <param name="WeaponTypesAffected">
+///     The weapon types the pips apply to, by the game's names, where the weapon's category is affected too
+///     (<see cref="WeaponCategoryRules.IsAffectedByEvasion" />).
+/// </param>
+/// <param name="PipsStrippedPerAttack">
+///     The pips every unit an attack affects loses when the attack ends, hit or miss: the target and any unit a
+///     missed shot hits.
+/// </param>
 /// <param name="VehiclePipMultiplier">A vehicle's pips are multiplied by this and rounded down.</param>
 /// <param name="CanVehiclesBeEvasive">Whether vehicles get evasive pips at all.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -23,6 +30,7 @@ internal sealed record EvasionRules(
     IReadOnlyList<EvasivePips> PipsByDistanceMoved,
     IReadOnlyList<float> ModifierByPips,
     IReadOnlyList<WeaponType> WeaponTypesAffected,
+    int PipsStrippedPerAttack,
     float VehiclePipMultiplier,
     bool CanVehiclesBeEvasive);
 

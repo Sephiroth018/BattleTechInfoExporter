@@ -35,11 +35,13 @@ internal sealed record WeaponDefinition : ComponentDefinition
         string? ammoCategory,
         int? internalAmmoCapacity,
         float damage,
+        float structureDamage,
         float stabilityDamage,
         int shotsWhenFired,
         int projectilesPerShot,
         float heatDamage,
         int heatGenerated,
+        CoilWeapon? coil,
         WeaponRanges ranges,
         float accuracyModifier,
         float criticalChanceMultiplier,
@@ -50,11 +52,13 @@ internal sealed record WeaponDefinition : ComponentDefinition
         AmmoCategory = ammoCategory;
         InternalAmmoCapacity = internalAmmoCapacity;
         Damage = damage;
+        StructureDamage = structureDamage;
         StabilityDamage = stabilityDamage;
         ShotsWhenFired = shotsWhenFired;
         ProjectilesPerShot = projectilesPerShot;
         HeatDamage = heatDamage;
         HeatGenerated = heatGenerated;
+        Coil = coil;
         Ranges = ranges;
         AccuracyModifier = accuracyModifier;
         CriticalChanceMultiplier = criticalChanceMultiplier;
@@ -62,7 +66,10 @@ internal sealed record WeaponDefinition : ComponentDefinition
         IsIndirectFireCapable = isIndirectFireCapable;
     }
 
-    /// <summary>The hardpoint kind the weapon needs, e.g. "Ballistic" or "Support".</summary>
+    /// <summary>
+    ///     The hardpoint kind the weapon needs, e.g. "Ballistic" or "Support", which also keys the rules'
+    ///     <c>combat.weaponCategories</c>.
+    /// </summary>
     public string Category { get; }
 
     /// <summary>
@@ -79,6 +86,12 @@ internal sealed record WeaponDefinition : ComponentDefinition
 
     /// <summary>The damage of one shot.</summary>
     public float Damage { get; }
+
+    /// <summary>
+    ///     The damage of one shot that goes straight to the structure, on top of <see cref="Damage" /> and whatever
+    ///     armor is left; a mech hit by it can take a critical hit with armor left.
+    /// </summary>
+    public float StructureDamage { get; }
 
     /// <summary>The stability damage of one shot.</summary>
     public float StabilityDamage { get; }
@@ -98,6 +111,12 @@ internal sealed record WeaponDefinition : ComponentDefinition
     /// <summary>The heat the mech takes per attack.</summary>
     public int HeatGenerated { get; }
 
+    /// <summary>
+    ///     How the COIL weapon gains from its mech's evasive pips, as the rules' <c>combat.coil</c> applies it;
+    ///     <c>null</c> for every other weapon.
+    /// </summary>
+    public CoilWeapon? Coil { get; }
+
     /// <summary>The range brackets, which decide the to-hit modifier by the target's distance.</summary>
     public WeaponRanges Ranges { get; }
 
@@ -116,6 +135,16 @@ internal sealed record WeaponDefinition : ComponentDefinition
     /// <summary>Whether the weapon can fire at targets out of line of sight.</summary>
     public bool IsIndirectFireCapable { get; }
 }
+
+/// <param name="EvasiveExponent">
+///     The power of the evasive pips that multiplies the damage of one shot; 0 leaves the damage at its base.
+/// </param>
+/// <param name="HeatDivisor">
+///     The heat the mech takes per attack is the damage of one shot divided by this; <c>null</c> when
+///     <see cref="WeaponDefinition.HeatGenerated" /> applies instead.
+/// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record CoilWeapon(float EvasiveExponent, float? HeatDivisor);
 
 /// <summary>The range brackets in meters, each with its to-hit modifier in <see cref="RangeBandModifiers" />.</summary>
 /// <param name="Min">

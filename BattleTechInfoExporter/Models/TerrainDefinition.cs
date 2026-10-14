@@ -22,11 +22,12 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="SensorRangeMultiplier">Multiplies the sensor range of a unit in the terrain.</param>
 /// <param name="SignatureMultiplier">Multiplies the signature of a unit in the terrain.</param>
 /// <param name="ToHitAgainstRanged">
-///     The to-hit modifier of ranged attacks against a unit in the terrain; positive makes the attack harder, as in
-///     the rules' <c>combat.toHit</c>.
+///     The to-hit modifier of ranged attacks against a mech or vehicle in the terrain, not a turret; positive makes
+///     the attack harder, as in the rules' <c>combat.toHit</c>.
 /// </param>
 /// <param name="ToHitAgainstMelee">
-///     The to-hit modifier of melee attacks against a unit in the terrain; positive makes the attack harder.
+///     The to-hit modifier of melee attacks against a mech or vehicle in the terrain, not a turret; positive makes
+///     the attack harder.
 /// </param>
 /// <param name="ToHitFromRanged">
 ///     The to-hit modifier of ranged attacks by a unit in the terrain; positive makes the attack harder.
@@ -35,7 +36,9 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="HeatSinkMultiplier">Multiplies the heat sink capacity of a mech in the terrain.</param>
 /// <param name="HeatPerRound">Added to a mech's heat at the end of its activation in the terrain.</param>
 /// <param name="DamageDealt">Multiplies the damage of a unit firing from the terrain, by weapon category.</param>
-/// <param name="DamageTaken">Multiplies the damage a unit in the terrain takes, by weapon category.</param>
+/// <param name="DamageTaken">
+///     Multiplies the damage a unit in the terrain takes, by weapon category; buildings take none.
+/// </param>
 /// <param name="StickyEffects">
 ///     What a unit gets when it enters, crosses or starts its activation in the terrain.
 /// </param>
@@ -70,12 +73,23 @@ internal sealed record TerrainMoveCosts(
     ByWeightClass<float?> Wheeled);
 
 /// <summary>
-///     <see cref="All" /> and the weapon category's multiplier both apply; melee has no category.
+///     <see cref="All" /> and the weapon category's multiplier both apply; melee and jump attacks get only
+///     <see cref="All" />.
 /// </summary>
 /// <param name="All">For every attack.</param>
 /// <param name="Support">For weapons of the <c>Support</c> <see cref="WeaponDefinition.Category" />.</param>
 /// <param name="Energy">For weapons of the <c>Energy</c> <see cref="WeaponDefinition.Category" />.</param>
 /// <param name="Ballistic">For weapons of the <c>Ballistic</c> <see cref="WeaponDefinition.Category" />.</param>
 /// <param name="Missile">For weapons of the <c>Missile</c> <see cref="WeaponDefinition.Category" />.</param>
+/// <param name="ByWeaponCategory">
+///     The weapon category's multiplier keyed by every <see cref="WeaponDefinition.Category" /> the game knows, as
+///     the rules' <c>combat.weaponCategories</c> are; 1 for a category without one, such as <c>Melee</c>.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record DamageMultipliers(float All, float Support, float Energy, float Ballistic, float Missile);
+internal sealed record DamageMultipliers(
+    float All,
+    float Support,
+    float Energy,
+    float Ballistic,
+    float Missile,
+    IReadOnlyDictionary<string, float> ByWeaponCategory);

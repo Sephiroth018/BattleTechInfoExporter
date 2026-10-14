@@ -1102,11 +1102,13 @@
         "ammoCategory",
         "internalAmmoCapacity",
         "damage",
+        "structureDamage",
         "stabilityDamage",
         "shotsWhenFired",
         "projectilesPerShot",
         "heatDamage",
         "heatGenerated",
+        "coil",
         "ranges",
         "accuracyModifier",
         "criticalChanceMultiplier",
@@ -1150,7 +1152,7 @@
         },
         "category": {
           "type": "string",
-          "description": "The hardpoint kind the weapon needs, e.g. \"Ballistic\" or \"Support\"."
+          "description": "The hardpoint kind the weapon needs, e.g. \"Ballistic\" or \"Support\", which also keys the rules' combat.weaponCategories."
         },
         "ammoCategory": {
           "type": [
@@ -1170,6 +1172,11 @@
         "damage": {
           "type": "number",
           "description": "The damage of one shot.",
+          "format": "float"
+        },
+        "structureDamage": {
+          "type": "number",
+          "description": "The damage of one shot that goes straight to the structure, on top of damage and whatever armor is left; a mech hit by it can take a critical hit with armor left.",
           "format": "float"
         },
         "stabilityDamage": {
@@ -1196,6 +1203,17 @@
           "type": "integer",
           "description": "The heat the mech takes per attack.",
           "format": "int32"
+        },
+        "coil": {
+          "description": "How the COIL weapon gains from its mech's evasive pips, as the rules' combat.coil applies it; null for every other weapon.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/CoilWeapon"
+            }
+          ]
         },
         "ranges": {
           "description": "The range brackets, which decide the to-hit modifier by the target's distance.",
@@ -1699,6 +1717,29 @@
         "Preview"
       ]
     },
+    "CoilWeapon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evasiveExponent",
+        "heatDivisor"
+      ],
+      "properties": {
+        "evasiveExponent": {
+          "type": "number",
+          "description": "The power of the evasive pips that multiplies the damage of one shot; 0 leaves the damage at its base.",
+          "format": "float"
+        },
+        "heatDivisor": {
+          "type": [
+            "null",
+            "number"
+          ],
+          "description": "The heat the mech takes per attack is the damage of one shot divided by this; null when heatGenerated applies instead.",
+          "format": "float"
+        }
+      }
+    },
     "WeaponRanges": {
       "type": "object",
       "description": "The range brackets in meters, each with its to-hit modifier in RangeBandModifiers.",
@@ -2031,12 +2072,12 @@
         },
         "toHitAgainstRanged": {
           "type": "number",
-          "description": "The to-hit modifier of ranged attacks against a unit in the terrain; positive makes the attack harder, as in the rules' combat.toHit.",
+          "description": "The to-hit modifier of ranged attacks against a mech or vehicle in the terrain, not a turret; positive makes the attack harder, as in the rules' combat.toHit.",
           "format": "float"
         },
         "toHitAgainstMelee": {
           "type": "number",
-          "description": "The to-hit modifier of melee attacks against a unit in the terrain; positive makes the attack harder.",
+          "description": "The to-hit modifier of melee attacks against a mech or vehicle in the terrain, not a turret; positive makes the attack harder.",
           "format": "float"
         },
         "toHitFromRanged": {
@@ -2063,7 +2104,7 @@
           "$ref": "#/definitions/DamageMultipliers"
         },
         "damageTaken": {
-          "description": "Multiplies the damage a unit in the terrain takes, by weapon category.",
+          "description": "Multiplies the damage a unit in the terrain takes, by weapon category; buildings take none.",
           "$ref": "#/definitions/DamageMultipliers"
         },
         "stickyEffects": {
@@ -2145,14 +2186,15 @@
     },
     "DamageMultipliers": {
       "type": "object",
-      "description": "all and the weapon category's multiplier both apply; melee has no category.",
+      "description": "all and the weapon category's multiplier both apply; melee and jump attacks get only all.",
       "additionalProperties": false,
       "required": [
         "all",
         "support",
         "energy",
         "ballistic",
-        "missile"
+        "missile",
+        "byWeaponCategory"
       ],
       "properties": {
         "all": {
@@ -2179,6 +2221,14 @@
           "type": "number",
           "description": "For weapons of the Missile category.",
           "format": "float"
+        },
+        "byWeaponCategory": {
+          "type": "object",
+          "description": "The weapon category's multiplier keyed by every category the game knows, as the rules' combat.weaponCategories are; 1 for a category without one, such as Melee.",
+          "additionalProperties": {
+            "type": "number",
+            "format": "float"
+          }
         }
       }
     },

@@ -24,6 +24,44 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.72.0
+
+Changed: rules.json (breaking), catalog.json.
+
+### rules.json
+- Added `combat.weaponCategories.<category>`, keyed by the catalog's weapon `category`, `Melee`
+  for melee and jump attacks: `vehicleDamageMultiplier` and `turretDamageMultiplier` multiply every
+  hit's damage against a vehicle or turret, and `isAffectedByEvasion` says whether evasive pips
+  apply. Melee and jump attacks do double damage to vehicles and turrets; re-derive their damage
+  against those.
+- Meaning changed `combat.evasion.weaponTypesAffected`: the pips apply only where the weapon's
+  category is affected too, which `Support` isn't; re-derive the hit chances of small lasers,
+  machine guns and flamers against evasive targets, which ignore the pips.
+- Added `combat.evasion.pipsStrippedPerAttack`: the pips the target and any unit a missed shot hits
+  lose when an attack ends, hit or miss.
+- Added `combat.damage`: `globalMultiplier` on every weapon's damage and
+  `artilleryAgainstBuildingsMultiplier` on artillery and mortar damage to buildings.
+- Added `combat.strayShots`: which units a missed ranged shot can hit instead of the target.
+- Added `combat.coil`: whether a COIL weapon's evasive pips multiply its shots or its damage, and
+  whether they count after a jump.
+- Moved `combat.toHit.damagedWeapon` and `combat.toHit.weaponInDamagedLocation` to
+  `combat.toHit.attackerDamage.mech`; added `combat.toHit.attackerDamage.vehicle` with a vehicle's
+  modifiers for its own damage.
+- Meaning changed `combat.lineOfFire.obstructedToHit`, `obstructedDamageMultiplier` and
+  `indirectFireDamageMultiplier`: stated not to apply against buildings, as in the game.
+- Meaning changed `combat.guard`: stated not to reduce stability damage, as in the game.
+
+### catalog.json
+- Added `componentDefinitions.weapons.<id>.structureDamage`: damage per shot straight to the
+  structure past any armor, e.g. the Gauss rifles' 5.
+- Added `componentDefinitions.weapons.<id>.coil`: a COIL weapon's `evasiveExponent` and
+  `heatDivisor`, `null` for every other weapon.
+- Added `byWeaponCategory` to `terrainDefinitions.<id>.damageDealt` and `damageTaken` and to
+  `biomeDefinitions.<id>.damageDealt`: the same category multipliers keyed by weapon category, as
+  rules.json's `combat.weaponCategories`, 1 for `Melee` and `AMS`.
+- Meaning changed `terrainDefinitions.<id>.toHitAgainstRanged` and `toHitAgainstMelee`: stated not
+  to apply to turrets; `damageTaken`: stated not to apply to buildings, as in the game.
+
 ## 0.71.0
 
 Changed: game-state.json, star-systems.json, catalog.json.

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using BattleTech;
 using BattleTechInfoExporter.Models;
@@ -17,6 +18,14 @@ internal static class CombatRulesReader
     private const int MinChancePercent = 5;
     private const int MaxChancePercent = 95;
 
+    // VehicleStructureRules.GetToHitModifier hardcodes a vehicle's modifiers for its own damage.
+    private const float VehicleDamagedWeaponToHit = 1;
+    private const float VehiclePenalizedLocationToHit = 1;
+    private const float VehicleNonFunctionalLocationToHit = 2;
+
+    // AbstractActor.ResolveAttackSequence calls ConsumeEvasivePip once for every unit the attack affected.
+    private const int EvasivePipsStrippedPerAttack = 1;
+
     internal static CombatRules Read(SimGameState simGame)
     {
         var constants = simGame.CombatConstants;
@@ -25,6 +34,16 @@ internal static class CombatRulesReader
             ReadEvasion(constants),
             ReadGuard(constants.ResolutionConstants),
             ReadLineOfFire(constants),
+            // Weapon.DamagePerShotAdjusted and StructureDamagePerShotAdjusted; DamageOrderUtility.ApplyDamageToAllLocations.
+            new DamageRules(
+                constants.CombatValueMultipliers.GlobalDamageMultiplier,
+                constants.CombatValueMultipliers.MortarBuildingDamageMultiplier),
+            ReadWeaponCategories(),
+            ReadStrayShots(constants.ToHit),
+            // Weapon.ShotsWhenFired and GetCOILDamageFromEvasivePips.
+            new CoilRules(
+                constants.ResolutionConstants.COILMultipliesShots,
+                constants.ResolutionConstants.COILUsesJumping),
             ReadHeat(constants),
             ReadStability(constants),
             new InjuryRules(
@@ -97,11 +116,19 @@ internal static class CombatRulesReader
             toHit.ToHitSelfStoodUp,
             toHit.ToHitSelfOverheated,
             toHit.ToHitSelfArmMountedWeapon,
-            // MechStructureRules.GetToHitModifier.
-            toHit.ToHitSelfWeaponDamaged,
-            new DamagedLocationModifiers(
-                toHit.ToHitSelfWeaponLocationDamagedMinor,
-                toHit.ToHitSelfWeaponLocationDamagedMajor),
+            // ToHit.GetSelfDamageModifier: MechStructureRules.GetToHitModifier from the constants,
+            // VehicleStructureRules.GetToHitModifier hardcoded.
+            new AttackerDamageModifiers(
+                new WeaponDamageModifiers(
+                    toHit.ToHitSelfWeaponDamaged,
+                    new DamagedLocationModifiers(
+                        toHit.ToHitSelfWeaponLocationDamagedMinor,
+                        toHit.ToHitSelfWeaponLocationDamagedMajor)),
+                new WeaponDamageModifiers(
+                    VehicleDamagedWeaponToHit,
+                    new DamagedLocationModifiers(
+                        VehiclePenalizedLocationToHit,
+                        VehicleNonFunctionalLocationToHit))),
             toHit.ToHitOffensivePush,
             // Mech.IsTargetPositionInFiringArc; a turret has its own (TurretChassisDef.FiringArcDegrees).
             toHit.FiringArcDegrees,
@@ -121,6 +148,7 @@ internal static class CombatRulesReader
                 .ToList(),
             toHit.ToHitMovingPipUMs,
             toHit.WeaponsAffectedByEvasive.Select(weaponType => (WeaponType)weaponType).ToList(),
+            EvasivePipsStrippedPerAttack,
             resolution.VehicleEvasiveResultMultiplier,
             resolution.VehiclesGetEvasive);
     }
@@ -151,6 +179,21 @@ internal static class CombatRulesReader
             constants.Visibility.RatioFullVis,
             constants.Visibility.RatioObstructedVis,
             constants.Visibility.MinRatioFromActors);
+
+    // The damage multipliers are Vehicle.GetAdjustedDamageForMelee's and Turret.GetAdjustedDamageForMelee's, which
+    // AttackDirector.OnAttackSequenceImpact applies to every hit despite their name; the evasion flag is
+    // ToHit.GetTargetSpeedModifier's.
+    private static SortedDictionary<string, WeaponCategoryRules> ReadWeaponCategories() =>
+        WeaponCategories.ByName(category => new WeaponCategoryRules(
+            category.VehicleDamageMultiplier,
+            category.TurretDamageMultiplier,
+            category.IsAffectedByEvasive));
+
+    // LineOfSight.FindSecondaryImpactTarget.
+    private static StrayShotRules? ReadStrayShots(ToHitConstantsDef toHit) =>
+        toHit.StrayShotsEnabled
+            ? new StrayShotRules(toHit.StrayShotsHitUnits ? toHit.StrayShotValidTargets : null)
+            : null;
 
     private static HeatRules ReadHeat(CombatGameConstants constants)
     {

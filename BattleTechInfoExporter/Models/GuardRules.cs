@@ -5,7 +5,7 @@ namespace BattleTechInfoExporter.Models;
 
 /// <summary>
 ///     How guard levels reduce damage: bracing, Bulwark and cover from terrain each add a level. Attacks from
-///     behind, melee and breaching shots ignore them.
+///     behind, melee and breaching shots ignore them. They don't reduce stability damage.
 /// </summary>
 /// <param name="DamageMultiplierByLevel">Indexed by the guard level, from unguarded up.</param>
 /// <param name="UnsteadyBreaksGuard">
