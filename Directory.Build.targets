@@ -1,7 +1,7 @@
 <Project>
   <!--
-    The version comes from git tags and conventional commit types, as CLAUDE.md's "Versioning" describes. An inline
-    task, because a stacked PR applies one bump per lower PR. IDE design-time builds skip git.
+    The mod's version comes from git tags and conventional commit types, as CLAUDE.md's "Versioning" describes. An
+    inline task, because a stacked PR applies one bump per lower PR. IDE design-time builds skip git.
   -->
   <UsingTask TaskName="ComputeVersionFromGit" TaskFactory="RoslynCodeTaskFactory"
              AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
@@ -188,7 +188,9 @@ public sealed class ComputeVersionFromGit : Task
 ]]></Code>
     </Task>
   </UsingTask>
-  <Target Name="ComputeBuildVersion" BeforeTargets="GetAssemblyVersion" Condition="'$(DesignTimeBuild)' != 'true'">
+  <!-- Only the mod is versioned: the schema generator is never shipped. -->
+  <Target Name="ComputeBuildVersion" BeforeTargets="GetAssemblyVersion"
+          Condition="'$(DesignTimeBuild)' != 'true' And '$(MSBuildProjectName)' == 'BattleTechInfoExporter'">
     <ComputeVersionFromGit RepositoryDirectory="$(MSBuildThisFileDirectory)">
       <Output TaskParameter="VersionPrefix" PropertyName="VersionPrefix" />
       <Output TaskParameter="BuildNumber" PropertyName="BuildNumber" />
@@ -205,17 +207,7 @@ public sealed class ComputeVersionFromGit : Task
       <ChangelogVersion>$([System.Text.RegularExpressions.Regex]::Match($(Changelog), '(?m)^## (\d+\.\d+\.\d+)$').Groups[1].Value)</ChangelogVersion>
     </PropertyGroup>
     <Error Condition="'$(ChangelogVersion)' == ''" Text="CHANGELOG.md has no version heading (## Major.Minor.Patch)." />
-    <PropertyGroup>
-      <ChangelogMajor>$(ChangelogVersion.Split('.')[0])</ChangelogMajor>
-      <ChangelogMinor>$(ChangelogVersion.Split('.')[1])</ChangelogMinor>
-      <ChangelogPatch>$(ChangelogVersion.Split('.')[2])</ChangelogPatch>
-      <BuiltMajor>$(VersionPrefix.Split('.')[0])</BuiltMajor>
-      <BuiltMinor>$(VersionPrefix.Split('.')[1])</BuiltMinor>
-      <BuiltPatch>$(VersionPrefix.Split('.')[2])</BuiltPatch>
-      <ChangelogOutdated>false</ChangelogOutdated>
-      <ChangelogOutdated Condition="'$(ChangelogMajor)' &lt; '$(BuiltMajor)' Or ('$(ChangelogMajor)' == '$(BuiltMajor)' And ('$(ChangelogMinor)' &lt; '$(BuiltMinor)' Or ('$(ChangelogMinor)' == '$(BuiltMinor)' And '$(ChangelogPatch)' &lt; '$(BuiltPatch)')))">true</ChangelogOutdated>
-    </PropertyGroup>
-    <Error Condition="$(ChangelogOutdated)"
+    <Error Condition="$([MSBuild]::VersionLessThan('$(ChangelogVersion)', '$(VersionPrefix)'))"
            Text="CHANGELOG.md's newest entry is $(ChangelogVersion), but this build is $(VersionPrefix): add this version's entry, or move the heading on when another PR released its number first." />
   </Target>
 </Project>
