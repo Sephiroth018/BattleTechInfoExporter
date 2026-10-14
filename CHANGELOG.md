@@ -26,9 +26,16 @@ changes the format.
 
 ## 0.72.1
 
-Changed: combat-state.json, combat-map.json.
+Changed: game-state.json, combat-state.json, combat-map.json.
+
+### game-state.json
+- Values corrected every faction reference to a faction without a definition: `id` is its
+  enumeration name instead of `""`, e.g. `INVALID_UNSET` for the target of a story contract that
+  only travels.
 
 ### combat-state.json
+- Values corrected `units.<id>.side.faction.id` and `buildingSides[].side.faction.id`:
+  `Player1sMercUnit` for the player's team instead of `""`.
 - Values corrected `damagedBuildings[].destroyedHexes[].elevation`: rounded to 0.1 m without the
   float noise (208.2, not 208.1999969482422).
 - Values corrected `units.<id>.position`, `objectives[].beacon` and `zones[].center`: rounded to
