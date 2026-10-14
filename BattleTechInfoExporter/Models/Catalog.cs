@@ -7,9 +7,9 @@ using Newtonsoft.Json;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     The root of <c>catalog.json</c>: every chassis, mech, vehicle, turret, component, terrain, biome, map, event
-///     and item collection definition the game has loaded, keyed by id. It describes the game, not the career, so it
-///     only changes with the game's data.
+///     The root of <c>catalog.json</c>: every chassis, mech, vehicle, turret, component, terrain, biome, map, event,
+///     item collection and faction definition the game has loaded, keyed by id. It describes the game, not the
+///     career, so it only changes with the game's data.
 /// </summary>
 /// <param name="SourceFingerprint">
 ///     A hash of the game's data the catalog was built from (<see cref="Export.CatalogSourceFingerprint" />); the
@@ -28,6 +28,7 @@ namespace BattleTechInfoExporter.Models;
 ///     The item collections the stores draw their stock from and the rewards are drawn from, keyed by collection
 ///     id; a star system's stores name theirs in <c>star-systems.json</c>.
 /// </param>
+/// <param name="FactionDefinitions">The factions' allies and enemies, keyed by faction id.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Catalog(
     string SourceFingerprint,
@@ -40,7 +41,8 @@ internal sealed record Catalog(
     IReadOnlyDictionary<string, BiomeDefinition> BiomeDefinitions,
     IReadOnlyDictionary<string, MapDefinition> MapDefinitions,
     IReadOnlyDictionary<string, EventDefinition> EventDefinitions,
-    IReadOnlyDictionary<string, ItemCollectionDefinition> ItemCollectionDefinitions) : ExportFile
+    IReadOnlyDictionary<string, ItemCollectionDefinition> ItemCollectionDefinitions,
+    IReadOnlyDictionary<string, FactionDefinition> FactionDefinitions) : ExportFile
 {
     internal const string FileName = "catalog.json";
 

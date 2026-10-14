@@ -30,8 +30,8 @@ internal static class CatalogSourceFingerprint
         BattleTechResourceType.DesignMaskDef
     ];
 
-    // Every type the catalog reads: the career's chassis, mechs, components and star systems, which also select the
-    // maps, events and item collections, the ones above, and the terrain data MapReader reads from disk.
+    // Every type the catalog reads: the career's chassis, mechs, components, factions and star systems, which also
+    // select the maps, events and item collections, the ones above, and the terrain data MapReader reads from disk.
     private static readonly IReadOnlyList<BattleTechResourceType> ResourceTypes =
     [
         BattleTechResourceType.SimGameEventDef,
@@ -43,6 +43,7 @@ internal static class CatalogSourceFingerprint
         BattleTechResourceType.HeatSinkDef,
         BattleTechResourceType.JumpJetDef,
         BattleTechResourceType.UpgradeDef,
+        BattleTechResourceType.FactionDef,
         BattleTechResourceType.StarSystemDef,
         BattleTechResourceType.TerrainData,
         .. ResourceTypesTheCareerDoesNotLoad

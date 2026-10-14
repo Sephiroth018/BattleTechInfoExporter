@@ -24,6 +24,11 @@ namespace BattleTechInfoExporter.Models;
 ///     once, by their ids in the catalog's <see cref="Catalog.ItemCollectionDefinitions" />. A store without any
 ///     doesn't exist in the star system.
 /// </param>
+/// <param name="ContractEmployers">
+///     The factions that can hire the company for the star system's generated contracts, sorted by name, each with
+///     the factions it can hire it against; a contract's own requirements can narrow them further. Story and
+///     flashpoint contracts name their own.
+/// </param>
 /// <param name="Difficulty">The star system's difficulty, as the starmap shows it.</param>
 /// <param name="CanTravelTo">
 ///     Whether the star system's travel requirements are met; story systems stay locked until then.
@@ -41,6 +46,7 @@ internal sealed record StarSystem(
     IReadOnlyList<DefinitionReference> Biomes,
     IReadOnlyList<DefinitionReference> Maps,
     ByStore<IReadOnlyList<string>> Stores,
+    IReadOnlyList<ContractEmployer> ContractEmployers,
     int Difficulty,
     bool CanTravelTo,
     Route? Route) : Reference(Id, Name);

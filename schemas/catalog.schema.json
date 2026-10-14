@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Catalog",
   "type": "object",
-  "description": "The root of catalog.json: every chassis, mech, vehicle, turret, component, terrain, biome, map, event and item collection definition the game has loaded, keyed by id. It describes the game, not the career, so it only changes with the game's data.",
+  "description": "The root of catalog.json: every chassis, mech, vehicle, turret, component, terrain, biome, map, event, item collection and faction definition the game has loaded, keyed by id. It describes the game, not the career, so it only changes with the game's data.",
   "additionalProperties": false,
   "required": [
     "modVersion",
@@ -18,7 +18,8 @@
     "biomeDefinitions",
     "mapDefinitions",
     "eventDefinitions",
-    "itemCollectionDefinitions"
+    "itemCollectionDefinitions",
+    "factionDefinitions"
   ],
   "properties": {
     "modVersion": {
@@ -103,6 +104,13 @@
       "description": "The item collections the stores draw their stock from and the rewards are drawn from, keyed by collection id; a star system's stores name theirs in star-systems.json.",
       "additionalProperties": {
         "$ref": "#/definitions/ItemCollectionDefinition"
+      }
+    },
+    "factionDefinitions": {
+      "type": "object",
+      "description": "The factions' allies and enemies, keyed by faction id.",
+      "additionalProperties": {
+        "$ref": "#/definitions/FactionDefinition"
       }
     }
   },
@@ -3138,6 +3146,41 @@
           "type": "integer",
           "description": "The entry's draw weight among the collection's entries.",
           "format": "int32"
+        }
+      }
+    },
+    "FactionDefinition": {
+      "type": "object",
+      "description": "A faction's relations to the other factions, which decide whom it hires the company against.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "allies",
+        "enemies"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id from the game's data files, which the entry is keyed by and the references to it use."
+        },
+        "name": {
+          "type": "string",
+          "description": "As in the references to the faction."
+        },
+        "allies": {
+          "type": "array",
+          "description": "The factions allied with it, sorted by name; on its contracts, one of them not allied with the other side may fight alongside it.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
+          }
+        },
+        "enemies": {
+          "type": "array",
+          "description": "The factions hostile to it, sorted by name: those it can hire the company against where a star system lists them as targets; while the company is allied with it, the company's reputation entries mark them as enemies.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
+          }
         }
       }
     }
