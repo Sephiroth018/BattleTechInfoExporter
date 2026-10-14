@@ -23,7 +23,7 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="OnlyLegsRaiseMinStability">Whether only destroyed legs count for it.</param>
 /// <param name="InstabilityFromDamage">
-///     The share of the stability bar added when a location is damaged, on top of a weapon's own instability.
+///     The share of the stability bar added when a location is damaged, on top of a weapon's own stability damage.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record StabilityRules(

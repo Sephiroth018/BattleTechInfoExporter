@@ -13,7 +13,7 @@ namespace BattleTechInfoExporter.Models;
 ///     parts are scrapped.
 /// </param>
 /// <param name="MaxJumpJets">The most jump jets a mech of the chassis can mount; 0 when it can't jump.</param>
-/// <param name="HeatDissipation">The heat the chassis itself removes per round, on top of its heat sinks.</param>
+/// <param name="Dissipation">The heat the chassis itself removes per round, on top of its heat sinks.</param>
 /// <param name="Movement">The walk and sprint distances and the pathing, which no loadout changes.</param>
 /// <param name="Melee">The damage of melee and jump attacks, before upgrades add to them.</param>
 /// <param name="StockMech">
@@ -28,7 +28,7 @@ internal sealed record ChassisDefinition(
     float InitialTonnage,
     int Value,
     int MaxJumpJets,
-    int HeatDissipation,
+    float Dissipation,
     ChassisMovement Movement,
     ChassisMelee Melee,
     DefinitionReference? StockMech,

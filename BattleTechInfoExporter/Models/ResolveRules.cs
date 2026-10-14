@@ -16,11 +16,11 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="InspiredEffects">The statistic changes an inspired mech gets.</param>
 /// <param name="BaselineGainPerRound">
-///     Gained every round from the second, times the units <see cref="BaselineGainMultiplier" /> counts.
+///     Gained every round from the second, times the units <see cref="BaselineGainScalesWith" /> counts.
 /// </param>
-/// <param name="BaselineGainMultiplier">What <see cref="BaselineGainPerRound" /> is multiplied by.</param>
+/// <param name="BaselineGainScalesWith">What <see cref="BaselineGainPerRound" /> is multiplied by the count of.</param>
 /// <param name="AddsMoraleLevelResolve">
-///     Whether the company's morale level adds its resolve per turn (see <see cref="MoraleLevel.ResolvePerTurn" />).
+///     Whether the company's morale level adds its resolve per round (see <see cref="MoraleLevel.ResolvePerRound" />).
 /// </param>
 /// <param name="AddsUnitResolveBonuses">
 ///     Whether the units' resolve bonuses add to the gain, the <c>MoraleBonusGain</c> statistic that cockpit mods
@@ -43,7 +43,7 @@ internal sealed record ResolveRules(
     bool IsAutoInspired,
     IReadOnlyList<StatisticChange> InspiredEffects,
     int BaselineGainPerRound,
-    ResolveGainMultiplier BaselineGainMultiplier,
+    ResolveGainScale BaselineGainScalesWith,
     bool AddsMoraleLevelResolve,
     bool AddsUnitResolveBonuses,
     bool OnlyBiggestUnitResolveBonus,
@@ -52,8 +52,8 @@ internal sealed record ResolveRules(
     IReadOnlyList<StatisticChange> InitiativeDelayEffects,
     bool CanAiGainResolve);
 
-/// <summary>What the baseline gain is multiplied by.</summary>
-internal enum ResolveGainMultiplier
+/// <summary>What the baseline gain is multiplied by the count of.</summary>
+internal enum ResolveGainScale
 {
     None,
     LivingUnits,

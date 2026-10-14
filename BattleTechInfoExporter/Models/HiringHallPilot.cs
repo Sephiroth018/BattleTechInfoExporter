@@ -6,15 +6,15 @@ namespace BattleTechInfoExporter.Models;
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record HiringHallPilot : Pilot
 {
-    internal HiringHallPilot(Pilot pilot, int hireCost, int salary, bool canHire) : base(pilot)
+    internal HiringHallPilot(Pilot pilot, int price, int salary, bool canHire) : base(pilot)
     {
-        HireCost = hireCost;
+        Price = price;
         Salary = salary;
         CanHire = canHire;
     }
 
     /// <summary>The one-time C-Bills to hire the pilot.</summary>
-    public int HireCost { get; }
+    public int Price { get; }
 
     /// <summary>What the pilot would add to the expenses of each report, as a crew member's line does.</summary>
     public int Salary { get; }

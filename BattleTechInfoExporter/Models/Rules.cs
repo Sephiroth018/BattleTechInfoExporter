@@ -9,6 +9,9 @@ namespace BattleTechInfoExporter.Models;
 /// </summary>
 /// <param name="MoraleLevels">The morale levels, which <see cref="Morale.Level" /> refers to.</param>
 /// <param name="ReputationLevels">The reputation levels, which <see cref="FactionReputation.Level" /> refers to.</param>
+/// <param name="MercenaryReviewBoardLevels">
+///     The Mercenary Review Board rating levels, which <see cref="MercenaryReviewBoard.Level" /> refers to.
+/// </param>
 /// <param name="Skills">The training table behind <see cref="Pilot.Skills" /> and <see cref="Pilot.Abilities" />.</param>
 /// <param name="SpiritsLevels">The effects of each spirits level, which <see cref="Spirits.Level" /> refers to.</param>
 /// <param name="MechPartsPerMech">The <see cref="StoredMechParts" /> needed to assemble a mech.</param>
@@ -24,6 +27,7 @@ namespace BattleTechInfoExporter.Models;
 internal sealed record Rules(
     IReadOnlyList<MoraleLevel> MoraleLevels,
     IReadOnlyList<ReputationLevel> ReputationLevels,
+    IReadOnlyList<MercenaryReviewBoardLevel> MercenaryReviewBoardLevels,
     SkillRules Skills,
     IReadOnlyList<SpiritsLevelCosts> SpiritsLevels,
     int MechPartsPerMech,

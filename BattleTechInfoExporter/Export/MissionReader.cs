@@ -33,10 +33,10 @@ internal static class MissionReader
                 .ToList(),
             contract.MoneyResults,
             // SimGameState.GetFinalReputationChange gives a faction that doesn't gain reputation no change.
-            new ReputationChange(
+            new MissionReputationChange(
                 employer.DoesGainReputation ? contract.EmployerReputationResults : null,
-                target.DoesGainReputation ? contract.TargetReputationResults : null),
-            contract.MercenaryReviewboardReputationResults,
+                target.DoesGainReputation ? contract.TargetReputationResults : null,
+                contract.MercenaryReviewboardReputationResults),
             contract.ExperienceEarned,
             contract.PlayerUnitResults
                 .Select(unit => ReadLanceUnit(simGame, contract, unit))

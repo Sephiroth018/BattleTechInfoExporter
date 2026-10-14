@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     The melee rules; damage and instability are the chassis' in the catalog. A melee attack against a turret,
+///     The melee rules; damage and stability damage are the chassis' in the catalog. A melee attack against a turret,
 ///     a building, a prone or a shut-down mech always has the maximum hit chance.
 /// </summary>
 /// <param name="DeathFromAboveToHit">The to-hit modifier of a jump attack.</param>

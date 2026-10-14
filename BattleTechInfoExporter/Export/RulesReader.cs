@@ -14,6 +14,7 @@ internal static class RulesReader
         new(
             ReadMoraleLevels(simGame),
             ReadReputationLevels(simGame),
+            ReadMercenaryReviewBoardLevels(simGame),
             ReadSkillRules(simGame),
             ReadSpiritsLevels(simGame),
             simGame.Constants.Story.DefaultMechPartMax,
@@ -106,9 +107,9 @@ internal static class RulesReader
     {
         var names = simGame.Constants.Story.MoraleLevelNames;
         var thresholds = simGame.CombatConstants.MoraleConstants.BaselineAddFromSimGameThresholds;
-        var resolvePerTurn = simGame.CombatConstants.MoraleConstants.BaselineAddFromSimGameValues;
-        return Enumerable.Range(0, Math.Min(names.Length, Math.Min(thresholds.Length, resolvePerTurn.Length)))
-            .Select(level => new MoraleLevel(names[level], thresholds[level], resolvePerTurn[level]))
+        var resolvePerRound = simGame.CombatConstants.MoraleConstants.BaselineAddFromSimGameValues;
+        return Enumerable.Range(0, Math.Min(names.Length, Math.Min(thresholds.Length, resolvePerRound.Length)))
+            .Select(level => new MoraleLevel(names[level], thresholds[level], resolvePerRound[level]))
             .ToList();
     }
 
@@ -129,6 +130,24 @@ internal static class RulesReader
                 morale.OffensivePushLowMoraleCost,
                 morale.DefensivePushLowMoraleCost)
         ];
+    }
+
+    // Level n starts at the (n - 1)th cap (SimGameState.GetMRBLevelFromRep); the limits and multipliers are
+    // indexed by level, so only levels present in all three are complete.
+    private static List<MercenaryReviewBoardLevel> ReadMercenaryReviewBoardLevels(SimGameState simGame)
+    {
+        var story = simGame.Constants.Story;
+        return Enumerable.Range(
+                0,
+                Math.Min(
+                    story.MRBRepCap.Length + 1,
+                    Math.Min(story.MRBRepHiringPowerLevelLimits.Length, story.MRBRepMod.Length)))
+            .Select(level => new MercenaryReviewBoardLevel(
+                level,
+                level == 0 ? 0 : Mathf.RoundToInt(story.MRBRepCap[level - 1]),
+                Mathf.RoundToInt(story.MRBRepHiringPowerLevelLimits[level]),
+                story.MRBRepMod[level]))
+            .ToList();
     }
 
     // The game's level bounds are mixed (upper bounds below INDIFFERENT, lower ones above it), so each level's start

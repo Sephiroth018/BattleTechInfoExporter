@@ -27,7 +27,7 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="BayMech">The player's mech in <c>game-state.json</c>, whose loadout holds its assigned armor.</param>
 /// <param name="Position">Where the unit is, or was last detected at for <see cref="UnitVisibility.LastSeen" />.</param>
-/// <param name="Facing">
+/// <param name="FacingDegrees">
 ///     The direction the unit faces, in degrees clockwise from the map's +Z axis; <c>null</c> when last seen.
 /// </param>
 /// <param name="Terrain">
@@ -55,7 +55,7 @@ internal sealed record CombatUnit(
     DefinitionReference? Definition,
     MechReference? BayMech,
     MapPosition Position,
-    float? Facing,
+    float? FacingDegrees,
     string? Terrain,
     PilotReference? Pilot,
     CombatUnitState? State,
@@ -76,7 +76,7 @@ internal sealed record CombatUnit(
 /// <param name="EvasionPips">The evasive pips the unit has, earned by moving (see <see cref="EvasionRules" />).</param>
 /// <param name="Guard">The unit's guard level and its sources.</param>
 /// <param name="IsEntrenched">
-///     Whether the unit is entrenched, e.g. by bracing, until its next activation: weapons' instability against it
+///     Whether the unit is entrenched, e.g. by bracing, until its next activation: weapons' stability damage against it
 ///     is multiplied by <see cref="StabilityRules.EntrenchedInstabilityMultiplier" />.
 /// </param>
 /// <param name="IsProne">Whether the mech has been knocked down; only mechs can be.</param>
@@ -122,7 +122,7 @@ internal sealed record MechState(MechHeat Heat, float Stability);
 
 /// <summary>A mech's heat as the HUD's heat bar shows it, with the thresholds it draws and the sinking it predicts.</summary>
 /// <param name="Current">The heat now.</param>
-/// <param name="DissipationPerRound">
+/// <param name="Dissipation">
 ///     The heat the mech sheds at the end of its activation now: its heat sinks after the terrain it stands in, the
 ///     biome and effects; standing in water or on a cold map changes it.
 /// </param>
@@ -135,7 +135,7 @@ internal sealed record MechState(MechHeat Heat, float Stability);
 ///     <see cref="HeatRules.MaxHeat" />.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record MechHeat(int Current, int DissipationPerRound, int OverheatsAbove, int MaxHeat);
+internal sealed record MechHeat(int Current, int Dissipation, int OverheatsAbove, int MaxHeat);
 
 /// <param name="Injuries">The injuries, including those from before the mission.</param>
 /// <param name="Health">
@@ -174,8 +174,8 @@ internal sealed record Guard(int Level, bool IsBraced, bool HasCover, bool HasBu
 
 /// <param name="Location">The game's name of the location it is mounted in.</param>
 /// <param name="DamageLevel">The game's damage level, e.g. <c>Functional</c> or <c>Destroyed</c>.</param>
-/// <param name="Ammo">
-///     The rounds left in an ammunition box, or in a weapon that carries its own; <c>null</c> for other components.
+/// <param name="ShotsLeft">
+///     The shots left in an ammunition box, or in a weapon that carries its own; <c>null</c> for other components.
 ///     A destroyed box has none.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -183,7 +183,7 @@ internal sealed record CombatComponent(
     ComponentReference Component,
     string Location,
     ComponentDamageLevel DamageLevel,
-    int? Ammo) : ComponentEntry(Component), IDamageable;
+    int? ShotsLeft) : ComponentEntry(Component), IDamageable;
 
 /// <param name="Ability">The ability, the pilot's or a mounted component's.</param>
 /// <param name="Cooldown">The unit's activations until the ability can be used again; 0 when ready.</param>
@@ -195,7 +195,7 @@ internal sealed record CombatAbility(DefinitionReference Ability, int Cooldown, 
 ///     How a unit could fire at a target from where it stands, as hovering over the target shows it.
 /// </summary>
 /// <param name="Target">The target's unit id, a key of <see cref="CombatState.Units" />.</param>
-/// <param name="Level">
+/// <param name="Blocking">
 ///     How much of the line of fire itself is blocked. A target beyond every weapon's range and the unit's sensors is
 ///     blocked too.
 /// </param>
@@ -207,6 +207,6 @@ internal sealed record CombatAbility(DefinitionReference Ability, int Cooldown, 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record LineOfFire(
     string Target,
-    LineOfFireBlocking Level,
+    LineOfFireBlocking Blocking,
     FireAvailability Fire,
     bool IsInFiringArc);

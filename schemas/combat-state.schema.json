@@ -299,7 +299,7 @@
         "definition",
         "bayMech",
         "position",
-        "facing",
+        "facingDegrees",
         "terrain",
         "pilot",
         "state",
@@ -371,7 +371,7 @@
           "description": "Where the unit is, or was last detected at for lastSeen.",
           "$ref": "#/definitions/MapPosition"
         },
-        "facing": {
+        "facingDegrees": {
           "type": [
             "null",
             "number"
@@ -634,7 +634,7 @@
         },
         "isEntrenched": {
           "type": "boolean",
-          "description": "Whether the unit is entrenched, e.g. by bracing, until its next activation: weapons' instability against it is multiplied by entrenchedInstabilityMultiplier."
+          "description": "Whether the unit is entrenched, e.g. by bracing, until its next activation: weapons' stability damage against it is multiplied by entrenchedInstabilityMultiplier."
         },
         "isProne": {
           "type": "boolean",
@@ -838,7 +838,7 @@
       "additionalProperties": false,
       "required": [
         "current",
-        "dissipationPerRound",
+        "dissipation",
         "overheatsAbove",
         "maxHeat"
       ],
@@ -848,7 +848,7 @@
           "description": "The heat now.",
           "format": "int32"
         },
-        "dissipationPerRound": {
+        "dissipation": {
           "type": "integer",
           "description": "The heat the mech sheds at the end of its activation now: its heat sinks after the terrain it stands in, the biome and effects; standing in water or on a cold map changes it.",
           "format": "int32"
@@ -872,7 +872,7 @@
         "component",
         "location",
         "damageLevel",
-        "ammo"
+        "shotsLeft"
       ],
       "properties": {
         "component": {
@@ -887,12 +887,12 @@
           "description": "The game's damage level, e.g. Functional or Destroyed.",
           "$ref": "#/definitions/ComponentDamageLevel"
         },
-        "ammo": {
+        "shotsLeft": {
           "type": [
             "integer",
             "null"
           ],
-          "description": "The rounds left in an ammunition box, or in a weapon that carries its own; null for other components. A destroyed box has none.",
+          "description": "The shots left in an ammunition box, or in a weapon that carries its own; null for other components. A destroyed box has none.",
           "format": "int32"
         }
       }
@@ -1063,7 +1063,7 @@
       "additionalProperties": false,
       "required": [
         "target",
-        "level",
+        "blocking",
         "fire",
         "isInFiringArc"
       ],
@@ -1072,7 +1072,7 @@
           "type": "string",
           "description": "The target's unit id, a key of units."
         },
-        "level": {
+        "blocking": {
           "description": "How much of the line of fire itself is blocked. A target beyond every weapon's range and the unit's sensors is blocked too.",
           "$ref": "#/definitions/LineOfFireBlocking"
         },

@@ -18,7 +18,7 @@ internal sealed record Ship(IReadOnlyList<ShipUpgrade> Upgrades);
 /// <param name="Location">The room of the ship the upgrade's details name, e.g. <c>MECH_BAY</c>.</param>
 /// <param name="Details">The upgrade's description, which also names effects the stats don't, e.g. training.</param>
 /// <param name="RequiredUpgrades">The upgrades that must be installed before this one can be bought.</param>
-/// <param name="PurchaseCost">The one-time C-Bills to buy the upgrade.</param>
+/// <param name="Price">The one-time C-Bills to buy the upgrade.</param>
 /// <param name="Upkeep">
 ///     What the upgrade adds to the expenses of each report once installed; an installed upgrade's line in
 ///     <see cref="ExpectedExpenses.ShipUpgrades" /> is the same.
@@ -35,7 +35,7 @@ internal sealed record ShipUpgrade(
     DropshipLocation Location,
     string Details,
     IReadOnlyList<DefinitionReference> RequiredUpgrades,
-    int PurchaseCost,
+    int Price,
     int Upkeep,
     int InstallDays,
     IReadOnlyList<ShipUpgradeEffect> Effects);
