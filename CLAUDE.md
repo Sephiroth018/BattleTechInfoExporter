@@ -489,9 +489,10 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   travel order's legs) instead, so a tool can correct a route mid-trip.
 - **The latest mission is a file of its own,** `mission-outcome.json`, written in combat when the
   mission ends, before the salvage is chosen, and again in the after-action report once the
-  salvage is final, with `salvage.received` filled in; the offer stays as it was. One file, because
-  the game has no id that identifies every contract to link two by. Each mech's ammo use is read
-  from its combat mech, which outlives the after-action report; the contract's copy has no ammo.
+  salvage is final, with `salvage.received` filled in. One file, because the game has no id that
+  identifies every contract to link two by. The outcome is read once, when the mission ends, and
+  the second write adds only `salvage.received` to it: by then the battle it reads from (the
+  objectives' grouping, each mech's ammo use from its combat mech) is being torn down.
 - **The running battle is a file of its own,** `combat-state.json`, written when every phase begins
   and after every unit's activation, and deleted when the game tears the battle down or a career is loaded, so it exists
   only while its battle runs. It shows what the player's HUD shows and no more: enemies by their

@@ -270,7 +270,7 @@
         },
         "objectiveIds": {
           "type": "array",
-          "description": "The ids combat-state.json objectives[].id had for the objectives this one groups, also those the HUD didn't list; its own id alone where it is one of them.",
+          "description": "Never empty: the ids combat-state.json objectives[].id had for the objectives this one groups, also those the HUD didn't list; its own id alone where it is one of them or groups none.",
           "items": {
             "type": "string"
           }

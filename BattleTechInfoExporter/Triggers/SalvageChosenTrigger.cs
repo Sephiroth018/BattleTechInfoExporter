@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using BattleTech;
 using BattleTechInfoExporter.Export;
 using HarmonyLib;
@@ -16,39 +15,18 @@ namespace BattleTechInfoExporter.Triggers;
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal static class SalvageChosenTrigger
 {
-    // Taken before the game moves the chosen items out of the pool into SalvageResults. GetPotentialSalvage
-    // returns copies; SalvageResults is the list the game appends to, so it's copied. A skirmish's contract has
-    // neither.
-    [HarmonyPrefix]
-    private static void RememberSalvageOffer(
-        [HarmonyArgument("__instance")] Contract contract,
-        [HarmonyArgument("__state")] out SalvageOffer? offer)
+    [HarmonyPostfix]
+    private static void OnSalvageChosen([HarmonyArgument("__instance")] Contract contract)
     {
-        offer = null;
         try
         {
+            // A skirmish's contract has no salvage.
             if (contract.SimGameContract)
             {
-                offer = new SalvageOffer(contract.GetPotentialSalvage(), contract.SalvageResults.ToList());
-            }
-        }
-        catch (Exception exception)
-        {
-            ModLog.Logger.LogException(exception);
-        }
-    }
-
-    [HarmonyPostfix]
-    private static void OnSalvageChosen(
-        [HarmonyArgument("__instance")] Contract contract,
-        [HarmonyArgument("__state")] SalvageOffer? offer)
-    {
-        try
-        {
-            // Null for a skirmish's contract, or when reading the offer failed, which the prefix has logged.
-            if (offer != null)
-            {
-                MissionExporter.ExportSalvageReceived(contract.BattleTechGame.Simulation, contract, offer);
+                MissionExporter.ExportSalvageReceived(
+                    contract.BattleTechGame.Simulation,
+                    contract,
+                    MissionCompletedTrigger.TakeOutcomeOf(contract));
             }
         }
         catch (Exception exception)
