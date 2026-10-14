@@ -21,7 +21,7 @@ namespace BattleTechInfoExporter.Models;
 ///     skill levels.
 /// </param>
 /// <param name="Health">The injuries the pilot can take before being incapacitated.</param>
-/// <param name="Tags">The pilot's tags, which the events' requirements check.</param>
+/// <param name="Tags">The pilot's tags, sorted, which the events' requirements check.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal record Pilot(
     string Id,

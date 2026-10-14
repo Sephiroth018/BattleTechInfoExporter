@@ -280,7 +280,7 @@
         },
         "tags": {
           "type": "array",
-          "description": "The company's tags, which the events' requirements check.",
+          "description": "The company's tags, sorted, which the events' requirements check.",
           "items": {
             "type": "string"
           }
@@ -415,7 +415,6 @@
         "LIKED",
         "FRIENDLY",
         "HONORED",
-        "ALLIED",
         "LOATHED",
         "HATED",
         "DISLIKED"
@@ -424,7 +423,6 @@
         "INDIFFERENT",
         "LIKED",
         "FRIENDLY",
-        "HONORED",
         "HONORED",
         "LOATHED",
         "HATED",
@@ -698,36 +696,25 @@
       }
     },
     "WorkQueueEntry": {
-      "type": "object",
-      "description": "An entry of the timeline: what the company is waiting for.",
-      "additionalProperties": false,
-      "required": [
-        "type",
-        "finishesOnDay",
-        "target"
-      ],
-      "properties": {
-        "type": {
-          "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
-          "$ref": "#/definitions/WorkOrderType"
+      "description": "An entry of the timeline: a work order the company is waiting for. Each kind of type has a record with the target it is about.",
+      "x-abstract": true,
+      "anyOf": [
+        {
+          "$ref": "#/definitions/FinancialReportOrder"
         },
-        "finishesOnDay": {
-          "type": "integer",
-          "description": "The day it finishes, on the scale of daysPassed.",
-          "format": "int32"
+        {
+          "$ref": "#/definitions/MechLabOrder"
         },
-        "target": {
-          "description": "What the entry is about, by its type: the mech the mech lab works on, the pilot the med bay heals, the star system the ship travels to or the ship upgrade being installed, as in upgrades. null for the financial report, and where the game can't resolve it.",
-          "oneOf": [
-            {
-              "type": "null"
-            },
-            {
-              "$ref": "#/definitions/Reference"
-            }
-          ]
+        {
+          "$ref": "#/definitions/MedBayOrder"
+        },
+        {
+          "$ref": "#/definitions/ShipUpgradeOrder"
+        },
+        {
+          "$ref": "#/definitions/TravelOrder"
         }
-      }
+      ]
     },
     "WorkOrderType": {
       "type": "string",
@@ -784,201 +771,144 @@
         "MechLabReadyMech"
       ]
     },
-    "Reference": {
-      "description": "Something the export refers to by its id instead of repeating it, with the name the UI shows. References compare by name, with the id breaking ties, so every list of entries that refer to a definition, which the game keeps in no meaningful order, is ordered the same way.",
-      "x-abstract": true,
-      "anyOf": [
-        {
-          "$ref": "#/definitions/ComponentReference"
-        },
-        {
-          "$ref": "#/definitions/DefinitionReference"
-        },
-        {
-          "$ref": "#/definitions/MechReference"
-        },
-        {
-          "$ref": "#/definitions/PilotReference"
-        },
-        {
-          "$ref": "#/definitions/StarSystem"
-        }
-      ]
-    },
-    "ComponentReference": {
+    "FinancialReportOrder": {
       "type": "object",
-      "description": "A component's definition, like DefinitionReference, with the type that tells which group of componentDefinitions holds it. Components compare by type first, then as every reference.",
+      "description": "The next financial report, of type FinancialReport, which is about nothing in particular.",
       "additionalProperties": false,
       "required": [
-        "id",
-        "name",
-        "type"
+        "type",
+        "finishesOnDay"
       ],
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
-        },
-        "name": {
-          "type": "string",
-          "description": "The name the UI shows."
-        },
         "type": {
-          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in componentDefinitions.",
-          "$ref": "#/definitions/ComponentType"
+          "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
+          "$ref": "#/definitions/WorkOrderType"
+        },
+        "finishesOnDay": {
+          "type": "integer",
+          "description": "The day it finishes, on the scale of daysPassed.",
+          "format": "int32"
         }
       }
     },
-    "ComponentType": {
-      "type": "string",
-      "x-enumNames": [
-        "NotSet",
-        "Weapon",
-        "AmmunitionBox",
-        "HeatSink",
-        "JumpJet",
-        "Upgrade",
-        "Special",
-        "MechPart"
-      ],
-      "enum": [
-        "NotSet",
-        "Weapon",
-        "AmmunitionBox",
-        "HeatSink",
-        "JumpJet",
-        "Upgrade",
-        "Special",
-        "MechPart"
-      ]
-    },
-    "StarSystem": {
+    "MechLabOrder": {
       "type": "object",
-      "description": "A star system with its active definition and its career state. The story swaps some star systems' definitions (e.g. to change their owner); the id and what the definition holds are the active one's.",
+      "description": "A mech lab order, of the MechLab… types.",
       "additionalProperties": false,
       "required": [
-        "id",
-        "name",
-        "owner",
-        "tags",
-        "biomes",
-        "maps",
-        "stores",
-        "difficulty",
-        "canTravelTo",
-        "route"
+        "type",
+        "finishesOnDay",
+        "target"
       ],
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "The active definition's id, as in the references to the star system."
+        "type": {
+          "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
+          "$ref": "#/definitions/WorkOrderType"
         },
-        "name": {
-          "type": "string",
-          "description": "The name, as in the references to the star system."
-        },
-        "owner": {
-          "description": "The faction that owns the star system.",
-          "$ref": "#/definitions/DefinitionReference"
-        },
-        "tags": {
-          "type": "array",
-          "description": "The star system's tags, which the events' requirements check, also those its starmap panel doesn't show.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "biomes": {
-          "type": "array",
-          "description": "The biomes the star system's missions can be on.",
-          "items": {
-            "$ref": "#/definitions/DefinitionReference"
-          }
-        },
-        "maps": {
-          "type": "array",
-          "description": "The maps the star system's contracts can be fought on, as the contract generator selects them from its biomes and map tags; each map's terrain is in the catalog's mapDefinitions.",
-          "items": {
-            "$ref": "#/definitions/DefinitionReference"
-          }
-        },
-        "stores": {
-          "description": "The item collections each of the star system's stores draws its stock from on arrival, every entry of each once, by their ids in the catalog's itemCollectionDefinitions. A store without any doesn't exist in the star system.",
-          "$ref": "#/definitions/ByStoreOfIReadOnlyListOfString"
-        },
-        "difficulty": {
+        "finishesOnDay": {
           "type": "integer",
-          "description": "The star system's difficulty, as the starmap shows it.",
+          "description": "The day it finishes, on the scale of daysPassed.",
           "format": "int32"
         },
-        "canTravelTo": {
-          "type": "boolean",
-          "description": "Whether the star system's travel requirements are met; story systems stay locked until then."
-        },
-        "route": {
-          "description": "The trip from the current star system; null where the game finds no route, always while canTravelTo is false.",
+        "target": {
+          "description": "The mech the mech lab works on; null where the game can't resolve it.",
           "oneOf": [
             {
               "type": "null"
             },
             {
-              "$ref": "#/definitions/Route"
+              "$ref": "#/definitions/MechReference"
             }
           ]
         }
       }
     },
-    "ByStoreOfIReadOnlyListOfString": {
+    "MedBayOrder": {
       "type": "object",
-      "description": "A value per store of a star system: its system store, faction store and black market.",
+      "description": "A med bay order, of type MedLabHeal.",
       "additionalProperties": false,
       "required": [
-        "system",
-        "faction",
-        "blackMarket"
+        "type",
+        "finishesOnDay",
+        "target"
       ],
       "properties": {
-        "system": {
-          "type": "array",
-          "description": "The value for the system store.",
-          "items": {
-            "type": "string"
-          }
+        "type": {
+          "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
+          "$ref": "#/definitions/WorkOrderType"
         },
-        "faction": {
-          "type": "array",
-          "description": "The value for the faction store.",
-          "items": {
-            "type": "string"
-          }
+        "finishesOnDay": {
+          "type": "integer",
+          "description": "The day it finishes, on the scale of daysPassed.",
+          "format": "int32"
         },
-        "blackMarket": {
-          "type": "array",
-          "description": "The value for the black market.",
-          "items": {
-            "type": "string"
-          }
+        "target": {
+          "description": "The pilot the med bay heals.",
+          "$ref": "#/definitions/PilotReference"
         }
       }
     },
-    "Route": {
+    "ShipUpgradeOrder": {
       "type": "object",
-      "description": "The trip from the current star system, as the starmap plans and shows it.",
+      "description": "A ship upgrade being installed, of the ArgoUpgrade… types.",
       "additionalProperties": false,
       "required": [
-        "days",
-        "cost"
+        "type",
+        "finishesOnDay",
+        "target"
       ],
       "properties": {
-        "days": {
+        "type": {
+          "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
+          "$ref": "#/definitions/WorkOrderType"
+        },
+        "finishesOnDay": {
           "type": "integer",
-          "description": "The days the trip takes from the current star system's planet, as the starmap shows them while the ship is there, with the whole leg to its jump point (jumpPointDays), also the part already travelled during a trip (see legEndsOnDay). 0 for the current star system.",
+          "description": "The day it finishes, on the scale of daysPassed.",
           "format": "int32"
         },
-        "cost": {
+        "target": {
+          "description": "The ship upgrade, as in upgrades; null where the game can't resolve it.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/DefinitionReference"
+            }
+          ]
+        }
+      }
+    },
+    "TravelOrder": {
+      "type": "object",
+      "description": "A trip, of the Travel… types.",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "finishesOnDay",
+        "target"
+      ],
+      "properties": {
+        "type": {
+          "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
+          "$ref": "#/definitions/WorkOrderType"
+        },
+        "finishesOnDay": {
           "type": "integer",
-          "description": "The C-Bills the trip costs; 0 for the current star system.",
+          "description": "The day it finishes, on the scale of daysPassed.",
           "format": "int32"
+        },
+        "target": {
+          "description": "The star system the ship travels to; null where the game can't resolve it.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/DefinitionReference"
+            }
+          ]
         }
       }
     },
@@ -1220,7 +1150,7 @@
         },
         "tags": {
           "type": "array",
-          "description": "The pilot's tags, which the events' requirements check.",
+          "description": "The pilot's tags, sorted, which the events' requirements check.",
           "items": {
             "type": "string"
           }
@@ -1885,6 +1815,53 @@
           "description": "Whether it's part of the chassis: every mech of the chassis has it, and it can't be removed."
         }
       }
+    },
+    "ComponentReference": {
+      "type": "object",
+      "description": "A component's definition, like DefinitionReference, with the type that tells which group of componentDefinitions holds it. Components compare by type first, then as every reference.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "type"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id it's referred to by: for a definition its id from the game's data files, for a mech in the mech bay or a pilot the game's own id of it."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name the UI shows."
+        },
+        "type": {
+          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in componentDefinitions.",
+          "$ref": "#/definitions/ComponentType"
+        }
+      }
+    },
+    "ComponentType": {
+      "type": "string",
+      "x-enumNames": [
+        "NotSet",
+        "Weapon",
+        "AmmunitionBox",
+        "HeatSink",
+        "JumpJet",
+        "Upgrade",
+        "Special",
+        "MechPart"
+      ],
+      "enum": [
+        "NotSet",
+        "Weapon",
+        "AmmunitionBox",
+        "HeatSink",
+        "JumpJet",
+        "Upgrade",
+        "Special",
+        "MechPart"
+      ]
     },
     "ComponentDamageLevel": {
       "type": "string",
@@ -2752,7 +2729,7 @@
         },
         "tags": {
           "type": "array",
-          "description": "The pilot's tags, which the events' requirements check.",
+          "description": "The pilot's tags, sorted, which the events' requirements check.",
           "items": {
             "type": "string"
           }
@@ -2864,7 +2841,7 @@
     },
     "LanceLimits": {
       "type": "object",
-      "description": "The lance the contract allows; every limit is null when there is none.",
+      "description": "The lance the contract allows.",
       "additionalProperties": false,
       "required": [
         "maxMechs",
@@ -2883,7 +2860,7 @@
             "null",
             "number"
           ],
-          "description": "The least total tonnage of the lance's mechs.",
+          "description": "The least total tonnage of the lance's mechs; null without a limit.",
           "format": "float"
         },
         "maxTonnage": {
@@ -2891,7 +2868,7 @@
             "null",
             "number"
           ],
-          "description": "The most total tonnage of the lance's mechs.",
+          "description": "The most total tonnage of the lance's mechs; null without a limit.",
           "format": "float"
         },
         "mechs": {
@@ -3051,6 +3028,136 @@
             "null"
           ],
           "description": "The change, usually a loss, with the target; null when the target doesn't gain reputation.",
+          "format": "int32"
+        }
+      }
+    },
+    "StarSystem": {
+      "type": "object",
+      "description": "A star system with its active definition and its career state. The story swaps some star systems' definitions (e.g. to change their owner); the id and what the definition holds are the active one's.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "owner",
+        "tags",
+        "biomes",
+        "maps",
+        "stores",
+        "difficulty",
+        "canTravelTo",
+        "route"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The active definition's id, as in the references to the star system."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name, as in the references to the star system."
+        },
+        "owner": {
+          "description": "The faction that owns the star system.",
+          "$ref": "#/definitions/DefinitionReference"
+        },
+        "tags": {
+          "type": "array",
+          "description": "The star system's tags, sorted, which the events' requirements check, also those its starmap panel doesn't show.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "biomes": {
+          "type": "array",
+          "description": "The biomes the star system's missions can be on, sorted by name.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
+          }
+        },
+        "maps": {
+          "type": "array",
+          "description": "The maps the star system's contracts can be fought on, as the contract generator selects them from its biomes and map tags; each map's terrain is in the catalog's mapDefinitions.",
+          "items": {
+            "$ref": "#/definitions/DefinitionReference"
+          }
+        },
+        "stores": {
+          "description": "The item collections each of the star system's stores draws its stock from on arrival, every entry of each once, by their ids in the catalog's itemCollectionDefinitions. A store without any doesn't exist in the star system.",
+          "$ref": "#/definitions/ByStoreOfIReadOnlyListOfString"
+        },
+        "difficulty": {
+          "type": "integer",
+          "description": "The star system's difficulty, as the starmap shows it.",
+          "format": "int32"
+        },
+        "canTravelTo": {
+          "type": "boolean",
+          "description": "Whether the star system's travel requirements are met; story systems stay locked until then."
+        },
+        "route": {
+          "description": "The trip from the current star system; null where the game finds no route, always while canTravelTo is false.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/Route"
+            }
+          ]
+        }
+      }
+    },
+    "ByStoreOfIReadOnlyListOfString": {
+      "type": "object",
+      "description": "A value per store of a star system: its system store, faction store and black market.",
+      "additionalProperties": false,
+      "required": [
+        "system",
+        "faction",
+        "blackMarket"
+      ],
+      "properties": {
+        "system": {
+          "type": "array",
+          "description": "The value for the system store.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "faction": {
+          "type": "array",
+          "description": "The value for the faction store.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "blackMarket": {
+          "type": "array",
+          "description": "The value for the black market.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Route": {
+      "type": "object",
+      "description": "The trip from the current star system, as the starmap plans and shows it.",
+      "additionalProperties": false,
+      "required": [
+        "days",
+        "cost"
+      ],
+      "properties": {
+        "days": {
+          "type": "integer",
+          "description": "The days the trip takes from the current star system's planet, as the starmap shows them while the ship is there, with the whole leg to its jump point (jumpPointDays), also the part already travelled during a trip (see legEndsOnDay). 0 for the current star system.",
+          "format": "int32"
+        },
+        "cost": {
+          "type": "integer",
+          "description": "The C-Bills the trip costs; 0 for the current star system.",
           "format": "int32"
         }
       }

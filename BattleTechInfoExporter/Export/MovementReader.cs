@@ -100,8 +100,8 @@ internal static class MovementReader
                     .Select(q => new HexPoint3(q, row.Key))
                     .ToList();
                 return new MovementRow(
-                    row.Key,
                     firstQ,
+                    row.Key,
                     ReadMoveRow(rowHexes, walk),
                     ReadMoveRow(rowHexes, sprint),
                     ReadMoveRow(rowHexes, reverse),

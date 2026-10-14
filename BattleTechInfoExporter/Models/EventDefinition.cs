@@ -62,7 +62,10 @@ internal sealed record EventTarget(EventScope Scope, EventRequirement? Requireme
 /// <summary>
 ///     An option the event offers; every option is shown, and one whose requirements aren't met can't be picked.
 /// </summary>
-/// <param name="Id">The option's id from the game's data files.</param>
+/// <param name="Id">
+///     The option's id from the game's data files, e.g. <c>outcome_1</c>: the game names options so, not the
+///     outcomes.
+/// </param>
 /// <param name="Name">The option's text, with placeholders as in <see cref="EventDefinition.Name" />.</param>
 /// <param name="Requirements">What must be met to pick the option, all of them.</param>
 /// <param name="Outcomes">What picking the option can lead to; the game draws one by weight.</param>

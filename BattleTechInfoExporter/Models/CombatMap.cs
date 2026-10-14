@@ -8,7 +8,10 @@ namespace BattleTechInfoExporter.Models;
 ///     once when the battle begins; the file exists only while a battle is running. Laid out in rows of characters
 ///     and numbers instead of an object per hex, so the file stays small enough for an AI chat to read whole.
 /// </summary>
-/// <param name="MapId">The map, keyed as in the catalog's <see cref="Catalog.MapDefinitions" />.</param>
+/// <param name="MapId">
+///     The map, keyed as in the catalog's <see cref="Catalog.MapDefinitions" />; <c>null</c> where the map isn't in
+///     the game's metadata database, e.g. a story map.
+/// </param>
 /// <param name="HexGrid">How the hexes' axial coordinates map to positions in meters, and their neighbors.</param>
 /// <param name="Terrains">
 ///     The legend of <see cref="HexRow.Terrains" />: each character's terrain, keyed as in the catalog's
@@ -68,8 +71,8 @@ internal sealed record HexOffset(int Q, int R);
 internal sealed record CombatBuilding(string Id, string Name, MapPosition Position, float MaxStructure);
 
 /// <summary>Consecutive hexes of one row, from (<see cref="Q" />, <see cref="R" />) on, one entry per hex in each list.</summary>
-/// <param name="R">The axial <c>r</c> of every hex in the row.</param>
 /// <param name="Q">The <c>q</c> of the first hex.</param>
+/// <param name="R">The axial <c>r</c> of every hex in the row.</param>
 /// <param name="Terrains">Each hex's terrain as a character of <see cref="CombatMap.Terrains" />.</param>
 /// <param name="Elevations">
 ///     The height in meters a unit standing on each hex is at, a building's roof where one stands.
@@ -84,8 +87,8 @@ internal sealed record CombatBuilding(string Id, string Name, MapPosition Positi
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record HexRow(
-    int R,
     int Q,
+    int R,
     string Terrains,
     IReadOnlyList<double> Elevations,
     IReadOnlyList<int?> Buildings,

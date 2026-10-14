@@ -103,8 +103,8 @@ internal static class CombatMapReader
             var rowHexes = hexes.GetRange(start, end - start);
             rows.Add(
                 new HexRow(
-                    rowHexes[0].Hex.R,
                     rowHexes[0].Hex.Q,
+                    rowHexes[0].Hex.R,
                     string.Concat(rowHexes.Select(hex =>
                         hex.Hex.Terrain is { } terrainId ? terrainCharacters[terrainId] : OpenGroundCharacter)),
                     rowHexes.Select(hex => hex.Hex.Elevation).ToList(),

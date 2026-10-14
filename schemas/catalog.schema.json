@@ -2489,7 +2489,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The option's id from the game's data files."
+          "description": "The option's id from the game's data files, e.g. outcome_1: the game names options so, not the outcomes."
         },
         "name": {
           "type": "string",
@@ -2610,7 +2610,7 @@
     },
     "CareerStatisticChange": {
       "type": "object",
-      "description": "A change the career makes to a statistic of the company or a pilot, e.g. by a ship upgrade or an event.",
+      "description": "A change the career makes to a statistic of the company or a pilot, e.g. by a ship upgrade or an event. Simpler than a combat statistic change on purpose: the career only adds to a statistic or sets it.",
       "additionalProperties": false,
       "required": [
         "statistic",

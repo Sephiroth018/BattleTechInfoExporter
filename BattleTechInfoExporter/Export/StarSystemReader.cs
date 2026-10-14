@@ -52,8 +52,8 @@ internal static class StarSystemReader
             definition.Description.Id,
             definition.Description.Name,
             DefinitionReferences.ReferenceTo(definition.OwnerValue),
-            system.Tags.ToList(),
-            definition.SupportedBiomes.Select(biome => biomes[biome]).ToList(),
+            system.Tags.OrderBy(tag => tag, StringComparer.Ordinal).ToList(),
+            definition.SupportedBiomes.Select(biome => biomes[biome]).OrderBy(biome => biome).ToList(),
             ReadPlayableMaps(definition, playableMaps),
             ReadStoreCollections(definition),
             // As the starmap's system panel shows it (SGSystemViewPopulator).

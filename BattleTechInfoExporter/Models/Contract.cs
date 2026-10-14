@@ -163,10 +163,10 @@ internal record ReputationChange(int? Employer, int? Target);
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Salvage(int Total, int Priority);
 
-/// <summary>The lance the contract allows; every limit is <c>null</c> when there is none.</summary>
+/// <summary>The lance the contract allows.</summary>
 /// <param name="MaxMechs">The most mechs the lance can deploy.</param>
-/// <param name="MinTonnage">The least total tonnage of the lance's mechs.</param>
-/// <param name="MaxTonnage">The most total tonnage of the lance's mechs.</param>
+/// <param name="MinTonnage">The least total tonnage of the lance's mechs; <c>null</c> without a limit.</param>
+/// <param name="MaxTonnage">The most total tonnage of the lance's mechs; <c>null</c> without a limit.</param>
 /// <param name="Mechs">The tonnage limits of each mech slot, one per mech allowed; <c>null</c> when no slot has any.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record LanceLimits(

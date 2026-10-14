@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BattleTech;
@@ -108,7 +109,7 @@ internal static class PilotReader
             ReadSkills(pilot),
             ReadAbilities(definition),
             pilot.Health,
-            definition.PilotTags.ToList());
+            definition.PilotTags.OrderBy(tag => tag, StringComparer.Ordinal).ToList());
     }
 
     // The pilot's statistics, which AbstractActor.SkillGunnery and the others read; effects on the pilot change them.

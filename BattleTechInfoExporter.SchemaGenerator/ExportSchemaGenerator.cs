@@ -34,6 +34,7 @@ internal sealed class ExportSchemaGenerator
             UseXmlDocumentation = false,
             SchemaProcessors =
             {
+                new EnumAliasProcessor(),
                 new AbstractRecordProcessor(),
                 new ModelProcessor(
                     new ModelDocumentation(serializerSettings),
@@ -50,6 +51,34 @@ internal sealed class ExportSchemaGenerator
         NewtonsoftJsonSchemaGenerator.FromType(exportFileModel, _settings);
 
     private static bool IsModel(Type type) => type.Assembly == ModelType.Assembly;
+
+    /// <summary>
+    ///     An enum alias (the game's <c>ALLIED = HONORED</c>) is written under its value's name, so the schema lists
+    ///     that name once and the alias not at all.
+    /// </summary>
+    private sealed class EnumAliasProcessor : ISchemaProcessor
+    {
+        public void Process(SchemaProcessorContext context)
+        {
+            var schema = context.Schema;
+            if (!context.ContextualType.Type.IsEnum || schema.EnumerationNames.Count != schema.Enumeration.Count)
+            {
+                return;
+            }
+
+            var members = schema.Enumeration.Zip(schema.EnumerationNames, (value, name) => (Value: value, Name: name))
+                .GroupBy(member => member.Value)
+                .Select(sameValue => sameValue.First())
+                .ToList();
+            schema.Enumeration.Clear();
+            schema.EnumerationNames.Clear();
+            foreach (var (value, name) in members)
+            {
+                schema.Enumeration.Add(value);
+                schema.EnumerationNames.Add(name);
+            }
+        }
+    }
 
     /// <summary>
     ///     An abstract record declared as a property's type is written as whichever derived record the value is, so it
