@@ -24,6 +24,17 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.72.1
+
+Changed: mission-outcome.json.
+
+### mission-outcome.json
+- Values corrected `trigger` and `salvage.received`: the file is written again once the salvage is
+  final, as `salvageChosen` with the salvage received; from 0.69.0 on it kept the write from the
+  mission's end, and `salvage.received` stayed `null`.
+- Values corrected `objectives[].objectiveIds`: a contract objective that groups no others has its
+  own id alone instead of an empty list; the list is never empty.
+
 ## 0.72.0
 
 Changed: rules.json (breaking), catalog.json.

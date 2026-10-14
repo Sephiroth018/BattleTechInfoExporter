@@ -48,7 +48,11 @@ internal static class SalvageChosenTrigger
             // Null for a skirmish's contract, or when reading the offer failed, which the prefix has logged.
             if (offer != null)
             {
-                MissionExporter.ExportSalvageReceived(contract.BattleTechGame.Simulation, contract, offer);
+                MissionExporter.ExportSalvageReceived(
+                    contract.BattleTechGame.Simulation,
+                    contract,
+                    offer,
+                    MissionCompletedTrigger.TakeObjectivesOf(contract));
             }
         }
         catch (Exception exception)
