@@ -524,7 +524,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   per terrain id, read from the map's terrain data file only on a rebuild.
 - **An event is its definition in the catalog plus the career's event state in the game state**
   (`events`): the catalog's `eventDefinitions` hold the requirements, options, outcomes and results
-  as the game's data has them, statistic names included, each requirement with the scope the game
+  as the game's data has them, statistic names included, except that a result's changes to the
+  stored components' counts are typed component changes, each requirement with the scope the game
   checks it against; the scope's own entry in the career files holds what the requirements check:
   the company's tags and statistics on `company`, each pilot's on the pilot, the star systems' tags
   in `star-systems.json`. Only the statistics some requirement compares are
@@ -609,8 +610,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **Option:** what the player can pick in an event (`SimGameEventOption`). Never "choice".
 - **Outcome:** one of an option's weighted sets of results, one of which picking it leads to
   (`SimGameEventResultSet`).
-- **Result:** one change an outcome makes to one scope: tags, statistics, actions or scheduled
-  events (`SimGameEventResult`).
+- **Result:** one change an outcome makes to one scope: tags, statistics, stored components,
+  actions or scheduled events (`SimGameEventResult`).
 - **Reference:** what the export refers to by its id instead of repeating it, with the name the UI
   shows (`Reference`): a definition, a mech in the mech bay, a component or a pilot.
 - **Entry:** a thing in one of its states, a member of a list: a component stored, for sale,

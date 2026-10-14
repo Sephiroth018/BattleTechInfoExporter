@@ -26,11 +26,17 @@ changes the format.
 
 ## 0.73.0
 
-Changed: game-state.json.
+Changed: game-state.json, catalog.json (breaking).
 
 ### game-state.json
 - Added `workQueue[].kind`: what the entry is about (`mechLab`, `medBay`, `travel`, `shipUpgrade`
   or `financialReport`), which decides its `target`, instead of the game's `type`.
+
+### catalog.json (breaking)
+- Moved the company results' changes to a stored component's count from
+  `eventDefinitions.<id>.options[].outcomes[].results[].statisticChanges[]`, where the statistic
+  was named `Item.<definition type>.<component id>`, to `componentChanges[]` next to it: the
+  `component` reference and the `count` of working copies added, negative for copies taken.
 
 ## 0.72.0
 

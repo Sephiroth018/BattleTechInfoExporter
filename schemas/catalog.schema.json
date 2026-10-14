@@ -2601,6 +2601,7 @@
         "addedTags",
         "removedTags",
         "statisticChanges",
+        "componentChanges",
         "durationDays",
         "actions",
         "forcedEvents"
@@ -2637,9 +2638,16 @@
         },
         "statisticChanges": {
           "type": "array",
-          "description": "The statistics changed; a boolean statistic's value as 1 or 0, as the requirements compare it.",
+          "description": "The statistics changed, apart from the stored components' counts in componentChanges; a boolean statistic's value as 1 or 0, as the requirements compare it.",
           "items": {
             "$ref": "#/definitions/CareerStatisticChange"
+          }
+        },
+        "componentChanges": {
+          "type": "array",
+          "description": "The components added to or taken from the company's storage.",
+          "items": {
+            "$ref": "#/definitions/ComponentChange"
           }
         },
         "durationDays": {
@@ -2647,7 +2655,7 @@
             "integer",
             "null"
           ],
-          "description": "How many days the tag and statistic changes last before the game reverts them; null when they last.",
+          "description": "How many days the tag, statistic and component changes last before the game reverts them; null when they last.",
           "format": "int32"
         },
         "actions": {
@@ -2688,6 +2696,26 @@
         "isSet": {
           "type": "boolean",
           "description": "Whether the change sets the statistic to value instead of adding it."
+        }
+      }
+    },
+    "ComponentChange": {
+      "type": "object",
+      "description": "A change to how many copies of a component the company keeps in storage.",
+      "additionalProperties": false,
+      "required": [
+        "component",
+        "count"
+      ],
+      "properties": {
+        "component": {
+          "description": "The component, by the id its definition is keyed by.",
+          "$ref": "#/definitions/ComponentReference"
+        },
+        "count": {
+          "type": "integer",
+          "description": "The working copies added; negative for copies taken.",
+          "format": "int32"
         }
       }
     },

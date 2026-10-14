@@ -61,13 +61,24 @@ internal static class EventDefinitionReader
                 (outcome.Results ?? []).Select(result => ReadResult(dataManager, result)).ToList()))
             .ToList());
 
-    private static EventResult ReadResult(DataManager dataManager, SimGameEventResult result) =>
-        new(
+    private static EventResult ReadResult(DataManager dataManager, SimGameEventResult result)
+    {
+        var statisticChanges = (result.Stats ?? [])
+            .Select(ReadStatisticChange)
+            .OfType<CareerStatisticChange>()
+            .Select(change => (Statistic: change, Component: ReadComponentChange(dataManager, result.Scope, change)))
+            .ToList();
+        return new EventResult(
             result.Scope,
             result.Requirements is { } requirement ? ReadRequirement(requirement, requirement.Scope) : null,
             ReadTags(result.AddedTags),
             ReadTags(result.RemovedTags),
-            (result.Stats ?? []).Select(ReadStatisticChange).OfType<CareerStatisticChange>().ToList(),
+            statisticChanges.Where(change => change.Component is null).Select(change => change.Statistic).ToList(),
+            statisticChanges
+                .Select(change => change.Component)
+                .OfType<ComponentChange>()
+                .OrderBy(change => change.Component)
+                .ToList(),
             // SimGameState.ApplySimGameEventResult tracks a result as temporary only with a duration.
             result.TemporaryResult && result.ResultDuration > 0 ? result.ResultDuration : null,
             (result.Actions ?? []).Select(action => ReadAction(dataManager, action)).ToList(),
@@ -80,6 +91,21 @@ internal static class EventDefinitionReader
                 forcedEvent.Probability,
                 forcedEvent.RetainPilot))
             .ToList());
+    }
+
+    // An event result adds to a stored item's count like to any other company statistic. A count that is set, of
+    // damaged copies or of something other than a component stays a statistic.
+    private static ComponentChange? ReadComponentChange(
+        DataManager dataManager,
+        EventScope scope,
+        CareerStatisticChange change) =>
+        scope == EventScope.Company
+        && !change.IsSet
+        && ItemCountStatistic.TryParse(change.Statistic) is { IsDamaged: false } statistic
+        && Enum.TryParse<BattleTechResourceType>(statistic.Type, out var resourceType)
+        && ComponentReferences.FindReferenceTo(dataManager, resourceType, statistic.Id) is { } component
+            ? new ComponentChange(component, (int)change.Value)
+            : null;
 
     // Each kind's value as SimGameState.ApplySimGameEventResult reads it: the kill, dismiss, heal and single injury
     // actions act on the event's pilot and ignore their value. Only the base game's event actions are known.

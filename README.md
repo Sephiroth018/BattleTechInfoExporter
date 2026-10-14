@@ -111,7 +111,8 @@ The last one describes the game rather than the career:
     whether it comes only once, whether the daily roll can draw it (otherwise only another event's
     result schedules it), its requirements, the other pilots or mech it involves, and its options.
     Each option has its requirements and its outcomes, drawn by weight, and each outcome its results:
-    tags added and removed, statistics changed, how many days the changes last before the game
+    tags added and removed, statistics changed, components added to or taken from storage, how
+    many days the changes last before the game
     reverts them (`null` when they last), actions such as killing, dismissing or sidelining the
     pilot, each with only the field its kind needs (the days, the injuries, the pilot, the item
     collection), and the events it schedules. A requirement names the scope it checks (the company, the

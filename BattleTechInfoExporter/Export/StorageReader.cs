@@ -9,8 +9,8 @@ namespace BattleTechInfoExporter.Export;
 
 /// <summary>Builds the company's storage from the game's career state.</summary>
 /// <remarks>
-///     The game keeps storage as company stats named <c>Item.&lt;type&gt;.&lt;id&gt;</c>, with a <c>.DAMAGED</c>
-///     suffix for damaged components; their value is the count.
+///     The game keeps storage as company stats named as <see cref="ItemCountStatistic" /> says; their value is the
+///     count.
 /// </remarks>
 internal static class StorageReader
 {
@@ -75,11 +75,12 @@ internal static class StorageReader
         simGame.GetAllInventoryStrings()
             .Select(statName =>
             {
-                var parts = statName.Split('.');
+                var statistic = ItemCountStatistic.TryParse(statName)
+                                ?? throw new InvalidOperationException($"{statName} counts no stored item");
                 return new StoredItem(
-                    parts[1],
-                    parts[2],
-                    statName.EndsWith(".DAMAGED", StringComparison.Ordinal),
+                    statistic.Type,
+                    statistic.Id,
+                    statistic.IsDamaged,
                     simGame.CompanyStats.GetValue<int>(statName));
             })
             .Where(item => item.Count >= 1)

@@ -39,14 +39,26 @@ internal static class ComponentReferences
         BattleTechResourceType resourceType,
         string componentId)
     {
-        if (FindDefinition(dataManager, resourceType, componentId) is { } definition)
+        if (FindReferenceTo(dataManager, resourceType, componentId) is { } reference)
         {
-            return ReferenceTo(definition.ComponentType, componentId, definition);
+            return reference;
         }
 
         ModLog.Logger.LogWarning($"Left out {componentId}: no {resourceType} definition");
         return null;
     }
+
+    /// <summary>
+    ///     The reference to a component, or <c>null</c> when no component of the resource type has the id, without
+    ///     logging: for a lookup of something that needn't be a component.
+    /// </summary>
+    internal static ComponentReference? FindReferenceTo(
+        DataManager dataManager,
+        BattleTechResourceType resourceType,
+        string componentId) =>
+        FindDefinition(dataManager, resourceType, componentId) is { } definition
+            ? ReferenceTo(definition.ComponentType, componentId, definition)
+            : null;
 
     // The id stands in for the name of a missing definition, which the catalog has no entry for.
     internal static ComponentReference ReferenceTo(
