@@ -127,7 +127,7 @@ internal static class CombatUnitReader
                 isLastSeen
                     ? combat.LocalPlayerTeam.VisibilityCache.previouslyDetectedEnemyLocations[actor]
                     : actor.CurrentPosition),
-            isLastSeen ? null : actor.CurrentRotation.eulerAngles.y,
+            isLastSeen ? null : ReadFacingDegrees(actor),
             isLastSeen ? null : actor.occupiedDesignMask?.Id,
             isSighted && actor.GetPilot() is { } pilot ? PilotReader.ReferenceTo(pilot) : null,
             isSighted ? ReadState(actor) : null,
@@ -175,7 +175,12 @@ internal static class CombatUnitReader
             _ => throw NoUnitKind(actor)
         };
 
-    internal static MapPosition ReadPosition(Vector3 position) => new(position.x, position.y, position.z);
+    internal static MapPosition ReadPosition(Vector3 position) =>
+        new(Rounding.ToTenth(position.x), Rounding.ToTenth(position.y), Rounding.ToTenth(position.z));
+
+    // Rounding 359.96 up gives 360, which is 0.
+    private static float ReadFacingDegrees(AbstractActor actor) =>
+        Rounding.ToTenth(actor.CurrentRotation.eulerAngles.y) % 360f;
 
     private static CombatUnitState ReadState(AbstractActor actor)
     {

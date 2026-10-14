@@ -10,8 +10,10 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>
 ///     Reads which steps from a hex to its neighbors the game's pathing blocks on slopes for the units of one group of
 ///     pathing capabilities. The game moves units over path nodes half a hex apart in eight directions (PathNodeGrid,
-///     PathingUtil.GetForwardDelta), so a neighbor is two node steps away; the step to it is blocked when every such
-///     route is. Terrain move costs and units in the way aren't part of it.
+///     PathingUtil.GetForwardDelta) and passes any node, stopping only on hex centers; the step to a neighbor is open
+///     when node steps lead from the hex's center to the neighbor's through the nodes of the two hexes and the two
+///     next to both. Wider detours the game also takes aren't searched, so the steps only approximate its pathing.
+///     Terrain move costs and units in the way aren't part of it.
 /// </summary>
 internal sealed class HexStepReader
 {
@@ -26,23 +28,33 @@ internal sealed class HexStepReader
     private static readonly IReadOnlyList<(int X, int Z)> NodeSteps =
         [(0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1)];
 
-    // Per direction, the path nodes a two-step route to the neighbor can pass through, as offsets from the hex.
-    private static readonly List<List<(int X, int Z)>> RouteNodes = Directions
-        .Select(direction =>
-        {
-            var target = NodeOf(direction);
-            return NodeSteps
-                .Where(step => NodeSteps.Contains((target.X - step.X, target.Z - step.Z)))
-                .ToList();
-        })
+    // A hex's nodes as offsets from its center: the center, the nodes halfway to its left and right neighbors, which
+    // it shares with them, and the nodes half a row above and below, which lie inside it. Together they tile the map.
+    private static readonly IReadOnlyList<(int X, int Z)> HexNodes = [(0, 0), (1, 0), (-1, 0), (0, 1), (0, -1)];
+
+    // Per direction, the nodes a route to the neighbor may pass, as offsets from the hex's center: those of the hex,
+    // the neighbor and the two hexes next to both, which lie in the directions before and after it.
+    private static readonly List<HashSet<(int X, int Z)>> RouteNodes = Enumerable.Range(0, Directions.Count)
+        .Select(direction => new HashSet<(int X, int Z)>(
+            new[]
+                {
+                    new HexPoint3(0, 0),
+                    Directions[direction],
+                    Directions[(direction + 1) % Directions.Count],
+                    Directions[(direction + Directions.Count - 1) % Directions.Count]
+                }
+                .SelectMany(hex => HexNodes.Select(node => Offset(NodeOf(hex), node)))))
         .ToList();
+
+    // Every node step is shared by several routes, hexes and directions.
+    private readonly Dictionary<((int X, int Z) From, (int X, int Z) To), bool> _blockedNodeSteps = new();
 
     private readonly CombatGameState _combat;
 
     // Checks the ledges between two nodes, in both directions, as a grid of the group's units does.
     private readonly PathNodeGrid _ledgeChecker;
 
-    // Every node step is shared by several routes, hexes and directions; the ledge check is the costly part.
+    // The ledge check is the costly part.
     private readonly Dictionary<((int X, int Z) From, (int X, int Z) To), bool> _ledgesBetweenNodes = new();
     private readonly Dictionary<(int X, int Z), (Vector3 Position, MapTerrainDataCell Cell)> _nodes = new();
 
@@ -93,26 +105,60 @@ internal sealed class HexStepReader
         return mask;
     }
 
-    private bool CanReach((int X, int Z) start, (int X, int Z) end, List<(int X, int Z)> routeNodes)
+    // A breadth-first search over the route's nodes, as PathNodeGrid.BuildPathNetwork spreads over every node.
+    private bool CanReach((int X, int Z) start, (int X, int Z) end, HashSet<(int X, int Z)> routeNodes)
     {
-        foreach (var via in routeNodes)
+        var reached = new HashSet<(int X, int Z)> { start };
+        var open = new Queue<(int X, int Z)>();
+        open.Enqueue(start);
+        while (open.Count > 0)
         {
-            var middle = (start.X + via.X, start.Z + via.Z);
-            if (!IsStepBlocked(start, middle) && !IsStepBlocked(middle, end))
+            var from = open.Dequeue();
+            foreach (var step in NodeSteps)
             {
-                return true;
+                var to = Offset(from, step);
+                if (!routeNodes.Contains((to.X - start.X, to.Z - start.Z)) || reached.Contains(to)
+                                                                           || IsStepBlocked(from, to))
+                {
+                    continue;
+                }
+
+                if (to == end)
+                {
+                    return true;
+                }
+
+                reached.Add(to);
+                open.Enqueue(to);
             }
         }
 
         return false;
     }
 
-    // As PathNodeGrid.GetTerrainModifiedCost without the terrain's cost: too steep a grade or cell, or a ledge
-    // between the nodes.
     private bool IsStepBlocked((int X, int Z) from, (int X, int Z) to)
+    {
+        if (!_blockedNodeSteps.TryGetValue((from, to), out var isBlocked))
+        {
+            isBlocked = ReadIsStepBlocked(from, to);
+            _blockedNodeSteps.Add((from, to), isBlocked);
+        }
+
+        return isBlocked;
+    }
+
+    // As PathNodeGrid.GetTerrainModifiedCost without the terrain's cost: too steep a grade or cell, or a ledge
+    // between the nodes. A step leaving the map's cells is blocked, as PathNodeGrid.FindBlockerBetween treats one
+    // starting outside them, whose check would otherwise read past the cells.
+    private bool ReadIsStepBlocked((int X, int Z) from, (int X, int Z) to)
     {
         var (fromPosition, _) = NodeAt(from);
         var (toPosition, toCell) = NodeAt(to);
+        if (!_combat.MapMetaData.IsWithinBounds(fromPosition) || !_combat.MapMetaData.IsWithinBounds(toPosition))
+        {
+            return true;
+        }
+
         var distance = Vector2.Distance(
             new Vector2(fromPosition.x, fromPosition.z),
             new Vector2(toPosition.x, toPosition.z));
@@ -154,4 +200,7 @@ internal sealed class HexStepReader
     // Path nodes lie half a hex apart along x and half a row apart along z, with a hex's center on every node
     // (PathNodeGrid.ResetPathGrid, PathNode.IsLegalWorldPathLocationForActor).
     private static (int X, int Z) NodeOf(HexPoint3 hex) => (2 * hex.q + hex.r, 2 * hex.r);
+
+    private static (int X, int Z) Offset((int X, int Z) node, (int X, int Z) offset) =>
+        (node.X + offset.X, node.Z + offset.Z);
 }

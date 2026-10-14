@@ -11,6 +11,8 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>Builds the pilots of the barracks and the hiring hall from the game's career state.</summary>
 internal static class PilotReader
 {
+    private const string NoLastName = "NONE";
+
     // The commander is kept apart from the roster; the barracks lists them first (SGBarracksWidget.Reset).
     internal static List<BarracksPilot> ReadPilots(SimGameState simGame, IReadOnlyList<string> comparedStatistics) =>
         new[] { simGame.Commander }
@@ -149,6 +151,10 @@ internal static class PilotReader
     private static int? ReadTagEndDay(SimGameState simGame, Pilot pilot, string tag) =>
         simGame.GetTemporaryTagLength(pilot, tag) is var days and > 0 ? simGame.DaysPassed + days : null;
 
-    private static string FullName(HumanDescriptionDef pilot) =>
-        $"{pilot.FirstName} {pilot.LastName}".Trim() is { Length: > 0 } fullName ? fullName : pilot.Name;
+    // The game's data gives pilots without a last name, such as the generic enemy and turret pilots, NONE instead.
+    private static string FullName(HumanDescriptionDef pilot)
+    {
+        var lastName = pilot.LastName == NoLastName ? string.Empty : pilot.LastName;
+        return $"{pilot.FirstName} {lastName}".Trim() is { Length: > 0 } fullName ? fullName : pilot.Name;
+    }
 }
