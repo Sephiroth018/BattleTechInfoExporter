@@ -601,8 +601,7 @@
         "components",
         "pilot",
         "abilities",
-        "precisionStrikeCost",
-        "vigilanceCost"
+        "resolveCosts"
       ],
       "properties": {
         "deathMethod": {
@@ -693,15 +692,16 @@
             "$ref": "#/definitions/CombatAbility"
           }
         },
-        "precisionStrikeCost": {
-          "type": "integer",
-          "description": "The resolve a Precision Strike costs the unit now, which its pilot's morale changes.",
-          "format": "int32"
-        },
-        "vigilanceCost": {
-          "type": "integer",
-          "description": "The resolve Vigilance costs the unit now.",
-          "format": "int32"
+        "resolveCosts": {
+          "description": "What Precision Strike and Vigilance cost the unit now, which its pilot's spirits change; null for the units not in the player's lance, which spend no resolve.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/ResolveCosts"
+            }
+          ]
         }
       }
     },
@@ -1093,6 +1093,27 @@
             "null"
           ],
           "description": "The uses left of an ability that can be used only so often; null without a limit.",
+          "format": "int32"
+        }
+      }
+    },
+    "ResolveCosts": {
+      "type": "object",
+      "description": "The resolve a mech's Precision Strike and Vigilance cost.",
+      "additionalProperties": false,
+      "required": [
+        "precisionStrikeCost",
+        "vigilanceCost"
+      ],
+      "properties": {
+        "precisionStrikeCost": {
+          "type": "integer",
+          "description": "The resolve a Precision Strike costs.",
+          "format": "int32"
+        },
+        "vigilanceCost": {
+          "type": "integer",
+          "description": "The resolve Vigilance costs.",
           "format": "int32"
         }
       }

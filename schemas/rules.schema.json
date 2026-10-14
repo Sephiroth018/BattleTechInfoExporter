@@ -1091,15 +1091,11 @@
       "description": "The combat effect of a pilot's spirits: the resolve their mech's Precision Strike and Vigilance cost.",
       "additionalProperties": false,
       "required": [
-        "level",
         "precisionStrikeCost",
-        "vigilanceCost"
+        "vigilanceCost",
+        "level"
       ],
       "properties": {
-        "level": {
-          "description": "The pilot's spirits level the costs apply at.",
-          "$ref": "#/definitions/SpiritsLevel"
-        },
         "precisionStrikeCost": {
           "type": "integer",
           "description": "The resolve a Precision Strike costs.",
@@ -1109,6 +1105,10 @@
           "type": "integer",
           "description": "The resolve Vigilance costs.",
           "format": "int32"
+        },
+        "level": {
+          "description": "The pilot's spirits level the costs apply at.",
+          "$ref": "#/definitions/SpiritsLevel"
         }
       }
     },

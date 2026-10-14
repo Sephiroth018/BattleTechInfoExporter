@@ -270,7 +270,7 @@ it stands in by its catalog id (`null` on open ground). What else it carries fol
   that carry their own, the pilot's injuries, health and bonus health left (which takes hits before they
   become injuries) and skills as the game computes with them now, effects included, together under
   `pilot`, which is `null` for a unit without one, the abilities that can be activated with their cooldowns and uses left,
-  and what Precision Strike and Vigilance cost it now. A Sensor Lock brings an enemy into full view
+  and, for the player's units, what Precision Strike and Vigilance cost them now. A Sensor Lock brings an enemy into full view
   for the player's whole side, and allied units' sensors count for the player. An enemy in sight
   but hidden by ECM counts as in full view, although the HUD hides its pilot, heat, stability and
   initiative and it can't be targeted until spotted well enough or sensor locked.

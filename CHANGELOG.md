@@ -26,7 +26,8 @@ changes the format.
 
 ## 0.73.0
 
-Changed: game-state.json, star-systems.json, catalog.json (breaking).
+Changed: game-state.json, star-systems.json, combat-state.json (breaking), catalog.json
+(breaking).
 
 ### game-state.json
 - Added `workQueue[].kind`: what the entry is about (`mechLab`, `medBay`, `travel`, `shipUpgrade`
@@ -36,6 +37,11 @@ Changed: game-state.json, star-systems.json, catalog.json (breaking).
 ### star-systems.json
 - Values corrected `starSystems.<id>.stores.system[]`, `faction[]` and `blackMarket[]`: sorted
   ordinally like every other list; some systems kept their data's order.
+
+### combat-state.json (breaking)
+- Moved `units.<id>.state.precisionStrikeCost` and `vigilanceCost` to
+  `units.<id>.state.resolveCosts`, which is `null` for every unit not in the player's lance:
+  enemies and allies spend no resolve.
 
 ### catalog.json (breaking)
 - Moved the company results' changes to a stored component's count from

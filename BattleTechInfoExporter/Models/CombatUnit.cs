@@ -91,8 +91,10 @@ internal sealed record CombatUnit(
 /// <param name="Components">Every component mounted, in the game's order.</param>
 /// <param name="Pilot">The pilot's condition; <c>null</c> without a pilot.</param>
 /// <param name="Abilities">The pilot's and components' abilities that can be activated, with their cooldowns.</param>
-/// <param name="PrecisionStrikeCost">The resolve a Precision Strike costs the unit now, which its pilot's morale changes.</param>
-/// <param name="VigilanceCost">The resolve Vigilance costs the unit now.</param>
+/// <param name="ResolveCosts">
+///     What Precision Strike and Vigilance cost the unit now, which its pilot's spirits change; <c>null</c> for the
+///     units not in the player's lance, which spend no resolve.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatUnitState(
     DeathMethod? DeathMethod,
@@ -109,8 +111,7 @@ internal sealed record CombatUnitState(
     IReadOnlyList<CombatComponent> Components,
     CombatPilotState? Pilot,
     IReadOnlyList<CombatAbility> Abilities,
-    int PrecisionStrikeCost,
-    int VigilanceCost);
+    ResolveCosts? ResolveCosts);
 
 /// <param name="Heat">The mech's heat.</param>
 /// <param name="Stability">The mech's stability bar.</param>
