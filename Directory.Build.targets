@@ -1,60 +1,201 @@
 <Project>
   <!--
-    The version comes from git: the newest release tag (v<Major.Minor.Patch>) reachable from HEAD, bumped by the
-    first-parent commits since it, by their conventional type. A "!" after the type is breaking: major, or minor
-    while the major is 0. feat is minor, fix and refactor patch; docs, chore and test don't bump and roll into
-    the next release. The build number counts those commits: with a bump from 0, so a PR's merge commit on main is
-    build 0; without one the tagged commit is build 0, so a commit after a release never shares its version. Merges
-    are counted and typed as one commit, so a merge from main into a branch adds nothing. IDE design-time builds
-    skip git and keep the SDK's default version.
+    The version comes from git tags and conventional commit types, as CLAUDE.md's "Versioning" describes. An inline
+    task, because a stacked PR applies one bump per lower PR. IDE design-time builds skip git.
   -->
+  <UsingTask TaskName="ComputeVersionFromGit" TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <RepositoryDirectory ParameterType="System.String" Required="true" />
+      <VersionPrefix ParameterType="System.String" Output="true" />
+      <BuildNumber ParameterType="System.Int32" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Class" Language="cs"><![CDATA[
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
+
+public sealed class ComputeVersionFromGit : Task
+{
+    private enum Bump { None, Patch, Minor, Breaking }
+
+    [Required]
+    public string RepositoryDirectory { get; set; }
+
+    [Output]
+    public string VersionPrefix { get; set; }
+
+    [Output]
+    public int BuildNumber { get; set; }
+
+    public override bool Execute()
+    {
+        try
+        {
+            ComputeVersion();
+            return true;
+        }
+        catch (Exception exception) when (exception is InvalidOperationException || exception is Win32Exception)
+        {
+            Log.LogError(exception.Message);
+            return false;
+        }
+    }
+
+    private void ComputeVersion()
+    {
+        var releaseTag = FindReleaseTag(string.Empty);
+        var tagMatch = Regex.Match(releaseTag, @"^v(\d+)\.(\d+)\.(\d+)$");
+        if (!tagMatch.Success)
+        {
+            throw new InvalidOperationException($"The release tag '{releaseTag}' isn't v<Major.Minor.Patch>.");
+        }
+
+        var boundaries = FindLowerBranches(releaseTag).Prepend(releaseTag).Append("HEAD").ToList();
+        var bumps = Enumerable.Range(1, boundaries.Count - 1)
+            .Select(i => Lines(Git($"log --first-parent --format=%s {boundaries[i - 1]}..{boundaries[i]}"))
+                .Select(BumpOf)
+                .DefaultIfEmpty(Bump.None)
+                .Max())
+            .ToList();
+
+        var major = int.Parse(tagMatch.Groups[1].Value);
+        var minor = int.Parse(tagMatch.Groups[2].Value);
+        var patch = int.Parse(tagMatch.Groups[3].Value);
+        foreach (var bump in bumps)
+        {
+            switch (bump)
+            {
+                case Bump.Breaking when major > 0:
+                    (major, minor, patch) = (major + 1, 0, 0);
+                    break;
+                case Bump.Breaking:
+                case Bump.Minor:
+                    (minor, patch) = (minor + 1, 0);
+                    break;
+                case Bump.Patch:
+                    patch++;
+                    break;
+            }
+        }
+
+        // Counted from the newest release on HEAD's first-parent chain, which a released lower PR doesn't move, as main
+        // reaches its commits only through a second parent: so every commit on a branch raises the count.
+        var countedSinceTag = FindReleaseTag("--first-parent");
+        var commitsSinceTag = int.Parse(Git($"rev-list --count --first-parent {countedSinceTag}..HEAD"));
+        VersionPrefix = $"{major}.{minor}.{patch}";
+        BuildNumber = commitsSinceTag - (bumps.Any(bump => bump != Bump.None) ? 1 : 0);
+        Log.LogMessage(MessageImportance.Normal,
+            $"Version {VersionPrefix}.{BuildNumber}: {releaseTag}, bumps {string.Join(", ", bumps.Select((bump, i) => $"{boundaries[i + 1]} {bump}"))}");
+    }
+
+    // Release tags form a chain on main, so the tag with the fewest commits on top is the newest.
+    private string FindReleaseTag(string options)
+    {
+        var (exitCode, releaseTag) = RunGit($"describe --tags --match v[0-9]*.[0-9]*.[0-9]* --exclude *-* --abbrev=0 {options}");
+        if (exitCode != 0)
+        {
+            throw new InvalidOperationException($"No release tag v<Major.Minor.Patch> is reachable from HEAD ({releaseTag}); fetch the tags.");
+        }
+
+        return releaseTag;
+    }
+
+    // The remote branches of the open PRs this one is stacked on, bottom first: their tips are in HEAD but not in main.
+    // A lower PR's commits that HEAD hasn't merged yet hide its branch, so they count as this PR's until merged.
+    private List<string> FindLowerBranches(string releaseTag)
+    {
+        var ownBranch = $"origin/{Git("branch --show-current")}";
+        var lowerBranches = Lines(Git("for-each-ref --merged HEAD --no-merged origin/main --no-contains HEAD --format=%(refname:short) refs/remotes/origin"))
+            .Where(branch => branch != ownBranch)
+            .OrderBy(branch => int.Parse(Git($"rev-list --count {releaseTag}..{branch}")))
+            .ToList();
+        for (var i = 1; i < lowerBranches.Count; i++)
+        {
+            if (RunGit($"merge-base --is-ancestor {lowerBranches[i - 1]} {lowerBranches[i]}").ExitCode != 0)
+            {
+                throw new InvalidOperationException(
+                    $"HEAD contains the remote branches {lowerBranches[i - 1]} and {lowerBranches[i]}, which aren't stacked on each other.");
+            }
+        }
+
+        return lowerBranches;
+    }
+
+    private static Bump BumpOf(string subject)
+    {
+        var match = Regex.Match(subject, @"^(?<type>[a-z]+)(\([^)]*\))?(?<breaking>!)?:");
+        if (!match.Success)
+        {
+            return Bump.None;
+        }
+
+        if (match.Groups["breaking"].Success)
+        {
+            return Bump.Breaking;
+        }
+
+        switch (match.Groups["type"].Value)
+        {
+            case "feat":
+                return Bump.Minor;
+            case "fix":
+            case "refactor":
+                return Bump.Patch;
+            default:
+                return Bump.None;
+        }
+    }
+
+    private string Git(string arguments)
+    {
+        var (exitCode, output) = RunGit(arguments);
+        if (exitCode != 0)
+        {
+            throw new InvalidOperationException($"git {arguments} failed with exit code {exitCode}: {output}");
+        }
+
+        return output;
+    }
+
+    private (int ExitCode, string Output) RunGit(string arguments)
+    {
+        var startInfo = new ProcessStartInfo("git", arguments)
+        {
+            WorkingDirectory = RepositoryDirectory,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+        };
+        using (var process = Process.Start(startInfo))
+        {
+            var errorOutput = process.StandardError.ReadToEndAsync();
+            var output = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+            return (process.ExitCode, process.ExitCode == 0 ? output.Trim() : $"{output}{errorOutput.Result}".Trim());
+        }
+    }
+
+    private static List<string> Lines(string output) =>
+        output.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(line => line.Trim()).ToList();
+}
+]]></Code>
+    </Task>
+  </UsingTask>
   <Target Name="ComputeBuildVersion" BeforeTargets="GetAssemblyVersion" Condition="'$(DesignTimeBuild)' != 'true'">
-    <!-- Release tags form a chain on main, so the tag with the fewest commits on top is the newest. -->
-    <Exec Command="git describe --tags --match v[0-9]*.[0-9]*.[0-9]* --exclude *-* --abbrev=0" WorkingDirectory="$(MSBuildThisFileDirectory)"
-          ConsoleToMsBuild="true" StandardOutputImportance="low" IgnoreExitCode="true">
-      <Output TaskParameter="ConsoleOutput" PropertyName="ReleaseTag" />
-    </Exec>
-    <Error Condition="!$([System.Text.RegularExpressions.Regex]::IsMatch('$(ReleaseTag)', '^v\d+\.\d+\.\d+$'))"
-           Text="No release tag v&lt;Major.Minor.Patch&gt; is reachable from HEAD (found '$(ReleaseTag)'); fetch the tags." />
+    <ComputeVersionFromGit RepositoryDirectory="$(MSBuildThisFileDirectory)">
+      <Output TaskParameter="VersionPrefix" PropertyName="VersionPrefix" />
+      <Output TaskParameter="BuildNumber" PropertyName="BuildNumber" />
+    </ComputeVersionFromGit>
     <PropertyGroup>
-      <!-- Counted by git's own message grep, so the subjects never pass through MSBuild. It matches every line of a
-           message, so a body line written like a subject ("fix(#12): ...") counts too; bodies don't start lines so. -->
-      <CountCommits>git rev-list --count --first-parent --extended-regexp $(ReleaseTag)..HEAD</CountCommits>
-    </PropertyGroup>
-    <Exec Command="$(CountCommits)" WorkingDirectory="$(MSBuildThisFileDirectory)" ConsoleToMsBuild="true"
-          StandardOutputImportance="low">
-      <Output TaskParameter="ConsoleOutput" PropertyName="CommitsSinceRelease" />
-    </Exec>
-    <Exec Command="$(CountCommits) --grep=&quot;^[a-z]+(\([^)]*\))?!:&quot;" WorkingDirectory="$(MSBuildThisFileDirectory)"
-          ConsoleToMsBuild="true" StandardOutputImportance="low">
-      <Output TaskParameter="ConsoleOutput" PropertyName="BreakingCommits" />
-    </Exec>
-    <Exec Command="$(CountCommits) --grep=&quot;^feat(\([^)]*\))?!?:&quot;" WorkingDirectory="$(MSBuildThisFileDirectory)"
-          ConsoleToMsBuild="true" StandardOutputImportance="low">
-      <Output TaskParameter="ConsoleOutput" PropertyName="FeatureCommits" />
-    </Exec>
-    <Exec Command="$(CountCommits) --grep=&quot;^(fix|refactor)(\([^)]*\))?!?:&quot;" WorkingDirectory="$(MSBuildThisFileDirectory)"
-          ConsoleToMsBuild="true" StandardOutputImportance="low">
-      <Output TaskParameter="ConsoleOutput" PropertyName="FixCommits" />
-    </Exec>
-    <PropertyGroup>
-      <ReleaseVersion>$(ReleaseTag.Substring(1))</ReleaseVersion>
-      <Major>$(ReleaseVersion.Split('.')[0])</Major>
-      <Minor>$(ReleaseVersion.Split('.')[1])</Minor>
-      <Patch>$(ReleaseVersion.Split('.')[2])</Patch>
-      <Bump>none</Bump>
-      <Bump Condition="'$(FixCommits)' > '0'">patch</Bump>
-      <Bump Condition="'$(FeatureCommits)' > '0' Or '$(BreakingCommits)' > '0'">minor</Bump>
-      <Bump Condition="'$(BreakingCommits)' > '0' And '$(Major)' > '0'">major</Bump>
-      <VersionPrefix Condition="'$(Bump)' == 'none'">$(ReleaseVersion)</VersionPrefix>
-      <VersionPrefix Condition="'$(Bump)' == 'patch'">$(Major).$(Minor).$([MSBuild]::Add($(Patch), 1))</VersionPrefix>
-      <VersionPrefix Condition="'$(Bump)' == 'minor'">$(Major).$([MSBuild]::Add($(Minor), 1)).0</VersionPrefix>
-      <VersionPrefix Condition="'$(Bump)' == 'major'">$([MSBuild]::Add($(Major), 1)).0.0</VersionPrefix>
-      <BuildNumber>$(CommitsSinceRelease)</BuildNumber>
-      <BuildNumber Condition="'$(Bump)' != 'none'">$([MSBuild]::Subtract($(CommitsSinceRelease), 1))</BuildNumber>
       <Version>$(VersionPrefix).$(BuildNumber)</Version>
     </PropertyGroup>
-    <Message Importance="normal" Text="Version $(Version): $(ReleaseTag) + $(CommitsSinceRelease) commits, bump $(Bump)" />
     <!--
       The changelog's newest entry must be this version's: older means the entry is missing, or another PR released
       its number first and the heading has to move on. Newer is a branch that hasn't merged main since a release.
