@@ -59,7 +59,7 @@ internal static class GameStateReader
             simGame.MedTechSkill,
             ReadTemporaryChanges(simGame, SimGameState.COMPANYSTAT_MEDTECH),
             simGame.GetMaxMechWarriors(),
-            simGame.CompanyTags.ToList(),
+            simGame.CompanyTags.OrderBy(tag => tag, StringComparer.Ordinal).ToList(),
             EventStatisticReader.ReadStatistics(simGame.CompanyStats, comparedStatistics));
 
     // SimGameState.UpdateTempResults reverts a temporary result as the day after its last day starts, adding the

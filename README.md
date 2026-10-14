@@ -159,8 +159,9 @@ The game state holds:
 - **Company:** name, date, funds, morale, rating, MechTech and MedTech with the changes events made
   to them for a time and the day each ends, the reputation with every faction, and the tags and
   statistics events check.
-- **Work queue:** the timeline's entries in order, each with the day it finishes and its `target`:
-  the mech, pilot, destination or ship upgrade it applies to, by the entry's type.
+- **Work queue:** the timeline's entries in order, each with the day it finishes and, by the
+  entry's type, its `target`: the mech, pilot, destination or ship upgrade it applies to; the
+  financial report has none.
 - **Ship:** the Argo's upgrades the engineering screen shows, each installed, installing,
   available or locked, with its required upgrades, price, upkeep, installation days and effects in
   the game's words and as values; `null` while the company still flies the Leopard.

@@ -8,7 +8,10 @@ namespace BattleTechInfoExporter.Models;
 ///     begins and after every unit's activation; the file exists only while a battle is running.
 /// </summary>
 /// <param name="Contract">The contract being fought, as in <see cref="MissionOutcome.Contract" />.</param>
-/// <param name="MapId">The map, keyed as in the catalog's <see cref="Catalog.MapDefinitions" />.</param>
+/// <param name="MapId">
+///     The map, keyed as in the catalog's <see cref="Catalog.MapDefinitions" />; <c>null</c> where the map isn't in
+///     the game's metadata database, e.g. a story map.
+/// </param>
 /// <param name="Round">The combat round, counted from 1.</param>
 /// <param name="Phase">
 ///     The current phase as the HUD numbers it, as <see cref="CombatUnitState.Initiative" />: units act from 5

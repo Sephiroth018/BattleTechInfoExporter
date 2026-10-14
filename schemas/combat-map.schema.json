@@ -34,7 +34,7 @@
         "null",
         "string"
       ],
-      "description": "The map, keyed as in the catalog's mapDefinitions."
+      "description": "The map, keyed as in the catalog's mapDefinitions; null where the map isn't in the game's metadata database, e.g. a story map."
     },
     "hexGrid": {
       "description": "How the hexes' axial coordinates map to positions in meters, and their neighbors.",
@@ -253,22 +253,22 @@
       "description": "Consecutive hexes of one row, from (q, r) on, one entry per hex in each list.",
       "additionalProperties": false,
       "required": [
-        "r",
         "q",
+        "r",
         "terrains",
         "elevations",
         "buildings",
         "blockedSteps"
       ],
       "properties": {
-        "r": {
-          "type": "integer",
-          "description": "The axial r of every hex in the row.",
-          "format": "int32"
-        },
         "q": {
           "type": "integer",
           "description": "The q of the first hex.",
+          "format": "int32"
+        },
+        "r": {
+          "type": "integer",
+          "description": "The axial r of every hex in the row.",
           "format": "int32"
         },
         "terrains": {

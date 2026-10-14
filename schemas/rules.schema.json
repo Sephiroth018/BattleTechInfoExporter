@@ -219,7 +219,6 @@
         "LIKED",
         "FRIENDLY",
         "HONORED",
-        "ALLIED",
         "LOATHED",
         "HATED",
         "DISLIKED"
@@ -228,7 +227,6 @@
         "INDIFFERENT",
         "LIKED",
         "FRIENDLY",
-        "HONORED",
         "HONORED",
         "LOATHED",
         "HATED",

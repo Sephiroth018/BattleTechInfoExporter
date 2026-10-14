@@ -18,12 +18,12 @@ internal static class WorkQueueReader
         var entries = simGame.MechLabQueue
             // SimGameState.UpdateMechLabWorkQueue relies on the same.
             .Cast<WorkOrderEntry_MechLab>()
-            .Select(order => ReadMechLabEntry(simGame, order, mechLabFinishingDays[order]))
+            .Select(order => (WorkQueueEntry)ReadMechLabEntry(simGame, order, mechLabFinishingDays[order]))
             // The med bay holds heal orders only (SimGameState.RefreshInjuries). The pilot's timeout comes from their
             // heal order, counted as the timeline does.
             .Concat(simGame.MedBayQueue.SubEntries
                 .OfType<WorkOrderEntry_MedBayHeal>()
-                .Select(order => new WorkQueueEntry(
+                .Select(order => new MedBayOrder(
                     order.Type,
                     PilotReader.ReadReadyOnDay(simGame, order.Pilot),
                     PilotReader.ReferenceTo(order.Pilot))))
@@ -36,7 +36,7 @@ internal static class WorkQueueReader
 
         if (simGame.FinancialReportNotification is { } report)
         {
-            entries.Add(new WorkQueueEntry(report.Type, FinancialReportReader.ReadDueOnDay(simGame), null));
+            entries.Add(new FinancialReportOrder(report.Type, FinancialReportReader.ReadDueOnDay(simGame)));
         }
 
         if (simGame.CurrentUpgradeEntry is { } upgradeOrder)
@@ -105,7 +105,7 @@ internal static class WorkQueueReader
         Mathf.Max(1, Mathf.CeilToInt((float)cost / dailyProgress));
 
     // The timeline names the mech by SimGameState.GetMechByID, which also finds readying mechs.
-    private static WorkQueueEntry ReadMechLabEntry(
+    private static MechLabOrder ReadMechLabEntry(
         SimGameState simGame,
         WorkOrderEntry_MechLab order,
         int finishesOnDay)
@@ -116,13 +116,13 @@ internal static class WorkQueueReader
             ModLog.Logger.LogWarning($"Work order {order.ID} names no mech of the company: {order.MechID}");
         }
 
-        return new WorkQueueEntry(
+        return new MechLabOrder(
             order.Type,
             finishesOnDay,
             mech is null ? null : MechReader.ReferenceToBayMech(mech));
     }
 
-    private static WorkQueueEntry ReadTravelEntry(SimGameState simGame, WorkOrderEntry_TravelGeneric travelOrder)
+    private static TravelOrder ReadTravelEntry(SimGameState simGame, WorkOrderEntry_TravelGeneric travelOrder)
     {
         var destination = simGame.Starmap?.Destination?.System;
         if (destination is null)
@@ -130,13 +130,13 @@ internal static class WorkQueueReader
             ModLog.Logger.LogWarning($"Travel order {travelOrder.ID} has no destination");
         }
 
-        return new WorkQueueEntry(
+        return new TravelOrder(
             travelOrder.Type,
             ReadArrivalDay(simGame, travelOrder),
             destination is null ? null : DefinitionReferences.ReferenceTo(destination.Def.Description));
     }
 
-    private static WorkQueueEntry ReadShipUpgradeEntry(
+    private static ShipUpgradeOrder ReadShipUpgradeEntry(
         SimGameState simGame,
         WorkOrderEntry_ArgoUpgradeGeneric upgradeOrder)
     {
@@ -146,7 +146,7 @@ internal static class WorkQueueReader
                 $"Left out {upgradeOrder.upgradeID}: no {nameof(BattleTechResourceType.ShipModuleUpgrade)} definition");
         }
 
-        return new WorkQueueEntry(
+        return new ShipUpgradeOrder(
             upgradeOrder.Type,
             simGame.DaysPassed + DaysUntilFinished(upgradeOrder, simGame.DailyUpgradeValue),
             upgrade is null ? null : DefinitionReferences.ReferenceTo(upgrade.Description));

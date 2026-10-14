@@ -24,6 +24,20 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.70.0
+
+Changed: game-state.json (breaking), star-systems.json.
+
+### game-state.json
+- Removed `workQueue[].target` from the entry of type `FinancialReport`, which was always `null`;
+  the other types keep it, each with the reference shape its type carries.
+- Values corrected `company.tags[]` and `pilots[].tags[]`: sorted, instead of the order the career
+  added them in.
+
+### star-systems.json
+- Values corrected `starSystems.<id>.tags[]` and `biomes[]`: sorted, like every other list of
+  references.
+
 ## 0.69.0
 
 Changed: mission-outcome.json, combat-state.json (breaking).

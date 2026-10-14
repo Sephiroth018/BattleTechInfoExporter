@@ -28,7 +28,7 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="TemporaryMedTechChanges">The changes events made to <paramref name="MedTech" /> for a time, by end day.</param>
 /// <param name="MaxPilots">The pilots the barracks hold, not counting the commander; no more can be hired.</param>
-/// <param name="Tags">The company's tags, which the events' requirements check.</param>
+/// <param name="Tags">The company's tags, sorted, which the events' requirements check.</param>
 /// <param name="Statistics">
 ///     The company's statistics some event's requirements compare, keyed by the game's name, as they compare them; a
 ///     statistic the company doesn't have is 0.
