@@ -72,7 +72,7 @@
     },
     "contractTypes": {
       "type": "array",
-      "description": "The mission types, which type refers to.",
+      "description": "The mission types, which the type of every contract refers to: game-state.json contracts[], game-state.json activeContract and mission-outcome.json contract.",
       "items": {
         "$ref": "#/definitions/ContractTypeDescription"
       }
@@ -1169,7 +1169,7 @@
     },
     "ContractTypeDescription": {
       "type": "object",
-      "description": "A mission type with the game's description of its objectives, which type refers to.",
+      "description": "A mission type with the game's description of its objectives, which the type of every contract refers to: game-state.json contracts[], game-state.json activeContract and mission-outcome.json contract.",
       "additionalProperties": false,
       "required": [
         "type",
@@ -1262,7 +1262,7 @@
         },
         "weaponCategories": {
           "type": "object",
-          "description": "By the weapon category's name, as the catalog's weapons name theirs; Melee is the melee and jump attacks'.",
+          "description": "By the weapon category's name, as the catalog's weapons name theirs; Melee is the melee and jump attacks'. AMS is a category no exported weapon has.",
           "additionalProperties": {
             "$ref": "#/definitions/WeaponCategoryRules"
           }
@@ -1609,7 +1609,7 @@
     },
     "AttackerDamageModifiers": {
       "type": "object",
-      "description": "Turrets get none.",
+      "description": "The to-hit modifiers for damage to the attacker's weapon or its location; an attacking turret gets none.",
       "additionalProperties": false,
       "required": [
         "mech",

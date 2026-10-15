@@ -146,7 +146,7 @@
         },
         "contractEmployers": {
           "type": "array",
-          "description": "The factions that can hire the company for the star system's generated contracts, sorted by name, each with the factions it can hire it against; a contract's own requirements can narrow them further. Story and flashpoint contracts name their own.",
+          "description": "The factions that can hire the company for the star system's generated contracts, sorted by name, each with the factions it can hire it against, without the employers the story sets aside; a contract's own requirements can narrow them further. Story and flashpoint contracts name their own.",
           "items": {
             "$ref": "#/definitions/ContractEmployer"
           }
@@ -240,7 +240,7 @@
         },
         "targets": {
           "type": "array",
-          "description": "The factions it can hire the company against there, sorted by name: its enemies among the star system's targets, except the company's allies.",
+          "description": "The factions it can hire the company against there, sorted by name: its enemies among the star system's targets, except the company's allies and the targets the story sets aside.",
           "items": {
             "$ref": "#/definitions/DefinitionReference"
           }

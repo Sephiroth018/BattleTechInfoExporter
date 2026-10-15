@@ -1939,7 +1939,7 @@
           "description": "The name the UI shows."
         },
         "type": {
-          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in catalog.json componentDefinitions.",
+          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in catalog.json componentDefinitions; never NotSet, Special or MechPart, which the game's enum also has.",
           "$ref": "#/definitions/ComponentType"
         }
       }
@@ -2638,7 +2638,7 @@
         },
         "count": {
           "type": "integer",
-          "description": "The copies kept; for components, the working ones.",
+          "description": "The chassis kept.",
           "format": "int32"
         }
       }
@@ -2985,7 +2985,7 @@
           "$ref": "#/definitions/DefinitionReference"
         },
         "target": {
-          "description": "The faction the mission is fought against.",
+          "description": "The faction the mission is fought against; INVALID_UNSET, which has no catalog.json factionDefinitions entry, for a story contract that only travels.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "difficulty": {
@@ -3265,7 +3265,7 @@
         },
         "contractEmployers": {
           "type": "array",
-          "description": "The factions that can hire the company for the star system's generated contracts, sorted by name, each with the factions it can hire it against; a contract's own requirements can narrow them further. Story and flashpoint contracts name their own.",
+          "description": "The factions that can hire the company for the star system's generated contracts, sorted by name, each with the factions it can hire it against, without the employers the story sets aside; a contract's own requirements can narrow them further. Story and flashpoint contracts name their own.",
           "items": {
             "$ref": "#/definitions/ContractEmployer"
           }
@@ -3340,7 +3340,7 @@
         },
         "targets": {
           "type": "array",
-          "description": "The factions it can hire the company against there, sorted by name: its enemies among the star system's targets, except the company's allies.",
+          "description": "The factions it can hire the company against there, sorted by name: its enemies among the star system's targets, except the company's allies and the targets the story sets aside.",
           "items": {
             "$ref": "#/definitions/DefinitionReference"
           }
@@ -3431,7 +3431,7 @@
           "$ref": "#/definitions/DefinitionReference"
         },
         "target": {
-          "description": "The faction the mission is fought against.",
+          "description": "The faction the mission is fought against; INVALID_UNSET, which has no catalog.json factionDefinitions entry, for a story contract that only travels.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "difficulty": {

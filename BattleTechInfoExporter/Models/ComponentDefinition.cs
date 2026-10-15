@@ -143,7 +143,8 @@ internal sealed record WeaponDefinition : ComponentDefinition
 ///     The power of the evasive pips that multiplies the damage of one shot; 0 leaves the damage at its base.
 /// </param>
 /// <param name="HeatDivisor">
-///     The heat the mech takes per attack is the damage of one shot divided by this; <c>null</c> when
+///     The heat the mech takes per attack is the damage of one shot as fired, after the evasive pips' increase and
+///     <see cref="DamageRules.GlobalMultiplier" />, divided by this; <c>null</c> when
 ///     <see cref="WeaponDefinition.HeatGenerated" /> applies instead.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

@@ -204,7 +204,7 @@
           "$ref": "#/definitions/DefinitionReference"
         },
         "target": {
-          "description": "The faction the mission is fought against.",
+          "description": "The faction the mission is fought against; INVALID_UNSET, which has no catalog.json factionDefinitions entry, for a story contract that only travels.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "difficulty": {
@@ -358,7 +358,7 @@
           ]
         },
         "bayMech": {
-          "description": "The player's mech in game-state.json, whose loadout holds its assigned armor.",
+          "description": "The player's mech in game-state.json, whose loadout holds its assigned armor; null for every other unit.",
           "oneOf": [
             {
               "type": "null"
@@ -962,7 +962,7 @@
           "description": "The name the UI shows."
         },
         "type": {
-          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in catalog.json componentDefinitions.",
+          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in catalog.json componentDefinitions; never NotSet, Special or MechPart, which the game's enum also has.",
           "$ref": "#/definitions/ComponentType"
         }
       }

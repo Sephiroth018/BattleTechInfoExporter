@@ -25,7 +25,10 @@ namespace BattleTechInfoExporter.Models;
 ///     The mech, vehicle or turret in the catalog, which holds its armor and loadout; <c>null</c> for the player's
 ///     mechs, which have <see cref="BayMech" /> instead, and for units out of full view.
 /// </param>
-/// <param name="BayMech">The player's mech in <c>game-state.json</c>, whose loadout holds its assigned armor.</param>
+/// <param name="BayMech">
+///     The player's mech in <c>game-state.json</c>, whose loadout holds its assigned armor; <c>null</c> for every
+///     other unit.
+/// </param>
 /// <param name="Position">Where the unit is, or was last detected at for <see cref="UnitVisibility.LastSeen" />.</param>
 /// <param name="FacingDegrees">
 ///     The direction the unit faces, in degrees clockwise from the map's +Z axis, from 0 to below 360 and to 0.1°,

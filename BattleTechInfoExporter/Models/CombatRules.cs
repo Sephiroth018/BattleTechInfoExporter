@@ -15,7 +15,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Damage">The damage multipliers that apply regardless of the target.</param>
 /// <param name="WeaponCategories">
 ///     By the weapon category's name, as the catalog's weapons name theirs; <c>Melee</c> is the melee and jump
-///     attacks'.
+///     attacks'. <c>AMS</c> is a category no exported weapon has.
 /// </param>
 /// <param name="StrayShots">What a missed shot can hit instead; <c>null</c> when misses hit nothing.</param>
 /// <param name="Coil">How COIL weapons gain from the attacker's evasive pips.</param>
