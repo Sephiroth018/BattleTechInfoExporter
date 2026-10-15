@@ -3478,7 +3478,10 @@
       "properties": {
         "canNegotiate": {
           "type": "boolean",
-          "description": "Whether the terms are negotiated with the sliders (NegotiableTerms) or fixed (FixedTerms)."
+          "description": "Whether the terms are negotiated with the sliders (NegotiableTerms) or fixed (FixedTerms).",
+          "enum": [
+            false
+          ]
         },
         "pay": {
           "type": "integer",
@@ -3506,7 +3509,10 @@
       "properties": {
         "canNegotiate": {
           "type": "boolean",
-          "description": "Whether the terms are negotiated with the sliders (NegotiableTerms) or fixed (FixedTerms)."
+          "description": "Whether the terms are negotiated with the sliders (NegotiableTerms) or fixed (FixedTerms).",
+          "enum": [
+            true
+          ]
         },
         "valuesByShare": {
           "type": "array",
