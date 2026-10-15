@@ -2565,9 +2565,9 @@
           "$ref": "#/definitions/Operator"
         },
         "value": {
-          "type": "number",
+          "type": "integer",
           "description": "The count it is compared to.",
-          "format": "float"
+          "format": "int32"
         }
       }
     },

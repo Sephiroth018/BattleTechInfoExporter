@@ -26,7 +26,11 @@ changes the format.
 
 ## 0.74.0
 
-Changed: combat-state.json, combat-map.json, catalog.json (breaking).
+Changed: game-state.json, combat-state.json, combat-map.json, catalog.json (breaking).
+
+### game-state.json
+- Type changed `mechs[].refit[].armor.front` and `rear` in steps of type `modifyArmor`: numbers
+  like every other armor value, no longer integers. The values are still whole.
 
 ### combat-state.json
 - Values corrected `units.<id>.state.mech.stability.current`, `unsteadyAbove` and
@@ -43,6 +47,8 @@ Changed: combat-state.json, combat-map.json, catalog.json (breaking).
   `biomeDefinitions.<id>.damageDealt`: they repeated `byWeaponCategory.Support`, `Energy`,
   `Ballistic` and `Missile`. A weapon's multiplier is `all` times its category's in
   `byWeaponCategory`.
+- Type changed `componentComparisons[].value` in every requirement of `eventDefinitions.<id>`:
+  an integer like `componentChanges[].count`, no longer a number. The values are the same.
 
 ## 0.73.0
 

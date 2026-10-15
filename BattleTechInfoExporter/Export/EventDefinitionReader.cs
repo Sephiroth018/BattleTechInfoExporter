@@ -103,8 +103,16 @@ internal static class EventDefinitionReader
         EventScope scope,
         CareerStatisticChange change) =>
         !change.IsSet && ReadCountedComponent(dataManager, scope, change.Statistic) is { } component
-            ? new ComponentChange(component, (int)change.Value)
+            ? new ComponentChange(component, ReadCount(change.Statistic, change.Value))
             : null;
+
+    // Events give a count as a float. The base game's data has whole numbers only; a fraction would change what a
+    // comparison with a whole count passes.
+    private static int ReadCount(string statisticName, float value) =>
+        value % 1f == 0f
+            ? (int)value
+            : throw new InvalidOperationException(
+                $"Event gives the count {statisticName} the fraction {value.ToString(CultureInfo.InvariantCulture)}");
 
     // Events change and compare a stored item's count like any other company statistic. A count of damaged copies or
     // of something other than a component stays a statistic.
@@ -173,17 +181,27 @@ internal static class EventDefinitionReader
             return null;
         }
 
-        var comparisons = (requirement.RequirementComparisons ?? [])
-            .Select(comparison => ReadCountedComponent(dataManager, scope, comparison.obj) is { } component
-                ? (IComparison)new ComponentComparison(component, comparison.op, comparison.val)
-                : new StatisticComparison(comparison.obj, comparison.op, comparison.val))
-            .ToList();
+        var statisticComparisons = new List<StatisticComparison>();
+        var componentComparisons = new List<ComponentComparison>();
+        foreach (var comparison in requirement.RequirementComparisons ?? [])
+        {
+            if (ReadCountedComponent(dataManager, scope, comparison.obj) is { } component)
+            {
+                componentComparisons.Add(
+                    new ComponentComparison(component, comparison.op, ReadCount(comparison.obj, comparison.val)));
+            }
+            else
+            {
+                statisticComparisons.Add(new StatisticComparison(comparison.obj, comparison.op, comparison.val));
+            }
+        }
+
         return new EventRequirement(
             scope,
             ReadTags(requirement.RequirementTags),
             ReadTags(requirement.ExclusionTags),
-            comparisons.OfType<StatisticComparison>().ToList(),
-            comparisons.OfType<ComponentComparison>().OrderBy(comparison => comparison.Component).ToList());
+            statisticComparisons,
+            componentComparisons.OrderBy(comparison => comparison.Component).ToList());
     }
 
     private static List<EventRequirement> ReadRequirementList(
