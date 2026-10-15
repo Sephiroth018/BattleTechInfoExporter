@@ -137,10 +137,6 @@ internal static class TerrainReader
         float missile) =>
         new(
             all,
-            support,
-            energy,
-            ballistic,
-            missile,
             WeaponCategories.ByName(category => category.DesignMaskString switch
             {
                 "Support" => support,

@@ -24,6 +24,17 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.74.0
+
+Changed: catalog.json (breaking).
+
+### catalog.json (breaking)
+- Removed `support`, `energy`, `ballistic` and `missile` from
+  `terrainDefinitions.<id>.damageDealt`, `terrainDefinitions.<id>.damageTaken` and
+  `biomeDefinitions.<id>.damageDealt`: they repeated `byWeaponCategory.Support`, `Energy`,
+  `Ballistic` and `Missile`. A weapon's multiplier is `all` times its category's in
+  `byWeaponCategory`.
+
 ## 0.73.0
 
 Changed: game-state.json (breaking), rules.json, star-systems.json, combat-state.json

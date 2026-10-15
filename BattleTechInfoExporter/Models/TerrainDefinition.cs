@@ -77,19 +77,9 @@ internal sealed record TerrainMoveCosts(
 ///     the one for every attack.
 /// </summary>
 /// <param name="All">For every attack.</param>
-/// <param name="Support">For weapons of the <c>Support</c> <see cref="WeaponDefinition.Category" />.</param>
-/// <param name="Energy">For weapons of the <c>Energy</c> <see cref="WeaponDefinition.Category" />.</param>
-/// <param name="Ballistic">For weapons of the <c>Ballistic</c> <see cref="WeaponDefinition.Category" />.</param>
-/// <param name="Missile">For weapons of the <c>Missile</c> <see cref="WeaponDefinition.Category" />.</param>
 /// <param name="ByWeaponCategory">
 ///     The weapon category's multiplier keyed by every <see cref="WeaponDefinition.Category" /> the game knows, as
 ///     <see cref="CombatRules.WeaponCategories" /> are; 1 for a category without one, such as <c>Melee</c>.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record DamageMultipliers(
-    float All,
-    float Support,
-    float Energy,
-    float Ballistic,
-    float Missile,
-    IReadOnlyDictionary<string, float> ByWeaponCategory);
+internal sealed record DamageMultipliers(float All, IReadOnlyDictionary<string, float> ByWeaponCategory);
