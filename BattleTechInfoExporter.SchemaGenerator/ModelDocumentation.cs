@@ -84,7 +84,8 @@ internal sealed partial class ModelDocumentation
     ///     A cref (<c>P:Namespace.Type.Member</c>) as the JSON shows it: an enum value as written; a property by its
     ///     JSON name alone on the documented type, as the type itself or one it derives from has it, or on the root; a
     ///     property or type elsewhere in this file by its owner's definition and JSON name (<c>Mech.id</c>); one in
-    ///     another file by that file and its path there (<c>rules.json moraleLevels</c>); anything else by its name.
+    ///     another file by that file and its path there (<c>rules.json moraleLevels</c>); one of an abstract record no
+    ///     property declares where each of its derived records is; anything else by its name.
     /// </summary>
     private string Target(string cref, Type documentedType)
     {
@@ -132,9 +133,12 @@ internal sealed partial class ModelDocumentation
             var locations = ExportSchemaGenerator.DerivedRecordsOf(owner)
                 .Select(derivedType => Location(derivedType, propertyName))
                 .ToList();
-            return locations.Count > 1
-                ? $"{string.Join(", ", locations[..^1])} and {locations[^1]}"
-                : string.Concat(locations);
+            return locations switch
+            {
+                [] => throw new InvalidOperationException($"{owner.Name} has no derived record to refer to"),
+                [var only] => only,
+                _ => $"{string.Join(", ", locations[..^1])} and {locations[^1]}"
+            };
         }
 
         return propertyName ?? DefinitionNames.Of(owner);

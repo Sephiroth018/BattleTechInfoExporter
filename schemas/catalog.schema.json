@@ -3286,7 +3286,7 @@
     },
     "FactionDefinition": {
       "type": "object",
-      "description": "A faction's relations to the other factions, which decide whom it hires the company against. Two faction references have no entry: Player1sMercUnit and INVALID_UNSET.",
+      "description": "A faction's relations to the other factions, which decide whom it hires the company against. Some faction references have no entry, such as Player1sMercUnit and INVALID_UNSET.",
       "additionalProperties": false,
       "required": [
         "id",

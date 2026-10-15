@@ -4,8 +4,8 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     A faction's relations to the other factions, which decide whom it hires the company against. Two faction
-///     references have no entry: <c>Player1sMercUnit</c> and <c>INVALID_UNSET</c>.
+///     A faction's relations to the other factions, which decide whom it hires the company against. Some faction
+///     references have no entry, such as <c>Player1sMercUnit</c> and <c>INVALID_UNSET</c>.
 /// </summary>
 /// <param name="Name">As in the references to the faction; not unique, since several ids can share a name.</param>
 /// <param name="Allies">
