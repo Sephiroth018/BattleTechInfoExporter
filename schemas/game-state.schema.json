@@ -2187,11 +2187,11 @@
         },
         "armor": {
           "description": "The location's armor after the change, by side.",
-          "$ref": "#/definitions/LocationArmorOfInt32"
+          "$ref": "#/definitions/LocationArmorOfInteger"
         }
       }
     },
-    "LocationArmorOfInt32": {
+    "LocationArmorOfInteger": {
       "type": "object",
       "description": "A location's armor by side, in whatever a file measures armor in.",
       "additionalProperties": false,

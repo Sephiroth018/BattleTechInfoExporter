@@ -768,7 +768,7 @@
         },
         "armor": {
           "description": "The armor left, by side; only a mech's torso has a rear.",
-          "$ref": "#/definitions/LocationArmorOfInt32"
+          "$ref": "#/definitions/LocationArmorOfInteger"
         },
         "structure": {
           "type": "integer",
@@ -777,7 +777,7 @@
         }
       }
     },
-    "LocationArmorOfInt32": {
+    "LocationArmorOfInteger": {
       "type": "object",
       "description": "A location's armor by side, in whatever a file measures armor in.",
       "additionalProperties": false,

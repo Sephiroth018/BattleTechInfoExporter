@@ -1511,19 +1511,19 @@
       "properties": {
         "mech": {
           "description": "Against a mech, by its weight class.",
-          "$ref": "#/definitions/ByWeightClassOfSingle"
+          "$ref": "#/definitions/ByWeightClassOfNumber"
         },
         "vehicle": {
           "description": "Against a vehicle, by its weight class.",
-          "$ref": "#/definitions/ByWeightClassOfSingle"
+          "$ref": "#/definitions/ByWeightClassOfNumber"
         },
         "turret": {
           "description": "Against a turret, by its chassis' weight class.",
-          "$ref": "#/definitions/ByWeightClassOfSingle"
+          "$ref": "#/definitions/ByWeightClassOfNumber"
         }
       }
     },
-    "ByWeightClassOfSingle": {
+    "ByWeightClassOfNumber": {
       "type": "object",
       "description": "A value per weight class of the unit it applies to.",
       "additionalProperties": false,
@@ -1598,7 +1598,7 @@
       "properties": {
         "mech": {
           "description": "For an attacking mech, by its weight class.",
-          "$ref": "#/definitions/ByWeightClassOfSingle"
+          "$ref": "#/definitions/ByWeightClassOfNumber"
         },
         "vehicle": {
           "type": "number",
@@ -2004,7 +2004,7 @@
         },
         "overheatStructureDamageByWeightClass": {
           "description": "The structure damage per location an overheated mech takes, by its weight class.",
-          "$ref": "#/definitions/ByWeightClassOfSingle"
+          "$ref": "#/definitions/ByWeightClassOfNumber"
         }
       }
     },
@@ -2818,7 +2818,7 @@
       "properties": {
         "enemyDestroyed": {
           "description": "By the enemy's weight class; a turret counts as light.",
-          "$ref": "#/definitions/ByWeightClassOfInt32"
+          "$ref": "#/definitions/ByWeightClassOfInteger"
         },
         "enemyDestroyedInMelee": {
           "type": "integer",
@@ -2887,7 +2887,7 @@
         }
       }
     },
-    "ByWeightClassOfInt32": {
+    "ByWeightClassOfInteger": {
       "type": "object",
       "description": "A value per weight class of the unit it applies to.",
       "additionalProperties": false,

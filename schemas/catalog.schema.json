@@ -367,7 +367,7 @@
         },
         "maxArmor": {
           "description": "The most armor the location can take.",
-          "$ref": "#/definitions/LocationArmorOfSingle"
+          "$ref": "#/definitions/LocationArmorOfNumber"
         },
         "structure": {
           "type": "number",
@@ -422,7 +422,7 @@
         "All"
       ]
     },
-    "LocationArmorOfSingle": {
+    "LocationArmorOfNumber": {
       "type": "object",
       "description": "A location's armor by side, in whatever a file measures armor in.",
       "additionalProperties": false,
@@ -794,7 +794,7 @@
         },
         "armor": {
           "description": "The armor fitted.",
-          "$ref": "#/definitions/LocationArmorOfSingle"
+          "$ref": "#/definitions/LocationArmorOfNumber"
         },
         "components": {
           "type": "array",
@@ -953,7 +953,7 @@
         },
         "armor": {
           "description": "The armor in combat, after the game's vehicle multiplier; a vehicle has no rear armor.",
-          "$ref": "#/definitions/LocationArmorOfSingle"
+          "$ref": "#/definitions/LocationArmorOfNumber"
         },
         "structure": {
           "type": "number",
@@ -1035,7 +1035,7 @@
         },
         "armor": {
           "description": "The armor in combat, after the game's vehicle multiplier; a turret has no rear armor.",
-          "$ref": "#/definitions/LocationArmorOfSingle"
+          "$ref": "#/definitions/LocationArmorOfNumber"
         },
         "structure": {
           "type": "number",
@@ -2177,19 +2177,19 @@
       "properties": {
         "mech": {
           "description": "For mechs, by their weight class; null where they can't enter.",
-          "$ref": "#/definitions/ByWeightClassOfNullableSingle"
+          "$ref": "#/definitions/ByWeightClassOfNullableNumber"
         },
         "tracked": {
           "description": "For tracked vehicles, by their weight class; null where they can't enter.",
-          "$ref": "#/definitions/ByWeightClassOfNullableSingle"
+          "$ref": "#/definitions/ByWeightClassOfNullableNumber"
         },
         "wheeled": {
           "description": "For wheeled vehicles, by their weight class; null where they can't enter.",
-          "$ref": "#/definitions/ByWeightClassOfNullableSingle"
+          "$ref": "#/definitions/ByWeightClassOfNullableNumber"
         }
       }
     },
-    "ByWeightClassOfNullableSingle": {
+    "ByWeightClassOfNullableNumber": {
       "type": "object",
       "description": "A value per weight class of the unit it applies to.",
       "additionalProperties": false,
