@@ -26,7 +26,16 @@ changes the format.
 
 ## 0.74.0
 
-Changed: catalog.json (breaking).
+Changed: combat-state.json, combat-map.json, catalog.json (breaking).
+
+### combat-state.json
+- Values corrected `units.<id>.state.mech.stability.current`, `unsteadyAbove` and
+  `maxStability`: rounded to a tenth like every other position and armor value.
+- Values corrected `damagedBuildings[].structure`: rounded to a tenth; damage that rounds away
+  no longer lists a building.
+
+### combat-map.json
+- Values corrected `buildings[].maxStructure`: rounded to a tenth.
 
 ### catalog.json (breaking)
 - Removed `support`, `energy`, `ballistic` and `missile` from

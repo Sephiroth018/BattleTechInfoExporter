@@ -25,15 +25,16 @@ internal static class BuildingReader
             .OrderBy(building => building.GUID, StringComparer.Ordinal)
             .ToList();
 
-    // A building can also be destroyed without damage (Building.IsDead), e.g. with the one it stands on.
+    // A building can also be destroyed without damage (Building.IsDead), e.g. with the one it stands on. Damage below
+    // the rounding doesn't count, so a damaged building never shows its max structure.
     internal static IReadOnlyList<DamagedBuilding> ReadDamagedBuildings(
         CombatGameState combat,
         IReadOnlyList<BattleTech.Building> buildings) =>
         buildings
-            .Where(building => building.IsDead || building.CurrentStructure < building.StartingStructure)
+            .Where(building => building.IsDead || ReadStructure(building) < ReadMaxStructure(building))
             .Select(building => new DamagedBuilding(
                 building.GUID,
-                Math.Max(0f, building.CurrentStructure),
+                ReadStructure(building),
                 building.IsDead ? ReadDestroyedHexes(combat, building) : null))
             .ToList();
 
@@ -53,7 +54,7 @@ internal static class BuildingReader
             building.GUID,
             building.DisplayName,
             CombatUnitReader.ReadPosition(building.CurrentPosition),
-            building.StartingStructure);
+            ReadMaxStructure(building));
 
     /// <summary>
     ///     The id of the obstruction whose building a unit standing in the cell is on, its topmost one
@@ -89,6 +90,12 @@ internal static class BuildingReader
             .Select(hex => MapHexReader.ReadHex(combat, hex))
             .ToList();
     }
+
+    private static float ReadStructure(BattleTech.Building building) =>
+        Rounding.ToTenth(Math.Max(0f, building.CurrentStructure));
+
+    private static float ReadMaxStructure(BattleTech.Building building) =>
+        Rounding.ToTenth(building.StartingStructure);
 
     private static ObstructionGameLogic ObstructionOf(CombatGameState combat, BattleTech.Building building) =>
         ObstructionGameLogic.GetObstructionFromBuilding(building, combat.ItemRegistry)

@@ -216,7 +216,10 @@ internal static class CombatUnitReader
 
     // Mech.UnsteadyThreshold already scales the statistic's percent to the bar; Mech.AddInstability compares with it.
     private static MechStability ReadStability(Mech mech) =>
-        new(mech.CurrentStability, mech.UnsteadyThreshold, mech.MaxStability);
+        new(
+            Rounding.ToTenth(mech.CurrentStability),
+            Rounding.ToTenth(mech.UnsteadyThreshold),
+            Rounding.ToTenth(mech.MaxStability));
 
     // Whole points, as the paper doll shows them (HUDMechArmorReadout.FormatForSummary, which the vehicle and turret
     // readouts share): cut off, except that a remainder below 1 shows as 1.
