@@ -72,7 +72,7 @@
     },
     "contractTypes": {
       "type": "array",
-      "description": "The mission types, which the type of every contract refers to: game-state.json contracts[], game-state.json activeContract and mission-outcome.json contract.",
+      "description": "The mission types, which game-state.json activeContract.type, mission-outcome.json contract.type and game-state.json contracts[].type refers to.",
       "items": {
         "$ref": "#/definitions/ContractTypeDescription"
       }
@@ -1169,7 +1169,7 @@
     },
     "ContractTypeDescription": {
       "type": "object",
-      "description": "A mission type with the game's description of its objectives, which the type of every contract refers to: game-state.json contracts[], game-state.json activeContract and mission-outcome.json contract.",
+      "description": "A mission type with the game's description of its objectives, which game-state.json activeContract.type, mission-outcome.json contract.type and game-state.json contracts[].type refers to.",
       "additionalProperties": false,
       "required": [
         "type",

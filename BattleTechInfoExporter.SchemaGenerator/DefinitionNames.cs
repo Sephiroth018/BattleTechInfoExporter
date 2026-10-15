@@ -17,13 +17,14 @@ internal sealed class DefinitionNames : ISchemaNameGenerator
     {
         if (!type.IsGenericType)
         {
-            return Type.GetTypeCode(type) switch
-            {
-                _ when type.IsEnum => type.Name,
-                TypeCode.Byte or TypeCode.Int16 or TypeCode.Int32 or TypeCode.Int64 => "Integer",
-                TypeCode.Single or TypeCode.Double or TypeCode.Decimal => "Number",
-                _ => type.Name
-            };
+            return type.IsEnum
+                ? type.Name
+                : Type.GetTypeCode(type) switch
+                {
+                    TypeCode.Byte or TypeCode.Int16 or TypeCode.Int32 or TypeCode.Int64 => "Integer",
+                    TypeCode.Single or TypeCode.Double or TypeCode.Decimal => "Number",
+                    _ => type.Name
+                };
         }
 
         var arguments = type.GetGenericArguments();

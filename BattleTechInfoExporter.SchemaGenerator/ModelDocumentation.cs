@@ -126,6 +126,17 @@ internal sealed partial class ModelDocumentation
             return $"{fileName} {ExportFilePaths.Join(otherPath, propertyName)}".TrimEnd();
         }
 
+        // An abstract record no property declares is only ever written as one of its derived records.
+        if (ExportSchemaGenerator.IsModel(owner) && owner.IsAbstract)
+        {
+            var locations = ExportSchemaGenerator.DerivedRecordsOf(owner)
+                .Select(derivedType => Location(derivedType, propertyName))
+                .ToList();
+            return locations.Count > 1
+                ? $"{string.Join(", ", locations[..^1])} and {locations[^1]}"
+                : string.Concat(locations);
+        }
+
         return propertyName ?? DefinitionNames.Of(owner);
     }
 
