@@ -2187,11 +2187,11 @@
         },
         "armor": {
           "description": "The location's armor after the change, by side.",
-          "$ref": "#/definitions/LocationArmorOfInteger"
+          "$ref": "#/definitions/LocationArmorOfNumber"
         }
       }
     },
-    "LocationArmorOfInteger": {
+    "LocationArmorOfNumber": {
       "type": "object",
       "description": "A location's armor by side, in whatever a file measures armor in.",
       "additionalProperties": false,
@@ -2201,17 +2201,17 @@
       ],
       "properties": {
         "front": {
-          "type": "integer",
+          "type": "number",
           "description": "The front armor; outside the torso, the location's only armor.",
-          "format": "int32"
+          "format": "float"
         },
         "rear": {
           "type": [
-            "integer",
-            "null"
+            "null",
+            "number"
           ],
           "description": "null outside the torso, which alone has rear armor.",
-          "format": "int32"
+          "format": "float"
         }
       }
     },

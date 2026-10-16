@@ -2240,36 +2240,12 @@
       "additionalProperties": false,
       "required": [
         "all",
-        "support",
-        "energy",
-        "ballistic",
-        "missile",
         "byWeaponCategory"
       ],
       "properties": {
         "all": {
           "type": "number",
           "description": "For every attack.",
-          "format": "float"
-        },
-        "support": {
-          "type": "number",
-          "description": "For weapons of the Support WeaponDefinition.category.",
-          "format": "float"
-        },
-        "energy": {
-          "type": "number",
-          "description": "For weapons of the Energy WeaponDefinition.category.",
-          "format": "float"
-        },
-        "ballistic": {
-          "type": "number",
-          "description": "For weapons of the Ballistic WeaponDefinition.category.",
-          "format": "float"
-        },
-        "missile": {
-          "type": "number",
-          "description": "For weapons of the Missile WeaponDefinition.category.",
           "format": "float"
         },
         "byWeaponCategory": {
@@ -2589,9 +2565,9 @@
           "$ref": "#/definitions/Operator"
         },
         "value": {
-          "type": "number",
+          "type": "integer",
           "description": "The count it is compared to.",
-          "format": "float"
+          "format": "int32"
         }
       }
     },
