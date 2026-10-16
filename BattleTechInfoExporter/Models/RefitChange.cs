@@ -60,7 +60,7 @@ internal abstract record LocationRefitChange(RefitChangeType Type, bool IsDone, 
 /// <summary>A step that adds or removes a location's armor.</summary>
 /// <param name="Armor">The location's armor after the change, by side.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record ModifyArmorChange(bool IsDone, ChassisLocations Location, LocationArmor<int> Armor)
+internal sealed record ModifyArmorChange(bool IsDone, ChassisLocations Location, LocationArmor<float> Armor)
     : LocationRefitChange(RefitChangeType.ModifyArmor, IsDone, Location);
 
 /// <summary>A step that repairs a location's structure.</summary>

@@ -31,7 +31,7 @@ internal sealed record EventRequirement(
 /// <param name="Operator">How the statistic's value compares to <paramref name="Value" />.</param>
 /// <param name="Value">The value the statistic is compared to.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record StatisticComparison(string Statistic, Operator Operator, float Value) : IComparison;
+internal sealed record StatisticComparison(string Statistic, Operator Operator, float Value) : IComparison<float>;
 
 /// <summary>
 ///     A comparison of the company's working copies of a component in storage, as
@@ -40,5 +40,5 @@ internal sealed record StatisticComparison(string Statistic, Operator Operator, 
 /// <param name="Operator">How the count compares to <paramref name="Value" />.</param>
 /// <param name="Value">The count it is compared to.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record ComponentComparison(ComponentReference Component, Operator Operator, float Value)
-    : ComponentEntry(Component), IComparison;
+internal sealed record ComponentComparison(ComponentReference Component, Operator Operator, int Value)
+    : ComponentEntry(Component), IComparison<int>;

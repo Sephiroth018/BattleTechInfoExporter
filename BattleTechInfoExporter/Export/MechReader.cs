@@ -221,7 +221,10 @@ internal static class MechReader
             WorkOrderEntry_ModifyMechArmor armor => new ModifyArmorChange(
                 step.IsMechLabComplete,
                 armor.Location,
-                ArmorOf(mech.GetChassisLocationDef(armor.Location), armor.DesiredFrontArmor, armor.DesiredRearArmor)),
+                ArmorOf<float>(
+                    mech.GetChassisLocationDef(armor.Location),
+                    armor.DesiredFrontArmor,
+                    armor.DesiredRearArmor)),
             WorkOrderEntry_RepairMechStructure structure => new RepairStructureChange(
                 step.IsMechLabComplete,
                 structure.Location,

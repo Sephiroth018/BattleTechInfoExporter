@@ -90,12 +90,12 @@ The last one describes the game rather than the career:
   - **Terrains:** what forest, water, rough ground, roads and the other terrains do to the units
     in them: move cost per unit type and weight class (`null` where impassable; open ground costs
     1.05 per meter), sprint multiplier, visibility, sensor range and signature, to-hit modifiers
-    against and from the terrain, cover, heat sinking and heat per round, damage dealt and taken,
-    and the statistic changes a unit picks up in it, e.g. rough ground's extra instability. A cell
+    against and from the terrain, cover, heat sinking and heat per round, damage dealt and taken
+    (a multiplier for every attack times one per weapon category), and the statistic changes a unit picks up in it, e.g. rough ground's extra instability. A cell
     has one terrain at most. Only what the game's combat code reads is exported; its tooltips also
     claim a stability damage multiplier that only the AI reads.
   - **Biomes:** keyed by the biome id the star systems refer to, what a map's biome does to every
-    unit on it on top of the terrain: heat sinking, heat per round and damage dealt, the only
+    unit on it on top of the terrain: heat sinking, heat per round and damage dealt (as for terrains), the only
     values the game reads from a biome.
   - **Maps:** every map some star system's contracts can be fought on: name, biome, map tags, the
     contract generator's draw weight and the terrain coverage: each terrain's share of the map's playable cells by terrain id, plus `none` for the

@@ -24,6 +24,32 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.74.0
+
+Changed: game-state.json, combat-state.json, combat-map.json, catalog.json (breaking).
+
+### game-state.json
+- Type changed `mechs[].refit[].armor.front` and `rear` in steps of type `modifyArmor`: numbers
+  like every other armor value, no longer integers. The values are still whole.
+
+### combat-state.json
+- Values corrected `units.<id>.state.mech.stability.current`, `unsteadyAbove` and
+  `maxStability`: rounded to a tenth like every other position and armor value.
+- Values corrected `damagedBuildings[].structure`: rounded to a tenth; damage that rounds away
+  no longer lists a building.
+
+### combat-map.json
+- Values corrected `buildings[].maxStructure`: rounded to a tenth.
+
+### catalog.json (breaking)
+- Removed `support`, `energy`, `ballistic` and `missile` from
+  `terrainDefinitions.<id>.damageDealt`, `terrainDefinitions.<id>.damageTaken` and
+  `biomeDefinitions.<id>.damageDealt`: they repeated `byWeaponCategory.Support`, `Energy`,
+  `Ballistic` and `Missile`. A weapon's multiplier is `all` times its category's in
+  `byWeaponCategory`.
+- Type changed `componentComparisons[].value` in every requirement of `eventDefinitions.<id>`:
+  an integer like `componentChanges[].count`, no longer a number. The values are the same.
+
 ## 0.73.0
 
 Changed: game-state.json (breaking), rules.json, star-systems.json, combat-state.json
