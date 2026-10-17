@@ -28,8 +28,8 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="Position">Where the ship is: the star system, and the travel under way.</param>
 /// <param name="Events">
-///     The events scheduled, drawn lately or used up; what their requirements check is on the entry of the scope
-///     they check, e.g. the company's tags and statistics on <see cref="Company" />.
+///     The events scheduled, drawn lately or used up; their requirements check the tags and statistics on their
+///     scope's entry, e.g. <see cref="Company" />.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record GameState(

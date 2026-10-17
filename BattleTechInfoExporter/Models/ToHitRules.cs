@@ -7,8 +7,8 @@ namespace BattleTechInfoExporter.Models;
 ///     How an attack's hit chance follows from its difficulty: the base chance of the skill level (see
 ///     <see cref="GunneryLevel.BaseHitChancePercent" />) loses <see cref="DifficultySteps" /> per point of the
 ///     summed modifiers, is rounded to <see cref="RoundedToPercent" /> and clamped between
-///     <see cref="MinChancePercent" /> and <see cref="MaxChancePercent" />. Every modifier here is a to-hit modifier
-///     added to that difficulty: positive makes the attack harder.
+///     <see cref="MinChancePercent" /> and <see cref="MaxChancePercent" />. The modifiers below are to-hit modifiers,
+///     added to that difficulty.
 /// </summary>
 /// <param name="DifficultySteps">The chance lost per point of difficulty, by step from the lowest difficulty up.</param>
 /// <param name="RoundedToPercent">The hit chance is rounded to the nearest multiple of this, in percent.</param>
@@ -122,8 +122,8 @@ internal sealed record AttackerWalkedModifiers(ByWeightClass<float> Mech, float 
 internal sealed record AttackerDamageModifiers(WeaponDamageModifiers Mech, WeaponDamageModifiers Vehicle);
 
 /// <summary>
-///     The to-hit modifiers for damage to the attacking weapon and its location; both apply when the weapon is
-///     damaged and its location too.
+///     The to-hit modifiers for damage to the attacking weapon and its location; both apply when the weapon and
+///     its location are damaged.
 /// </summary>
 /// <param name="DamagedWeapon">For a weapon damaged by a critical hit but not destroyed.</param>
 /// <param name="WeaponInDamagedLocation">For a weapon in a damaged location.</param>

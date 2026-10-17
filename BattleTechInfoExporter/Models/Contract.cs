@@ -9,7 +9,9 @@ namespace BattleTechInfoExporter.Models;
 ///     (<see cref="ActiveContract" />) and fought (<see cref="MissionContract" />). Each state declares the star
 ///     system the mission is fought in, by reference or in full.
 /// </summary>
-/// <param name="Id">The contract's id from the game's data files; <c>null</c> where the game keeps no reference to it.</param>
+/// <param name="Id">
+///     The contract's id from the game's data files; <c>null</c> where the game keeps no reference to it.
+/// </param>
 /// <param name="Name">The contract's name, as the contract list shows it.</param>
 /// <param name="Type">The mission type, described in <see cref="Rules.ContractTypes" />.</param>
 /// <param name="DisplayStyle">Whether it's a regular, story, restoration or flashpoint contract.</param>
@@ -20,8 +22,8 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="Difficulty">
 ///     The difficulty on the skulls' scale of 1 to 10 (two per skull), capped at
-///     <see cref="ContractRules.MaxGlobalDifficulty" />; the value <see cref="ReputationLevel.MaxContractDifficulty" />
-///     limits.
+///     <see cref="ContractRules.MaxGlobalDifficulty" /> and limited by
+///     <see cref="ReputationLevel.MaxContractDifficulty" />.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal abstract record ContractIdentity(

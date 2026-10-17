@@ -1322,7 +1322,7 @@
     },
     "ToHitRules": {
       "type": "object",
-      "description": "How an attack's hit chance follows from its difficulty: the base chance of the skill level (see GunneryLevel.baseHitChancePercent) loses difficultySteps per point of the summed modifiers, is rounded to roundedToPercent and clamped between minChancePercent and maxChancePercent. Every modifier here is a to-hit modifier added to that difficulty: positive makes the attack harder.",
+      "description": "How an attack's hit chance follows from its difficulty: the base chance of the skill level (see GunneryLevel.baseHitChancePercent) loses difficultySteps per point of the summed modifiers, is rounded to roundedToPercent and clamped between minChancePercent and maxChancePercent. The modifiers below are to-hit modifiers, added to that difficulty.",
       "additionalProperties": false,
       "required": [
         "difficultySteps",
@@ -1628,7 +1628,7 @@
     },
     "WeaponDamageModifiers": {
       "type": "object",
-      "description": "The to-hit modifiers for damage to the attacking weapon and its location; both apply when the weapon is damaged and its location too.",
+      "description": "The to-hit modifiers for damage to the attacking weapon and its location; both apply when the weapon and its location are damaged.",
       "additionalProperties": false,
       "required": [
         "damagedWeapon",
@@ -2227,7 +2227,7 @@
         },
         "maxHeightDifference": {
           "type": "number",
-          "description": "The most height difference, in meters, between the position a melee or jump attack is made from and the target's.",
+          "description": "The largest height difference, in meters, between the attacker's position and the target's for a melee or jump attack.",
           "format": "float"
         }
       }
@@ -3767,7 +3767,7 @@
       "properties": {
         "basePerDifficulty": {
           "type": "number",
-          "description": "Times the contract's difficulty, the product rounded, plus baseAddition.",
+          "description": "Times the contract's difficulty, rounded before baseAddition is added.",
           "format": "float"
         },
         "baseAddition": {
@@ -3777,7 +3777,7 @@
         },
         "negotiablePerDifficulty": {
           "type": "number",
-          "description": "Times the contract's difficulty, the product rounded, plus negotiableAddition.",
+          "description": "Times the contract's difficulty, rounded before negotiableAddition is added.",
           "format": "float"
         },
         "negotiableAddition": {

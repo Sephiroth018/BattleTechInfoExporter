@@ -209,7 +209,7 @@
         },
         "difficulty": {
           "type": "integer",
-          "description": "The difficulty on the skulls' scale of 1 to 10 (two per skull), capped at rules.json campaign.contracts.maxGlobalDifficulty; the value rules.json reputationLevels[].maxContractDifficulty limits.",
+          "description": "The difficulty on the skulls' scale of 1 to 10 (two per skull), capped at rules.json campaign.contracts.maxGlobalDifficulty and limited by rules.json reputationLevels[].maxContractDifficulty.",
           "format": "int32"
         },
         "starSystem": {
@@ -1245,18 +1245,18 @@
             "null",
             "string"
           ],
-          "description": "The evasion pips per hex when sprinting, as MovementLegend.moves says; null for a legged or unsteady mech, which can't sprint."
+          "description": "Like walk, when sprinting; null for a legged or unsteady mech, which can't sprint."
         },
         "reverse": {
           "type": "string",
-          "description": "The evasion pips per hex when moving backward, as MovementLegend.moves says."
+          "description": "Like walk, when moving backward."
         },
         "jump": {
           "type": [
             "null",
             "string"
           ],
-          "description": "The evasion pips per hex when jumping, as MovementLegend.moves says; null for a vehicle and a mech without a working jump jet."
+          "description": "Like walk, when jumping; null for a vehicle and a mech without a working jump jet."
         },
         "attacks": {
           "type": "array",
@@ -1496,7 +1496,7 @@
             "array",
             "null"
           ],
-          "description": "The hexes the building stood on, with the ground's elevation and the rubble's terrain they now have in place of those in combat-map.json, which isn't rewritten when it falls; units on its roof drop to the ground. null while it stands.",
+          "description": "The hexes the building stood on, now with the ground's elevation and the rubble's terrain, since combat-map.json isn't rewritten when it falls; units on its roof drop to the ground. null while it stands.",
           "items": {
             "$ref": "#/definitions/MapHex"
           }

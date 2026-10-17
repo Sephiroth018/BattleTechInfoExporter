@@ -130,7 +130,7 @@
       "$ref": "#/definitions/Position"
     },
     "events": {
-      "description": "The events scheduled, drawn lately or used up; what their requirements check is on the entry of the scope they check, e.g. the company's tags and statistics on company.",
+      "description": "The events scheduled, drawn lately or used up; their requirements check the tags and statistics on their scope's entry, e.g. company.",
       "$ref": "#/definitions/EventState"
     }
   },
@@ -2913,7 +2913,7 @@
         },
         "salary": {
           "type": "integer",
-          "description": "The C-Bills the pilot would add to the expenses of each financial report once hired.",
+          "description": "The C-Bills the pilot would add to the expenses of each report once hired.",
           "format": "int32"
         },
         "canHire": {
@@ -2990,7 +2990,7 @@
         },
         "difficulty": {
           "type": "integer",
-          "description": "The difficulty on the skulls' scale of 1 to 10 (two per skull), capped at rules.json campaign.contracts.maxGlobalDifficulty; the value rules.json reputationLevels[].maxContractDifficulty limits.",
+          "description": "The difficulty on the skulls' scale of 1 to 10 (two per skull), capped at rules.json campaign.contracts.maxGlobalDifficulty and limited by rules.json reputationLevels[].maxContractDifficulty.",
           "format": "int32"
         },
         "terms": {
@@ -3436,7 +3436,7 @@
         },
         "difficulty": {
           "type": "integer",
-          "description": "The difficulty on the skulls' scale of 1 to 10 (two per skull), capped at rules.json campaign.contracts.maxGlobalDifficulty; the value rules.json reputationLevels[].maxContractDifficulty limits.",
+          "description": "The difficulty on the skulls' scale of 1 to 10 (two per skull), capped at rules.json campaign.contracts.maxGlobalDifficulty and limited by rules.json reputationLevels[].maxContractDifficulty.",
           "format": "int32"
         },
         "meetsReputation": {

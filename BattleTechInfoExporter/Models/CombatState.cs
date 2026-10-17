@@ -83,9 +83,9 @@ internal sealed record BuildingSide(string Id, TeamSide Side);
 /// <param name="Id">The building's id in <see cref="CombatMap.Buildings" />.</param>
 /// <param name="Structure">The structure left; its max is in <see cref="CombatBuilding.MaxStructure" />.</param>
 /// <param name="DestroyedHexes">
-///     The hexes the building stood on, with the ground's elevation and the rubble's terrain they now have in place
-///     of those in <c>combat-map.json</c>, which isn't rewritten when it falls; units on its roof drop to the
-///     ground. <c>null</c> while it stands.
+///     The hexes the building stood on, now with the ground's elevation and the rubble's terrain, since
+///     <c>combat-map.json</c> isn't rewritten when it falls; units on its roof drop to the ground. <c>null</c> while
+///     it stands.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record DamagedBuilding(string Id, float Structure, IReadOnlyList<MapHex>? DestroyedHexes);

@@ -9,8 +9,8 @@ namespace BattleTechInfoExporter.Models;
 /// </summary>
 /// <param name="DeathFromAboveToHit">The to-hit modifier of a jump attack.</param>
 /// <param name="MaxHeightDifference">
-///     The most height difference, in meters, between the position a melee or jump attack is made from and the
-///     target's.
+///     The largest height difference, in meters, between the attacker's position and the target's for a melee or
+///     jump attack.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MeleeAttackRules(float DeathFromAboveToHit, float MaxHeightDifference);

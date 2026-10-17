@@ -184,7 +184,7 @@
         },
         "difficulty": {
           "type": "integer",
-          "description": "The difficulty on the skulls' scale of 1 to 10 (two per skull), capped at rules.json campaign.contracts.maxGlobalDifficulty; the value rules.json reputationLevels[].maxContractDifficulty limits.",
+          "description": "The difficulty on the skulls' scale of 1 to 10 (two per skull), capped at rules.json campaign.contracts.maxGlobalDifficulty and limited by rules.json reputationLevels[].maxContractDifficulty.",
           "format": "int32"
         },
         "starSystem": {
