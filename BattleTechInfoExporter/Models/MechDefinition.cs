@@ -15,8 +15,9 @@ namespace BattleTechInfoExporter.Models;
 ///     fitting is built for, which a refit can change; no rule reads it.
 /// </param>
 /// <param name="Description">
-///     The mech's description, as the mech tooltip and the store show it, as plain text: it describes the standard
-///     fitting, which a refit can change; no rule reads it.
+///     The mech's description, as the mech tooltip and the store show it, or the chassis' one the mech bay shows
+///     where the mech has none, as plain text: it describes the standard fitting, which a refit can change; no rule
+///     reads it.
 /// </param>
 /// <param name="Value">The C-Bill value the game computes from the chassis, armor and components.</param>
 /// <param name="UsedTonnage">The tonnage of the chassis, armor and components.</param>

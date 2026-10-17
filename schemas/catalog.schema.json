@@ -514,7 +514,7 @@
         },
         "description": {
           "type": "string",
-          "description": "The mech's description, as the mech tooltip and the store show it, as plain text: it describes the standard fitting, which a refit can change; no rule reads it."
+          "description": "The mech's description, as the mech tooltip and the store show it, or the chassis' one the mech bay shows where the mech has none, as plain text: it describes the standard fitting, which a refit can change; no rule reads it."
         },
         "value": {
           "type": "integer",
