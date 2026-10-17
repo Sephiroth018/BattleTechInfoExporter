@@ -8,7 +8,10 @@ namespace BattleTechInfoExporter.Models;
 ///     The events the daily roll drew lately; it draws none of them again until no other event can come.
 /// </param>
 /// <param name="UsedOneTimeEvents">The one-time events the daily roll has drawn, which it never draws again.</param>
-/// <param name="ScheduledEvents">The events results have scheduled, in the order the game rolls them.</param>
+/// <param name="ScheduledEvents">
+///     The events results have scheduled, in the order the game rolls them; one about a pilot who has left is left
+///     out, as the game drops it when it comes.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record EventState(
     IReadOnlyList<DefinitionReference> RecentlyDrawnEvents,
@@ -16,8 +19,8 @@ internal sealed record EventState(
     IReadOnlyList<ScheduledEvent> ScheduledEvents);
 
 /// <summary>
-///     An event a result has scheduled. Its days assume a daily roll every day; the game skips the roll on arrival
-///     in a star system and when the story moves on, and the later events in the list on a day one comes.
+///     An event a result has scheduled. Its days assume a daily roll every day from the next; the game skips it on
+///     arrival in a star system, when the story moves on, and for the events after one that comes that day.
 /// </summary>
 /// <param name="Event">The event scheduled.</param>
 /// <param name="Pilot">The pilot the event is about; <c>null</c> when the game picks one when it comes.</param>

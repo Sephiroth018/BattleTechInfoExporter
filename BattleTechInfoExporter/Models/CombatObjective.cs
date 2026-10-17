@@ -15,7 +15,7 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="TargetUnitIds">
 ///     The units it is about (to destroy, protect or escort), as keys of <see cref="CombatState.Units" />, while
-///     they are in full view: neither blips nor destroyed enemies.
+///     they are in full view, destroyed ones included; blips are left out.
 /// </param>
 /// <param name="TargetBuildingIds">
 ///     The buildings it is about (to destroy or defend), by their <see cref="CombatBuilding.Id" />.
@@ -44,8 +44,8 @@ internal sealed record CombatObjective(
 /// </param>
 /// <param name="Center">The zone's center on the map.</param>
 /// <param name="Radius">
-///     The radius of the hexagon the HUD draws; whether a unit is inside is decided per map cell, which this only
-///     approximates.
+///     The radius of the hexagon the HUD draws, in meters; whether a unit is inside is decided per map cell, which
+///     this only approximates.
 /// </param>
 /// <param name="IsPreview">Drawn as a zone that becomes active later.</param>
 /// <param name="ObjectiveIds">

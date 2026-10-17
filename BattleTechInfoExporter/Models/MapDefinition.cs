@@ -5,8 +5,7 @@ namespace BattleTechInfoExporter.Models;
 
 /// <summary>
 ///     A combat map some star system's contracts can be fought on, and the terrain it is made of. The contract
-///     generator draws a star system's map among the maps its entry in <see cref="Starmap.StarSystems" /> lists,
-///     by weight.
+///     generator draws a star system's map among its <see cref="StarSystem.Maps" />, by weight.
 /// </summary>
 /// <param name="Name">The map's friendly name.</param>
 /// <param name="Biome">The map's biome, as the star systems refer to it.</param>
@@ -14,7 +13,9 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Weight">The contract generator's draw weight among a star system's maps.</param>
 /// <param name="TerrainCoverage">
 ///     Each terrain's share of the map's playable cells, keyed by terrain id, plus <c>none</c> for the cells with
-///     no terrain (bare biome). Cells are all the same size, so a share is an area share; the shares sum to 1.
+///     no terrain (bare biome). Cells are all the same size, so a share is an area share; the shares sum to 1. Keyed
+///     by terrain, as a kind of cell is a different terrain per map, e.g. water is ice on a polar map; a cell under a
+///     building counts as the terrain below it.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MapDefinition(

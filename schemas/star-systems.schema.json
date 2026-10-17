@@ -17,7 +17,7 @@
     },
     "exportedAt": {
       "type": "string",
-      "description": "When the file was last written.",
+      "description": "When the file was last written, in ISO 8601 with the local time's UTC offset.",
       "format": "date-time"
     },
     "trigger": {
@@ -35,7 +35,7 @@
   "definitions": {
     "ExportTrigger": {
       "type": "string",
-      "description": "What caused an export.",
+      "description": "What caused an export. `careerLoaded`: A career is loaded, new or from a save. The game state is skipped while a finished contract's results are still to be applied, and the catalog is rebuilt only when it's missing or stale, once the game has loaded every vehicle, turret and design mask. `manualSave`: The player saves the career outside combat. `autosave`: The game saves the career on its own outside combat, e.g. once an event's popup is closed with the picked option's results applied, or once a contract's results are applied. `contractCompleted`: A contract's results are applied, salvage included, where the game doesn't save the career afterwards, which is `autosave` otherwise. `financialReportShown`: The monthly financial report is shown, with the expenses paid. `mechLabOrderCompleted`: A mech lab order completes, at the end of a day or right away when it has nothing left to do; when several work orders complete together, the last one names the export. `pilotHealed`: A pilot's healing in the med bay completes, as `mechLabOrderCompleted`. `shipUpgradeCompleted`: An Argo upgrade's installation completes, as `mechLabOrderCompleted`. `contractsGenerated`: The game has generated a star system's contracts. `jumped`: The ship has jumped into its destination star system, at the end of that day, with the star system's contracts; work orders completing that day export with it. `arrived`: The ship arrives at the planet after a trip. `storeClosed`: A store closes, from the main screen or the mech lab. `purchaseCompleted`: The store screen completes a purchase, or refuses one. `saleCompleted`: The store screen completes a sale, or refuses one, once for a stack sold at once. `mechBayChanged`: The mech bay changes: a refit, repair, readying or storing is queued, an order is cancelled, the work queue is reordered, a mech or chassis is stored or scrapped, a stored component's repair is queued, or a mech is renamed without a refit. `experienceSpent`: The barracks confirm a pilot's training. `mechPlacementShown`: The game asks where to put a new mech because every mech bay is full, e.g. after salvage completes one. `missionCompleted`: A mission ends, still in combat, before the salvage is chosen. `salvageChosen`: The after-action report has finalized the salvage: once the priority salvage is confirmed, or right away when there is nothing to choose. `shipUpgradeStarted`: An Argo upgrade is bought and its installation starts. `phaseStarted`: A phase begins, before its first unit acts: the battle's first once the lance is deployed, and every later one, also one reached by reserving units. `combatStarted`: A new battle begins, when the briefing is dismissed. `combatLoaded`: A battle is loaded from a save, continuing mid-phase. `activationCompleted`: A unit's activation is done, its attacks resolved; out of contact, once the player's units have all moved. Reserving a unit doesn't count.",
       "x-enumNames": [
         "CareerLoaded",
         "ManualSave",
@@ -135,18 +135,18 @@
         },
         "maps": {
           "type": "array",
-          "description": "The maps the star system's contracts can be fought on, as the contract generator selects them from its biomes and map tags; each map's terrain is in catalog.json mapDefinitions.",
+          "description": "The maps the star system's contracts can be fought on, as the contract generator selects them from its biomes and map tags; each map's terrain is in catalog.json mapDefinitions. The contract type and the maps the game offered lately narrow a contract's choice further, which isn't exported.",
           "items": {
             "$ref": "#/definitions/DefinitionReference"
           }
         },
         "stores": {
-          "description": "The item collections each of the star system's stores draws its stock from on arrival, every entry of each once, by their ids in catalog.json itemCollectionDefinitions, sorted. A store without any doesn't exist in the star system.",
+          "description": "The item collections each of the star system's stores draws its stock from on arrival, every entry of each once, by their ids in catalog.json itemCollectionDefinitions, sorted. A store without any doesn't exist in the star system. The story adds collections, e.g. better progression tiers, by swapping the star system's definition, which these follow.",
           "$ref": "#/definitions/ByStoreOfStringList"
         },
         "contractEmployers": {
           "type": "array",
-          "description": "The factions that can hire the company for the star system's generated contracts, sorted by name, each with its targets, without those the story sets aside; story and flashpoint contracts name their own.",
+          "description": "The factions that can hire the company for the star system's generated contracts, without the employers the story sets aside, sorted by name, each with its targets; a contract's own requirements can narrow them, and story and flashpoint contracts name their own.",
           "items": {
             "$ref": "#/definitions/ContractEmployer"
           }
@@ -258,7 +258,7 @@
       "properties": {
         "days": {
           "type": "integer",
-          "description": "The days the trip takes from the current star system's planet, with the whole leg to its jump point (game-state.json position.travel.jumpPointDays) even during a trip; 0 for the current star system.",
+          "description": "The days the trip takes from the current star system's planet, with the whole leg to its jump point (game-state.json position.travel.jumpPointDays) even during a trip, which game-state.json position.travel.legEndsOnDay corrects; 0 for the current star system.",
           "format": "int32"
         },
         "cost": {

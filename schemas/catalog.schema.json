@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Catalog",
   "type": "object",
-  "description": "The root of `catalog.json`: every chassis, mech, vehicle, turret, component, terrain, biome, map, event, item collection and faction definition the game has loaded, keyed by id. It describes the game, not the career, so it only changes with the game's data.",
+  "description": "The root of `catalog.json`: every chassis, mech, vehicle, turret, component, terrain, biome, map, event, item collection and faction definition the game has loaded, keyed by id. It describes the game, not the career, so it only changes with the game's data. The tutorial's target dummies are left out.",
   "additionalProperties": false,
   "required": [
     "modVersion",
@@ -28,7 +28,7 @@
     },
     "exportedAt": {
       "type": "string",
-      "description": "When the file was last written.",
+      "description": "When the file was last written, in ISO 8601 with the local time's UTC offset.",
       "format": "date-time"
     },
     "trigger": {
@@ -37,7 +37,7 @@
     },
     "sourceFingerprint": {
       "type": "string",
-      "description": "A hash of the game's data files the catalog was built from: of every one it reads, its id, file and last write time; the catalog is rebuilt when it differs from the game's current data."
+      "description": "A hash of the game's data files the catalog was built from: of every one it reads, its id, file and last write time; the catalog is rebuilt when it differs from the game's current data. A game update, a DLC bought or removed, a mod installed, updated, removed or disabled, or a ModTek merge re-run changes it; a DLL mod patching definitions in memory doesn't, so delete the file to force a rebuild then."
     },
     "chassisDefinitions": {
       "type": "object",
@@ -48,14 +48,14 @@
     },
     "mechDefinitions": {
       "type": "object",
-      "description": "The mechs, keyed by mech id.",
+      "description": "The mechs, keyed by mech id, without the copies of stock mechs the game makes for unlocked skins.",
       "additionalProperties": {
         "$ref": "#/definitions/MechDefinition"
       }
     },
     "vehicleDefinitions": {
       "type": "object",
-      "description": "The vehicles, keyed by vehicle id.",
+      "description": "The vehicles, keyed by vehicle id, without the tutorial's target vehicles.",
       "additionalProperties": {
         "$ref": "#/definitions/VehicleDefinition"
       }
@@ -68,7 +68,7 @@
       }
     },
     "componentDefinitions": {
-      "description": "The components, grouped by type and keyed by component id.",
+      "description": "The components, grouped by type and keyed by component id, without the game's internal melee and AI weapons and the ammunition boxes for weapons that carry their own ammunition, such as flamers.",
       "$ref": "#/definitions/ComponentDefinitions"
     },
     "terrainDefinitions": {
@@ -101,7 +101,7 @@
     },
     "itemCollectionDefinitions": {
       "type": "object",
-      "description": "The item collections the stores draw their stock from and the rewards are drawn from, keyed by collection id; a star system's stores name theirs in star-systems.json starSystems.",
+      "description": "The item collections the stores draw their stock from and the rewards are drawn from, keyed by collection id; a star system's stores name theirs in star-systems.json starSystems.*.stores.",
       "additionalProperties": {
         "$ref": "#/definitions/ItemCollectionDefinition"
       }
@@ -117,7 +117,7 @@
   "definitions": {
     "ExportTrigger": {
       "type": "string",
-      "description": "What caused an export.",
+      "description": "What caused an export. `careerLoaded`: A career is loaded, new or from a save. The game state is skipped while a finished contract's results are still to be applied, and the catalog is rebuilt only when it's missing or stale, once the game has loaded every vehicle, turret and design mask. `manualSave`: The player saves the career outside combat. `autosave`: The game saves the career on its own outside combat, e.g. once an event's popup is closed with the picked option's results applied, or once a contract's results are applied. `contractCompleted`: A contract's results are applied, salvage included, where the game doesn't save the career afterwards, which is `autosave` otherwise. `financialReportShown`: The monthly financial report is shown, with the expenses paid. `mechLabOrderCompleted`: A mech lab order completes, at the end of a day or right away when it has nothing left to do; when several work orders complete together, the last one names the export. `pilotHealed`: A pilot's healing in the med bay completes, as `mechLabOrderCompleted`. `shipUpgradeCompleted`: An Argo upgrade's installation completes, as `mechLabOrderCompleted`. `contractsGenerated`: The game has generated a star system's contracts. `jumped`: The ship has jumped into its destination star system, at the end of that day, with the star system's contracts; work orders completing that day export with it. `arrived`: The ship arrives at the planet after a trip. `storeClosed`: A store closes, from the main screen or the mech lab. `purchaseCompleted`: The store screen completes a purchase, or refuses one. `saleCompleted`: The store screen completes a sale, or refuses one, once for a stack sold at once. `mechBayChanged`: The mech bay changes: a refit, repair, readying or storing is queued, an order is cancelled, the work queue is reordered, a mech or chassis is stored or scrapped, a stored component's repair is queued, or a mech is renamed without a refit. `experienceSpent`: The barracks confirm a pilot's training. `mechPlacementShown`: The game asks where to put a new mech because every mech bay is full, e.g. after salvage completes one. `missionCompleted`: A mission ends, still in combat, before the salvage is chosen. `salvageChosen`: The after-action report has finalized the salvage: once the priority salvage is confirmed, or right away when there is nothing to choose. `shipUpgradeStarted`: An Argo upgrade is bought and its installation starts. `phaseStarted`: A phase begins, before its first unit acts: the battle's first once the lance is deployed, and every later one, also one reached by reserving units. `combatStarted`: A new battle begins, when the briefing is dismissed. `combatLoaded`: A battle is loaded from a save, continuing mid-phase. `activationCompleted`: A unit's activation is done, its attacks resolved; out of contact, once the player's units have all moved. Reserving a unit doesn't count.",
       "x-enumNames": [
         "CareerLoaded",
         "ManualSave",
@@ -441,7 +441,7 @@
             "null",
             "number"
           ],
-          "description": "The rear armor; `null` when the location is outside the torso, which alone has it.",
+          "description": "The rear armor; `null` when the location is outside the torso.",
           "format": "float"
         }
       }
@@ -481,7 +481,7 @@
     },
     "MechDefinition": {
       "type": "object",
-      "description": "A mech: a loadout on a chassis, as a mech assembled from parts or bought comes with it. The frame is in chassisDefinitions.",
+      "description": "A mech: a loadout on a chassis, which a mech assembled from parts or bought comes with while rules.json campaign.salvage.assembledMechsComeEquipped is true. The frame is in chassisDefinitions. The game's appearance dates aren't exported, as it doesn't enforce them; nor are the company tags a few DLC mechs need before the game draws them into a lance, which finishing a flashpoint adds.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -510,7 +510,7 @@
         },
         "role": {
           "type": "string",
-          "description": "The chassis' stock role, e.g. \"Brawler\", as the mech tooltip and the mech lab show it: what its standard fitting is built for, which a refit can change; no rule reads it."
+          "description": "The chassis' stock role, e.g. `Brawler`, as the mech tooltip and the mech lab show it: what its standard fitting is built for, which a refit can change; no rule reads it."
         },
         "description": {
           "type": "string",
@@ -1040,7 +1040,7 @@
         },
         "firingArcDegrees": {
           "type": "number",
-          "description": "The arc it can fire into without turning, in degrees.",
+          "description": "How far to either side of its facing it can fire, in degrees.",
           "format": "float"
         },
         "armor": {
@@ -1183,7 +1183,7 @@
             "null",
             "string"
           ],
-          "description": "The ammunition the weapon fires, as AmmunitionBoxDefinition.ammoCategory names it; a weapon with internalAmmoCapacity fires its own first and then any ammunition boxes of the category, which the catalog has none of; `null` when it needs no ammunition."
+          "description": "The ammunition the weapon fires, as AmmunitionBoxDefinition.ammoCategory names it; a weapon with internalAmmoCapacity fires its own first, then any boxes of the category, of which the catalog has none; `null` when it needs no ammunition."
         },
         "internalAmmoCapacity": {
           "type": [
@@ -2017,7 +2017,7 @@
     },
     "ComponentDefinition": {
       "type": "object",
-      "description": "The fields every component definition has; the shapes of the types with stats of their own add those. Upgrades have no others.",
+      "description": "The fields every component definition has; each type with stats of its own adds them in its shape.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -2067,7 +2067,7 @@
     },
     "TerrainDefinition": {
       "type": "object",
-      "description": "A terrain's effects on the units in it: forest, water, rough ground, roads and the like. A cell has one terrain at most, so the effects never stack; the map's biome applies on top (see BiomeDefinition).",
+      "description": "A terrain's effects on the units in it: forest, water, rough ground, roads and the like. A cell has one terrain at most, so the effects never stack; the map's biome applies on top (see BiomeDefinition). Only the effects the game's combat code reads are exported: the stability damage multiplier some tooltips describe, e.g. ice's and marsh's, is read only by the AI. A terrain that does change the stability damage taken, e.g. rough ground, does so through stickyEffects.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -2098,7 +2098,7 @@
           "description": "As the combat HUD shows it."
         },
         "moveCost": {
-          "description": "What a step into the terrain costs of the unit's movement, per meter of the step: open ground costs 1.05; `null` when the unit can't enter it.",
+          "description": "What a step into the terrain costs of the unit's movement, per meter of the step; `null` when the unit can't enter it. Open ground has no terrain and costs the normal move cost of the unit's pathing capabilities instead, 1.05 for every unit in the game's data.",
           "$ref": "#/definitions/TerrainMoveCosts"
         },
         "sprintMultiplier": {
@@ -2306,7 +2306,7 @@
     },
     "MapDefinition": {
       "type": "object",
-      "description": "A combat map some star system's contracts can be fought on, and the terrain it is made of. The contract generator draws a star system's map among the maps its entry in star-systems.json starSystems lists, by weight.",
+      "description": "A combat map some star system's contracts can be fought on, and the terrain it is made of. The contract generator draws a star system's map among its star-systems.json starSystems.*.maps, by weight.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -2343,7 +2343,7 @@
         },
         "terrainCoverage": {
           "type": "object",
-          "description": "Each terrain's share of the map's playable cells, keyed by terrain id, plus `none` for the cells with no terrain (bare biome). Cells are all the same size, so a share is an area share; the shares sum to 1.",
+          "description": "Each terrain's share of the map's playable cells, keyed by terrain id, plus `none` for the cells with no terrain (bare biome). Cells are all the same size, so a share is an area share; the shares sum to 1. Keyed by terrain, as a kind of cell is a different terrain per map, e.g. water is ice on a polar map; a cell under a building counts as the terrain below it.",
           "additionalProperties": {
             "type": "number",
             "format": "double"
@@ -2353,7 +2353,7 @@
     },
     "EventDefinition": {
       "type": "object",
-      "description": "An event the game can show between missions: when it can come, and the options it offers.",
+      "description": "An event the game can show between missions: when it can come, and the options it offers. Its story texts aren't exported.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -2394,7 +2394,7 @@
           "description": "Whether the daily event roll can draw the event; when false, it comes only when another event's result schedules it."
         },
         "requirements": {
-          "description": "What the event's company or pilot (scope) must meet; `null` when any will do.",
+          "description": "What the event's company or pilot (scope) must meet; `null` when it has none.",
           "oneOf": [
             {
               "type": "null"
@@ -2729,7 +2729,7 @@
             "integer",
             "null"
           ],
-          "description": "How many days the tag, statistic and component changes last before the game reverts them; `null` when they're permanent.",
+          "description": "How many days the tag, statistic and component changes last before the game reverts them; `null` when they are permanent.",
           "format": "int32"
         },
         "actions": {
@@ -2750,7 +2750,7 @@
     },
     "CareerStatisticChange": {
       "type": "object",
-      "description": "A change the career makes to a statistic of the company or a pilot, e.g. by a ship upgrade or an event: it adds to the statistic or sets it.",
+      "description": "A change the career makes to a statistic of the company or a pilot, e.g. by a ship upgrade or an event.",
       "additionalProperties": false,
       "required": [
         "statistic",

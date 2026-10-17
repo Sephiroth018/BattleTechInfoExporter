@@ -58,8 +58,9 @@ public sealed class ComputeVersionFromGit : Task
         }
 
         var boundaries = FindLowerBranches(releaseTag).Prepend(releaseTag).Append("HEAD").ToList();
+        // Without the release's commits: from a lower branch cut before the release, HEAD's first parents reach them.
         var bumps = Enumerable.Range(1, boundaries.Count - 1)
-            .Select(i => Lines(Git($"log --first-parent --format=%s {boundaries[i - 1]}..{boundaries[i]}"))
+            .Select(i => Lines(Git($"log --first-parent --format=%s {boundaries[i - 1]}..{boundaries[i]} ^{releaseTag}"))
                 .Select(BumpOf)
                 .DefaultIfEmpty(Bump.None)
                 .Max())

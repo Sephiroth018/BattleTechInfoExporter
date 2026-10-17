@@ -5,8 +5,8 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     The fields every pilot has; the shapes of the pilots of the barracks and of the hiring hall add fields of
-///     their own.
+///     The fields every pilot has; the barracks' and the hiring hall's pilots each add their own fields in their
+///     shape.
 /// </summary>
 /// <param name="Id">The game's pilot id, which the references to the pilot carry.</param>
 /// <param name="Name">The full name without callsign.</param>
@@ -20,7 +20,7 @@ namespace BattleTechInfoExporter.Models;
 ///     The primary abilities only, described in <see cref="Rules.Skills" />; the passive traits follow from the
 ///     skill levels.
 /// </param>
-/// <param name="Health">The injuries the pilot can take before being incapacitated.</param>
+/// <param name="Health">The injuries at which the pilot is incapacitated.</param>
 /// <param name="Tags">The pilot's tags, sorted, which the events' requirements check.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal record Pilot(

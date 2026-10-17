@@ -5,13 +5,16 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     A mech: a loadout on a chassis, as a mech assembled from parts or bought comes with it. The frame is in
-///     <see cref="Catalog.ChassisDefinitions" />.
+///     A mech: a loadout on a chassis, which a mech assembled from parts or bought comes with while
+///     <see cref="SalvageRules.AssembledMechsComeEquipped" /> is true. The frame is in
+///     <see cref="Catalog.ChassisDefinitions" />. The game's appearance dates aren't exported, as it doesn't enforce
+///     them; nor are the company tags a few DLC mechs need before the game draws them into a lance, which finishing
+///     a flashpoint adds.
 /// </summary>
 /// <param name="Name">The name with the variant, as in the references to the mech.</param>
 /// <param name="Chassis">The mech's chassis, in <see cref="Catalog.ChassisDefinitions" />.</param>
 /// <param name="Role">
-///     The chassis' stock role, e.g. "Brawler", as the mech tooltip and the mech lab show it: what its standard
+///     The chassis' stock role, e.g. <c>Brawler</c>, as the mech tooltip and the mech lab show it: what its standard
 ///     fitting is built for, which a refit can change; no rule reads it.
 /// </param>
 /// <param name="Description">

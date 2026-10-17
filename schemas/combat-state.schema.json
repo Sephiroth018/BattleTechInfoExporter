@@ -28,7 +28,7 @@
     },
     "exportedAt": {
       "type": "string",
-      "description": "When the file was last written.",
+      "description": "When the file was last written, in ISO 8601 with the local time's UTC offset.",
       "format": "date-time"
     },
     "trigger": {
@@ -67,7 +67,7 @@
     },
     "units": {
       "type": "object",
-      "description": "Every unit the player knows of, keyed by the game's unit id: the player's and allied units, and the enemies and neutral units the HUD shows or last showed.",
+      "description": "Every unit the player knows of, keyed by the game's unit id: the player's and allied units, and the enemies and neutral units the HUD shows or last showed. A destroyed unit stays, as its wreck is on the map; an enemy or neutral unit that withdrew or that the mission's script removed leaves no wreck and is left out.",
       "additionalProperties": {
         "$ref": "#/definitions/CombatUnit"
       }
@@ -88,21 +88,21 @@
     },
     "landingZones": {
       "type": "array",
-      "description": "Where a dropship or drop pods are about to land; entries come and go as the mission readies landings and they happen.",
+      "description": "Where a dropship or drop pods are about to land; entries come and go as the mission readies landings and they happen. The game ties none to the objective announcing it: match them by position with the objective's `beacon`. A lance arriving without drop pods or a dropship has none; the band along the encounter boundary, which the HUD marks the same way, isn't exported.",
       "items": {
         "$ref": "#/definitions/LandingZone"
       }
     },
     "buildingSides": {
       "type": "array",
-      "description": "The buildings on a side, e.g. a base to destroy or defend, by their id in combat-map.json buildings and in the order of their ids; the others are on none. The mission's script can change a building's side during the battle.",
+      "description": "The buildings on a side, e.g. a base to destroy or defend, by their combat-map.json buildings[].id, in the order of their ids; the others are on none. The mission's script can change a building's side during the battle.",
       "items": {
         "$ref": "#/definitions/BuildingSide"
       }
     },
     "damagedBuildings": {
       "type": "array",
-      "description": "The buildings of combat-map.json buildings below their max structure, destroyed ones included, in the order of their ids; the others are undamaged.",
+      "description": "The buildings below their max structure, destroyed ones included, by their combat-map.json buildings[].id, in the order of their ids; the others are undamaged.",
       "items": {
         "$ref": "#/definitions/DamagedBuilding"
       }
@@ -111,7 +111,7 @@
   "definitions": {
     "ExportTrigger": {
       "type": "string",
-      "description": "What caused an export.",
+      "description": "What caused an export. `careerLoaded`: A career is loaded, new or from a save. The game state is skipped while a finished contract's results are still to be applied, and the catalog is rebuilt only when it's missing or stale, once the game has loaded every vehicle, turret and design mask. `manualSave`: The player saves the career outside combat. `autosave`: The game saves the career on its own outside combat, e.g. once an event's popup is closed with the picked option's results applied, or once a contract's results are applied. `contractCompleted`: A contract's results are applied, salvage included, where the game doesn't save the career afterwards, which is `autosave` otherwise. `financialReportShown`: The monthly financial report is shown, with the expenses paid. `mechLabOrderCompleted`: A mech lab order completes, at the end of a day or right away when it has nothing left to do; when several work orders complete together, the last one names the export. `pilotHealed`: A pilot's healing in the med bay completes, as `mechLabOrderCompleted`. `shipUpgradeCompleted`: An Argo upgrade's installation completes, as `mechLabOrderCompleted`. `contractsGenerated`: The game has generated a star system's contracts. `jumped`: The ship has jumped into its destination star system, at the end of that day, with the star system's contracts; work orders completing that day export with it. `arrived`: The ship arrives at the planet after a trip. `storeClosed`: A store closes, from the main screen or the mech lab. `purchaseCompleted`: The store screen completes a purchase, or refuses one. `saleCompleted`: The store screen completes a sale, or refuses one, once for a stack sold at once. `mechBayChanged`: The mech bay changes: a refit, repair, readying or storing is queued, an order is cancelled, the work queue is reordered, a mech or chassis is stored or scrapped, a stored component's repair is queued, or a mech is renamed without a refit. `experienceSpent`: The barracks confirm a pilot's training. `mechPlacementShown`: The game asks where to put a new mech because every mech bay is full, e.g. after salvage completes one. `missionCompleted`: A mission ends, still in combat, before the salvage is chosen. `salvageChosen`: The after-action report has finalized the salvage: once the priority salvage is confirmed, or right away when there is nothing to choose. `shipUpgradeStarted`: An Argo upgrade is bought and its installation starts. `phaseStarted`: A phase begins, before its first unit acts: the battle's first once the lance is deployed, and every later one, also one reached by reserving units. `combatStarted`: A new battle begins, when the briefing is dismissed. `combatLoaded`: A battle is loaded from a save, continuing mid-phase. `activationCompleted`: A unit's activation is done, its attacks resolved; out of contact, once the player's units have all moved. Reserving a unit doesn't count.",
       "x-enumNames": [
         "CareerLoaded",
         "ManualSave",
@@ -185,7 +185,7 @@
             "null",
             "string"
           ],
-          "description": "The contract's data file; `null` when the game keeps no reference to it."
+          "description": "The contract's id from the game's data files; `null` when the game keeps no reference to it."
         },
         "name": {
           "type": "string",
@@ -209,7 +209,7 @@
         },
         "difficulty": {
           "type": "integer",
-          "description": "On the scale of rules.json reputationLevels[].maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
+          "description": "The difficulty on the skulls' scale of 1 to 10 (two per skull), capped at rules.json campaign.contracts.maxGlobalDifficulty and limited by rules.json reputationLevels[].maxContractDifficulty.",
           "format": "int32"
         },
         "starSystem": {
@@ -269,7 +269,7 @@
       "properties": {
         "moves": {
           "type": "string",
-          "description": "How to read the characters of the moves."
+          "description": "How to read the characters of the moves; their evasion pips follow from the length of the path the unit would walk there, or a jump's straight distance."
         },
         "fire": {
           "type": "object",
@@ -347,7 +347,7 @@
           ]
         },
         "definition": {
-          "description": "The mech, vehicle or turret in the catalog, which holds its armor and loadout; `null` when the unit is one of the player's mechs, which have bayMech instead, or out of full view.",
+          "description": "The mech, vehicle or turret in the catalog, which holds its armor and loadout; `null` when the unit is out of full view or one of the player's mechs, which have bayMech instead.",
           "oneOf": [
             {
               "type": "null"
@@ -377,7 +377,7 @@
             "null",
             "number"
           ],
-          "description": "The direction the unit faces, in degrees clockwise from the map's +Z axis, from 0 to below 360 and to 0.1°, which a blip's marker turns to at every level; `null` when last seen.",
+          "description": "The direction the unit faces, in degrees clockwise seen from above, to 0.1°: 0 towards the map's +z, 90 towards its +x, up to below 360. A blip's marker shows it at every level; `null` when last seen.",
           "format": "float"
         },
         "terrain": {
@@ -388,7 +388,7 @@
           "description": "The terrain the unit stands in, keyed as in catalog.json terrainDefinitions, which a blip's position on the map shows; `null` when on open ground or last seen."
         },
         "pilot": {
-          "description": "The pilot, which the HUD names only in full view (`full`).",
+          "description": "The pilot, which the HUD names only in full view (`full`); `null` when the unit is out of full view or has no pilot.",
           "oneOf": [
             {
               "type": "null"
@@ -399,7 +399,7 @@
           ]
         },
         "state": {
-          "description": "The unit's condition, shown in full view (`full`).",
+          "description": "The unit's condition, which the HUD shows only in full view (`full`); `null` when the unit is out of full view.",
           "oneOf": [
             {
               "type": "null"
@@ -414,7 +414,7 @@
             "array",
             "null"
           ],
-          "description": "The lines of fire to the units it could attack: from the player's units to every living enemy in full view (`full`), and from those enemies to the player's units. `null` when the unit is neither, or destroyed.",
+          "description": "The lines of fire to the units it could attack: from the player's units to every living enemy in full view (`full`), and from those enemies to the player's units. `null` when the unit is destroyed or neither of those. The hit chance isn't exported: it follows from rules.json combat.toHit and changes as soon as a unit moves.",
           "items": {
             "$ref": "#/definitions/LineOfFire"
           }
@@ -469,7 +469,7 @@
     },
     "UnitVisibility": {
       "type": "string",
-      "description": "How much of a unit the player's HUD shows (the game's VisibilityLevel). `full`: In sight of the player's side, or one of its own units: everything the HUD can show. A unit hidden by ECM counts too. `blipMaximum`: A sensor blip with the unit's kind and tonnage, or a turret's weight class. `blipType`: A sensor blip with the unit's kind. `blipMinimum`: A sensor blip with nothing but its position. `lastSeen`: Out of sensor range, where the player's side last detected it; not known to be destroyed.",
+      "description": "How much of a unit the player's HUD shows (the game's VisibilityLevel). `full`: In sight of the player's side, allied units' sensors included, or one of its own units: everything the HUD can show. An enemy in sight but hidden by ECM counts too, though the HUD hides its pilot, heat, stability and initiative. A destroyed unit stays in full view. `blipMaximum`: A sensor blip with the unit's kind and tonnage, or a turret's weight class. `blipType`: A sensor blip with the unit's kind. `blipMinimum`: A sensor blip with nothing but its position. `lastSeen`: Out of sensor range, where the player's side last detected it; not known to be destroyed.",
       "x-enumNames": [
         "Full",
         "BlipMaximum",
@@ -608,7 +608,7 @@
       ],
       "properties": {
         "deathMethod": {
-          "description": "How the unit was destroyed (the game's DeathMethod), e.g. `LegDestruction`, or `PilotKilled` also for an incapacitated pilot; `null` when the unit lives.",
+          "description": "How the unit was destroyed (the game's DeathMethod), e.g. `LegDestruction`, a turret's `CenterTorsoDestruction`, a vehicle's `VehicleLocationDestroyed`, or `PilotKilled` also for an incapacitated pilot; `null` when the unit lives.",
           "oneOf": [
             {
               "type": "null"
@@ -754,7 +754,7 @@
     },
     "UnitLocation": {
       "type": "object",
-      "description": "A location's armor and structure left, in whole points as the paper doll shows them.",
+      "description": "A location's armor and structure left, in whole points as the paper doll shows them: cut off, a remainder below 1 shown as 1.",
       "additionalProperties": false,
       "required": [
         "location",
@@ -796,7 +796,7 @@
             "integer",
             "null"
           ],
-          "description": "The rear armor; `null` when the location is outside the torso, which alone has it.",
+          "description": "The rear armor; `null` when the location is outside the torso.",
           "format": "int32"
         }
       }
@@ -814,7 +814,7 @@
       "properties": {
         "level": {
           "type": "integer",
-          "description": "What the sources below add up to: bracing and cover 1 each, Bulwark 1 more on top of either. Bracing and Bulwark don't count while the guard is broken (unsteady, prone, shut down, sensor locked or hit), and none while the unit moves.",
+          "description": "What the sources below add up to: bracing and cover 1 each, Bulwark 1 more on top of either; Bulwark not after a melee hit since the unit's last activation. Bracing and Bulwark don't count while the guard is broken (unsteady, prone, shut down, sensor locked or hit), and none while the unit moves.",
           "format": "int32"
         },
         "isBraced": {
@@ -1031,7 +1031,7 @@
         },
         "health": {
           "type": "integer",
-          "description": "The injuries the pilot can take before being incapacitated, as in mission-outcome.json lance[].health.",
+          "description": "The injuries at which the pilot is incapacitated, as in mission-outcome.json lance[].health.",
           "format": "int32"
         },
         "bonusHealth": {
@@ -1189,7 +1189,7 @@
     },
     "UnitMovement": {
       "type": "object",
-      "description": "The hexes a player's unit can end its move on, read from the game's own pathing, with the evasion pips it gets and the attacks it has there. A unit that has activated gets those of its next activation, from where it stands. Laid out in rows of characters, as MovementLegend explains, like combat-map.json rows, whose hexes give each hex's terrain and elevation.",
+      "description": "The hexes a player's unit can end its move on, read from the game's own pathing, with the evasion pips it gets and the attacks it has there. A unit that has activated gets those of its next activation, from where it stands. Laid out in rows of characters, as MovementLegend explains, like combat-map.json rows, whose hexes give each hex's terrain and elevation. The facing after a move isn't exported, as the unit can turn at its end.",
       "additionalProperties": false,
       "required": [
         "targets",
@@ -1245,18 +1245,18 @@
             "null",
             "string"
           ],
-          "description": "`null` when the unit is a legged or unsteady mech, which can't sprint."
+          "description": "Like walk, when sprinting; `null` when the unit is a legged or unsteady mech, which can't sprint."
         },
         "reverse": {
           "type": "string",
-          "description": "Moving backward."
+          "description": "Like walk, when moving backward."
         },
         "jump": {
           "type": [
             "null",
             "string"
           ],
-          "description": "`null` when the unit is a vehicle or a mech without a working jump jet."
+          "description": "Like walk, when jumping; `null` when the unit is a vehicle or a mech without a working jump jet."
         },
         "attacks": {
           "type": "array",
@@ -1307,7 +1307,7 @@
         },
         "targetUnitIds": {
           "type": "array",
-          "description": "The units it is about (to destroy, protect or escort), as keys of units, while they are in full view: neither blips nor destroyed enemies.",
+          "description": "The units it is about (to destroy, protect or escort), as keys of units, while they are in full view, destroyed ones included; blips are left out.",
           "items": {
             "type": "string"
           }
@@ -1377,7 +1377,7 @@
         },
         "radius": {
           "type": "number",
-          "description": "The radius of the hexagon the HUD draws; whether a unit is inside is decided per map cell, which this only approximates.",
+          "description": "The radius of the hexagon the HUD draws, in meters; whether a unit is inside is decided per map cell, which this only approximates.",
           "format": "float"
         },
         "isPreview": {
@@ -1413,7 +1413,7 @@
         },
         "hexes": {
           "type": "array",
-          "description": "The hexes where a unit is crushed by the landing, those whose center cell the game marks, in the order of combat-map.json rows: a dropship's whole footprint, or one hex per drop pod, one per unit of the lance.",
+          "description": "The hexes whose center cell the game marks, in the order of combat-map.json rows; a unit standing on one is crushed. A dropship's whole footprint, or each drop pod's hex, one per unit of the lance.",
           "items": {
             "$ref": "#/definitions/HexCoordinates"
           }
@@ -1488,7 +1488,7 @@
         },
         "structure": {
           "type": "number",
-          "description": "The structure left; its max is in combat-map.json buildings[].maxStructure.",
+          "description": "The structure left, which the HUD shows when the building is targeted; its max is in combat-map.json buildings[].maxStructure.",
           "format": "float"
         },
         "destroyedHexes": {
@@ -1496,7 +1496,7 @@
             "array",
             "null"
           ],
-          "description": "The hexes the building stood on as they are now, since `combat-map.json` isn't rewritten when it falls: units on its roof drop to the ground, which the rubble's terrain covers. `null` when it stands.",
+          "description": "The hexes the building stood on, now with the ground's elevation and the rubble's terrain, since `combat-map.json` isn't rewritten when it falls; units on its roof drop to the ground. `null` when it stands. The blocked steps onto and off them still follow the roof, and the terrain a building's explosion changes around it isn't exported.",
           "items": {
             "$ref": "#/definitions/MapHex"
           }

@@ -22,7 +22,7 @@
     },
     "exportedAt": {
       "type": "string",
-      "description": "When the file was last written.",
+      "description": "When the file was last written, in ISO 8601 with the local time's UTC offset.",
       "format": "date-time"
     },
     "trigger": {
@@ -52,7 +52,7 @@
     },
     "pathingGroups": {
       "type": "array",
-      "description": "The groups of the game's pathing capabilities units move with (catalog.json chassisDefinitions.*.movement.pathingId) that block the same steps, by id; HexRow.blockedSteps has an entry per group.",
+      "description": "The groups of the game's pathing capabilities units move with (catalog.json chassisDefinitions.*.movement.pathingId) that block the same steps, by id; HexRow.blockedSteps has an entry per group. The game's own data makes two groups, the mechs' and the vehicles'.",
       "items": {
         "type": "array",
         "items": {
@@ -62,7 +62,7 @@
     },
     "buildings": {
       "type": "array",
-      "description": "Every building on the map when the file was written, in the order of their ids; a dropship only if it had landed by then.",
+      "description": "Every building on the map when the file was written, in the order of their ids. A dropship occupies no hex until it has landed; one landing later, e.g. the Leopard an evacuation calls in, isn't here but can be in the combat state's building lists.",
       "items": {
         "$ref": "#/definitions/CombatBuilding"
       }
@@ -78,7 +78,7 @@
   "definitions": {
     "ExportTrigger": {
       "type": "string",
-      "description": "What caused an export.",
+      "description": "What caused an export. `careerLoaded`: A career is loaded, new or from a save. The game state is skipped while a finished contract's results are still to be applied, and the catalog is rebuilt only when it's missing or stale, once the game has loaded every vehicle, turret and design mask. `manualSave`: The player saves the career outside combat. `autosave`: The game saves the career on its own outside combat, e.g. once an event's popup is closed with the picked option's results applied, or once a contract's results are applied. `contractCompleted`: A contract's results are applied, salvage included, where the game doesn't save the career afterwards, which is `autosave` otherwise. `financialReportShown`: The monthly financial report is shown, with the expenses paid. `mechLabOrderCompleted`: A mech lab order completes, at the end of a day or right away when it has nothing left to do; when several work orders complete together, the last one names the export. `pilotHealed`: A pilot's healing in the med bay completes, as `mechLabOrderCompleted`. `shipUpgradeCompleted`: An Argo upgrade's installation completes, as `mechLabOrderCompleted`. `contractsGenerated`: The game has generated a star system's contracts. `jumped`: The ship has jumped into its destination star system, at the end of that day, with the star system's contracts; work orders completing that day export with it. `arrived`: The ship arrives at the planet after a trip. `storeClosed`: A store closes, from the main screen or the mech lab. `purchaseCompleted`: The store screen completes a purchase, or refuses one. `saleCompleted`: The store screen completes a sale, or refuses one, once for a stack sold at once. `mechBayChanged`: The mech bay changes: a refit, repair, readying or storing is queued, an order is cancelled, the work queue is reordered, a mech or chassis is stored or scrapped, a stored component's repair is queued, or a mech is renamed without a refit. `experienceSpent`: The barracks confirm a pilot's training. `mechPlacementShown`: The game asks where to put a new mech because every mech bay is full, e.g. after salvage completes one. `missionCompleted`: A mission ends, still in combat, before the salvage is chosen. `salvageChosen`: The after-action report has finalized the salvage: once the priority salvage is confirmed, or right away when there is nothing to choose. `shipUpgradeStarted`: An Argo upgrade is bought and its installation starts. `phaseStarted`: A phase begins, before its first unit acts: the battle's first once the lance is deployed, and every later one, also one reached by reserving units. `combatStarted`: A new battle begins, when the briefing is dismissed. `combatLoaded`: A battle is loaded from a save, continuing mid-phase. `activationCompleted`: A unit's activation is done, its attacks resolved; out of contact, once the player's units have all moved. Reserving a unit doesn't count.",
       "x-enumNames": [
         "CareerLoaded",
         "ManualSave",
@@ -193,7 +193,7 @@
     },
     "CombatBuilding": {
       "type": "object",
-      "description": "A building, which units can be fired at, stand on and be blocked by.",
+      "description": "A building, which units can fire at, stand on and be blocked by.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -273,7 +273,7 @@
         },
         "terrains": {
           "type": "string",
-          "description": "Each hex's terrain as a character of terrains."
+          "description": "Each hex's terrain as a character of terrains: the first that applies to its center cell of map boundary, impassable, destroyed building, deep water, water, the terrain of the building on it, road, the map's custom terrain, forest and rough ground; otherwise open ground."
         },
         "elevations": {
           "type": "array",
@@ -296,7 +296,7 @@
         },
         "blockedSteps": {
           "type": "array",
-          "description": "Per entry of pathingGroups, the steps to neighbors its units can't take on slopes, one character per hex as HexGridLayout.blockedStepsFormula says. An approximation: a blocked step may still be reachable by a detour; a player unit's combat-state.json units.*.movement is exact.",
+          "description": "Per entry of pathingGroups, the steps to neighbors its units can't take on slopes, one character per hex as HexGridLayout.blockedStepsFormula says: too steep a grade between path nodes, too steep ground or a ledge in between. Terrain move costs and units in the way aren't part of it; impassable terrain has its own character in terrains. An approximation: a detour may still reach a neighbor a blocked step can't; a player unit's combat-state.json units.*.movement is exact.",
           "items": {
             "type": "string"
           }
