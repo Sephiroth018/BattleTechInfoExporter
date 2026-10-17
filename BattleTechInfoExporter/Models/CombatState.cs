@@ -18,17 +18,16 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="MovementLegend">How to read the units' <see cref="CombatUnit.Movement" />.</param>
 /// <param name="Units">
 ///     Every unit the player knows of, keyed by the game's unit id: the player's and allied units, and the enemies
-///     and neutral units the HUD shows or last showed. A destroyed unit stays, as its wreck is on the map; one that
-///     withdrew or that the mission's script removed leaves no wreck and is left out.
+///     and neutral units the HUD shows or last showed. A destroyed unit stays, as its wreck is on the map; an enemy or
+///     neutral unit that withdrew or that the mission's script removed leaves no wreck and is left out.
 /// </param>
 /// <param name="Objectives">The objectives the HUD lists, finished ones included, in the HUD's order.</param>
 /// <param name="Zones">The zones drawn on the map.</param>
 /// <param name="LandingZones">
 ///     Where a dropship or drop pods are about to land; entries come and go as the mission readies landings and
 ///     they happen. The game ties none to the objective announcing it: match them by position with the
-///     objective's <c>beacon</c>. A lance arriving another way, e.g. at a
-///     <c>regionDef_HostileDropZone</c> zone, has none; the band along the encounter boundary, which the HUD marks
-///     the same way, isn't exported.
+///     objective's <c>beacon</c>. A lance arriving without drop pods or a dropship has none; the band along the
+///     encounter boundary, which the HUD marks the same way, isn't exported.
 /// </param>
 /// <param name="BuildingSides">
 ///     The buildings on a side, e.g. a base to destroy or defend, by their <see cref="CombatBuilding.Id" />, in the

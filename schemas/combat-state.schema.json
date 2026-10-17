@@ -67,7 +67,7 @@
     },
     "units": {
       "type": "object",
-      "description": "Every unit the player knows of, keyed by the game's unit id: the player's and allied units, and the enemies and neutral units the HUD shows or last showed. A destroyed unit stays, as its wreck is on the map; one that withdrew or that the mission's script removed leaves no wreck and is left out.",
+      "description": "Every unit the player knows of, keyed by the game's unit id: the player's and allied units, and the enemies and neutral units the HUD shows or last showed. A destroyed unit stays, as its wreck is on the map; an enemy or neutral unit that withdrew or that the mission's script removed leaves no wreck and is left out.",
       "additionalProperties": {
         "$ref": "#/definitions/CombatUnit"
       }
@@ -88,7 +88,7 @@
     },
     "landingZones": {
       "type": "array",
-      "description": "Where a dropship or drop pods are about to land; entries come and go as the mission readies landings and they happen. The game ties none to the objective announcing it: match them by position with the objective's `beacon`. A lance arriving another way, e.g. at a `regionDef_HostileDropZone` zone, has none; the band along the encounter boundary, which the HUD marks the same way, isn't exported.",
+      "description": "Where a dropship or drop pods are about to land; entries come and go as the mission readies landings and they happen. The game ties none to the objective announcing it: match them by position with the objective's `beacon`. A lance arriving without drop pods or a dropship has none; the band along the encounter boundary, which the HUD marks the same way, isn't exported.",
       "items": {
         "$ref": "#/definitions/LandingZone"
       }

@@ -6,8 +6,9 @@ namespace BattleTechInfoExporter.Models;
 /// <summary>
 ///     A terrain's effects on the units in it: forest, water, rough ground, roads and the like. A cell has one
 ///     terrain at most, so the effects never stack; the map's biome applies on top (see
-///     <see cref="BiomeDefinition" />). Only the effects the game's combat code reads are exported; the tooltips also
-///     name a stability damage multiplier, which only the AI reads.
+///     <see cref="BiomeDefinition" />). Only the effects the game's combat code reads are exported: the stability
+///     damage multiplier some tooltips describe, e.g. ice's and marsh's, is read only by the AI. A terrain that does
+///     change the stability damage taken, e.g. rough ground, does so through <see cref="StickyEffects" />.
 /// </summary>
 /// <param name="Name">As the combat HUD shows it.</param>
 /// <param name="MoveCost">

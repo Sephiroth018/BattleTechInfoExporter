@@ -481,7 +481,7 @@
     },
     "MechDefinition": {
       "type": "object",
-      "description": "A mech: a loadout on a chassis, which a mech assembled from parts or bought comes with while rules.json campaign.salvage.assembledMechsComeEquipped is true. The frame is in chassisDefinitions. The game's appearance dates aren't exported, as the campaign ignores them; nor are the company tags a few DLC mechs need before enemy lances field them, which finishing a flashpoint adds.",
+      "description": "A mech: a loadout on a chassis, which a mech assembled from parts or bought comes with while rules.json campaign.salvage.assembledMechsComeEquipped is true. The frame is in chassisDefinitions. The game's appearance dates aren't exported, as it doesn't enforce them; nor are the company tags a few DLC mechs need before the game draws them into a lance, which finishing a flashpoint adds.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -2067,7 +2067,7 @@
     },
     "TerrainDefinition": {
       "type": "object",
-      "description": "A terrain's effects on the units in it: forest, water, rough ground, roads and the like. A cell has one terrain at most, so the effects never stack; the map's biome applies on top (see BiomeDefinition). Only the effects the game's combat code reads are exported; the tooltips also name a stability damage multiplier, which only the AI reads.",
+      "description": "A terrain's effects on the units in it: forest, water, rough ground, roads and the like. A cell has one terrain at most, so the effects never stack; the map's biome applies on top (see BiomeDefinition). Only the effects the game's combat code reads are exported: the stability damage multiplier some tooltips describe, e.g. ice's and marsh's, is read only by the AI. A terrain that does change the stability damage taken, e.g. rough ground, does so through stickyEffects.",
       "additionalProperties": false,
       "required": [
         "id",
