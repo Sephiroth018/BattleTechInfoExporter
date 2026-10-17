@@ -79,7 +79,7 @@ internal sealed record ChassisLocationDefinition(
 
 /// <summary>A location's armor by side.</summary>
 /// <param name="Front">The front armor; outside the torso, the location's only armor.</param>
-/// <param name="Rear">The rear armor; <c>null</c> when the location is outside the torso, which alone has it.</param>
+/// <param name="Rear">The rear armor; <c>null</c> when the location is outside the torso.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record LocationArmor<TSide>(TSide Front, TSide? Rear)
     where TSide : struct;

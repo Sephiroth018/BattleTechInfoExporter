@@ -5,7 +5,8 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     A mech: a loadout on a chassis, as a mech assembled from parts or bought comes with it. The frame is in
+///     A mech: a loadout on a chassis, which a mech assembled from parts or bought comes with while
+///     <see cref="SalvageRules.AssembledMechsComeEquipped" /> is true. The frame is in
 ///     <see cref="Catalog.ChassisDefinitions" />.
 /// </summary>
 /// <param name="Name">The name with the variant, as in the references to the mech.</param>
