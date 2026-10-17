@@ -487,6 +487,8 @@
         "id",
         "name",
         "chassis",
+        "role",
+        "description",
         "value",
         "usedTonnage",
         "stats",
@@ -505,6 +507,17 @@
         "chassis": {
           "description": "The mech's chassis, in chassisDefinitions.",
           "$ref": "#/definitions/DefinitionReference"
+        },
+        "role": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "The chassis' stock role, e.g. \"Brawler\", as the mech tooltip and the mech lab show it: the game's flavor text, which no rule reads; null when the chassis has none."
+        },
+        "description": {
+          "type": "string",
+          "description": "The mech's description, as the mech tooltip and the store show it, as plain text: the game's flavor text, which no rule reads."
         },
         "value": {
           "type": "integer",
