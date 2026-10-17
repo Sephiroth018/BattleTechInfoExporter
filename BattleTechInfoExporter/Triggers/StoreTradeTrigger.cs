@@ -14,8 +14,8 @@ namespace BattleTechInfoExporter.Triggers;
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal static class StoreTradeTrigger
 {
-    // A refused purchase exports because the store's stock can change without funds moving (Shop.Purchase takes a
-    // limited item out of stock before checking the funds); the export writes nothing when nothing changed.
+    // A refused trade exports too: the store's stock can change without funds moving (Shop.Purchase takes a limited
+    // item out of stock before checking the funds), and the export writes nothing when nothing changed.
     [HarmonyPatch(typeof(SG_Shop_Screen), nameof(SG_Shop_Screen.BuyCurrentSelection))]
     [HarmonyPostfix]
     private static void OnPurchaseCompleted([HarmonyArgument("__instance")] SG_Shop_Screen storeScreen)

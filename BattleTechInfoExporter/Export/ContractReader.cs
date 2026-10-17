@@ -16,7 +16,9 @@ namespace BattleTechInfoExporter.Export;
 /// </summary>
 internal static class ContractReader
 {
-    /// <summary>The most priority salvage picks a mission gives, hardcoded in <see cref="Contract.GenerateSalvage" />.</summary>
+    /// <summary>
+    ///     The most priority salvage picks a mission gives, hardcoded in <see cref="Contract.GenerateSalvage" />.
+    /// </summary>
     internal const int MaxPrioritySalvage = 8;
 
     // The slider positions of the contract negotiation in percent; their step is set in the screen's UI asset.

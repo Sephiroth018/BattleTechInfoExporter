@@ -9,7 +9,8 @@ namespace BattleTechInfoExporter.Export;
 
 /// <summary>
 ///     Reads which steps from a hex to its neighbors the game's pathing blocks on slopes for the units of one group of
-///     pathing capabilities, approximated from the game's path node steps between the hexes.
+///     pathing capabilities, approximated from the game's path node steps between the hexes, without terrain move
+///     costs or units in the way.
 /// </summary>
 // Units pass any path node, half a hex apart (PathNodeGrid), and stop on hex centers. A step is open when node steps
 // link the two centers through the two hexes and the two next to both; wider detours the game takes aren't searched.

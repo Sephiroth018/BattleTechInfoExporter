@@ -13,7 +13,8 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>
 ///     Builds the catalog's map definitions from the maps the contract generator selects for each star system
 ///     definition, the metadata database's map rows and each map's terrain data file, which the game reads only when
-///     the map is played (<see cref="MapMetaData.LoadMapMetaData" />); and reads the maps it selects for one star system.
+///     the map is played (<see cref="MapMetaData.LoadMapMetaData" />); and reads the maps it selects for one star
+///     system.
 /// </summary>
 internal static class MapReader
 {
