@@ -287,37 +287,32 @@ this file.
 - **SDK-style projects, built and tested with `dotnet`**, also for .NET Framework targets. Shared
   settings live in `Directory.Build.props`, package versions in `Directory.Packages.props` (central
   package management), the SDK version in `global.json`, and tools in `.config/dotnet-tools.json`
-  (`dotnet tool restore`).
+  (`dotnet tool restore`). A new solution takes `Directory.Build.props` and `.editorconfig` from an
+  existing one, since they hold the rules the build enforces.
 - **Solution format:** keep a repository's existing one; new repositories use `.slnx`.
-- **Newest C# language version, nullable reference types enabled.** On old target frameworks,
-  PolySharp supplies the compile-time polyfills newer language features need.
-- **Warnings are errors** (`TreatWarningsAsErrors`), with the built-in .NET analyzers at
-  `latest-recommended` and `EnforceCodeStyleInBuild`. Suppress a diagnostic only at the narrowest
-  scope, with a justification.
+- **On old target frameworks, PolySharp** supplies the compile-time polyfills newer language
+  features need.
 - **`.editorconfig` is the single source of style, formatting and naming rules**, ReSharper's
   included (`resharper_*` keys). Inspection severities it can't express go in the team-shared
   ReSharper settings file `<solution name>.sln.DotSettings` (named so even for `.slnx`), created
-  when the first one is needed. Never
-  loosen either to make a change pass. Its `end_of_line = lf` matches `.gitattributes`, so
-  formatting checks see the same line endings on every machine.
+  when the first one is needed. Never loosen either to make a change pass. Its `end_of_line = lf`
+  matches `.gitattributes`, so formatting checks see the same line endings on every machine.
 - **ReSharper Command Line Tools** (`JetBrains.ReSharper.GlobalTools`, a local tool) apply the
-  IDE's rules outside it: `jb cleanupcode` formats, `jb inspectcode` reports inspections.
+  IDE's rules outside it: `jb cleanupcode` formats, `jb inspectcode` reports inspections. They run
+  only on the shared settings layers, so their results don't depend on anyone's IDE settings.
 - **Tests use xUnit v3.**
-- **ReSharper runs only on shared settings** (`--disable-settings-layers` for the global and
-  personal layers), so its results don't depend on anyone's IDE settings.
 - **CI (GitHub Actions) is strict:** the build passes with warnings as errors, all tests pass,
   `jb cleanupcode` leaves no diff, and `jb inspectcode` reports nothing at warning level or above.
   Fix the cause; never weaken a check to get green.
 
 ## C# conventions
 
-Everything enforceable lives in `.editorconfig` and the analyzer settings (style, file-scoped
-namespaces, namespaces matching folders, `var` everywhere, culture-safe formatting and parsing).
-This section holds what needs judgment.
+What the tools enforce lives in `.editorconfig` and the analyzer settings; this section holds what
+needs judgment.
 
 - **`internal` by default**; a type is `public` only when another assembly needs it. Public classes
-  stay open; internal ones are sealed unless designed for inheritance.
-- **Immutable by default:** records for data, `init`/`readonly` where possible, and read-only
+  stay open.
+- **Immutable by default:** records for data, `init` and `readonly` where possible, and read-only
   collection interfaces (`IReadOnlyList<T>`, `IReadOnlyDictionary<TKey, TValue>`) in signatures.
 - **No escape hatches** (null-forgiving `!`, `#nullable disable`, `dynamic`, reflection) without a
   narrow, stated reason. Where a project needs one (e.g. reflection for a game's private members),
@@ -337,8 +332,9 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
 
 ## Game and runtime constraints
 
-- **BattleTech 1.9.1 on Mono with the .NET Framework 4.7.2 profile**, so the project targets
-  `net472`. It is loaded by ModTek v4.5.1 or later, which calls every public static `Init` method.
+- **BattleTech 1.9.1 on Unity 2018.4 and Mono with the .NET Framework 4.7.2 profile**, so the
+  project targets `net472`. It is loaded by ModTek v4.5.1 or later, which calls every public static
+  `Init` method.
 - **Only the story campaign is supported** (`SimGameState.IsCampaign`); `CampaignExport` skips
   career mode with a log line.
 - **Game assemblies come from the install** (`BattleTechGameDir` in the git-ignored
@@ -367,210 +363,111 @@ A BattleTech mod that exports the career state as JSON for tools to read (see RE
 
 ## Structure
 
-Two projects in `BattleTechInfoExporter.slnx`: the mod, `BattleTechInfoExporter/`, and the schema
-generator, `BattleTechInfoExporter.SchemaGenerator/` (net9.0, never shipped). The mod's build builds
-and runs the generator on the built mod; it writes a JSON Schema per export file into `schemas/`
-(`ExportFileModels` checks the mod's `ExportFiles` lists every file, `ExportSchemaGenerator`
-generates them with the mod's own serializer settings, `ModelDocumentation` turns the models' doc
-comments into their descriptions, rendering a cref as where the JSON holds its target
-(`ExportFilePaths`), and `GameEnums` describes the game's enums), and fails the build when a
-definition or an exported property has no description. The mod grants it `InternalsVisibleTo` for the serializer settings, the one exception
-to "its own test project only".
+Two projects in `BattleTechInfoExporter.slnx`:
 
-In the mod, `ModEntryPoint` is the
-only public type; it deletes the files in `exports/` and the schemas in `schemas/` that aren't in
-`ExportFiles` (e.g. an earlier version's, through `ModFolderFiles`) and applies all Harmony patches
-in the assembly. `ModAssembly` holds the mod's name, version and folder, `ModLog` its logger.
-Folders:
+- **The mod,** `BattleTechInfoExporter/`. Its build computes the version `Major.Minor.Patch.Build`
+  from git (the `ComputeBuildVersion` target with the inline task `ComputeVersionFromGit`, in
+  `Directory.Build.targets`; see "Versioning"), stamps it into the DLL, generates `mod.json` from it
+  and the description, author, repository URL and supported game version in
+  `Directory.Build.props`, and runs the schema generator. The mod folder holds the DLL, `mod.json`,
+  `CHANGELOG.md` and the schemas.
+- **The schema generator,** `BattleTechInfoExporter.SchemaGenerator/` (net9.0, never shipped),
+  which the mod's build builds and runs on the built mod, in three roles. It writes a JSON Schema
+  per export file into `schemas/` with the mod's own serializer settings (`ExportSchemaGenerator`,
+  with `ExportFileModels` checking that the mod's `ExportFiles` lists every file). It fails the
+  build when a definition, an exported property or a game enum has no description
+  (`ModelDocumentation` turns the models' doc comments into descriptions, rendering a cref as where
+  the JSON holds its target, `ExportFilePaths`; `GameEnums` describes the game's enums). And it
+  validates export files against the schemas (see "Commands"). The mod grants it
+  `InternalsVisibleTo` for the serializer settings, the one exception to "its own test project
+  only".
 
-- `Triggers/`: the patches that decide when to export, the recorder patches they share, and
-  `ContractGenerationPatch`, which makes the game's own contract generation complete in one go.
-- `Export/`: the exporters, the single entry points the triggers call: `GameStateExporter` for the
-  career state, the rules and the star systems, `MissionExporter` for the mission file,
-  one method per write, `CombatExporter` for the combat map and the combat state, which it also deletes, and `CatalogExporter`
-  for the catalog, which rebuilds it only when it's missing or stale (another mod version or
-  another `CatalogSourceFingerprint`, the hash of the game's manifest entries it reads), first
-  loading the vehicles, turrets and design masks the career doesn't and exporting once they are
-  loaded. All run their export inside `CampaignExport`. `GameStateReader` builds the game
-  state file's models from the game, one reader per section of the file (`FinancialReportReader` the
-  financial report), taking the star systems it shows in full from the star systems file's model, after
-  `SystemContractGenerator` generated the current system's contracts where the game hadn't yet; `RulesReader` builds the
-  rules file's tables, with `AbilityReader` reading each ability, `CombatRulesReader` the combat
-  constants and `CampaignRulesReader` the campaign constants; `EffectReader` reads the statistic
-  changes of abilities, components, terrains and rules; `StarSystemReader` builds the star systems file from the starmap, with
-  `RouteReader` reading the route to a system as the starmap plans it and `FactionReader` which factions hire
-  against whom there; `MissionReader` builds the
-  mission file's models from the completed contract; `CombatStateReader` builds the combat state
-  file from the running battle, with `CombatUnitReader` reading each unit as the HUD shows it,
-  `MovementReader` where each player unit can move, and `ObjectiveReader` the objectives and zones; `CombatMapReader` builds the combat map file from the
-  battle's map, with `MapHexReader` reading the playable hexes, `HexStepReader` the steps slopes
-  block through the game's own path checks, and `BuildingReader` the buildings, also the damaged
-  ones for the combat state; `CatalogReader` builds the catalog from the
-  definitions the game has loaded, with `TerrainReader` reading the terrains and biomes from the
-  design masks, `MapReader` the maps from the metadata database and their terrain data files,
-  `EventDefinitionReader` the events, which also makes the references to them,
-  `ItemCollectionReader` the item collections the stores draw from, and `FactionReader` the
-  factions' allies and enemies; `EventStateReader`
-  builds the game state's events section, and `EventStatisticReader` the company's and the pilots'
-  statistics the events compare.
-  `DefinitionReferences` makes the
-  references that need only a description, a faction, a biome or a data-driven enum value, and
-  `ComponentReferences` every reference to a component, and `ShopItemReferences` the references to what a
-  store or item collection holds, by the game's shop item type; a reference
-  with a naming rule of its own is made by the reader that owns it. `ReferencedEntries` builds the
-  lists of entries that refer to a definition, leaving out what has none, `GameText` makes every exported game text plain,
-  `HudInitiative` numbers phases and initiative as the HUD does, and `WeaponCategories` keys tables by
-  weapon category.
-  `ExportFileWriter` replaces, deletes and reads the header of the files in the mod's `exports/`
-  folder, by file name and text, knowing no model.
+In the mod, `ModEntryPoint` is the only public type; it deletes the files in `exports/` and
+`schemas/` that `ExportFiles` doesn't list (e.g. an earlier version's) and applies all Harmony
+patches in the assembly. Folders:
+
+- `Triggers/`: the patches that decide when to export, and those that make the game's own contract
+  generation complete in one go.
+- `Export/`: the exporters, the only entry points the triggers call: `GameStateExporter` for the
+  career state, `MissionExporter` for the mission file, `CombatExporter` for the combat map and
+  state, which it also deletes, and `CatalogExporter` for the catalog. The career export first
+  generates the current star system's contracts where the game hasn't yet, as the contract screen
+  does when it opens (`SystemContractGenerator`). Below the exporters, one
+  `<Section>Reader` per section of a file builds its models from the game, and cross-cutting
+  helpers make the references, the plain game texts, the rounding and the comparisons; a reference
+  with a naming rule of its own is made by the reader that owns it. `ExportFileWriter` replaces,
+  deletes and reads the header of the files in `exports/`, by file name and text, knowing no model.
 - `Models/`: immutable records, one per JSON object, and the mod's own enums. The records are
   marked `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` because only the serializer reads
   them. Every exported property has a doc comment, overriding "XML doc comments only where name and
   signature aren't enough": a `<param>` on its record, or a `<summary>` on a body property, on the
   record that declares it, or once on the interface property it implements where every implementing
-  record means the same by it. It's the schema's description, so it's short (a fragment is fine) and
-  says what the value is, its unit or scale and what `null` means. `ExportFile`, the root of every file, is more than data, by decision: it owns the header,
-  the JSON conventions, the content compared before a write and the writing itself, through
-  `ExportFileWriter` and the clock.
-
-The version is `Major.Minor.Patch.Build`, computed by the build from git (`ComputeBuildVersion` in
-`Directory.Build.targets`, an inline task; see "Versioning"). The same target fails the build when
-`CHANGELOG.md`'s newest heading is older than that version. The build stamps the version into the
-DLL and generates `mod.json` from it and the description, author, repository URL and supported game
-version in `Directory.Build.props`.
+  record means the same by it. It's the schema's description, so it's short (a fragment is fine)
+  and says what the value is, its unit or scale and what `null` means. `ExportFile`, the root of
+  every file, is more than data, by decision: it owns the header, the JSON conventions, the content
+  compared before a write and the writing itself, through `ExportFileWriter` and the clock.
 
 Planned features are issues on the GitHub Project "Road to 1.0", whose status follows the work (see
 "Issues and projects").
 
 ## Export format
 
-- **References to game definitions are `{ "id", "name" }`:** the id from the game's data files and
-  the name shown in the UI. Both are always set; where a definition is missing, a name from the
-  game's enumeration stands in. Faction names get title case with the short name in brackets
-  (`FactionNames`), e.g. "The Local Pirate Organization (Pirates)", because the game's are written
-  for use mid-sentence. Component references also carry the game's component `type`, which names
-  their group in the catalog's `componentDefinitions`.
-- **Definitions live only in the catalog,** in root objects keyed by id (e.g. `componentDefinitions`,
-  grouped by component type with one entry shape per group and no null sections). The other files
-  refer to them by id and match the catalog through `modVersion`; their entries carry the reference
-  and their own state, instead of repeating the definition's stats or limits (e.g. a location's max
-  armor or slots). A reference whose definition is missing has no entry. Keys keep the game's ids as they are.
-  Star systems are the exception, by decision: see below.
-- **Lists of entries that refer to a definition, which the game keeps in no meaningful order**
-  (storage, stores, salvage), are ordered the same way everywhere, by their references' own comparison (`Reference`, `ComponentReference`): by component
-  type for components, then by name, with the id breaking ties. A mech's components keep the game's
-  order.
-- **Files are cut for round trips, not size:** the consumer, a Claude chat, copies each changed file
-  whole into its workspace and parses it with code, so a file's size costs it nothing and every
-  file it has to copy again costs a round trip. Data that changes together shares a file, static
-  data stays apart, and what a step needs (a combat round, choosing a contract) is in the file that
-  step reads.
-- **The career state is three files, read together on every career export:** `game-state.json`,
-  with the next financial report as a section of its own (`financialReport`, next to the company,
-  which keeps only its funds), `rules.json` for the game tables (e.g. `moraleLevels`,
-  `reputationLevels` at its root): how the game works for this career, which doesn't change
-  between exports, and `star-systems.json` with every star system. Values in the game state refer
-  to the rules by name, instead of repeating thresholds and effects per entry.
-- **Star systems live in `star-systems.json`, not the catalog, by decision:** keyed by the id of
-  each system's active definition, each entry holds its active definition's name, owner, tags,
-  biomes, maps and the item collections its stores draw from (`stores`, by their ids in the
-  catalog's `itemCollectionDefinitions`) next to what changes during a career (difficulty, travel
-  requirements, route, and the employers with their targets, `contractEmployers`, which the
-  company's alliances and the story's ignored factions narrow). The
-  story swaps a system's definition (`StarSystem_SetActiveDef`, e.g. when its owner changes); the
-  inactive definitions give a consumer nothing and aren't exported. The full entry is repeated
-  wherever a step needs it: in the game state `position.starSystem`, `position.travel.destination`,
-  the active contract's and each offered contract's star system, the current one included, so
-  every contract has one shape; the other files refer to a star system by its reference alone.
-- **A route is the starmap's** (`RouteReader`) from the current system, its days and cost: `null`
-  where the game finds no route, always for a system whose travel requirements aren't met. The
-  current system's is 0 days and 0 C-Bills. Its days always include the whole leg from the current
-  system's planet to its jump point, as the starmap shows them in the system: during a trip the
-  starmap counts down what's left, which would change every route each day. The trip under way has
-  that leg's length (`jumpPointDays`) and the day the leg under way ends (`legEndsOnDay`, from the
-  travel order's legs) instead, so a tool can correct a route mid-trip.
-- **The latest mission is a file of its own,** `mission-outcome.json`, written in combat when the
-  mission ends, before the salvage is chosen, and again in the after-action report once the
-  salvage is final, with `salvage.received` filled in. One file, because the game has no id that
-  identifies every contract to link two by. The outcome is read once, when the mission ends, and
-  the second write adds only `salvage.received` to it: by then the battle it reads from (the
-  objectives' grouping, each mech's ammo use from its combat mech) is being torn down.
-- **The running battle is a file of its own,** `combat-state.json`, written when every phase begins
-  and after every unit's activation, and deleted when the game tears the battle down or a career is loaded, so it exists
-  only while its battle runs. It shows what the player's HUD shows and no more: enemies by their
-  visibility (`CombatUnitReader`), from full detail down to a blip's position or the position they
-  were last detected at. Every read is a cached lookup or a statistic, apart from the map cells of
-  destroyed buildings and the player's units' movement (`MovementReader`): the hexes each can reach
-  from the path grids the game keeps for every unit, finishing a grid still being built, and from
-  the game's jump landing check per hex in jump range, with the
-  path's length and a line of fire to every enemy in full view per hex. It never reads the career
-  files or the catalog.
-- **The battle's ground is a file of its own,** `combat-map.json`, written once when the battle
-  begins and deleted with the combat state: the map doesn't change, and the combat state lists what
-  does (damaged buildings, a destroyed building's hexes). It isn't in the catalog, because buildings
-  exist only once the battle's map has loaded. It's laid out in rows of characters and numbers,
-  not an object per hex, so an AI chat can read it whole, and spells out its own hex grid
-  (`hexGrid`). A hex is what a unit standing on it gets from the cell at its center (`MapHexReader`);
-  blocked steps follow the game's path node steps (`HexStepReader`).
-- **The catalog is a file of its own that doesn't depend on the career:** `catalog.json`, with
-  every chassis, mech, vehicle, turret, component, terrain, biome, map, event, item collection and
-  faction definition the game has loaded, rebuilt on a career load only when it's missing or stale: written by another mod version or with
-  another `sourceFingerprint`, the hash of the game's manifest entries for everything it reads (id,
-  file and last write time). A change touching no file it reads (a DLL mod patching definitions in
-  memory) isn't detected; deleting the file forces a rebuild. Vehicles' and turrets'
-  armor and structure are their combat values, after the game's vehicle multipliers. Terrains are
-  keyed by design mask id, biomes by the biome id the star systems refer to.
-- **Maps are selected by the game, not derived by the consumer:** each star system in
-  `star-systems.json` lists the maps its contracts can be fought on, through the contract
-  generator's own query (`MapReader.ReadPlayableMaps`), run on every career export once per distinct
-  input (required and excluded map tags, biomes) rather than per star system. The catalog's
-  `mapDefinitions` hold each map's draw weight and terrain coverage, the share of its playable cells
-  per terrain id, read from the map's terrain data file only on a rebuild.
-- **An event is its definition in the catalog plus the career's event state in the game state**
-  (`events`): the catalog's `eventDefinitions` hold the requirements, options, outcomes and results
-  as the game's data has them, statistic names included, except that the changes to and
-  comparisons of the stored components' counts name the component, each requirement with the scope
-  the game checks it against; the scope's own entry in the career files holds what the requirements
-  check: the company's tags and statistics on `company`, its stored components' counts in
-  `storage`, each pilot's on the pilot, the star systems' tags in `star-systems.json`. Only the statistics some requirement compares are
-  exported, as the game compares them (a number, 0 for one the scope doesn't have). What the game
-  doesn't show and only its random rolls use, such as the daily event chance, is left out; the
-  events scheduled and drawn lately are known to the player, so they're in.
-- **The rules export only constants the game's code reads** (`combat` and `campaign` in
-  `rules.json`): a constant the game never reads, reads only in code nothing calls, or reads only
-  for presentation or the AI is left out, so a consumer never plans around a number that does
-  nothing. A value the game hardcodes but a tool computes with (a rounding, a limit) is exported
-  next to the constants; a rule it hardcodes with conditions is stated in the description of the
-  value it affects, never in the README, which isn't shipped.
-- **Every export file has a JSON Schema** (draft-04), `schemas/<file>.schema.json`, generated on
-  every build, committed, and shipped in the mod folder's `schemas/`. Every property is required,
-  since the mod writes them all, `null` included; an abstract record declared as a property's type
-  is `anyOf` its derived records, each listing its own values of the enum or boolean that tells them
-  apart.
-  An enum lists only the values the mod writes. A change to the export format shows in the schemas'
-  diff.
-- **Every export file starts with `modVersion`, `exportedAt` and `trigger`** (`ExportFile`, which
-  every file's model inherits), describing the export that last wrote it.
-- **Points in time are day numbers** on the game's `DaysPassed` scale (`company.daysPassed`), e.g.
-  `readyOnDay`, never countdowns, so a passing day changes only the company's day and date. Durations
-  that don't count down (a route's travel days) stay durations.
-- **Phases and initiative are numbered as on the HUD** (`HudInitiative`), from 5 down to 1, never on
-  the game's internal scale, where units act from 1 up: in the combat state, and in the rules'
-  statistic changes to the initiative statistics, whose sign flips so a positive change acts earlier.
-- **Game texts are plain text** (`GameText`): descriptions, objective titles and event titles and
-  options lose the formatting tags (`<i>`, `<color=…>`) and tooltip links the game's UI renders,
-  and a switch on a pilot's gender resolves to its default wording; the callsign and pronoun
-  placeholders stay. An event's references carry the same plain name as its catalog entry. Other
-  names are left as they are.
-- **Game enums keep the game's values** (e.g. `IN_SYSTEM`, `LIKED`); the UI shows the same. Our own
-  enums are camelCase.
-- **JSON:** camelCase properties, compact (no indentation, since only tools read the files), `null`
-  written explicitly, through the game's Newtonsoft.Json.
-- **Files are replaced atomically**, so a tool reading them never sees a half-written file, and
-  only when their content apart from `exportedAt` and `trigger` changed, so a tool copying the files
-  that changed skips the others. `ExportFile` compares with the content it last wrote, kept in
-  memory, so each file is also written once after every game start. The game state's day and date
-  count as content: an export on a new day writes it, so its day is the latest export's.
+What each file holds is in its schema and the README. This section holds what a change to the
+format must keep.
+
+Conventions a new field follows:
+
+- **References are `{ "id", "name" }`**, both always set; component references also carry `type`,
+  and faction names get title case with the short name in brackets (`FactionNames`).
+- **Definitions live only in the catalog,** keyed by the game's ids and grouped by type, one entry
+  shape per group with no null sections; the other files refer to them by id and carry only their
+  own state. A reference whose definition is missing has no entry.
+- **Lists of entries are sorted by their references' comparison** where the game keeps no
+  meaningful order; a mech's components keep the game's.
+- **Points in time are day numbers** on the `daysPassed` scale, never countdowns; durations stay
+  durations.
+- **Phases and initiative are numbered as on the HUD** (`HudInitiative`), from 5 down to 1.
+- **Game texts are plain** (`GameText`), without the UI's formatting tags and tooltip links.
+- **Game enums keep the game's values;** our own enums are camelCase.
+- **Floats the mod computes are rounded to a tenth** (`Rounding`); the game's constants keep theirs.
+- **A choice is a derived shape** with a switch field, the enum or boolean that tells them apart.
+- **Every file has a JSON Schema** (draft-04, `schemas/<file>.schema.json`, committed and
+  shipped): every property required, derived shapes pinning their switch value, enums listing only
+  the values the mod writes. A format change shows in the schemas' diff.
+- **Files are cut for round trips, not size:** the consumer copies each changed file whole, so data
+  that changes together shares a file and what a step needs is in the file that step reads.
+- **JSON is camelCase and compact,** `null` written explicitly, through the game's Newtonsoft.Json.
+
+Layout decisions a change would otherwise undo:
+
+- **The career state is three files, read together on every career export** (`game-state.json`,
+  `rules.json`, `star-systems.json`): the rules don't change between exports, so the game state
+  refers to them by name instead of repeating thresholds.
+- **Star systems live in `star-systems.json`, not the catalog,** keyed by their active
+  definition's id (the story swaps definitions through the `StarSystem_SetActiveDef` result action),
+  and repeated in full wherever a step needs one: their state changes during a career. The inactive
+  definitions give a consumer nothing and aren't exported.
+- **The latest mission is one file written twice,** when the mission ends and once the salvage is
+  final, the second write adding only `salvage.received`: the game has no id that identifies every
+  contract to link two files by, and by then the battle the outcome reads from is torn down.
+- **The combat files read only the battle,** never the career files or the catalog, and the combat
+  state only what the HUD shows: it's written after every activation, so its reads stay cached
+  lookups and statistics, apart from the movement and destroyed buildings' cells.
+- **The combat map isn't in the catalog:** buildings exist only once the battle's map has loaded.
+- **The catalog is rebuilt on a career load only when it's missing or stale,** written by another
+  mod version or with another `sourceFingerprint` (the game's manifest entries it reads): a rebuild
+  loads what the career doesn't. A DLL mod patching definitions in memory isn't detected.
+- **Values the game decides are read through its own code,** never re-derived: routes from the
+  starmap, a star system's maps from the contract generator's query, blocked steps from the path
+  checks, so they match what the game does.
+- **The rules export only constants the game's code reads,** never one read only for presentation
+  or the AI, so a consumer never plans around a number that does nothing. Hardcoded values a tool
+  computes with sit next to them; hardcoded rules go in the description of the value they affect.
+- **What the game doesn't show and only its random rolls use is left out** (e.g. the daily event
+  chance): a consumer can't act on it.
+- **Files are replaced atomically and only when their content apart from `exportedAt` and
+  `trigger` changed,** so a tool never reads a half-written file and one copying the changed files
+  skips the others. The game state's day counts as content.
 
 ## Glossary
 
@@ -584,6 +481,11 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **Vehicle:** a ground unit with fixed armor and loadout (`VehicleDef`), only met as an enemy or
   ally in combat.
 - **Turret:** a fixed emplacement with a single location (`TurretDef`).
+- **Unit:** a mech, vehicle or turret in combat (the game's `AbstractActor`).
+- **Location:** a body location of a unit: a mech's head, torsos, arms and legs, a vehicle's front,
+  sides, rear and turret, a turret's single one. Never a star system.
+- **Loadout:** the components mounted in a unit's locations; a mech's can change, a vehicle's and a
+  turret's are fixed.
 - **Catalog:** the export of every chassis, mech, vehicle, turret, component, terrain, biome, map,
   event, item collection and faction definition the game has loaded (`catalog.json`).
 - **Item collection:** a weighted list the stores and rewards draw items from (`ItemCollectionDef`):
@@ -595,6 +497,9 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   star system can have several; one is active at a time.
 - **Ship upgrade:** an upgrade of the Argo (`ShipModuleUpgrade`), bought in its engineering
   screen. Never just "upgrade", which components also have.
+- **Work order:** a job the company waits for (the game's `WorkOrderEntry`): mech lab work, healing
+  in the med bay, the trip, the financial report, a ship upgrade. **Work queue:** the timeline's
+  list of them, by the day they finish (`workQueue`).
 - **Terrain:** a design mask applied to a map cell (`DesignMaskDef`): forest, water, rough ground,
   roads and the like. A cell has one terrain at most.
 - **Biome:** a map's map-wide design mask, keyed by the game's `Biome.BIOMESKIN`, applied on top of
@@ -605,11 +510,21 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
   stands on a hex's center, and gets its height and terrain from the map cell there.
 - **Building:** a destructible structure on a combat map, the game's combatant `Building`; units
   can fire at it, stand on its roof and be blocked by it. Crates, trees and fences aren't buildings.
+- **Lance:** the up to four units the player deploys on a mission. **Last lance:** the mechs and
+  pilots last sent on a mission, which the lance configuration fills a contract's open slots with.
+- **Round:** one pass through every unit's activation, counted from 1. **Phase:** the part of a
+  round in which the units of one initiative act, numbered as on the HUD from 5 down to 1.
 - **Activation:** one unit's turn within a phase: it moves, attacks or braces, and is done for the
   round. Reserving a unit postpones its activation to a later phase.
+- **Visibility:** how much of a unit the player's HUD shows (the game's `VisibilityLevel`): full
+  view, a blip, or the position it was last detected at.
 - **Blip:** an enemy known only from sensors (the game's `VisibilityLevel` from `Blip0Minimum` to
   `Blip4Maximum`), shown with as much detail as the player's side's sensors reveal. An enemy in
   sight but hidden by ECM (`BlipGhost`) isn't a blip: the export treats it as in full view.
+- **Evasion pips:** what a unit earns by moving, each making ranged attacks against it harder (the
+  game's `EvasivePipsCurrent`).
+- **Resolve:** the points the player's lance gains in combat and spends on Precision Strike and
+  Vigilance (the game's `Team.Morale`).
 - **Statistic change:** a change an ability or component makes to a statistic (the game's
   `EffectData` of type `StatisticEffect`), or an event's result makes (`SimGameStat`).
 - **Event:** something the game shows between missions, about the company or a pilot, offering
@@ -626,16 +541,18 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **Contract identity:** what a contract is in every state, offered, accepted or fought
   (`ContractIdentity`). **Contract briefing:** what the contract details show before the mission,
   on top of its identity (`ContractBriefing`).
+- **Trigger:** what caused an export (`ExportTrigger`), in every file's header. A statistic change's
+  `trigger` is the game's own, when the change is made (`EffectTriggerType`).
 
 ## Commands
 
-- **Build:** `dotnet build`, which also regenerates the schemas.
+- **Build:** `dotnet build`.
 - **Validate exports:** `dotnet
   BattleTechInfoExporter.SchemaGenerator/bin/Debug/net9.0/BattleTechInfoExporter.SchemaGenerator.dll
   <game> --validate <game>/Mods/BattleTechInfoExporter/exports` checks the game's current export
-  files against the schemas of the last build, without writing any.
-- **Deploy:** `dotnet build -p:DeployToGame=true` also copies the DLL and `mod.json` into
-  `<game>/Mods/BattleTechInfoExporter/`, for testing a branch in the game.
+  files against schemas it generates in memory from the last build's DLL, writing none.
+- **Deploy:** `dotnet build -p:DeployToGame=true` also copies the DLL, `mod.json`, `CHANGELOG.md`
+  and the schemas into `<game>/Mods/BattleTechInfoExporter/`, for testing a branch in the game.
 - **Package:** `dotnet build -c Release` also writes `artifacts/BattleTechInfoExporter-<version>.zip`.
 - **Format:** `dotnet jb cleanupcode BattleTechInfoExporter.slnx --profile="Built-in: Full Cleanup"
   --disable-settings-layers="GlobalAll;GlobalPerProduct;SolutionPersonal;ProjectPersonal"
@@ -652,9 +569,10 @@ Every merged PR that changes the mod gets a GitHub release, after the merge, fro
 `gh release create v<Major.Minor.Patch>` on the merge commit, with the zip attached and release
 notes summarizing the PR (marked as generated with Claude Code). For the export format's changes,
 the notes point to the version's entry in `CHANGELOG.md` instead of restating them. The tag has no
-build number: it marks the semantic release, and the merge commit is build 0 of that version. The
-tag is what the next build derives its version from, so a PR whose type doesn't bump (`docs`,
-`chore`) gets no release and rolls into the next one.
+build number: it marks the semantic release, and the next build derives its version from it. A PR
+whose type doesn't bump (see "Versioning") gets no release and rolls into the next one. Before
+tagging, check that the merge commit carries no tag yet (`git describe --exact-match` fails); a tag
+means the release exists.
 
 ## Changelog
 
@@ -678,15 +596,15 @@ to issues or PRs: its reader can't use them, and no dates either.
 
 - **No automated tests and no CI.** The mod only reads and exports game state, which can't run
   outside the game, and everything references the game's assemblies. This overrides "Testing",
-  Definition of done steps 1 and 4, and the CI rule in "Toolchain and enforcement".
+  Definition of done steps 1 and 4, "Merging needs green CI" and the CI rule in "Toolchain and
+  enforcement"; the "Verification" checklist gates the merge instead.
 - **Formatting, build and inspections still apply** (Definition of done steps 2, 3 and 5), run
   locally before every pushed commit.
 - **A bug fix starts with reproduction steps in its issue** instead of a failing test.
-- **Merging needs the "Verification" checklist ticked** instead of green CI.
 
 ## Knowledge sources
 
-The game is BattleTech 1.9.1 (Unity 2018.4, Mono, .NET Framework 4.7.2). In order of authority:
+In order of authority:
 
 1. **The decompiled game code** in the sibling folder `../BattleTechDecompiled` (`Assembly-CSharp`,
    `BattleTech.Common`) is the source of truth for game behavior. It is never copied into this
@@ -707,8 +625,8 @@ The game is BattleTech 1.9.1 (Unity 2018.4, Mono, .NET Framework 4.7.2). In orde
 
 ## Verification
 
-In the game, by the user. Every PR's description lists what to check in the game; the user ticks it
-before the go-ahead. Every checklist starts with the standard checks:
+In the game, by the user, as the checklist in the PR's description (see "Definition of done"). Every
+checklist starts with the standard checks:
 
 1. The game starts and the main menu shows `/W MODTEK`.
 2. ModTek's log (`Mods/.modtek/battletech_log.txt`) shows ModTek loading the mod with the PR's
@@ -743,7 +661,4 @@ after a release never shares its version. Every commit on a branch raises its ve
 lower PR is released, so a deployed build that isn't the branch's latest shows a lower one. While
 the export format is still being worked out, versions stay at 0.x and a breaking format change
 bumps only the minor version; 1.0.0 marks the format as settled. Issues name the part their change
-bumps (major, minor or patch) and the PR title's type applies it. Every bump adds its entry to
-`CHANGELOG.md` under the number the branch's build computes, and the build fails while that heading
-is older than the version (see "Changelog"). Before tagging a release, check that the merge commit
-carries no tag yet (`git describe --exact-match` fails); a tag means the release exists.
+bumps (major, minor or patch) and the PR title's type applies it.
