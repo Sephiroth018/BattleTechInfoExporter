@@ -14,9 +14,8 @@ namespace BattleTechInfoExporter.Models;
 ///     the cap.
 /// </param>
 /// <param name="ModifierByPips">
-///     The to-hit modifier by the number of pips the weapon doesn't ignore, from one pip up; for more pips than entries,
-///     the pips times the
-///     difference of the last two.
+///     The to-hit modifier by the number of pips the weapon doesn't ignore, from one pip up; for more pips than
+///     entries, the pips times the difference of the last two.
 /// </param>
 /// <param name="WeaponTypesAffected">
 ///     The weapon types the pips apply to, by the game's names, where the weapon's category is affected too
