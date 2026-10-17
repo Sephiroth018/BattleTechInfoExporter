@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using BattleTechInfoExporter.Models;
@@ -33,20 +32,20 @@ internal sealed partial class ModelDocumentation
     internal string? TypeDescription(Type type) => Render(type.GetXmlDocsElement()?.Element("summary"), type);
 
     /// <summary>
-    ///     The enum's summary, followed by each documented member's among <paramref name="writtenValues" /> as
-    ///     <c>`value`: summary</c>.
+    ///     The enum's summary, followed by each documented member's among <paramref name="writtenMembers" />, the
+    ///     schema's values with their member names, as <c>`value`: summary</c>.
     /// </summary>
-    internal string? EnumDescription(Type enumType, IReadOnlyCollection<string> writtenValues)
+    internal string? EnumDescription(Type enumType, IEnumerable<(object? Value, string Name)> writtenMembers)
     {
         if (TypeDescription(enumType) is not { } summary)
         {
             return null;
         }
 
-        var members = enumType.GetFields(BindingFlags.Public | BindingFlags.Static)
-            .Select(member => (Value: WrittenValue(member.GetValue(null)!),
-                Description: Render(member.GetXmlDocsElement()?.Element("summary"), enumType)))
-            .Where(member => member.Description is not null && writtenValues.Contains(member.Value))
+        var members = writtenMembers
+            .Select(member => (member.Value,
+                Description: Render(enumType.GetField(member.Name)?.GetXmlDocsElement()?.Element("summary"), enumType)))
+            .Where(member => member.Description is not null)
             .Select(member => $"`{member.Value}`: {member.Description}");
         return string.Join(" ", members.Prepend(summary));
     }
@@ -121,16 +120,14 @@ internal sealed partial class ModelDocumentation
             .FirstOrDefault(type => type is not null);
         return (kind, type) switch
         {
-            ('F', { IsEnum: true }) => $"`{WrittenValue(Enum.Parse(type, memberName))}`",
+            ('F', { IsEnum: true }) =>
+                $"`{JsonConvert.SerializeObject(Enum.Parse(type, memberName), _serializerSettings).Trim('"')}`",
             ('P', not null) when JsonNameOf(type, memberName) is { } jsonName =>
                 type.IsAssignableFrom(documentedType) ? jsonName : Location(type, jsonName),
             ('T', not null) => Location(type, null),
             _ => memberName
         };
     }
-
-    private string WrittenValue(object enumValue) =>
-        JsonConvert.SerializeObject(enumValue, _serializerSettings).Trim('"');
 
     private string? JsonNameOf(Type owner, string propertyName) =>
         _serializerSettings.ContractResolver!.ResolveContract(owner) is JsonObjectContract contract
@@ -152,15 +149,18 @@ internal sealed partial class ModelDocumentation
             return $"{fileName} {ExportFilePaths.Join(otherPath, propertyName)}".TrimEnd();
         }
 
+        if (!ExportSchemaGenerator.IsModel(owner))
+        {
+            return propertyName ?? DefinitionNames.Of(owner);
+        }
+
         // A record no file holds directly, abstract or not, is only ever written as one of its derived records.
-        var locations = ExportSchemaGenerator.IsModel(owner)
-            ? ExportSchemaGenerator.DerivedRecordsOf(owner)
-                .Select(derivedType => Location(derivedType, propertyName))
-                .ToList()
-            : [];
+        var locations = ExportSchemaGenerator.DerivedRecordsOf(owner)
+            .Select(derivedType => Location(derivedType, propertyName))
+            .ToList();
         return locations switch
         {
-            [] when ExportSchemaGenerator.IsModel(owner) && owner.IsAbstract =>
+            [] when owner.IsAbstract =>
                 throw new InvalidOperationException($"{owner.Name} has no derived record to refer to"),
             [] => propertyName ?? DefinitionNames.Of(owner),
             [var only] => only,

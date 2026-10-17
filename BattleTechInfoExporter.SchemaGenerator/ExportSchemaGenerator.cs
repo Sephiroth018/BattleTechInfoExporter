@@ -65,10 +65,10 @@ internal sealed class ExportSchemaGenerator
     internal static bool IsModel(Type type) => type.Assembly == ModelType.Assembly;
 
     /// <summary>
-    ///     The records an abstract record is written as, by name, so the schema doesn't depend on reflection's order.
+    ///     The non-abstract records derived from the record, by name, so the schema doesn't depend on reflection's order.
     /// </summary>
-    internal static IEnumerable<Type> DerivedRecordsOf(Type abstractRecord) =>
-        ModelTypes.Where(candidate => !candidate.IsAbstract && candidate.IsSubclassOf(abstractRecord))
+    internal static IEnumerable<Type> DerivedRecordsOf(Type record) =>
+        ModelTypes.Where(candidate => !candidate.IsAbstract && candidate.IsSubclassOf(record))
             .OrderBy(derivedType => derivedType.Name, StringComparer.Ordinal);
 
     // By the value as written: the game's enums by name, the mod's in camelCase, while the names are the members'.
@@ -360,7 +360,7 @@ internal sealed class ExportSchemaGenerator
 
             // The enum's values are final by now: this processor runs last.
             schema.Description = type.IsEnum
-                ? _documentation.EnumDescription(type, schema.Enumeration.OfType<string>().ToList())
+                ? _documentation.EnumDescription(type, schema.Enumeration.Zip(schema.EnumerationNames))
                 : _documentation.TypeDescription(type);
             if (schema.Description is null)
             {
