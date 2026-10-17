@@ -4,8 +4,8 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     The fields every unit definition in the catalog starts with; the chassis, vehicle and turret definitions derive
-///     from it.
+///     The fields every unit definition in the catalog starts with; the chassis, vehicle and turret definitions
+///     each add their own fields in their shape.
 /// </summary>
 /// <param name="Name">As in the references to the unit.</param>
 /// <param name="WeightClass">The weight class, from <c>LIGHT</c> to <c>ASSAULT</c>.</param>

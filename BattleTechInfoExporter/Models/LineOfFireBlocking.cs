@@ -1,6 +1,6 @@
 namespace BattleTechInfoExporter.Models;
 
-/// <summary>How much of a line of fire is blocked (the game's <c>LineOfFireLevel</c>).</summary>
+/// <summary>How much of a line of fire is blocked (the game's <see cref="BattleTech.LineOfFireLevel" />).</summary>
 internal enum LineOfFireBlocking
 {
     /// <summary>Nothing in the way: direct fire without a line of fire penalty.</summary>

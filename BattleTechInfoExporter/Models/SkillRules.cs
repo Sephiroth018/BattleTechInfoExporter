@@ -27,7 +27,7 @@ internal sealed record SkillRules(
 internal sealed record Skill<TLevel>(string Description, IReadOnlyList<TLevel> Levels)
     where TLevel : SkillLevel;
 
-/// <summary>A level of a skill; the skills with numbers of their own per level derive from it.</summary>
+/// <summary>A level of a skill; a skill with numbers of its own per level adds them in its shape.</summary>
 /// <param name="Level">The skill level, from 2.</param>
 /// <param name="ExperienceCost">The experience spent to reach the level from the one below.</param>
 /// <param name="Abilities">The primary abilities and passive traits unlocked at the level.</param>
@@ -68,11 +68,11 @@ internal sealed record PilotingLevel(
 ///     The game's activation timing of the ability, e.g. <c>Passive</c>, <c>ConsumedByFiring</c> or
 ///     <c>CommandAbility</c>.
 /// </param>
-/// <param name="Targeting">How the ability is aimed; <c>null</c> for one that isn't.</param>
+/// <param name="Targeting">How the ability is aimed; <c>null</c> when it isn't.</param>
 /// <param name="Cooldown">
-///     The unit's activations before the ability can be used again; <c>null</c> without a cooldown.
+///     The unit's activations before the ability can be used again; <c>null</c> when it has no cooldown.
 /// </param>
-/// <param name="Uses">How often the ability can be used per mission; <c>null</c> without a limit.</param>
+/// <param name="Uses">How often the ability can be used per mission; <c>null</c> when there's no limit.</param>
 /// <param name="Effects">
 ///     The statistics the ability changes; empty for an ability whose effect the game hardcodes, e.g.
 ///     Multi-Target or Sensor Lock.

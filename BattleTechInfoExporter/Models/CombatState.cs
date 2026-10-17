@@ -8,11 +8,7 @@ namespace BattleTechInfoExporter.Models;
 ///     begins and after every unit's activation; the file exists only while a battle is running.
 /// </summary>
 /// <param name="Contract">The contract being fought, as in <see cref="MissionOutcome.Contract" />.</param>
-/// <param name="MapId">
-///     The map's id in the game's metadata database, which keys <see cref="Catalog.MapDefinitions" />; a map no
-///     star system's contracts are generated on, e.g. a story map, has no entry there. <c>null</c> where the map
-///     isn't in the metadata database.
-/// </param>
+/// <param name="MapId">The battle's map, as <see cref="CombatMap.MapId" />.</param>
 /// <param name="Round">The combat round, counted from 1.</param>
 /// <param name="Phase">
 ///     The current phase as the HUD numbers it, as <see cref="CombatUnitState.Initiative" />: units act from 5
@@ -27,8 +23,8 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Objectives">The objectives the HUD lists, finished ones included, in the HUD's order.</param>
 /// <param name="Zones">The zones drawn on the map.</param>
 /// <param name="LandingZones">
-///     Where a dropship or drop pods are about to land, which the HUD marks as dangerous: a unit standing there is
-///     crushed when they do. Entries come and go as the mission readies landings and they happen.
+///     Where a dropship or drop pods are about to land; entries come and go as the mission readies landings and
+///     they happen.
 /// </param>
 /// <param name="BuildingSides">
 ///     The buildings on a side, e.g. a base to destroy or defend, by their id in <see cref="CombatMap.Buildings" />
@@ -62,7 +58,7 @@ internal sealed record CombatState(
 /// <param name="Kind">What is about to land.</param>
 /// <param name="Hexes">
 ///     The hexes whose center cell the game marks, in the order of <see cref="CombatMap.Rows" />; a unit standing on
-///     one is crushed. A dropship's whole footprint, or the hex each drop pod lands on, one per unit of the lance.
+///     one is crushed. A dropship's whole footprint, or each drop pod's hex, one per unit of the lance.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record LandingZone(string Id, LandingZoneKind Kind, IReadOnlyList<HexCoordinates> Hexes);
@@ -75,7 +71,7 @@ internal sealed record HexCoordinates(int Q, int R);
 
 /// <summary>A building on a side, highlighted in its team's color on the map.</summary>
 /// <param name="Id">The building's id in <see cref="CombatMap.Buildings" />.</param>
-/// <param name="Side">Whose side the building is on, as a unit has it.</param>
+/// <param name="Side">Whose side the building is on.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record BuildingSide(string Id, TeamSide Side);
 
@@ -84,7 +80,7 @@ internal sealed record BuildingSide(string Id, TeamSide Side);
 /// <param name="Structure">The structure left; its max is in <see cref="CombatBuilding.MaxStructure" />.</param>
 /// <param name="DestroyedHexes">
 ///     The hexes the building stood on, now with the ground's elevation and the rubble's terrain, since
-///     <c>combat-map.json</c> isn't rewritten when it falls; units on its roof drop to the ground. <c>null</c> while
+///     <c>combat-map.json</c> isn't rewritten when it falls; units on its roof drop to the ground. <c>null</c> when
 ///     it stands.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -95,7 +91,7 @@ internal sealed record DamagedBuilding(string Id, float Structure, IReadOnlyList
 /// <param name="R">The hex's axial <c>r</c>, as in <see cref="CombatMap.HexGrid" />.</param>
 /// <param name="Elevation">As in <see cref="HexRow.Elevations" />.</param>
 /// <param name="Terrain">
-///     Keyed as in <see cref="Catalog.TerrainDefinitions" />; <c>null</c> on open ground.
+///     Keyed as in <see cref="Catalog.TerrainDefinitions" />; <c>null</c> when on open ground.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MapHex(int Q, int R, float Elevation, string? Terrain);

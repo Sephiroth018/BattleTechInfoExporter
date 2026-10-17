@@ -10,7 +10,7 @@ namespace BattleTechInfoExporter.Models;
 ///     system the mission is fought in, by reference or in full.
 /// </summary>
 /// <param name="Id">
-///     The contract's id from the game's data files; <c>null</c> where the game keeps no reference to it.
+///     The contract's id from the game's data files; <c>null</c> when the game keeps no reference to it.
 /// </param>
 /// <param name="Name">The contract's name, as the contract list shows it.</param>
 /// <param name="Type">The mission type, described in <see cref="Rules.ContractTypes" />.</param>
@@ -39,7 +39,7 @@ internal abstract record ContractIdentity(
 /// <param name="Description">The contract's description, as the contract details show it.</param>
 /// <param name="LanceLimits">The limits on the lance the company can deploy on the mission.</param>
 /// <param name="Biome">
-///     The biome of the map the mission is fought on, as the contract details show it; <c>null</c> where they show
+///     The biome of the map the mission is fought on, as the contract details show it; <c>null</c> when they show
 ///     none.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -63,8 +63,8 @@ internal abstract record ContractBriefing(
 /// </param>
 /// <param name="Negotiation">The terms the contract can be accepted with: negotiated or fixed.</param>
 /// <param name="StarSystem">
-///     The star system the mission is fought in, in full, as in <c>star-systems.json</c>, with the trip there: the
-///     current one, whose route takes 0 days and costs 0 C-Bills, or another the company travels to first.
+///     The star system the mission is fought in, in full, as in <see cref="Starmap.StarSystems" />, with the trip
+///     there: the current one, whose route takes 0 days and costs 0 C-Bills, or another the company travels to first.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record OfferedContract(
@@ -86,11 +86,12 @@ internal sealed record OfferedContract(
 /// <summary>The accepted travel contract, until the company proceeds with it on arrival or breaks it.</summary>
 /// <param name="Terms">The terms the contract was accepted with.</param>
 /// <param name="ArrivesOnDay">
-///     While travelling to the star system, the day of arrival, on the scale of <see cref="Company.DaysPassed" />,
-///     as in <see cref="Travel.ArrivesOnDay" />; <c>null</c> otherwise.
+///     The day of arrival in the star system, on the scale of <see cref="Company.DaysPassed" />, as in
+///     <see cref="Travel.ArrivesOnDay" />; <c>null</c> when the ship isn't travelling there.
 /// </param>
 /// <param name="StarSystem">
-///     The star system the mission is fought in, in full, as in <c>star-systems.json</c>, with the trip there.
+///     The star system the mission is fought in, in full, as in <see cref="Starmap.StarSystems" />, with the trip
+///     there.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ActiveContract(
@@ -110,8 +111,8 @@ internal sealed record ActiveContract(
     : ContractBriefing(Id, Name, Type, DisplayStyle, Employer, Target, Difficulty, Description, LanceLimits, Biome);
 
 /// <summary>
-///     The terms a contract can be accepted with; each value of <see cref="CanNegotiate" /> has a record with the
-///     fields of its own.
+///     The terms a contract can be accepted with; each value of <see cref="CanNegotiate" /> has a shape with fields
+///     of its own.
 /// </summary>
 /// <param name="CanNegotiate">
 ///     Whether the terms are negotiated with the sliders (<see cref="NegotiableTerms" />) or fixed
@@ -142,7 +143,7 @@ internal sealed record FixedTerms(int Pay, Salvage Salvage, ReputationChange Rep
 internal sealed record ValuesAtShare(int SharePercent, int Pay, Salvage Salvage, ReputationChange Reputation);
 
 /// <summary>The terms a contract was accepted with.</summary>
-/// <param name="Shares">The slider positions the terms were negotiated at; <c>null</c> for fixed terms.</param>
+/// <param name="Shares">The slider positions the terms were negotiated at; <c>null</c> when the terms are fixed.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record AcceptedTerms(
     NegotiatedShares? Shares,
@@ -178,8 +179,8 @@ internal sealed record Salvage(int Total, int Priority);
 
 /// <summary>The lance the contract allows.</summary>
 /// <param name="MaxMechs">The most mechs the lance can deploy.</param>
-/// <param name="MinTonnage">The least total tonnage of the lance's mechs; <c>null</c> without a limit.</param>
-/// <param name="MaxTonnage">The most total tonnage of the lance's mechs; <c>null</c> without a limit.</param>
+/// <param name="MinTonnage">The least total tonnage of the lance's mechs; <c>null</c> when there's no limit.</param>
+/// <param name="MaxTonnage">The most total tonnage of the lance's mechs; <c>null</c> when there's no limit.</param>
 /// <param name="Mechs">The tonnage limits of each mech slot, one per mech allowed; <c>null</c> when no slot has any.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record LanceLimits(
@@ -189,7 +190,7 @@ internal sealed record LanceLimits(
     IReadOnlyList<MechSlotLimits>? Mechs);
 
 /// <summary>The tonnage limits of one mech slot of the lance.</summary>
-/// <param name="MinTonnage">The least tonnage of the mech in the slot; <c>null</c> without a limit.</param>
-/// <param name="MaxTonnage">The most tonnage of the mech in the slot; <c>null</c> without a limit.</param>
+/// <param name="MinTonnage">The least tonnage of the mech in the slot; <c>null</c> when there's no limit.</param>
+/// <param name="MaxTonnage">The most tonnage of the mech in the slot; <c>null</c> when there's no limit.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechSlotLimits(float? MinTonnage, float? MaxTonnage);

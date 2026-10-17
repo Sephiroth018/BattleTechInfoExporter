@@ -9,7 +9,7 @@ namespace BattleTechInfoExporter.Models;
 ///     <see cref="PayVariance" /> either way and rounded to thousands.
 /// </summary>
 /// <param name="PayPerDifficulty">In C-Bills, before the type's multiplier, the difficulty scale and the variance.</param>
-/// <param name="PayVariance">The most the pay varies either way, as a 0-1 fraction of it.</param>
+/// <param name="PayVariance">The most the pay varies either way, as a fraction from 0 to 1 of the pay.</param>
 /// <param name="GuaranteedPayShare">The share of the pay the company gets on top of the negotiated share.</param>
 /// <param name="GoodFaithPayShare">The share of the pay for a mission not completed, with a good faith effort.</param>
 /// <param name="NoFaithPayShare">The share without a good faith effort.</param>
@@ -17,15 +17,17 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Experience">The experience a contract's pilots earn.</param>
 /// <param name="MaxGlobalDifficulty">The career's global difficulty never exceeds this.</param>
 /// <param name="DifficultyVariance">
-///     A contract's difficulty is the system's plus the global one, varied by up to this either way.
+///     A contract's difficulty is the star system's plus the global one, varied by up to this either way.
 /// </param>
-/// <param name="MaxPerSystem">The most contracts a system offers at once, unless it sets its own.</param>
-/// <param name="RenewedPerRefresh">Added to a system's open contract slots at each renewal.</param>
+/// <param name="MaxPerSystem">The most contracts a star system offers at once, unless it sets its own.</param>
+/// <param name="RenewedPerRefresh">Added to a star system's open contract slots at each renewal.</param>
 /// <param name="RefreshDays">
-///     A system's open contract slots are renewed once more than this many days passed since their last renewal, so
-///     every <see cref="RefreshDays" /> + 1 days.
+///     A star system's open contract slots are renewed once more than this many days passed since their last
+///     renewal, so every <see cref="RefreshDays" /> + 1 days.
 /// </param>
-/// <param name="RemovedPerCompleted">Taken off a system's open contract slots for each contract completed there.</param>
+/// <param name="RemovedPerCompleted">
+///     Taken off a star system's open contract slots for each contract completed there.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ContractRules(
     int PayPerDifficulty,

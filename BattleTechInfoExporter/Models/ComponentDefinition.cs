@@ -4,8 +4,7 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     The fields every component definition has; the definitions of types with stats of their own derive from
-///     it. Upgrades have no others.
+///     The fields every component definition has; each type with stats of its own adds them in its shape.
 /// </summary>
 /// <param name="Name">The name the mech lab shows, as in the references to the component.</param>
 /// <param name="Tonnage">The component's weight in tons.</param>
@@ -13,8 +12,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Value">The C-Bill value of the component.</param>
 /// <param name="Effects">The statistics the component changes while mounted.</param>
 /// <param name="IsSalvageable">
-///     Whether the component can come as salvage; the game's <c>BLACKLISTED</c> tag rules it out. Nothing else
-///     follows from it, e.g. about stores.
+///     Whether the component can come as salvage; the game's <c>BLACKLISTED</c> tag rules it out.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal record ComponentDefinition(
@@ -68,21 +66,21 @@ internal sealed record WeaponDefinition : ComponentDefinition
     }
 
     /// <summary>
-    ///     The hardpoint kind the weapon needs, e.g. "Ballistic" or "Support", which also keys
+    ///     The hardpoint kind the weapon needs, e.g. <c>Ballistic</c> or <c>Support</c>, which also keys
     ///     <see cref="CombatRules.WeaponCategories" />.
     /// </summary>
     public string Category { get; }
 
     /// <summary>
-    ///     The ammo the weapon fires, as <see cref="AmmunitionBoxDefinition.AmmoCategory" /> names it; a weapon with
-    ///     <see cref="InternalAmmoCapacity" /> fires its own ammo first and then any boxes of the category, which the
-    ///     catalog has none of; <c>null</c> when it needs no ammo.
+    ///     The ammunition the weapon fires, as <see cref="AmmunitionBoxDefinition.AmmoCategory" /> names it; a weapon
+    ///     with <see cref="InternalAmmoCapacity" /> fires its own first, then any boxes of the category, of which the
+    ///     catalog has none; <c>null</c> when it needs no ammunition.
     /// </summary>
     public string? AmmoCategory { get; }
 
     /// <summary>
-    ///     The shots a weapon that carries its own ammo, like a flamer, has per mission; <c>null</c> for every other
-    ///     weapon.
+    ///     The shots a weapon that carries its own ammunition, like a flamer, has per mission; <c>null</c> when it
+    ///     carries none.
     /// </summary>
     public int? InternalAmmoCapacity { get; }
 
@@ -114,8 +112,8 @@ internal sealed record WeaponDefinition : ComponentDefinition
     public int HeatGenerated { get; }
 
     /// <summary>
-    ///     How the COIL weapon gains from its mech's evasive pips, as <see cref="CombatRules.Coil" /> applies it;
-    ///     <c>null</c> for every other weapon.
+    ///     How the COIL weapon gains from its mech's evasion pips, as <see cref="CombatRules.Coil" /> applies it;
+    ///     <c>null</c> when it isn't a COIL weapon.
     /// </summary>
     public CoilWeapon? Coil { get; }
 
@@ -138,12 +136,12 @@ internal sealed record WeaponDefinition : ComponentDefinition
     public bool IsIndirectFireCapable { get; }
 }
 
-/// <summary>How a COIL weapon gains from its mech's evasive pips.</summary>
+/// <summary>How a COIL weapon gains from its mech's evasion pips.</summary>
 /// <param name="EvasiveExponent">
-///     The power of the evasive pips that multiplies the damage of one shot; 0 leaves the damage at its base.
+///     The power of the evasion pips that multiplies the damage of one shot; 0 leaves the damage at its base.
 /// </param>
 /// <param name="HeatDivisor">
-///     The heat the mech takes per attack is the damage of one shot as fired, after the evasive pips' increase and
+///     The heat the mech takes per attack is the damage of one shot as fired, after the evasion pips' increase and
 ///     <see cref="DamageRules.GlobalMultiplier" />, divided by this; <c>null</c> when
 ///     <see cref="WeaponDefinition.HeatGenerated" /> applies instead.
 /// </param>
@@ -181,7 +179,7 @@ internal sealed record AmmunitionBoxDefinition : ComponentDefinition
         Capacity = capacity;
     }
 
-    /// <summary>The weapons the ammo fits, e.g. "AC/5".</summary>
+    /// <summary>The weapons the ammunition fits, e.g. <c>AC/5</c>.</summary>
     public string AmmoCategory { get; }
 
     /// <summary>The shots in the box; it is full at the start of every mission.</summary>

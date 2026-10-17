@@ -24,7 +24,8 @@ namespace BattleTechInfoExporter.Models;
 ///     schedules it.
 /// </param>
 /// <param name="Requirements">
-///     What the event's company or pilot (<paramref name="Scope" />) must meet; <c>null</c> when nothing.
+///     What the event's company or pilot (<paramref name="Scope" />) must meet; <c>null</c> when it has
+///     none.
 /// </param>
 /// <param name="AdditionalRequirements">What the other scopes must meet, all of them.</param>
 /// <param name="AdditionalTargets">
@@ -124,7 +125,7 @@ internal sealed record ComponentChange(ComponentReference Component, int Count) 
 
 /// <summary>
 ///     What else a result does, about the event's pilot or the company; each value of <see cref="Type" /> has a
-///     record with the field it needs.
+///     shape with the field it needs.
 /// </summary>
 /// <param name="Type">What the action does.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

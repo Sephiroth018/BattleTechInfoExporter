@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
-/// <summary>A pilot for hire in the current system's hiring hall.</summary>
+/// <summary>A pilot for hire in the current star system's hiring hall.</summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record HiringHallPilot : Pilot
 {

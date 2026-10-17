@@ -11,7 +11,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="IsPrimary">Whether the HUD lists it as a primary objective.</param>
 /// <param name="Progress">
 ///     The progress line the HUD shows under the title, e.g. a count of units destroyed; <c>null</c>
-///     where it shows none.
+///     when it shows none.
 /// </param>
 /// <param name="TargetUnitIds">
 ///     The units it is about (to destroy, protect or escort), as keys of <see cref="CombatState.Units" />, while
@@ -22,7 +22,7 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="Beacon">
 ///     Where the HUD draws the objective's beacon, 2 m above the ground, e.g. where the reinforcements it announces
-///     will land; <c>null</c> where it draws none: an objective that marks its target units instead, or a
+///     will land; <c>null</c> when it draws none: an objective that marks its target units instead, or a
 ///     finished one.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

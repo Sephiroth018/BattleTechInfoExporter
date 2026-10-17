@@ -14,7 +14,7 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="MaxJumpJets">The most jump jets a mech of the chassis can mount; 0 when it can't jump.</param>
 /// <param name="Dissipation">The heat the chassis itself removes per round, on top of its heat sinks.</param>
-/// <param name="Movement">The walk and sprint distances and the pathing, which no loadout changes.</param>
+/// <param name="Movement">How the chassis moves.</param>
 /// <param name="Melee">The damage of melee and jump attacks, before upgrades add to them.</param>
 /// <param name="StockMech">
 ///     The mech the game treats as the chassis' stock loadout; <c>null</c> when its definition is missing.
@@ -77,9 +77,9 @@ internal sealed record ChassisLocationDefinition(
     Hardpoints Hardpoints,
     int Slots);
 
-/// <summary>A location's armor by side, in whatever a file measures armor in.</summary>
+/// <summary>A location's armor by side.</summary>
 /// <param name="Front">The front armor; outside the torso, the location's only armor.</param>
-/// <param name="Rear"><c>null</c> outside the torso, which alone has rear armor.</param>
+/// <param name="Rear">The rear armor; <c>null</c> when the location is outside the torso.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record LocationArmor<TSide>(TSide Front, TSide? Rear)
     where TSide : struct;

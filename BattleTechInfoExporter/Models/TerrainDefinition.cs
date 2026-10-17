@@ -10,10 +10,10 @@ namespace BattleTechInfoExporter.Models;
 /// </summary>
 /// <param name="Name">As the combat HUD shows it.</param>
 /// <param name="MoveCost">
-///     What a step into the terrain costs of the unit's movement, per meter of the step; <c>null</c> where the unit
-///     can't enter. Open ground has no terrain and costs 1.05 for every unit in the game's data.
+///     What a step into the terrain costs of the unit's movement, per meter of the step; <c>null</c> when the unit
+///     can't enter it. Open ground has no terrain and costs 1.05 for every unit in the game's data.
 /// </param>
-/// <param name="SprintMultiplier">Multiplies the move cost when sprinting; <c>null</c> where the terrain is impassable.</param>
+/// <param name="SprintMultiplier">Multiplies the move cost when sprinting; <c>null</c> when the unit can't enter it.</param>
 /// <param name="VisibilityMultiplier">
 ///     Multiplies the spotting distance a sight line uses up while it passes through the terrain below
 ///     <paramref name="VisibilityHeight" />.
@@ -63,9 +63,9 @@ internal sealed record TerrainDefinition(
     IReadOnlyList<StatisticChange> StickyEffects) : ICatalogEntry;
 
 /// <summary>By the unit: a mech, a tracked vehicle or a wheeled vehicle, and its weight class.</summary>
-/// <param name="Mech">For mechs, by their weight class; <c>null</c> where they can't enter.</param>
-/// <param name="Tracked">For tracked vehicles, by their weight class; <c>null</c> where they can't enter.</param>
-/// <param name="Wheeled">For wheeled vehicles, by their weight class; <c>null</c> where they can't enter.</param>
+/// <param name="Mech">For mechs, by their weight class; <c>null</c> when they can't enter it.</param>
+/// <param name="Tracked">For tracked vehicles, by their weight class; <c>null</c> when they can't enter it.</param>
+/// <param name="Wheeled">For wheeled vehicles, by their weight class; <c>null</c> when they can't enter it.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record TerrainMoveCosts(
     ByWeightClass<float?> Mech,

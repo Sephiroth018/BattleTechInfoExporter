@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     The hexes a player's unit can end its move on, read from the game's own pathing, with the evasion it gets
+///     The hexes a player's unit can end its move on, read from the game's own pathing, with the evasion pips it gets
 ///     and the attacks it has there. A unit that has activated gets those of its next activation, from where it
 ///     stands. Laid out in rows of characters, as <see cref="MovementLegend" /> explains, like
 ///     <see cref="CombatMap.Rows" />, whose hexes give each hex's terrain and elevation.
@@ -25,11 +25,13 @@ internal sealed record UnitMovement(IReadOnlyList<string> Targets, IReadOnlyList
 /// <param name="R">The axial <c>r</c> of every hex in the row.</param>
 /// <param name="Walk">The evasion pips per hex as <see cref="MovementLegend.Moves" /> says.</param>
 /// <param name="Sprint">
-///     Like <see cref="Walk" />, when sprinting; <c>null</c> for a legged or unsteady mech, which can't sprint.
+///     Like <see cref="Walk" />, when sprinting; <c>null</c> when the unit is a legged or unsteady mech, which can't
+///     sprint.
 /// </param>
 /// <param name="Reverse">Like <see cref="Walk" />, when moving backward.</param>
 /// <param name="Jump">
-///     Like <see cref="Walk" />, when jumping; <c>null</c> for a vehicle and a mech without a working jump jet.
+///     Like <see cref="Walk" />, when jumping; <c>null</c> when the unit is a vehicle or a mech without a working
+///     jump jet.
 /// </param>
 /// <param name="Attacks">
 ///     Per entry of <see cref="UnitMovement.Targets" />, the fire and side as <see cref="MovementLegend.Fire" /> and

@@ -135,7 +135,7 @@
         },
         "maps": {
           "type": "array",
-          "description": "The maps the star system's contracts can be fought on, as the contract generator selects them from its biomes and map tags; each map's terrain is in the catalog's `mapDefinitions`.",
+          "description": "The maps the star system's contracts can be fought on, as the contract generator selects them from its biomes and map tags; each map's terrain is in catalog.json mapDefinitions.",
           "items": {
             "$ref": "#/definitions/DefinitionReference"
           }
@@ -146,7 +146,7 @@
         },
         "contractEmployers": {
           "type": "array",
-          "description": "The factions that can hire the company for the star system's generated contracts, sorted by name, each with the factions it can hire it against, without the employers the story sets aside; a contract's own requirements can narrow them further. Story and flashpoint contracts name their own.",
+          "description": "The factions that can hire the company for the star system's generated contracts, without the employers the story sets aside, sorted by name, each with its targets; a contract's own requirements can narrow them, and story and flashpoint contracts name their own.",
           "items": {
             "$ref": "#/definitions/ContractEmployer"
           }
@@ -158,10 +158,10 @@
         },
         "canTravelTo": {
           "type": "boolean",
-          "description": "Whether the star system's travel requirements are met; story systems stay locked until then."
+          "description": "Whether the star system's travel requirements are met; story star systems stay locked until then."
         },
         "route": {
-          "description": "The trip from the current star system; `null` where the game finds no route, always while canTravelTo is false.",
+          "description": "The trip from the current star system; `null` when the game finds no route, always when canTravelTo is false.",
           "oneOf": [
             {
               "type": "null"
@@ -235,7 +235,7 @@
       ],
       "properties": {
         "employer": {
-          "description": "A faction that can hire the company in the star system.",
+          "description": "The faction that offers the contracts.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "targets": {
@@ -258,7 +258,7 @@
       "properties": {
         "days": {
           "type": "integer",
-          "description": "The days the trip takes from the current star system's planet, as the starmap shows them while the ship is there, with the whole leg to its jump point (game-state.json position.travel.jumpPointDays), also the part already travelled during a trip (see game-state.json position.travel.legEndsOnDay). 0 for the current star system.",
+          "description": "The days the trip takes from the current star system's planet, with the whole leg to its jump point (game-state.json position.travel.jumpPointDays) even during a trip, which game-state.json position.travel.legEndsOnDay corrects; 0 for the current star system.",
           "format": "int32"
         },
         "cost": {

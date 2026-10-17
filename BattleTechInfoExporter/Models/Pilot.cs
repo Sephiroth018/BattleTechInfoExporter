@@ -5,8 +5,8 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     The fields every pilot has; the pilots of the barracks and of the hiring hall derive from it with fields of
-///     their own.
+///     The fields every pilot has; the barracks' and the hiring hall's pilots each add their own fields in their
+///     shape.
 /// </summary>
 /// <param name="Id">The game's pilot id, which the references to the pilot carry.</param>
 /// <param name="Name">The full name without callsign.</param>
@@ -14,7 +14,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Type">The kind of pilot, which the barracks tells apart by color.</param>
 /// <param name="Age">The age in years.</param>
 /// <param name="Gender">The game's gender value, e.g. <c>Female</c>.</param>
-/// <param name="Expertise">The barracks title derived from the primary abilities, e.g. "Recruit" or "Lancer".</param>
+/// <param name="Expertise">The barracks title derived from the primary abilities, e.g. <c>Recruit</c> or <c>Lancer</c>.</param>
 /// <param name="Skills">The skill levels, whose effects <see cref="Rules.Skills" /> lists per level.</param>
 /// <param name="Abilities">
 ///     The primary abilities only, described in <see cref="Rules.Skills" />; the passive traits follow from the

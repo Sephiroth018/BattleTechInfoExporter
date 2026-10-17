@@ -101,7 +101,7 @@
     },
     "itemCollectionDefinitions": {
       "type": "object",
-      "description": "The item collections the stores draw their stock from and the rewards are drawn from, keyed by collection id; a star system's stores name theirs in `star-systems.json`.",
+      "description": "The item collections the stores draw their stock from and the rewards are drawn from, keyed by collection id; a star system's stores name theirs in star-systems.json starSystems.*.stores.",
       "additionalProperties": {
         "$ref": "#/definitions/ItemCollectionDefinition"
       }
@@ -228,7 +228,7 @@
           "format": "float"
         },
         "movement": {
-          "description": "The walk and sprint distances and the pathing, which no loadout changes.",
+          "description": "How the chassis moves.",
           "$ref": "#/definitions/ChassisMovement"
         },
         "melee": {
@@ -424,7 +424,7 @@
     },
     "LocationArmorOfNumber": {
       "type": "object",
-      "description": "A location's armor by side, in whatever a file measures armor in.",
+      "description": "A location's armor by side.",
       "additionalProperties": false,
       "required": [
         "front",
@@ -441,7 +441,7 @@
             "null",
             "number"
           ],
-          "description": "`null` outside the torso, which alone has rear armor.",
+          "description": "The rear armor; `null` when the location is outside the torso.",
           "format": "float"
         }
       }
@@ -510,7 +510,7 @@
         },
         "role": {
           "type": "string",
-          "description": "The chassis' stock role, e.g. \"Brawler\", as the mech tooltip and the mech lab show it: what its standard fitting is built for, which a refit can change; no rule reads it."
+          "description": "The chassis' stock role, e.g. `Brawler`, as the mech tooltip and the mech lab show it: what its standard fitting is built for, which a refit can change; no rule reads it."
         },
         "description": {
           "type": "string",
@@ -836,7 +836,7 @@
     },
     "ComponentReference": {
       "type": "object",
-      "description": "A component's definition, like DefinitionReference, with the type that tells which group of componentDefinitions holds it. Components compare by type first, then as every reference.",
+      "description": "A reference to a component's definition, with its type. Components are ordered by type, then by name, with the id breaking ties.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -1063,7 +1063,7 @@
     },
     "ComponentDefinitions": {
       "type": "object",
-      "description": "The catalog's component definitions, which every export file's references point to, grouped by ComponentReference.type and keyed by component id: a reference's `type` names its group, `Weapon` in `weapons`, `AmmunitionBox` in `ammunitionBoxes`, `HeatSink` in `heatSinks`, `JumpJet` in `jumpJets` and `Upgrade` in `upgrades`. A reference whose definition the game can't find has no entry; its id stands in for its name.",
+      "description": "The catalog's component definitions, which every export file's references point to, grouped by ComponentReference.type and keyed by component id. A reference whose definition the game can't find has no entry; its id stands in for its name.",
       "additionalProperties": false,
       "required": [
         "weapons",
@@ -1075,35 +1075,35 @@
       "properties": {
         "weapons": {
           "type": "object",
-          "description": "The components of type `Weapon`, keyed by component id, without the game's internal melee, jump attack and AI weapons, which no unit mounts.",
+          "description": "The components of type `Weapon`, without the game's internal melee, jump attack and AI weapons, which no unit mounts.",
           "additionalProperties": {
             "$ref": "#/definitions/WeaponDefinition"
           }
         },
         "ammunitionBoxes": {
           "type": "object",
-          "description": "The components of type `AmmunitionBox`, keyed by component id.",
+          "description": "The components of type `AmmunitionBox`.",
           "additionalProperties": {
             "$ref": "#/definitions/AmmunitionBoxDefinition"
           }
         },
         "heatSinks": {
           "type": "object",
-          "description": "The components of type `HeatSink`, keyed by component id.",
+          "description": "The components of type `HeatSink`.",
           "additionalProperties": {
             "$ref": "#/definitions/HeatSinkDefinition"
           }
         },
         "jumpJets": {
           "type": "object",
-          "description": "The components of type `JumpJet`, keyed by component id.",
+          "description": "The components of type `JumpJet`.",
           "additionalProperties": {
             "$ref": "#/definitions/JumpJetDefinition"
           }
         },
         "upgrades": {
           "type": "object",
-          "description": "The components of type `Upgrade`, e.g. actuators, cockpit mods and gyros, keyed by component id; they have only the common fields.",
+          "description": "The components of type `Upgrade`, e.g. actuators, cockpit mods and gyros; they have only the common fields.",
           "additionalProperties": {
             "$ref": "#/definitions/ComponentDefinition"
           }
@@ -1172,25 +1172,25 @@
         },
         "isSalvageable": {
           "type": "boolean",
-          "description": "Whether the component can come as salvage; the game's `BLACKLISTED` tag rules it out. Nothing else follows from it, e.g. about stores."
+          "description": "Whether the component can come as salvage; the game's `BLACKLISTED` tag rules it out."
         },
         "category": {
           "type": "string",
-          "description": "The hardpoint kind the weapon needs, e.g. \"Ballistic\" or \"Support\", which also keys rules.json combat.weaponCategories."
+          "description": "The hardpoint kind the weapon needs, e.g. `Ballistic` or `Support`, which also keys rules.json combat.weaponCategories."
         },
         "ammoCategory": {
           "type": [
             "null",
             "string"
           ],
-          "description": "The ammo the weapon fires, as AmmunitionBoxDefinition.ammoCategory names it; a weapon with internalAmmoCapacity fires its own ammo first and then any boxes of the category, which the catalog has none of; `null` when it needs no ammo."
+          "description": "The ammunition the weapon fires, as AmmunitionBoxDefinition.ammoCategory names it; a weapon with internalAmmoCapacity fires its own first, then any boxes of the category, of which the catalog has none; `null` when it needs no ammunition."
         },
         "internalAmmoCapacity": {
           "type": [
             "integer",
             "null"
           ],
-          "description": "The shots a weapon that carries its own ammo, like a flamer, has per mission; `null` for every other weapon.",
+          "description": "The shots a weapon that carries its own ammunition, like a flamer, has per mission; `null` when it carries none.",
           "format": "int32"
         },
         "damage": {
@@ -1229,7 +1229,7 @@
           "format": "int32"
         },
         "coil": {
-          "description": "How the COIL weapon gains from its mech's evasive pips, as rules.json combat.coil applies it; `null` for every other weapon.",
+          "description": "How the COIL weapon gains from its mech's evasion pips, as rules.json combat.coil applies it; `null` when it isn't a COIL weapon.",
           "oneOf": [
             {
               "type": "null"
@@ -1290,7 +1290,7 @@
           "description": "A boolean, integer or number, as the statistic's type requires. Changes to the initiative statistics (`BaseInitiative`, `PhaseModifier`, `PhaseModifierSelf`) are as the HUD numbers phases, so a positive change makes the unit act earlier."
         },
         "appliesTo": {
-          "description": "The pilot or the components whose statistic changes; `null` for the unit's own.",
+          "description": "The pilot or the components whose statistic changes; `null` when it's the unit's own.",
           "oneOf": [
             {
               "type": "null"
@@ -1389,7 +1389,7 @@
           "$ref": "#/definitions/TargetCollection"
         },
         "filter": {
-          "description": "Which of the weapons or ammunition boxes; `null` for all of them, and always for the pilot, the random and the strongest weapon.",
+          "description": "Which of the weapons or ammunition boxes; `null` when it's all of them, and always for the pilot, the random and the strongest weapon.",
           "oneOf": [
             {
               "type": "null"
@@ -1420,7 +1420,7 @@
       ]
     },
     "ComponentFilter": {
-      "description": "The one property the game filters the components by; the game's data can name several, of which only the first in ComponentFilterKind's order counts. Each kind has a record with its value's type.",
+      "description": "The one property the game filters the components by; the game's data can name several, of which only the first in ComponentFilterKind's order counts. Each kind has a shape with its value's type.",
       "x-abstract": true,
       "anyOf": [
         {
@@ -1775,7 +1775,7 @@
     },
     "CoilWeapon": {
       "type": "object",
-      "description": "How a COIL weapon gains from its mech's evasive pips.",
+      "description": "How a COIL weapon gains from its mech's evasion pips.",
       "additionalProperties": false,
       "required": [
         "evasiveExponent",
@@ -1784,7 +1784,7 @@
       "properties": {
         "evasiveExponent": {
           "type": "number",
-          "description": "The power of the evasive pips that multiplies the damage of one shot; 0 leaves the damage at its base.",
+          "description": "The power of the evasion pips that multiplies the damage of one shot; 0 leaves the damage at its base.",
           "format": "float"
         },
         "heatDivisor": {
@@ -1792,7 +1792,7 @@
             "null",
             "number"
           ],
-          "description": "The heat the mech takes per attack is the damage of one shot as fired, after the evasive pips' increase and rules.json combat.damage.globalMultiplier, divided by this; `null` when WeaponDefinition.heatGenerated applies instead.",
+          "description": "The heat the mech takes per attack is the damage of one shot as fired, after the evasion pips' increase and rules.json combat.damage.globalMultiplier, divided by this; `null` when WeaponDefinition.heatGenerated applies instead.",
           "format": "float"
         }
       }
@@ -1884,11 +1884,11 @@
         },
         "isSalvageable": {
           "type": "boolean",
-          "description": "Whether the component can come as salvage; the game's `BLACKLISTED` tag rules it out. Nothing else follows from it, e.g. about stores."
+          "description": "Whether the component can come as salvage; the game's `BLACKLISTED` tag rules it out."
         },
         "ammoCategory": {
           "type": "string",
-          "description": "The weapons the ammo fits, e.g. \"AC/5\"."
+          "description": "The weapons the ammunition fits, e.g. `AC/5`."
         },
         "capacity": {
           "type": "integer",
@@ -1944,7 +1944,7 @@
         },
         "isSalvageable": {
           "type": "boolean",
-          "description": "Whether the component can come as salvage; the game's `BLACKLISTED` tag rules it out. Nothing else follows from it, e.g. about stores."
+          "description": "Whether the component can come as salvage; the game's `BLACKLISTED` tag rules it out."
         },
         "dissipation": {
           "type": "number",
@@ -2001,7 +2001,7 @@
         },
         "isSalvageable": {
           "type": "boolean",
-          "description": "Whether the component can come as salvage; the game's `BLACKLISTED` tag rules it out. Nothing else follows from it, e.g. about stores."
+          "description": "Whether the component can come as salvage; the game's `BLACKLISTED` tag rules it out."
         },
         "minTonnage": {
           "type": "number",
@@ -2017,7 +2017,7 @@
     },
     "ComponentDefinition": {
       "type": "object",
-      "description": "The fields every component definition has; the definitions of types with stats of their own derive from it. Upgrades have no others.",
+      "description": "The fields every component definition has; each type with stats of its own adds them in its shape.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -2061,7 +2061,7 @@
         },
         "isSalvageable": {
           "type": "boolean",
-          "description": "Whether the component can come as salvage; the game's `BLACKLISTED` tag rules it out. Nothing else follows from it, e.g. about stores."
+          "description": "Whether the component can come as salvage; the game's `BLACKLISTED` tag rules it out."
         }
       }
     },
@@ -2098,7 +2098,7 @@
           "description": "As the combat HUD shows it."
         },
         "moveCost": {
-          "description": "What a step into the terrain costs of the unit's movement, per meter of the step; `null` where the unit can't enter. Open ground has no terrain and costs 1.05 for every unit in the game's data.",
+          "description": "What a step into the terrain costs of the unit's movement, per meter of the step; `null` when the unit can't enter it. Open ground has no terrain and costs 1.05 for every unit in the game's data.",
           "$ref": "#/definitions/TerrainMoveCosts"
         },
         "sprintMultiplier": {
@@ -2106,7 +2106,7 @@
             "null",
             "number"
           ],
-          "description": "Multiplies the move cost when sprinting; `null` where the terrain is impassable.",
+          "description": "Multiplies the move cost when sprinting; `null` when the unit can't enter it.",
           "format": "float"
         },
         "visibilityMultiplier": {
@@ -2186,15 +2186,15 @@
       ],
       "properties": {
         "mech": {
-          "description": "For mechs, by their weight class; `null` where they can't enter.",
+          "description": "For mechs, by their weight class; `null` when they can't enter it.",
           "$ref": "#/definitions/ByWeightClassOfNullableNumber"
         },
         "tracked": {
-          "description": "For tracked vehicles, by their weight class; `null` where they can't enter.",
+          "description": "For tracked vehicles, by their weight class; `null` when they can't enter it.",
           "$ref": "#/definitions/ByWeightClassOfNullableNumber"
         },
         "wheeled": {
-          "description": "For wheeled vehicles, by their weight class; `null` where they can't enter.",
+          "description": "For wheeled vehicles, by their weight class; `null` when they can't enter it.",
           "$ref": "#/definitions/ByWeightClassOfNullableNumber"
         }
       }
@@ -2306,7 +2306,7 @@
     },
     "MapDefinition": {
       "type": "object",
-      "description": "A combat map some star system's contracts can be fought on, and the terrain it is made of. The contract generator draws a star system's map among the maps `star-systems.json` lists for the system, by weight.",
+      "description": "A combat map some star system's contracts can be fought on, and the terrain it is made of. The contract generator draws a star system's map among its star-systems.json starSystems.*.maps, by weight.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -2394,7 +2394,7 @@
           "description": "Whether the daily event roll can draw the event; when false, it comes only when another event's result schedules it."
         },
         "requirements": {
-          "description": "What the event's company or pilot (scope) must meet; `null` when nothing.",
+          "description": "What the event's company or pilot (scope) must meet; `null` when it has none.",
           "oneOf": [
             {
               "type": "null"
@@ -2478,7 +2478,7 @@
       ],
       "properties": {
         "scope": {
-          "description": "Whose tags and statistics are checked: the company's or a pilot's, the commander included (both in `game-state.json`), or the current star system's (in `star-systems.json`).",
+          "description": "Whose tags and statistics are checked: the company's or a pilot's, the commander included (both in `game-state.json`), or the current star system's (in star-systems.json starSystems).",
           "$ref": "#/definitions/EventScope"
         },
         "requiredTags": {
@@ -2750,7 +2750,7 @@
     },
     "CareerStatisticChange": {
       "type": "object",
-      "description": "A change the career makes to a statistic of the company or a pilot, e.g. by a ship upgrade or an event. Simpler than a combat statistic change on purpose: the career only adds to a statistic or sets it.",
+      "description": "A change the career makes to a statistic of the company or a pilot, e.g. by a ship upgrade or an event.",
       "additionalProperties": false,
       "required": [
         "statistic",
@@ -2760,7 +2760,7 @@
       "properties": {
         "statistic": {
           "type": "string",
-          "description": "The game's name of the statistic, e.g. \"MechTechSkill\"."
+          "description": "The game's name of the statistic, e.g. `MechTechSkill`."
         },
         "value": {
           "type": "number",
@@ -2794,7 +2794,7 @@
       }
     },
     "ResultAction": {
-      "description": "What else a result does, about the event's pilot or the company; each value of type has a record with the field it needs.",
+      "description": "What else a result does, about the event's pilot or the company; each value of type has a shape with the field it needs.",
       "x-abstract": true,
       "anyOf": [
         {
@@ -3149,7 +3149,7 @@
         },
         "emptyWeight": {
           "type": "integer",
-          "description": "The draw weight of the collection's empty entries, which use up a draw and yield nothing; 0 where it has none.",
+          "description": "The draw weight of the collection's empty entries, which use up a draw and yield nothing; 0 when it has none.",
           "format": "int32"
         }
       }
@@ -3173,7 +3173,7 @@
             "integer",
             "null"
           ],
-          "description": "The copies a draw yields; `null`: unlimited.",
+          "description": "The copies a draw yields; `null` when unlimited.",
           "format": "int32"
         },
         "weight": {
@@ -3202,7 +3202,7 @@
             "integer",
             "null"
           ],
-          "description": "The copies a draw yields; `null`: unlimited.",
+          "description": "The copies a draw yields; `null` when unlimited.",
           "format": "int32"
         },
         "weight": {
@@ -3231,7 +3231,7 @@
             "integer",
             "null"
           ],
-          "description": "The copies a draw yields; `null`: unlimited.",
+          "description": "The copies a draw yields; `null` when unlimited.",
           "format": "int32"
         },
         "weight": {
@@ -3260,7 +3260,7 @@
             "integer",
             "null"
           ],
-          "description": "The draws from the collection, each by weight and with the same entry possible again; `null`: every entry once.",
+          "description": "The draws from the collection, each by weight and with the same entry possible again; `null` when every entry is drawn once.",
           "format": "int32"
         },
         "weight": {

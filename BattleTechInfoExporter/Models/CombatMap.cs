@@ -10,7 +10,7 @@ namespace BattleTechInfoExporter.Models;
 /// </summary>
 /// <param name="MapId">
 ///     The map's id in the game's metadata database, which keys <see cref="Catalog.MapDefinitions" />; a map no
-///     star system's contracts are generated on, e.g. a story map, has no entry there. <c>null</c> where the map
+///     star system's contracts are generated on, e.g. a story map, has no entry there. <c>null</c> when the map
 ///     isn't in the metadata database.
 /// </param>
 /// <param name="HexGrid">How the hexes' axial coordinates map to positions in meters, and their neighbors.</param>
@@ -72,7 +72,7 @@ internal sealed record HexOffset(int Q, int R);
 internal sealed record CombatBuilding(string Id, string Name, MapPosition Position, float MaxStructure);
 
 /// <summary>Consecutive hexes of one row, from (<see cref="Q" />, <see cref="R" />) on, one entry per hex in each list.</summary>
-/// <param name="Q">The <c>q</c> of the first hex.</param>
+/// <param name="Q">The axial <c>q</c> of the first hex.</param>
 /// <param name="R">The axial <c>r</c> of every hex in the row.</param>
 /// <param name="Terrains">Each hex's terrain as a character of <see cref="CombatMap.Terrains" />.</param>
 /// <param name="Elevations">
@@ -83,10 +83,9 @@ internal sealed record CombatBuilding(string Id, string Name, MapPosition Positi
 ///     <see cref="CombatBuilding.Id" /> is what the combat state refers to the building by.
 /// </param>
 /// <param name="BlockedSteps">
-///     Per entry of <see cref="CombatMap.PathingGroups" />, the steps to neighbors its units can't take on slopes, one
-///     character per hex as <see cref="HexGridLayout.BlockedStepsFormula" /> says: an approximation of the game's
-///     pathing that may block a step a detour through farther hexes allows; a player unit's
-///     <see cref="CombatUnit.Movement" /> is exact for its current turn.
+///     Per entry of <see cref="CombatMap.PathingGroups" />, the steps to neighbors its units can't take on slopes,
+///     one character per hex as <see cref="HexGridLayout.BlockedStepsFormula" /> says. An approximation: a detour
+///     may still reach a neighbor a blocked step can't; a player unit's <see cref="CombatUnit.Movement" /> is exact.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record HexRow(
