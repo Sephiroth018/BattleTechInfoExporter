@@ -487,6 +487,8 @@
         "id",
         "name",
         "chassis",
+        "role",
+        "description",
         "value",
         "usedTonnage",
         "stats",
@@ -505,6 +507,14 @@
         "chassis": {
           "description": "The mech's chassis, in chassisDefinitions.",
           "$ref": "#/definitions/DefinitionReference"
+        },
+        "role": {
+          "type": "string",
+          "description": "The chassis' stock role, e.g. \"Brawler\", as the mech tooltip and the mech lab show it: what its standard fitting is built for, which a refit can change; no rule reads it."
+        },
+        "description": {
+          "type": "string",
+          "description": "The mech's description, as the mech tooltip and the store show it, or the chassis' one the mech bay shows where the mech has none, as plain text: it describes the standard fitting, which a refit can change; no rule reads it."
         },
         "value": {
           "type": "integer",
