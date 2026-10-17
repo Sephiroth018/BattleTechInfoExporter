@@ -14,7 +14,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Name">The name with the variant, as in the references to the mech.</param>
 /// <param name="Chassis">The mech's chassis, in <see cref="Catalog.ChassisDefinitions" />.</param>
 /// <param name="Role">
-///     The chassis' stock role, e.g. "Brawler", as the mech tooltip and the mech lab show it: what its standard
+///     The chassis' stock role, e.g. <c>Brawler</c>, as the mech tooltip and the mech lab show it: what its standard
 ///     fitting is built for, which a refit can change; no rule reads it.
 /// </param>
 /// <param name="Description">

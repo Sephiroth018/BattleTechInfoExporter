@@ -510,7 +510,7 @@
         },
         "role": {
           "type": "string",
-          "description": "The chassis' stock role, e.g. \"Brawler\", as the mech tooltip and the mech lab show it: what its standard fitting is built for, which a refit can change; no rule reads it."
+          "description": "The chassis' stock role, e.g. `Brawler`, as the mech tooltip and the mech lab show it: what its standard fitting is built for, which a refit can change; no rule reads it."
         },
         "description": {
           "type": "string",
