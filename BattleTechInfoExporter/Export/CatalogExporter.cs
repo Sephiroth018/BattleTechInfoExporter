@@ -4,16 +4,16 @@ using BattleTechInfoExporter.Models;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>The single entry point the triggers of the catalog export call.</summary>
 internal static class CatalogExporter
 {
     /// <summary>
     ///     Rebuilds the catalog only when it's missing or stale: written by another mod version or from other
     ///     sources (<see cref="CatalogSourceFingerprint" />). Deleting the file forces a rebuild. The rebuild loads
-    ///     every vehicle, turret and design mask, which the career doesn't (SimGameState.RequestDataManagerResources;
-    ///     only a combat map loads its own masks), and writes the catalog once they are loaded: on a later frame
-    ///     the first time, right away once cached.
+    ///     every vehicle, turret and design mask, which the career doesn't
+    ///     (<see cref="SimGameState.RequestDataManagerResources" />; only a combat map loads its own masks), and writes
+    ///     the catalog once they are loaded.
     /// </summary>
+    // The load completes on a later frame the first time, right away once the definitions are cached.
     internal static void Export(SimGameState simGame, ExportTrigger trigger) =>
         CampaignExport.Run(
             simGame,

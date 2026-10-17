@@ -9,7 +9,6 @@ using StarSystem = BattleTech.StarSystem;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Builds the star systems file's model from the game's starmap.</summary>
 internal static class StarSystemReader
 {
     internal static Starmap Read(SimGameState simGame)

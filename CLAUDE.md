@@ -234,8 +234,9 @@ deliberate workaround, or an external fact with its source (e.g. the game method
 - **Short:** one or two lines.
 - **No history or discussion narration**; that belongs in the commit message.
 - **Don't restate** the code or a nearby comment.
-- **Refer to other code by symbol name, never by file path.** In XML docs use `<see cref="..."/>`
-  so renames follow.
+- **Refer to other code by symbol name, never by file path,** ours and external code's alike (e.g. a
+  game's members). In XML docs use `<see cref="..."/>` so renames follow; in `//` comments, where
+  no cref can be written, the plain name in parentheses, e.g. `(Type.Member)`.
 - **Change a comment in the same edit as its code**, or delete it.
 - **No issue links**, except to explain code that deliberately looks like a bug when the reason is
   too long to state inline.

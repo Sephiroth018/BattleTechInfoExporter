@@ -19,8 +19,8 @@ internal static class MissionCompletedTrigger
     private static (Contract Contract, MissionOutcome Outcome)? _lastCompleted;
 
     /// <summary>
-    ///     Takes the outcome the export read when the contract's mission ended, or null where it didn't read one, and
-    ///     forgets the contract.
+    ///     Takes the outcome the export read when the contract's mission ended, or <c>null</c> where it didn't read one,
+    ///     and forgets the contract.
     /// </summary>
     internal static MissionOutcome? TakeOutcomeOf(Contract contract)
     {

@@ -13,7 +13,7 @@ namespace BattleTechInfoExporter.Export;
 /// <summary>
 ///     Builds the catalog's map definitions from the maps the contract generator selects for each star system
 ///     definition, the metadata database's map rows and each map's terrain data file, which the game reads only when
-///     the map is played (MapMetaData.LoadMapMetaData); and reads the maps it selects for one star system.
+///     the map is played (<see cref="MapMetaData.LoadMapMetaData" />); and reads the maps it selects for one star system.
 /// </summary>
 internal static class MapReader
 {
@@ -29,7 +29,8 @@ internal static class MapReader
     /// <summary>
     ///     Every map the contracts of some star system definition can be fought on, keyed by map id; every star system
     ///     definition counts, also those the career doesn't use and those the story swaps in
-    ///     (SimGameState.SetStarSystemDef), which the career loads all of (SimGameState.RequestDataManagerResources).
+    ///     (<see cref="SimGameState.SetStarSystemDef" />), which the career loads all of
+    ///     (<see cref="SimGameState.RequestDataManagerResources" />).
     /// </summary>
     internal static SortedDictionary<string, MapDefinition> ReadMapDefinitions(
         DataManager dataManager,

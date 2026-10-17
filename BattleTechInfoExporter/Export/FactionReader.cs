@@ -56,9 +56,10 @@ internal static class FactionReader
 
     /// <summary>
     ///     The factions that can hire the company in the star system, each with the factions it can hire it against
-    ///     there, as SimGameState.GenerateContractParticipants pairs them. That method can't be called instead: it
-    ///     also draws each pair's other factions from the game's NetworkRandom, which would change the game's draws.
+    ///     there, as <see cref="SimGameState.GenerateContractParticipants" /> pairs them.
     /// </summary>
+    // That method can't be called instead: it also draws each pair's other factions from the game's NetworkRandom,
+    // which would change the game's draws.
     internal static IReadOnlyList<ContractEmployer> ReadContractEmployers(
         SimGameState simGame,
         StarSystemDef starSystem) =>

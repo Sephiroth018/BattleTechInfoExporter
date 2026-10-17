@@ -16,7 +16,7 @@ namespace BattleTechInfoExporter.Export;
 /// </summary>
 internal static class ContractReader
 {
-    /// <summary>The most priority salvage picks a mission gives, hardcoded in Contract.GenerateSalvage.</summary>
+    /// <summary>The most priority salvage picks a mission gives, hardcoded in <see cref="Contract.GenerateSalvage" />.</summary>
     internal const int MaxPrioritySalvage = 8;
 
     // The slider positions of the contract negotiation in percent; their step is set in the screen's UI asset.
@@ -146,7 +146,10 @@ internal static class ContractReader
             contractOverride.finalDifficulty + contractOverride.difficultyUIModifier,
             MaxGlobalDifficulty(simGame));
 
-    /// <summary>The cap on the career's global difficulty, as SimGameState.ContractUserMeetsReputation_Campaign rounds it.</summary>
+    /// <summary>
+    ///     The cap on the career's global difficulty, as
+    ///     <see cref="SimGameState.ContractUserMeetsReputation_Campaign" /> rounds it.
+    /// </summary>
     internal static int MaxGlobalDifficulty(SimGameState simGame) =>
         (int)simGame.Constants.Story.GlobalContractDifficultyMax;
 

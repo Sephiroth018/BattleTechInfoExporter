@@ -9,7 +9,6 @@ using StarSystem = BattleTech.StarSystem;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Builds the game state file's models from the game's career state.</summary>
 internal static class GameStateReader
 {
     // The star systems the game state shows in full are taken from the star systems file, as they are there.

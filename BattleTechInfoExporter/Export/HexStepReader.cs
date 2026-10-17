@@ -9,12 +9,12 @@ namespace BattleTechInfoExporter.Export;
 
 /// <summary>
 ///     Reads which steps from a hex to its neighbors the game's pathing blocks on slopes for the units of one group of
-///     pathing capabilities. The game moves units over path nodes half a hex apart in eight directions (PathNodeGrid,
-///     PathingUtil.GetForwardDelta) and passes any node, stopping only on hex centers; the step to a neighbor is open
-///     when node steps lead from the hex's center to the neighbor's through the nodes of the two hexes and the two
-///     next to both. Wider detours the game also takes aren't searched, so the steps only approximate its pathing.
-///     Terrain move costs and units in the way aren't part of it.
+///     pathing capabilities, approximated from the game's path node steps between the hexes.
 /// </summary>
+// The game moves units over path nodes half a hex apart in eight directions (PathNodeGrid,
+// PathingUtil.GetForwardDelta) and passes any node, stopping only on hex centers; the step to a neighbor is open when
+// node steps lead from the hex's center to the neighbor's through the nodes of the two hexes and the two next to both.
+// Wider detours the game also takes aren't searched. Terrain move costs and units in the way aren't part of it.
 internal sealed class HexStepReader
 {
     // The cost PathNodeGrid gives a step it blocks (GetTerrainModifiedCost); no unit moves that far.

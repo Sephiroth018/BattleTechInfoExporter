@@ -7,11 +7,7 @@ using BattleTechInfoExporter.Models;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Builds the company's storage from the game's career state.</summary>
-/// <remarks>
-///     The game keeps storage as company stats named as <see cref="ItemCountStatistic" /> says; their value is the
-///     count.
-/// </remarks>
+// The game keeps storage as company stats named as ItemCountStatistic says; their value is the count.
 internal static class StorageReader
 {
     // A stored chassis' stat type; mech parts have their own (SimGameState.MECH_PART_ITEM).

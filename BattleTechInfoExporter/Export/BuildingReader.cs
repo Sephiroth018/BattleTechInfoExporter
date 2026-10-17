@@ -58,7 +58,7 @@ internal static class BuildingReader
 
     /// <summary>
     ///     The id of the obstruction whose building a unit standing in the cell is on, its topmost one
-    ///     (AbstractActor.CheckEnteredCellsForBuildings); <c>null</c> where there is none.
+    ///     (<see cref="AbstractActor.CheckEnteredCellsForBuildings" />); <c>null</c> where there is none.
     /// </summary>
     internal static string? ReadObstructionId(MapTerrainDataCell cell) =>
         cell.MapEncounterLayerDataCell.GetTopmostBuilding()?.buildingGuid;
