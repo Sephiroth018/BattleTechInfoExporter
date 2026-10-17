@@ -24,6 +24,15 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.75.1
+
+Changed: game-state.json.
+
+### game-state.json
+- Values corrected: an export with `trigger` `jumped` is now written once the game has rolled the
+  destination's stores and hiring hall. Before, it showed `stores` and `hiringHall` from a roll
+  the game replaced a moment later; take both from a later export of that star system instead.
+
 ## 0.75.0
 
 Changed: catalog.json.
