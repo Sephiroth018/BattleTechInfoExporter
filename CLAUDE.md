@@ -291,7 +291,6 @@ this file.
 - **Solution format:** keep a repository's existing one; new repositories use `.slnx`.
 - **On old target frameworks, PolySharp** supplies the compile-time polyfills newer language
   features need.
-- **Suppress a diagnostic only at the narrowest scope**, with a justification.
 - **`.editorconfig` is the single source of style, formatting and naming rules**, ReSharper's
   included (`resharper_*` keys). Inspection severities it can't express go in the team-shared
   ReSharper settings file `<solution name>.sln.DotSettings` (named so even for `.slnx`), created
@@ -426,33 +425,29 @@ Conventions a new field follows:
 - **Game texts are plain** (`GameText`), without the UI's formatting tags and tooltip links.
 - **Game enums keep the game's values;** our own enums are camelCase.
 - **Floats the mod computes are rounded to a tenth** (`Rounding`); the game's constants keep theirs.
-- **Every nullable property says what `null` means.**
 - **A choice is a derived shape** with a switch field, the enum or boolean that tells them apart.
 - **Every file has a JSON Schema** (draft-04, `schemas/<file>.schema.json`, committed and
   shipped): every property required, derived shapes pinning their switch value, enums listing only
   the values the mod writes. A format change shows in the schemas' diff.
-- **Files are cut for round trips, not size:** the consumer, a Claude chat, copies each changed file
-  whole and parses it with code, so data that changes together shares a file, static data stays
-  apart, and what a step needs (a combat round, choosing a contract) is in the file that step reads.
+- **Files are cut for round trips, not size:** the consumer copies each changed file whole, so data
+  that changes together shares a file and what a step needs is in the file that step reads.
 - **JSON is camelCase and compact,** `null` written explicitly, through the game's Newtonsoft.Json.
 
 Layout decisions a change would otherwise undo:
 
 - **The career state is three files, read together on every career export** (`game-state.json`,
-  `rules.json`, `star-systems.json`): the rules, how the game works for this career, don't change
-  between exports, so the game state refers to them by name instead of repeating thresholds.
+  `rules.json`, `star-systems.json`): the rules don't change between exports, so the game state
+  refers to them by name instead of repeating thresholds.
 - **Star systems live in `star-systems.json`, not the catalog,** keyed by their active
-  definition's id, and the full entry is repeated wherever a step needs one (the position, the
-  travel destination, every contract's): their state changes during a career, and the story swaps
-  their definitions (the `StarSystem_SetActiveDef` result action), whose inactive ones aren't
-  exported.
+  definition's id (the story swaps definitions through the `StarSystem_SetActiveDef` result action),
+  and repeated in full wherever a step needs one: their state changes during a career.
 - **The latest mission is one file written twice,** when the mission ends and once the salvage is
   final, the second write adding only `salvage.received`: the game has no id that identifies every
   contract to link two files by, and by then the battle the outcome reads from is torn down.
-- **The combat files never read the career files or the catalog,** and the combat state shows only
-  what the player's HUD shows: it's written after every activation, so its reads stay cached
-  lookups and statistics, apart from the movement and destroyed buildings' cells. The combat map
-  isn't in the catalog, because buildings exist only once the battle's map has loaded.
+- **The combat files read only the battle,** never the career files or the catalog, and the combat
+  state only what the HUD shows: it's written after every activation, so its reads stay cached
+  lookups and statistics, apart from the movement and destroyed buildings' cells.
+- **The combat map isn't in the catalog:** buildings exist only once the battle's map has loaded.
 - **The catalog is rebuilt on a career load only when it's missing or stale,** written by another
   mod version or with another `sourceFingerprint` (the game's manifest entries it reads): a rebuild
   loads what the career doesn't. A DLL mod patching definitions in memory isn't detected.
@@ -460,9 +455,8 @@ Layout decisions a change would otherwise undo:
   starmap, a star system's maps from the contract generator's query, blocked steps from the path
   checks, so they match what the game does.
 - **The rules export only constants the game's code reads,** never one read only for presentation
-  or the AI, so a consumer never plans around a number that does nothing. A value the game
-  hardcodes but a tool computes with is exported next to them; a hardcoded rule with conditions is
-  stated in the description of the value it affects.
+  or the AI, so a consumer never plans around a number that does nothing. Hardcoded values a tool
+  computes with sit next to them; hardcoded rules go in the description of the value they affect.
 - **Files are replaced atomically and only when their content apart from `exportedAt` and
   `trigger` changed,** so a tool never reads a half-written file and one copying the changed files
   skips the others. The game state's day counts as content.
