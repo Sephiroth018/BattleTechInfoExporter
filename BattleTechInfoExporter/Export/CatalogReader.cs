@@ -146,6 +146,13 @@ internal static class CatalogReader
             reference.Id,
             reference.Name,
             MechReader.ReferenceTo(mech.Chassis),
+            // The mech tooltip and the mech lab show the chassis' role (TooltipPrefab_Mech, MechLabMechInfoWidget).
+            mech.Chassis.StockRole,
+            // The mech bay shows the chassis' description (MechDetails), which stands in where the mech has none.
+            GameText.ToPlainText(
+                string.IsNullOrEmpty(mech.Description.Details)
+                    ? mech.Chassis.Description.Details
+                    : mech.Description.Details),
             mech.Description.Cost,
             MechReader.ReadUsedTonnage(mech),
             MechStatsReader.Read(mech),

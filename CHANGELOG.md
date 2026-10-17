@@ -24,6 +24,17 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.75.0
+
+Changed: catalog.json.
+
+### catalog.json
+- Added `mechDefinitions.<id>.role`: the chassis' stock role the game shows for the mech, e.g.
+  "Brawler". It describes the standard fitting, which a refit can change; no rule reads it.
+- Added `mechDefinitions.<id>.description`: the mech's description the game shows, or its chassis'
+  where the mech has none, as plain text.
+  It describes the standard fitting, which a refit can change; no rule reads it.
+
 ## 0.74.0
 
 Changed: game-state.json, combat-state.json, combat-map.json, catalog.json (breaking).
