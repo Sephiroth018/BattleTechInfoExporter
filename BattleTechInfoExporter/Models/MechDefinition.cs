@@ -51,9 +51,6 @@ internal sealed record MechLocationDefinition(
     IReadOnlyList<LoadoutComponent> Components);
 
 /// <summary>A component of a mech definition's loadout.</summary>
-/// <param name="IsFixed">
-///     Whether the component is part of the chassis: every mech of the chassis has it, and it can't be removed.
-/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record LoadoutComponent(ComponentReference Component, bool IsFixed)
     : ComponentEntry(Component), IFixedOrRemovable;

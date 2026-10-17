@@ -1,6 +1,6 @@
 namespace BattleTechInfoExporter.Models;
 
-/// <summary>How much of a unit the player's HUD shows (the game's <c>VisibilityLevel</c>).</summary>
+/// <summary>How much of a unit the player's HUD shows (the game's <see cref="BattleTech.VisibilityLevel" />).</summary>
 internal enum UnitVisibility
 {
     /// <summary>

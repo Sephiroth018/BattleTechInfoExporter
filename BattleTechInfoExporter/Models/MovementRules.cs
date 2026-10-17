@@ -8,7 +8,7 @@ namespace BattleTechInfoExporter.Models;
 /// </summary>
 /// <param name="OverheatedPenalty">The share lost while overheated.</param>
 /// <param name="LegDamagePenalty">The share lost per leg, by its damage.</param>
-/// <param name="MinMultiplier">The least share of the distance a mech keeps, from 0 to 1.</param>
+/// <param name="MinMultiplier">The least share of the distance a mech keeps, as a fraction from 0 to 1.</param>
 /// <param name="PivotInPlaceThreshold">
 ///     A move that ends closer than this to where it started, in meters, only turns the mech and costs no move.
 /// </param>

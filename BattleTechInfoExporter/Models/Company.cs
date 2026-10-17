@@ -16,7 +16,8 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Funds">The company's C-Bills.</param>
 /// <param name="MercenaryReviewBoard">The company's standing with the Mercenary Review Board.</param>
 /// <param name="Reputation">
-///     The reputation with each faction that gains it, keyed by faction id, except the Mercenary Review Board.
+///     The reputation with each faction that gains it, keyed by faction id; the Mercenary Review Board's is
+///     <see cref="MercenaryReviewBoard" />.
 /// </param>
 /// <param name="MechTech">
 ///     The tech points the mech lab works a day (<see cref="CampaignRules.MechLab" />), including

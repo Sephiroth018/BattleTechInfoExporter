@@ -4,7 +4,6 @@ using BattleTechInfoExporter.Models;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Builds the current system's stores from the game's career state.</summary>
 internal static class StoreReader
 {
     // A store exists when it has stock (StarSystem.HasFactionStore, HasBlackMarketStore). CanUseSystemStore doesn't

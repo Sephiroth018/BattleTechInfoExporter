@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     One step of a mech's queued refit; each value of <see cref="Type" /> has a record with the fields of its own.
+///     One step of a mech's queued refit; each value of <see cref="Type" /> has a shape with fields of its own.
 /// </summary>
 /// <param name="Type">The kind of step, which decides the step's other fields.</param>
 /// <param name="IsDone">Whether the mech techs have finished the step; its change is then part of the mech.</param>
@@ -42,7 +42,7 @@ internal sealed record RemoveComponentChange(
     : ComponentRefitChange(RefitChangeType.RemoveComponent, IsDone, Component, DamageLevel);
 
 /// <summary>A step that repairs a component.</summary>
-/// <param name="Location">Where the component is mounted; <c>null</c> for one in storage.</param>
+/// <param name="Location">Where the component is mounted; <c>null</c> when it's in storage.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record RepairComponentChange(
     bool IsDone,

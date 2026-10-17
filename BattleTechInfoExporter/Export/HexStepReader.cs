@@ -9,18 +9,20 @@ namespace BattleTechInfoExporter.Export;
 
 /// <summary>
 ///     Reads which steps from a hex to its neighbors the game's pathing blocks on slopes for the units of one group of
-///     pathing capabilities. The game moves units over path nodes half a hex apart in eight directions (PathNodeGrid,
-///     PathingUtil.GetForwardDelta) and passes any node, stopping only on hex centers; the step to a neighbor is open
-///     when node steps lead from the hex's center to the neighbor's through the nodes of the two hexes and the two
-///     next to both. Wider detours the game also takes aren't searched, so the steps only approximate its pathing.
-///     Terrain move costs and units in the way aren't part of it.
+///     pathing capabilities, approximated from the game's path node steps between the hexes, without terrain move
+///     costs or units in the way.
 /// </summary>
+// Units pass any path node, half a hex apart (PathNodeGrid), and stop on hex centers. A step is open when node steps
+// link the two centers through the two hexes and the two next to both; wider detours the game takes aren't searched.
 internal sealed class HexStepReader
 {
     // The cost PathNodeGrid gives a step it blocks (GetTerrainModifiedCost); no unit moves that far.
     private const float BlockedStepCost = 99999.9f;
 
-    /// <summary>The six neighbors' offsets, in the game's direction order (HexPoint3.Step) and a mask's bit order.</summary>
+    /// <summary>
+    ///     The six neighbors' offsets, in the game's direction order (<see cref="HexPoint3.Step" />) and a mask's bit
+    ///     order.
+    /// </summary>
     internal static readonly IReadOnlyList<HexPoint3> Directions =
         Enumerable.Range(0, 6).Select(direction => new HexPoint3(0, 0).Step(direction)).ToList();
 

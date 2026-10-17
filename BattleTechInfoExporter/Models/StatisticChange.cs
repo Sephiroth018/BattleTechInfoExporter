@@ -12,7 +12,7 @@ namespace BattleTechInfoExporter.Models;
 ///     positive change makes the unit act earlier.
 /// </param>
 /// <param name="AppliesTo">
-///     The pilot or the components whose statistic changes; <c>null</c> for the unit's own.
+///     The pilot or the components whose statistic changes; <c>null</c> when it's the unit's own.
 /// </param>
 /// <param name="Duration">How long the change lasts; <c>null</c> when it lasts for the whole mission.</param>
 /// <param name="Target">
@@ -35,15 +35,15 @@ internal sealed record StatisticChange(
 ///     The pilot, the weapons, the ammunition boxes, one random working weapon or the strongest working weapon.
 /// </param>
 /// <param name="Filter">
-///     Which of the weapons or ammunition boxes; <c>null</c> for all of them, and always for the pilot, the random
-///     and the strongest weapon.
+///     Which of the weapons or ammunition boxes; <c>null</c> when it's all of them, and always for the pilot, the
+///     random and the strongest weapon.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record EffectTargetCollection(StatisticEffectData.TargetCollection Collection, ComponentFilter? Filter);
 
 /// <summary>
 ///     The one property the game filters the components by; the game's data can name several, of which only the
-///     first in <see cref="ComponentFilterKind" />'s order counts. Each kind has a record with its value's type.
+///     first in <see cref="ComponentFilterKind" />'s order counts. Each kind has a shape with its value's type.
 /// </summary>
 /// <param name="Kind">Which property of the components the filter compares, deciding the type of its value.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
