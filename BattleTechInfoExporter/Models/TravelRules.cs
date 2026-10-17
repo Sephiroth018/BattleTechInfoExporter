@@ -3,9 +3,9 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     How long a trip takes, which <see cref="StarSystem.Route" /> states per star system: the days of each jump
-///     plus the days to and from the jump point of the star systems at both ends, scaled by the Argo's drive
-///     upgrades.
+///     How long a trip takes, which each star system's route in <see cref="Starmap.StarSystems" /> states: the
+///     days of each jump plus the days to and from the jump point of the star systems at both ends, scaled by the
+///     Argo's drive upgrades.
 /// </summary>
 /// <param name="DaysPerJump">Of a jump from a star system without a fuel station.</param>
 /// <param name="DaysPerJumpFromFuelStation">Of a jump from a star system with one.</param>

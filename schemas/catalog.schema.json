@@ -101,7 +101,7 @@
     },
     "itemCollectionDefinitions": {
       "type": "object",
-      "description": "The item collections the stores draw their stock from and the rewards are drawn from, keyed by collection id; a star system's stores name theirs in star-systems.json.",
+      "description": "The item collections the stores draw their stock from and the rewards are drawn from, keyed by collection id; a star system's stores name theirs in star-systems.json starSystems.",
       "additionalProperties": {
         "$ref": "#/definitions/ItemCollectionDefinition"
       }
@@ -2296,7 +2296,7 @@
     },
     "MapDefinition": {
       "type": "object",
-      "description": "A combat map some star system's contracts can be fought on, and the terrain it is made of. The contract generator draws a star system's map among the maps star-systems.json lists for the system, by weight.",
+      "description": "A combat map some star system's contracts can be fought on, and the terrain it is made of. The contract generator draws a star system's map among the maps its entry in star-systems.json starSystems lists, by weight.",
       "additionalProperties": false,
       "required": [
         "id",

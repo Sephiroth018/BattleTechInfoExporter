@@ -3888,7 +3888,7 @@
     },
     "TravelRules": {
       "type": "object",
-      "description": "How long a trip takes, which game-state.json activeContract.starSystem.route states per star system: the days of each jump plus the days to and from the jump point of the star systems at both ends, scaled by the Argo's drive upgrades.",
+      "description": "How long a trip takes, which each star system's route in star-systems.json starSystems states: the days of each jump plus the days to and from the jump point of the star systems at both ends, scaled by the Argo's drive upgrades.",
       "additionalProperties": false,
       "required": [
         "daysPerJump",
