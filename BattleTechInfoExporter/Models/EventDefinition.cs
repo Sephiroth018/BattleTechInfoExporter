@@ -126,7 +126,7 @@ internal sealed record ComponentChange(ComponentReference Component, int Count) 
 ///     What else a result does, about the event's pilot or the company; each value of <see cref="Type" /> has a
 ///     record with the field it needs.
 /// </summary>
-/// <param name="Type">What the action does, e.g. <c>MechWarrior_SetTimeout</c> or <c>MechWarrior_Kill</c>.</param>
+/// <param name="Type">What the action does.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal abstract record ResultAction(SimGameResultAction.ActionType Type);
 

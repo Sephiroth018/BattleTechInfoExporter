@@ -341,7 +341,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The definition's id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction)."
         },
         "name": {
           "type": "string",
@@ -836,7 +836,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The component definition's id from the game's data files."
         },
         "name": {
           "type": "string",
@@ -2852,7 +2852,7 @@
       ],
       "properties": {
         "type": {
-          "description": "What the action does, e.g. `MechWarrior_SetTimeout` or `MechWarrior_Kill`.",
+          "description": "What the action does.",
           "enum": [
             "System_AddFlashpoint"
           ],
@@ -2878,7 +2878,7 @@
       ],
       "properties": {
         "type": {
-          "description": "What the action does, e.g. `MechWarrior_SetTimeout` or `MechWarrior_Kill`.",
+          "description": "What the action does.",
           "enum": [
             "MechWarrior_AddHiring"
           ],
@@ -2906,11 +2906,11 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The game's pilot id."
         },
         "name": {
           "type": "string",
-          "description": "The name the UI shows."
+          "description": "The pilot's full name without callsign."
         },
         "callsign": {
           "type": "string",
@@ -2928,7 +2928,7 @@
       ],
       "properties": {
         "type": {
-          "description": "What the action does, e.g. `MechWarrior_SetTimeout` or `MechWarrior_Kill`.",
+          "description": "What the action does.",
           "enum": [
             "MechWarrior_AddInjuries",
             "MechWarrior_SubtractInjuries"
@@ -2955,7 +2955,7 @@
       ],
       "properties": {
         "type": {
-          "description": "What the action does, e.g. `MechWarrior_SetTimeout` or `MechWarrior_Kill`.",
+          "description": "What the action does.",
           "enum": [
             "MechWarrior_Kill",
             "MechWarrior_Fire",
@@ -2981,7 +2981,7 @@
       ],
       "properties": {
         "type": {
-          "description": "What the action does, e.g. `MechWarrior_SetTimeout` or `MechWarrior_Kill`.",
+          "description": "What the action does.",
           "enum": [
             "MechWarrior_Callsign"
           ],
@@ -3007,7 +3007,7 @@
       ],
       "properties": {
         "type": {
-          "description": "What the action does, e.g. `MechWarrior_SetTimeout` or `MechWarrior_Kill`.",
+          "description": "What the action does.",
           "enum": [
             "System_ShowRewards"
           ],
@@ -3033,7 +3033,7 @@
       ],
       "properties": {
         "type": {
-          "description": "What the action does, e.g. `MechWarrior_SetTimeout` or `MechWarrior_Kill`.",
+          "description": "What the action does.",
           "enum": [
             "MechWarrior_SetTimeout"
           ],

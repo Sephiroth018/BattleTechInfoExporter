@@ -229,7 +229,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The definition's id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction)."
         },
         "name": {
           "type": "string",
@@ -388,7 +388,7 @@
           "description": "The terrain the unit stands in, keyed as in catalog.json terrainDefinitions, which a blip's position on the map shows; `null` on open ground and when last seen."
         },
         "pilot": {
-          "description": "The pilot, which the HUD names only at `full`.",
+          "description": "The pilot, which the HUD names only in full view (`full`).",
           "oneOf": [
             {
               "type": "null"
@@ -399,7 +399,7 @@
           ]
         },
         "state": {
-          "description": "The unit's condition, shown at `full`.",
+          "description": "The unit's condition, shown in full view (`full`).",
           "oneOf": [
             {
               "type": "null"
@@ -414,7 +414,7 @@
             "array",
             "null"
           ],
-          "description": "The lines of fire to the units it could attack: from the player's units to every living enemy at `full`, and from those enemies to the player's units. `null` for the others, destroyed units included.",
+          "description": "The lines of fire to the units it could attack: from the player's units to every living enemy in full view (`full`), and from those enemies to the player's units. `null` for the others, destroyed units included.",
           "items": {
             "$ref": "#/definitions/LineOfFire"
           }
@@ -453,7 +453,7 @@
     },
     "UnitAllegiance": {
       "type": "string",
-      "description": "Whose side a team in combat is on, seen from the player: its units' and its buildings'. `player`: The player's own lance. `ally`: A team on the player's side, e.g. the employer's units. `neutral`: A team neither side fights, until it turns hostile.",
+      "description": "Whose side a team in combat is on, seen from the player: its units' and its buildings'. `player`: The player's own lance. `ally`: A team on the player's side, e.g. the employer's units. `enemy`: A team fighting the player's side. `neutral`: A team neither side fights, until it turns hostile.",
       "x-enumNames": [
         "Player",
         "Ally",
@@ -526,7 +526,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The game's own id of the mech in the mech bay."
         },
         "name": {
           "type": "string",
@@ -573,11 +573,11 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The game's pilot id."
         },
         "name": {
           "type": "string",
-          "description": "The name the UI shows."
+          "description": "The pilot's full name without callsign."
         },
         "callsign": {
           "type": "string",
@@ -955,7 +955,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The component definition's id from the game's data files."
         },
         "name": {
           "type": "string",
@@ -1159,7 +1159,7 @@
     },
     "LineOfFireBlocking": {
       "type": "string",
-      "description": "How much of a line of fire is blocked (the game's `LineOfFireLevel`). `partiallyBlocked`: The game's obstructed line: direct fire is still possible, with the penalties of rules.json combat.lineOfFire. `blocked`: No direct fire; a weapon that can fire indirectly still may.",
+      "description": "How much of a line of fire is blocked (the game's `LineOfFireLevel`). `clear`: Nothing in the way: direct fire without a line of fire penalty. `partiallyBlocked`: The game's obstructed line: direct fire is still possible, with the penalties of rules.json combat.lineOfFire. `blocked`: No direct fire; a weapon that can fire indirectly still may.",
       "x-enumNames": [
         "Clear",
         "PartiallyBlocked",
@@ -1198,7 +1198,7 @@
       "properties": {
         "targets": {
           "type": "array",
-          "description": "The enemies at `full` by unit id, in the order of MovementRow.attacks.",
+          "description": "The enemies in full view (`full`) by unit id, in the order of MovementRow.attacks.",
           "items": {
             "type": "string"
           }

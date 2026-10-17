@@ -8,6 +8,7 @@ namespace BattleTechInfoExporter.Models;
 ///     A component's definition, like <see cref="DefinitionReference" />, with the type that tells which group of
 ///     <see cref="Catalog.ComponentDefinitions" /> holds it. Components compare by type first, then as every reference.
 /// </summary>
+/// <param name="Id">The component definition's id from the game's data files.</param>
 /// <param name="Type">
 ///     The game's component type, e.g. <c>Weapon</c> or <c>AmmunitionBox</c>, which names the component's group in
 ///     <see cref="Catalog.ComponentDefinitions" />; never <c>NotSet</c>, <c>Special</c> or <c>MechPart</c>, which the
