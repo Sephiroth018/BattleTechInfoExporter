@@ -185,7 +185,7 @@
             "null",
             "string"
           ],
-          "description": "The contract's data file; null where the game keeps no reference to it."
+          "description": "The contract's data file; null when the game keeps no reference to it."
         },
         "name": {
           "type": "string",
@@ -1102,7 +1102,7 @@
             "integer",
             "null"
           ],
-          "description": "The uses left of an ability that can be used only so often; null when unlimited.",
+          "description": "The uses left of an ability that can be used only so often; null when there's no limit.",
           "format": "int32"
         }
       }

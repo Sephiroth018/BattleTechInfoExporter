@@ -207,7 +207,7 @@ internal sealed record CombatComponent(
 /// <summary>An ability a unit can activate, as its HUD button shows it.</summary>
 /// <param name="Ability">The ability, the pilot's or a mounted component's.</param>
 /// <param name="Cooldown">The unit's activations until the ability can be used again; 0 when ready.</param>
-/// <param name="UsesLeft">The uses left of an ability that can be used only so often; <c>null</c> when unlimited.</param>
+/// <param name="UsesLeft">The uses left of an ability that can be used only so often; <c>null</c> when there's no limit.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatAbility(DefinitionReference Ability, int Cooldown, int? UsesLeft);
 

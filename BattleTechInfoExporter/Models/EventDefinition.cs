@@ -24,7 +24,8 @@ namespace BattleTechInfoExporter.Models;
 ///     schedules it.
 /// </param>
 /// <param name="Requirements">
-///     What the event's company or pilot (<paramref name="Scope" />) must meet; <c>null</c> when nothing.
+///     What the event's company or pilot (<paramref name="Scope" />) must meet; <c>null</c> when any will
+///     do.
 /// </param>
 /// <param name="AdditionalRequirements">What the other scopes must meet, all of them.</param>
 /// <param name="AdditionalTargets">
@@ -101,7 +102,7 @@ internal sealed record EventOutcome(int Weight, IReadOnlyList<EventResult> Resul
 /// <param name="ComponentChanges">The components added to or taken from the company's storage.</param>
 /// <param name="DurationDays">
 ///     How many days the tag, statistic and component changes last before the game reverts them; <c>null</c> when
-///     they last.
+///     they're permanent.
 /// </param>
 /// <param name="Actions">What else the result does, e.g. kill or dismiss the pilot.</param>
 /// <param name="ForcedEvents">The events the result schedules.</param>
@@ -124,7 +125,7 @@ internal sealed record ComponentChange(ComponentReference Component, int Count) 
 
 /// <summary>
 ///     What else a result does, about the event's pilot or the company; each value of <see cref="Type" /> has a
-///     record with the field it needs.
+///     shape with the field it needs.
 /// </summary>
 /// <param name="Type">What the action does, e.g. <c>MechWarrior_SetTimeout</c> or <c>MechWarrior_Kill</c>.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

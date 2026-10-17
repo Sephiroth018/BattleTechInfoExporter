@@ -160,7 +160,7 @@
             "null",
             "string"
           ],
-          "description": "The contract's data file; null where the game keeps no reference to it."
+          "description": "The contract's data file; null when the game keeps no reference to it."
         },
         "name": {
           "type": "string",
@@ -388,7 +388,7 @@
             "integer",
             "null"
           ],
-          "description": "The day the pilot is out of the med bay, as the barracks counts it once the contract is resolved; null for an uninjured or killed pilot.",
+          "description": "The day the pilot is out of the med bay, as the barracks counts it once the contract is resolved; null when the pilot is uninjured or killed.",
           "format": "int32"
         },
         "mechKills": {
@@ -410,7 +410,7 @@
           "description": "Whether the mech was destroyed and not recovered; its surviving components are in MissionSalvage.automatic."
         },
         "repair": {
-          "description": "What repairing the mech's damage in the mech bay would take, as for a mech bay mech's game-state.json mechs[].repair; null without damage and for a lost mech.",
+          "description": "What repairing the mech's damage in the mech bay would take, as for a mech bay mech's game-state.json mechs[].repair; null when the mech is undamaged or lost.",
           "oneOf": [
             {
               "type": "null"
@@ -436,7 +436,7 @@
         },
         "ammunition": {
           "type": "array",
-          "description": "The shots fired from every ammo box and every weapon that carries its own ammo, in the mech's component order.",
+          "description": "The shots fired from every ammunition box and every weapon that carries its own ammunition, in the mech's component order.",
           "items": {
             "$ref": "#/definitions/AmmunitionUse"
           }
@@ -712,7 +712,7 @@
     },
     "AmmunitionUse": {
       "type": "object",
-      "description": "The shots a mech fired from an ammo box, or from a weapon that carries its own ammo.",
+      "description": "The shots a mech fired from an ammunition box, or from a weapon that carries its own ammunition.",
       "additionalProperties": false,
       "required": [
         "component",
@@ -766,7 +766,7 @@
           "$ref": "#/definitions/SalvageItems"
         },
         "received": {
-          "description": "Everything the company gets: the priority salvage, the salvage drawn at random and automatic; null until the salvage is final.",
+          "description": "Everything the company gets: the priority salvage, the salvage drawn at random and automatic; null when the salvage isn't final yet.",
           "oneOf": [
             {
               "type": "null"
@@ -805,7 +805,7 @@
     },
     "StoredComponent": {
       "type": "object",
-      "description": "A stored component, described in the catalog.",
+      "description": "A stored component.",
       "additionalProperties": false,
       "required": [
         "component",
@@ -831,7 +831,7 @@
     },
     "StoredMechParts": {
       "type": "object",
-      "description": "Stored parts of a mech, described in the catalog, from which the mech is assembled.",
+      "description": "Stored parts of a mech, from which the mech is assembled.",
       "additionalProperties": false,
       "required": [
         "mech",

@@ -6,7 +6,7 @@ namespace BattleTechInfoExporter.Models;
 /// <summary>The root of <c>game-state.json</c>.</summary>
 /// <param name="Company">The company's day, funds, morale, reputation and techs.</param>
 /// <param name="FinancialReport">The next financial report, as the finance screen projects it.</param>
-/// <param name="Ship">The Argo; <c>null</c> while the company still flies the Leopard.</param>
+/// <param name="Ship">The Argo; <c>null</c> when the company still flies the Leopard.</param>
 /// <param name="WorkQueue">
 ///     The timeline's entries, by the day they finish; entries finishing on the same day are in the order mech lab,
 ///     med bay, travel, financial report, ship upgrade.
@@ -17,11 +17,11 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="LastLance">The units of the lance last sent on a mission.</param>
 /// <param name="Storage">What the company keeps in storage.</param>
 /// <param name="Stores">
-///     The current star system's stores, each <c>null</c> if the star system has none or the company can't use it.
-///     Their stock changes only on arrival in a star system.
+///     The current star system's stores, each <c>null</c> when the star system has none or the company can't use
+///     it. Their stock changes only on arrival in a star system.
 /// </param>
-/// <param name="HiringHall">The pilots for hire in the current system's hiring hall.</param>
-/// <param name="ActiveContract">The travel contract the company has accepted; <c>null</c> without one.</param>
+/// <param name="HiringHall">The pilots for hire in the current star system's hiring hall.</param>
+/// <param name="ActiveContract">The travel contract the company has accepted; <c>null</c> when there's none.</param>
 /// <param name="Contracts">
 ///     The contracts the Command Center offers, without the active contract, generated for the export when the game
 ///     hasn't yet; during a trip, only from the jump into the destination on.

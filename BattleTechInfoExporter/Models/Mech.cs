@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     A mech in the mech bay, with its current loadout; each value of <see cref="Status" /> has a record with the
+///     A mech in the mech bay, with its current loadout; each value of <see cref="Status" /> has a shape with
 ///     fields of its own.
 /// </summary>
 /// <param name="Id">The mech's own id, unique among the company's mechs.</param>
@@ -17,7 +17,7 @@ namespace BattleTechInfoExporter.Models;
 ///     Whether the mech is free for use or held by the mech lab, which decides the mech's other fields.
 /// </param>
 /// <param name="IsFieldable">Whether the mech can be taken on a mission, as the lance configuration decides.</param>
-/// <param name="Problems">The loadout problems the mech lab warns about, e.g. missing ammo, in the game's words.</param>
+/// <param name="Problems">The loadout problems the mech lab warns about, e.g. missing ammunition, in the game's words.</param>
 /// <param name="Loadout">The current loadout, as the mech bay shows it.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal abstract record Mech(
@@ -33,7 +33,7 @@ internal abstract record Mech(
 
 /// <summary>A mech free for use.</summary>
 /// <param name="Repair">
-///     What repairing the mech's damage in the mech bay would take; <c>null</c> without damage.
+///     What repairing the mech's damage in the mech bay would take; <c>null</c> when the mech is undamaged.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ReadyMech(

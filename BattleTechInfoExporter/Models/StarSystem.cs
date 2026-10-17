@@ -17,7 +17,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Biomes">The biomes the star system's missions can be on, sorted by name.</param>
 /// <param name="Maps">
 ///     The maps the star system's contracts can be fought on, as the contract generator selects them from its biomes
-///     and map tags; each map's terrain is in the catalog's <c>mapDefinitions</c>.
+///     and map tags; each map's terrain is in <see cref="Catalog.MapDefinitions" />.
 /// </param>
 /// <param name="Stores">
 ///     The item collections each of the star system's stores draws its stock from on arrival, every entry of each
@@ -26,15 +26,14 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="ContractEmployers">
 ///     The factions that can hire the company for the star system's generated contracts, sorted by name, each with
-///     the factions it can hire it against, without the employers the story sets aside; a contract's own
-///     requirements can narrow them further. Story and flashpoint contracts name their own.
+///     its targets, without those the story sets aside; story and flashpoint contracts name their own.
 /// </param>
 /// <param name="Difficulty">The star system's difficulty, as the starmap shows it.</param>
 /// <param name="CanTravelTo">
-///     Whether the star system's travel requirements are met; story systems stay locked until then.
+///     Whether the star system's travel requirements are met; story star systems stay locked until then.
 /// </param>
 /// <param name="Route">
-///     The trip from the current star system; <c>null</c> where the game finds no route, always while
+///     The trip from the current star system; <c>null</c> when the game finds no route, always when
 ///     <paramref name="CanTravelTo" /> is false.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

@@ -204,11 +204,11 @@
         },
         "canUseSystemStore": {
           "type": "boolean",
-          "description": "Whether the system owner's store is open at this level."
+          "description": "Whether the system store is open at this level with the star system's owner."
         },
         "storePriceChangePercent": {
           "type": "integer",
-          "description": "The change of store prices at this level with the store's faction (the system owner, or the pirates at the black market), as a percentage of an item's cost added to its price, as the UI shows it. It adds to the system's own discount.",
+          "description": "The change of store prices at this level with the store's faction (the star system's owner, or the pirates at the black market), as a percentage of an item's cost added to its price, as the UI shows it. It adds to the star system's own discount.",
           "format": "int32"
         }
       }
@@ -398,7 +398,7 @@
           "$ref": "#/definitions/ActivationTiming"
         },
         "targeting": {
-          "description": "How the ability is aimed; null for one that isn't.",
+          "description": "How the ability is aimed; null when it isn't.",
           "oneOf": [
             {
               "type": "null"
@@ -413,7 +413,7 @@
             "integer",
             "null"
           ],
-          "description": "The rounds before the ability can be used again; null without a cooldown.",
+          "description": "The rounds before the ability can be used again; null when it has no cooldown.",
           "format": "int32"
         },
         "uses": {
@@ -421,7 +421,7 @@
             "integer",
             "null"
           ],
-          "description": "How often the ability can be used per mission; null without a limit.",
+          "description": "How often the ability can be used per mission; null when there's no limit.",
           "format": "int32"
         },
         "effects": {
@@ -530,7 +530,7 @@
           "description": "A boolean, integer or number, as the statistic's type requires. Changes to the initiative statistics (BaseInitiative, PhaseModifier, PhaseModifierSelf) are as the HUD numbers phases, so a positive change makes the unit act earlier."
         },
         "appliesTo": {
-          "description": "The pilot or the components whose statistic changes; null for the unit's own.",
+          "description": "The pilot or the components whose statistic changes; null when it's the unit's own.",
           "oneOf": [
             {
               "type": "null"
@@ -629,7 +629,7 @@
           "$ref": "#/definitions/TargetCollection"
         },
         "filter": {
-          "description": "Which of the weapons or ammunition boxes; null for all of them, and always for the pilot, the random and the strongest weapon.",
+          "description": "Which of the weapons or ammunition boxes; null when it's all of them, and always for the pilot, the random and the strongest weapon.",
           "oneOf": [
             {
               "type": "null"
@@ -660,7 +660,7 @@
       ]
     },
     "ComponentFilter": {
-      "description": "The one property the game filters the components by; the game's data can name several, of which only the first in ComponentFilterKind's order counts. Each kind has a record with its value's type.",
+      "description": "The one property the game filters the components by; the game's data can name several, of which only the first in ComponentFilterKind's order counts. Each kind has a shape with its value's type.",
       "x-abstract": true,
       "anyOf": [
         {
@@ -1100,7 +1100,7 @@
     },
     "SkillLevel": {
       "type": "object",
-      "description": "A level of a skill; the skills with numbers of their own per level derive from it.",
+      "description": "A level of a skill; the shapes of the skills with numbers of their own per level add those.",
       "additionalProperties": false,
       "required": [
         "level",
@@ -1190,7 +1190,7 @@
             "null",
             "number"
           ],
-          "description": "Multiplies the pay of the type's contracts (see ContractRules); null for priority missions, whose pay the story sets.",
+          "description": "Multiplies the pay of the type's contracts (see ContractRules); null when the type is Priority, whose pay the story sets.",
           "format": "float"
         }
       }
@@ -1211,7 +1211,7 @@
         },
         "distance": {
           "type": "number",
-          "description": "The distance in meters, before the jump jets' JumpDistanceMultiplier effects, which add to a multiplier of 1.",
+          "description": "The distance in meters, which 1 plus the jump jets' JumpDistanceMultiplier effects multiplies.",
           "format": "float"
         }
       }
@@ -1574,7 +1574,7 @@
         },
         "modifierPerLevel": {
           "type": "number",
-          "description": "Subtracted per level the attacker stands above the target, added per level below.",
+          "description": "The modifier per level of height difference.",
           "format": "float"
         },
         "usesMultipleLevels": {
@@ -1813,12 +1813,12 @@
         },
         "clearRatio": {
           "type": "number",
-          "description": "The share of clear sight lines, from 0 to 1, for a clear line of fire.",
+          "description": "The share of clear sight lines for a clear line of fire, as a fraction from 0 to 1.",
           "format": "float"
         },
         "obstructedRatio": {
           "type": "number",
-          "description": "The share of clear sight lines, from 0 to 1, for an obstructed line of fire.",
+          "description": "The share of clear sight lines for an obstructed line of fire, as a fraction from 0 to 1.",
           "format": "float"
         },
         "minRatioFromUnits": {
@@ -2507,7 +2507,7 @@
         },
         "degradePerHit": {
           "type": "number",
-          "description": "The share of the way to 1, from 0 to 1, the multiplier moves after each hit.",
+          "description": "The share of the way to 1 the multiplier moves after each hit, as a fraction from 0 to 1.",
           "format": "float"
         }
       }
@@ -2764,7 +2764,7 @@
     },
     "ResolveEventThresholds": {
       "type": "object",
-      "description": "The shares, from 0 to 1, at which an attack's resolve events happen.",
+      "description": "The shares at which an attack's resolve events happen, as fractions from 0 to 1.",
       "additionalProperties": false,
       "required": [
         "majorityHit",
@@ -2943,7 +2943,7 @@
         },
         "minMultiplier": {
           "type": "number",
-          "description": "The least share of the distance a mech keeps, from 0 to 1.",
+          "description": "The least share of the distance a mech keeps, as a fraction from 0 to 1.",
           "format": "float"
         },
         "pivotInPlaceThreshold": {
@@ -3130,7 +3130,7 @@
     },
     "InstallCosts": {
       "type": "object",
-      "description": "By the component's category: weapons by their type, where ballistic covers autocannons, Gauss rifles and machine guns, missile LRMs and SRMs, energy lasers, PPCs and COILs, and support flamers; other weapons and upgrades are other.",
+      "description": "By the component's category, weapons by their type.",
       "additionalProperties": false,
       "required": [
         "ballistic",
@@ -3233,17 +3233,17 @@
       "properties": {
         "incapacitated": {
           "type": "number",
-          "description": "Without lethal injuries, as a 0-1 fraction; 1 or more is certain before Guts.",
+          "description": "Without lethal injuries, as a fraction from 0 to 1; 1 or more is certain before Guts.",
           "format": "float"
         },
         "lethal": {
           "type": "number",
-          "description": "After lethal injuries, as a 0-1 fraction; 1 or more is certain before Guts.",
+          "description": "After lethal injuries, as a fraction from 0 to 1; 1 or more is certain before Guts.",
           "format": "float"
         },
         "reductionPerGuts": {
           "type": "number",
-          "description": "As a 0-1 fraction; the chance doesn't fall below 0.",
+          "description": "As a fraction from 0 to 1; the chance doesn't fall below 0.",
           "format": "float"
         }
       }
@@ -3266,7 +3266,7 @@
       "properties": {
         "costPerBaseSkillPoint": {
           "type": "number",
-          "description": "The hiring price, before the system owner's reputation adjustment.",
+          "description": "The hiring price, before the adjustment for the reputation with the star system's owner.",
           "format": "float"
         },
         "salaryPerBaseSkillPoint": {
@@ -3281,12 +3281,12 @@
         },
         "pilotsPerSystem": {
           "type": "integer",
-          "description": "How many pilots a system's hiring hall offers.",
+          "description": "How many pilots a star system's hiring hall offers.",
           "format": "int32"
         },
         "roninChance": {
           "type": "number",
-          "description": "The chance of each of them being a ronin, unless the system sets its own.",
+          "description": "The chance of each of them being a ronin, unless the star system sets its own.",
           "format": "float"
         },
         "generatedPilotHealth": {
@@ -3372,7 +3372,7 @@
         },
         "priorityShare": {
           "type": "number",
-          "description": "The share of the picks that are priority picks, a 0-1 fraction, rounded down.",
+          "description": "The share of the picks that are priority picks, as a fraction from 0 to 1, rounded down.",
           "format": "float"
         },
         "maxPriorityPicks": {
@@ -3420,7 +3420,7 @@
       "properties": {
         "chance": {
           "type": "number",
-          "description": "Multiplies the picks, as a 0-1 fraction.",
+          "description": "Multiplies the picks, as a fraction from 0 to 1.",
           "format": "float"
         },
         "chanceLostPerMechDestroyed": {
@@ -3496,7 +3496,7 @@
         },
         "divisor": {
           "type": "number",
-          "description": "Divides the contract's difficulty plus a tier's offset, giving the tier's 0-1 chance.",
+          "description": "Divides the contract's difficulty plus a tier's offset, giving the tier's chance as a fraction from 0 to 1.",
           "format": "float"
         }
       }
@@ -3693,7 +3693,7 @@
         },
         "payVariance": {
           "type": "number",
-          "description": "The most the pay varies either way, as a 0-1 fraction of it.",
+          "description": "The most the pay varies either way, as a fraction of it from 0 to 1.",
           "format": "float"
         },
         "guaranteedPayShare": {
@@ -3726,27 +3726,27 @@
         },
         "difficultyVariance": {
           "type": "integer",
-          "description": "A contract's difficulty is the system's plus the global one, varied by up to this either way.",
+          "description": "A contract's difficulty is the star system's plus the global one, varied by up to this either way.",
           "format": "int32"
         },
         "maxPerSystem": {
           "type": "integer",
-          "description": "The most contracts a system offers at once, unless it sets its own.",
+          "description": "The most contracts a star system offers at once, unless it sets its own.",
           "format": "int32"
         },
         "renewedPerRefresh": {
           "type": "number",
-          "description": "Added to a system's open contract slots at each renewal.",
+          "description": "Added to a star system's open contract slots at each renewal.",
           "format": "float"
         },
         "refreshDays": {
           "type": "integer",
-          "description": "A system's open contract slots are renewed once more than this many days passed since their last renewal, so every refreshDays + 1 days.",
+          "description": "A star system's open contract slots are renewed once more than this many days passed since their last renewal, so every refreshDays + 1 days.",
           "format": "int32"
         },
         "removedPerCompleted": {
           "type": "number",
-          "description": "Taken off a system's open contract slots for each contract completed there.",
+          "description": "Taken off a star system's open contract slots for each contract completed there.",
           "format": "float"
         }
       }
@@ -3888,7 +3888,7 @@
     },
     "TravelRules": {
       "type": "object",
-      "description": "How long a trip takes, which the star systems file states per system: the days of each jump plus the days to and from the jump point of the systems at both ends, scaled by the Argo's drive upgrades.",
+      "description": "How long a trip takes, which game-state.json activeContract.starSystem.route states per star system: the days of each jump plus the days to and from the jump point of the star systems at both ends, scaled by the Argo's drive upgrades.",
       "additionalProperties": false,
       "required": [
         "daysPerJump",
@@ -3899,17 +3899,17 @@
       "properties": {
         "daysPerJump": {
           "type": "integer",
-          "description": "Of a jump from a system without a fuel station.",
+          "description": "Of a jump from a star system without a fuel station.",
           "format": "int32"
         },
         "daysPerJumpFromFuelStation": {
           "type": "integer",
-          "description": "Of a jump from a system with one.",
+          "description": "Of a jump from a star system with one.",
           "format": "int32"
         },
         "defaultDaysToJumpPoint": {
           "type": "integer",
-          "description": "For a system that sets no distance of its own.",
+          "description": "For a star system that sets no distance of its own.",
           "format": "int32"
         },
         "maxJumpDistance": {
