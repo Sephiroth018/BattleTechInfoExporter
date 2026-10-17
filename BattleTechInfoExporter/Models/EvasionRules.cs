@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     How a unit earns evasive pips by moving and what each pip does to ranged attacks against it. A sensor lock
+///     How a unit earns evasion pips by moving and what each pip does to ranged attacks against it. A sensor lock
 ///     strips pips (see <see cref="SensorLockRules.EvasivePipsStripped" />).
 /// </summary>
 /// <param name="PipsByDistanceMoved">
@@ -26,7 +26,7 @@ namespace BattleTechInfoExporter.Models;
 ///     missed shot hits.
 /// </param>
 /// <param name="VehiclePipMultiplier">A vehicle's pips are multiplied by this and rounded down.</param>
-/// <param name="CanVehiclesBeEvasive">Whether vehicles get evasive pips at all.</param>
+/// <param name="CanVehiclesBeEvasive">Whether vehicles get evasion pips at all.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record EvasionRules(
     IReadOnlyList<EvasivePips> PipsByDistanceMoved,
@@ -36,7 +36,7 @@ internal sealed record EvasionRules(
     float VehiclePipMultiplier,
     bool CanVehiclesBeEvasive);
 
-/// <summary>The evasive pips a move longer than a distance earns.</summary>
+/// <summary>The evasion pips a move longer than a distance earns.</summary>
 /// <param name="MoreThan">The distance in meters the unit has to exceed.</param>
 /// <param name="Pips">The pips the unit gets for it.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

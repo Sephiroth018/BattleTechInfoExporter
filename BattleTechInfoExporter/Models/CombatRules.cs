@@ -6,10 +6,10 @@ namespace BattleTechInfoExporter.Models;
 /// <summary>
 ///     The combat rules: the constants behind to-hit, evasion, cover, damage, heat, stability, melee, hit
 ///     locations, visibility, resolve and movement. A to-hit modifier is added to the attack's difficulty:
-///     positive makes the shot harder, negative is a bonus.
+///     positive makes the attack harder, negative is a bonus.
 /// </summary>
 /// <param name="ToHit">How an attack's hit chance follows from its modifiers.</param>
-/// <param name="Evasion">The evasive pips units earn by moving.</param>
+/// <param name="Evasion">The evasion pips units earn by moving.</param>
 /// <param name="Guard">How guard levels reduce damage.</param>
 /// <param name="LineOfFire">How cover between attacker and target affects ranged attacks.</param>
 /// <param name="Damage">The damage multipliers that apply regardless of the target.</param>
@@ -18,7 +18,7 @@ namespace BattleTechInfoExporter.Models;
 ///     attacks'. <c>AMS</c> is a category no exported weapon has.
 /// </param>
 /// <param name="StrayShots">What a missed shot can hit instead; <c>null</c> when misses hit nothing.</param>
-/// <param name="Coil">How COIL weapons gain from the attacker's evasive pips.</param>
+/// <param name="Coil">How COIL weapons gain from the attacker's evasion pips.</param>
 /// <param name="Heat">The heat rules of mechs.</param>
 /// <param name="Stability">The stability rules of mechs.</param>
 /// <param name="Injuries">What injures a mech's pilot.</param>

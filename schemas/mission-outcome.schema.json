@@ -571,7 +571,7 @@
     },
     "LocationArmorOfArmor": {
       "type": "object",
-      "description": "A location's armor by side, in whatever a file measures armor in.",
+      "description": "A location's armor by side.",
       "additionalProperties": false,
       "required": [
         "front",
@@ -583,7 +583,7 @@
           "$ref": "#/definitions/Armor"
         },
         "rear": {
-          "description": "null outside the torso, which alone has rear armor.",
+          "description": "The rear armor; null when the location is outside the torso, which alone has it.",
           "oneOf": [
             {
               "type": "null"
@@ -635,14 +635,14 @@
           "$ref": "#/definitions/ChassisLocations"
         },
         "damageLevel": {
-          "description": "The game's damage level, e.g. Penalized or Destroyed.",
+          "description": "The component's damage level, e.g. Penalized or Destroyed.",
           "$ref": "#/definitions/ComponentDamageLevel"
         }
       }
     },
     "ComponentReference": {
       "type": "object",
-      "description": "A component's definition, like DefinitionReference, with the type that tells which group of catalog.json componentDefinitions holds it. Components compare by type first, then as every reference.",
+      "description": "A reference to a component's definition, with its type. Components are ordered by type, then by name, with the id breaking ties.",
       "additionalProperties": false,
       "required": [
         "id",
