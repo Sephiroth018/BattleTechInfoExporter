@@ -88,7 +88,7 @@
     },
     "landingZones": {
       "type": "array",
-      "description": "Where a dropship or drop pods are about to land; entries come and go as the mission readies landings and they happen. The game ties none to the objective announcing it: match them by position with the objective's `beacon`. A lance arriving without drop pods or a dropship, e.g. at a zone of type `regionDef_HostileDropZone`, has none, and the band along the encounter boundary the HUD marks the same way isn't exported.",
+      "description": "Where a dropship or drop pods are about to land; entries come and go as the mission readies landings and they happen. The game ties none to the objective announcing it: match them by position with the objective's `beacon`. A lance arriving another way, e.g. at a `regionDef_HostileDropZone` zone, has none; the band along the encounter boundary, which the HUD marks the same way, isn't exported.",
       "items": {
         "$ref": "#/definitions/LandingZone"
       }
@@ -269,7 +269,7 @@
       "properties": {
         "moves": {
           "type": "string",
-          "description": "How to read the characters of the moves, whose evasion pips come from the length of the path the unit would walk there, or a jump's straight distance."
+          "description": "How to read the characters of the moves; their evasion pips follow from the length of the path the unit would walk there, or a jump's straight distance."
         },
         "fire": {
           "type": "object",
@@ -469,7 +469,7 @@
     },
     "UnitVisibility": {
       "type": "string",
-      "description": "How much of a unit the player's HUD shows (the game's VisibilityLevel). `full`: In sight of the player's side, allied units' sensors included, or one of its own units: everything the HUD can show. An enemy in sight but hidden by ECM counts too, though the HUD hides its pilot, heat, stability and initiative. A destroyed unit stays in full view, as its wreck is on the map. `blipMaximum`: A sensor blip with the unit's kind and tonnage, or a turret's weight class. `blipType`: A sensor blip with the unit's kind. `blipMinimum`: A sensor blip with nothing but its position. `lastSeen`: Out of sensor range, where the player's side last detected it; not known to be destroyed.",
+      "description": "How much of a unit the player's HUD shows (the game's VisibilityLevel). `full`: In sight of the player's side, allied units' sensors included, or one of its own units: everything the HUD can show. An enemy in sight but hidden by ECM counts too, though the HUD hides its pilot, heat, stability and initiative. A destroyed unit stays in full view. `blipMaximum`: A sensor blip with the unit's kind and tonnage, or a turret's weight class. `blipType`: A sensor blip with the unit's kind. `blipMinimum`: A sensor blip with nothing but its position. `lastSeen`: Out of sensor range, where the player's side last detected it; not known to be destroyed.",
       "x-enumNames": [
         "Full",
         "BlipMaximum",

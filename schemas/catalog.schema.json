@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Catalog",
   "type": "object",
-  "description": "The root of `catalog.json`: every chassis, mech, vehicle, turret, component, terrain, biome, map, event, item collection and faction definition the game has loaded, keyed by id. It describes the game, not the career, so it only changes with the game's data. Left out are the tutorial's target dummies and target vehicles, the copies of stock mechs the game makes for unlocked skins, the game's internal melee and AI weapons and the ammunition boxes for weapons that carry their own ammunition, such as flamers.",
+  "description": "The root of `catalog.json`: every chassis, mech, vehicle, turret, component, terrain, biome, map, event, item collection and faction definition the game has loaded, keyed by id. It describes the game, not the career, so it only changes with the game's data. The tutorial's target dummies are left out.",
   "additionalProperties": false,
   "required": [
     "modVersion",
@@ -37,7 +37,7 @@
     },
     "sourceFingerprint": {
       "type": "string",
-      "description": "A hash of the game's data files the catalog was built from: of every one it reads, its id, file and last write time; the catalog is rebuilt when it differs from the game's current data. A game update, a DLC bought or removed, a mod installed, updated, removed or disabled, or a ModTek merge re-run changes it; a DLL mod patching definitions in memory doesn't, so deleting the file is what forces a rebuild then."
+      "description": "A hash of the game's data files the catalog was built from: of every one it reads, its id, file and last write time; the catalog is rebuilt when it differs from the game's current data. A game update, a DLC bought or removed, a mod installed, updated, removed or disabled, or a ModTek merge re-run changes it; a DLL mod patching definitions in memory doesn't, so delete the file to force a rebuild then."
     },
     "chassisDefinitions": {
       "type": "object",
@@ -48,14 +48,14 @@
     },
     "mechDefinitions": {
       "type": "object",
-      "description": "The mechs, keyed by mech id.",
+      "description": "The mechs, keyed by mech id, without the copies of stock mechs the game makes for unlocked skins.",
       "additionalProperties": {
         "$ref": "#/definitions/MechDefinition"
       }
     },
     "vehicleDefinitions": {
       "type": "object",
-      "description": "The vehicles, keyed by vehicle id.",
+      "description": "The vehicles, keyed by vehicle id, without the tutorial's target vehicles.",
       "additionalProperties": {
         "$ref": "#/definitions/VehicleDefinition"
       }
@@ -68,7 +68,7 @@
       }
     },
     "componentDefinitions": {
-      "description": "The components, grouped by type and keyed by component id.",
+      "description": "The components, grouped by type and keyed by component id, without the game's internal melee and AI weapons and the ammunition boxes for weapons that carry their own ammunition, such as flamers.",
       "$ref": "#/definitions/ComponentDefinitions"
     },
     "terrainDefinitions": {
@@ -2343,7 +2343,7 @@
         },
         "terrainCoverage": {
           "type": "object",
-          "description": "Each terrain's share of the map's playable cells, keyed by terrain id, plus `none` for the cells with no terrain (bare biome). Cells are all the same size, so a share is an area share; the shares sum to 1. Keyed by terrain because the same kind of cell is a different terrain per map, e.g. water is ice on a polar map; a cell under a building counts as the terrain below it.",
+          "description": "Each terrain's share of the map's playable cells, keyed by terrain id, plus `none` for the cells with no terrain (bare biome). Cells are all the same size, so a share is an area share; the shares sum to 1. Keyed by terrain, as a kind of cell is a different terrain per map, e.g. water is ice on a polar map; a cell under a building counts as the terrain below it.",
           "additionalProperties": {
             "type": "number",
             "format": "double"

@@ -26,9 +26,9 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="LandingZones">
 ///     Where a dropship or drop pods are about to land; entries come and go as the mission readies landings and
 ///     they happen. The game ties none to the objective announcing it: match them by position with the
-///     objective's <c>beacon</c>. A lance arriving without drop pods or a dropship, e.g. at a zone of type
-///     <c>regionDef_HostileDropZone</c>, has none, and the band along the encounter boundary the HUD marks the same
-///     way isn't exported.
+///     objective's <c>beacon</c>. A lance arriving another way, e.g. at a
+///     <c>regionDef_HostileDropZone</c> zone, has none; the band along the encounter boundary, which the HUD marks
+///     the same way, isn't exported.
 /// </param>
 /// <param name="BuildingSides">
 ///     The buildings on a side, e.g. a base to destroy or defend, by their <see cref="CombatBuilding.Id" />, in the

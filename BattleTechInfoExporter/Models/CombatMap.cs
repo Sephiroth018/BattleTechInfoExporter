@@ -16,9 +16,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="HexGrid">How the hexes' axial coordinates map to positions in meters, and their neighbors.</param>
 /// <param name="Terrains">
 ///     The legend of <see cref="HexRow.Terrains" />: each character's terrain, keyed as in
-///     <see cref="Catalog.TerrainDefinitions" />; <c>.</c> is open ground (<c>null</c>). A cell's terrain is the
-///     first of: map boundary, impassable, destroyed building, deep water, water, the terrain of the building on
-///     it, road, the map's custom terrain, forest, rough ground; otherwise open ground.
+///     <see cref="Catalog.TerrainDefinitions" />; <c>.</c> is open ground (<c>null</c>).
 /// </param>
 /// <param name="PathingGroups">
 ///     The groups of the game's pathing capabilities units move with
@@ -26,9 +24,9 @@ namespace BattleTechInfoExporter.Models;
 ///     has an entry per group. The game's own data makes two groups, the mechs' and the vehicles'.
 /// </param>
 /// <param name="Buildings">
-///     Every building on the map when the file was written, in the order of their ids. A dropship counts only if it
-///     had landed by then: hovering or not yet arrived, it occupies no hex, and one landing later, e.g. the Leopard an
-///     evacuation calls in, isn't here but can be in the combat state's building lists.
+///     Every building on the map when the file was written, in the order of their ids. A dropship occupies no hex
+///     until it has landed; one landing later, e.g. the Leopard an evacuation calls in, isn't here but can be in the
+///     combat state's building lists.
 /// </param>
 /// <param name="Rows">
 ///     The hexes a unit can stand on, by <c>r</c>, then <c>q</c>; a row of hexes with a gap in the playable area is
@@ -77,7 +75,11 @@ internal sealed record CombatBuilding(string Id, string Name, MapPosition Positi
 /// <summary>Consecutive hexes of one row, from (<see cref="Q" />, <see cref="R" />) on, one entry per hex in each list.</summary>
 /// <param name="Q">The axial <c>q</c> of the first hex.</param>
 /// <param name="R">The axial <c>r</c> of every hex in the row.</param>
-/// <param name="Terrains">Each hex's terrain as a character of <see cref="CombatMap.Terrains" />.</param>
+/// <param name="Terrains">
+///     Each hex's terrain as a character of <see cref="CombatMap.Terrains" />: the first that applies to its center
+///     cell of map boundary, impassable, destroyed building, deep water, water, the terrain of the building on it,
+///     road, the map's custom terrain, forest and rough ground; otherwise open ground.
+/// </param>
 /// <param name="Elevations">
 ///     The height in meters a unit standing on each hex is at, a building's roof where one stands, to 0.1 m.
 /// </param>

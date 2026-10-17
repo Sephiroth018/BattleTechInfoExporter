@@ -6,7 +6,7 @@ internal enum UnitVisibility
     /// <summary>
     ///     In sight of the player's side, allied units' sensors included, or one of its own units: everything the HUD
     ///     can show. An enemy in sight but hidden by ECM counts too, though the HUD hides its pilot, heat, stability
-    ///     and initiative. A destroyed unit stays in full view, as its wreck is on the map.
+    ///     and initiative. A destroyed unit stays in full view.
     /// </summary>
     Full,
 

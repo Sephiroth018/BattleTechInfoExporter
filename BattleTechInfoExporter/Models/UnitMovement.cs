@@ -50,7 +50,7 @@ internal sealed record MovementRow(
 
 /// <summary>How to read <see cref="UnitMovement" />'s rows, spelled out so the file explains itself.</summary>
 /// <param name="Moves">
-///     How to read the characters of the moves, whose evasion pips come from the length of the path the unit would
+///     How to read the characters of the moves; their evasion pips follow from the length of the path the unit would
 ///     walk there, or a jump's straight distance.
 /// </param>
 /// <param name="Fire">The first character of an attack: how the unit could fire at the target from the hex.</param>

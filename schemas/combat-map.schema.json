@@ -42,7 +42,7 @@
     },
     "terrains": {
       "type": "object",
-      "description": "The legend of HexRow.terrains: each character's terrain, keyed as in catalog.json terrainDefinitions; `.` is open ground (`null`). A cell's terrain is the first of: map boundary, impassable, destroyed building, deep water, water, the terrain of the building on it, road, the map's custom terrain, forest, rough ground; otherwise open ground.",
+      "description": "The legend of HexRow.terrains: each character's terrain, keyed as in catalog.json terrainDefinitions; `.` is open ground (`null`).",
       "additionalProperties": {
         "type": [
           "null",
@@ -62,7 +62,7 @@
     },
     "buildings": {
       "type": "array",
-      "description": "Every building on the map when the file was written, in the order of their ids. A dropship counts only if it had landed by then: hovering or not yet arrived, it occupies no hex, and one landing later, e.g. the Leopard an evacuation calls in, isn't here but can be in the combat state's building lists.",
+      "description": "Every building on the map when the file was written, in the order of their ids. A dropship occupies no hex until it has landed; one landing later, e.g. the Leopard an evacuation calls in, isn't here but can be in the combat state's building lists.",
       "items": {
         "$ref": "#/definitions/CombatBuilding"
       }
@@ -273,7 +273,7 @@
         },
         "terrains": {
           "type": "string",
-          "description": "Each hex's terrain as a character of terrains."
+          "description": "Each hex's terrain as a character of terrains: the first that applies to its center cell of map boundary, impassable, destroyed building, deep water, water, the terrain of the building on it, road, the map's custom terrain, forest and rough ground; otherwise open ground."
         },
         "elevations": {
           "type": "array",
