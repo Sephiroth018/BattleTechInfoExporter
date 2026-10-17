@@ -26,7 +26,7 @@
     },
     "exportedAt": {
       "type": "string",
-      "description": "When the file was last written.",
+      "description": "When the file was last written, in ISO 8601 with the local time's UTC offset.",
       "format": "date-time"
     },
     "trigger": {
@@ -413,7 +413,7 @@
             "integer",
             "null"
           ],
-          "description": "The rounds before the ability can be used again; `null` without a cooldown.",
+          "description": "The unit's activations before the ability can be used again; `null` without a cooldown.",
           "format": "int32"
         },
         "uses": {
@@ -1322,7 +1322,7 @@
     },
     "ToHitRules": {
       "type": "object",
-      "description": "How an attack's hit chance follows from its difficulty: the base chance of the skill level (see GunneryLevel.baseHitChancePercent) loses difficultySteps per point of the summed modifiers, is rounded to roundedToPercent and clamped between minChancePercent and maxChancePercent.",
+      "description": "How an attack's hit chance follows from its difficulty: the base chance of the skill level (see GunneryLevel.baseHitChancePercent) loses difficultySteps per point of the summed modifiers, is rounded to roundedToPercent and clamped between minChancePercent and maxChancePercent. The modifiers below are to-hit modifiers, added to that difficulty.",
       "additionalProperties": false,
       "required": [
         "difficultySteps",
@@ -1386,45 +1386,45 @@
         },
         "targetShutdown": {
           "type": "number",
-          "description": "Against a shut-down mech, ranged attacks.",
+          "description": "The modifier of ranged attacks against a shut-down mech.",
           "format": "float"
         },
         "targetProne": {
           "type": "number",
-          "description": "Against a prone mech, ranged attacks.",
+          "description": "The modifier of ranged attacks against a prone mech.",
           "format": "float"
         },
         "attackerSprinted": {
           "type": "number",
-          "description": "When the attacker sprinted this round.",
+          "description": "The modifier when the attacker sprinted this round.",
           "format": "float"
         },
         "attackerWalked": {
-          "description": "When the attacker moved more than 10 meters this round without sprinting.",
+          "description": "The modifier when the attacker moved more than 10 meters this round without sprinting.",
           "$ref": "#/definitions/AttackerWalkedModifiers"
         },
         "attackerStoodUp": {
           "type": "number",
-          "description": "When the attacker stood up this round.",
+          "description": "The modifier when the attacker stood up this round.",
           "format": "float"
         },
         "attackerOverheated": {
           "type": "number",
-          "description": "When the attacking mech is overheated.",
+          "description": "The modifier when the attacking mech is overheated.",
           "format": "float"
         },
         "armMountedWeapon": {
           "type": "number",
-          "description": "For a mech's ranged weapon mounted in an arm.",
+          "description": "The modifier for a mech's ranged weapon mounted in an arm.",
           "format": "float"
         },
         "attackerDamage": {
-          "description": "For damage to the attacker's weapon or the location it's mounted in.",
+          "description": "The modifiers for damage to the attacker's weapon or the location it's mounted in.",
           "$ref": "#/definitions/AttackerDamageModifiers"
         },
         "precisionStrike": {
           "type": "number",
-          "description": "For an attack made with Precision Strike.",
+          "description": "The modifier of an attack made with Precision Strike.",
           "format": "float"
         },
         "mechFiringArcDegrees": {
@@ -1609,7 +1609,7 @@
     },
     "AttackerDamageModifiers": {
       "type": "object",
-      "description": "The to-hit modifiers for damage to the attacker's weapon or its location; an attacking turret gets none.",
+      "description": "The to-hit modifiers for damage to the attacker's weapon or its location, by the attacker's kind; an attacking turret gets none.",
       "additionalProperties": false,
       "required": [
         "mech",
@@ -1628,7 +1628,7 @@
     },
     "WeaponDamageModifiers": {
       "type": "object",
-      "description": "Both apply when the weapon is damaged and its location too.",
+      "description": "The to-hit modifiers for damage to the attacking weapon and its location; both apply when the weapon and its location are damaged.",
       "additionalProperties": false,
       "required": [
         "damagedWeapon",
@@ -1689,7 +1689,7 @@
         },
         "modifierByPips": {
           "type": "array",
-          "description": "The to-hit modifier by the number of pips, from one pip up; each pip beyond the last entry adds the difference of the last two.",
+          "description": "The to-hit modifier by the number of pips the weapon doesn't ignore, from one pip up; for more pips than entries, the pips times the difference of the last two.",
           "items": {
             "type": "number",
             "format": "float"
@@ -2227,7 +2227,7 @@
         },
         "maxHeightDifference": {
           "type": "number",
-          "description": "In meters, between the attacker's and the target's position.",
+          "description": "The largest height difference, in meters, between the attacker's position and the target's for a melee or jump attack.",
           "format": "float"
         }
       }
@@ -2346,7 +2346,7 @@
         },
         "artillery": {
           "type": "array",
-          "description": "The locations an artillery strike or mortar hits, each with its own damage.",
+          "description": "The locations an artillery strike or mortar hits, all at once; each takes the full damage, which a mortar rolls anew per location.",
           "items": {
             "$ref": "#/definitions/ArmorLocation"
           }
@@ -2457,7 +2457,7 @@
         },
         "artillery": {
           "type": "array",
-          "description": "The locations an artillery strike or mortar hits, each with its own damage.",
+          "description": "The locations an artillery strike or mortar hits, all at once; each takes the full damage, which a mortar rolls anew per location.",
           "items": {
             "$ref": "#/definitions/VehicleChassisLocations"
           }
@@ -2545,7 +2545,7 @@
         },
         "canHeadBeClustered": {
           "type": "boolean",
-          "description": "Whether a later hit can land on the head unless the first hit did."
+          "description": "Whether a later hit can land on the head after a first hit elsewhere; after one on the head, it always can."
         }
       }
     },
@@ -3767,7 +3767,7 @@
       "properties": {
         "basePerDifficulty": {
           "type": "number",
-          "description": "Rounded, plus baseAddition.",
+          "description": "Times the contract's difficulty before the skulls' adjustment, rounded before baseAddition is added.",
           "format": "float"
         },
         "baseAddition": {
@@ -3777,7 +3777,7 @@
         },
         "negotiablePerDifficulty": {
           "type": "number",
-          "description": "Rounded, plus negotiableAddition.",
+          "description": "Times the contract's difficulty before the skulls' adjustment, rounded before negotiableAddition is added.",
           "format": "float"
         },
         "negotiableAddition": {

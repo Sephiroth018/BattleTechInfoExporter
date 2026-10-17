@@ -101,7 +101,7 @@ internal sealed record EventOutcome(int Weight, IReadOnlyList<EventResult> Resul
 /// <param name="ComponentChanges">The components added to or taken from the company's storage.</param>
 /// <param name="DurationDays">
 ///     How many days the tag, statistic and component changes last before the game reverts them; <c>null</c> when
-///     they last.
+///     they are permanent.
 /// </param>
 /// <param name="Actions">What else the result does, e.g. kill or dismiss the pilot.</param>
 /// <param name="ForcedEvents">The events the result schedules.</param>

@@ -31,7 +31,7 @@
     },
     "exportedAt": {
       "type": "string",
-      "description": "When the file was last written.",
+      "description": "When the file was last written, in ISO 8601 with the local time's UTC offset.",
       "format": "date-time"
     },
     "trigger": {
@@ -97,7 +97,7 @@
       "$ref": "#/definitions/Storage"
     },
     "stores": {
-      "description": "The current star system's stores, each `null` if the star system has none or the company can't use it. Their stock changes only on arrival in a star system.",
+      "description": "The current star system's stores, each `null` if the star system has none or the company can't use it. Their stock is restocked on arrival in a star system; purchases take from it.",
       "$ref": "#/definitions/StarSystemStores"
     },
     "hiringHall": {
@@ -130,7 +130,7 @@
       "$ref": "#/definitions/Position"
     },
     "events": {
-      "description": "The events scheduled, drawn lately or used up, and the company's tags and statistics their requirements check.",
+      "description": "The events scheduled, drawn lately or used up; their requirements check the tags and statistics on their scope's entry, e.g. company.",
       "$ref": "#/definitions/EventState"
     }
   },
@@ -708,7 +708,7 @@
       }
     },
     "WorkQueueEntry": {
-      "description": "An entry of the timeline: a work order the company is waiting for. Each kind has a record with the target it is about.",
+      "description": "An entry of the timeline: a work order the company is waiting for. Each kind has a record of its own, with the target it is about where it has one.",
       "x-abstract": true,
       "anyOf": [
         {
@@ -910,7 +910,7 @@
           "format": "int32"
         },
         "target": {
-          "description": "The pilot the med bay heals.",
+          "description": "The pilot the med bay heals; always set, since the order holds the pilot itself.",
           "$ref": "#/definitions/PilotReference"
         }
       }
@@ -1071,7 +1071,7 @@
         },
         "upkeep": {
           "type": "integer",
-          "description": "What the upgrade adds to the expenses of each report once installed; an installed upgrade's line in ExpectedExpenses.shipUpgrades is the same.",
+          "description": "The C-Bills the upgrade adds to the expenses of each report once installed; an installed upgrade's line in ExpectedExpenses.shipUpgrades is the same.",
           "format": "int32"
         },
         "installDays": {
@@ -1238,7 +1238,7 @@
         },
         "health": {
           "type": "integer",
-          "description": "The injuries the pilot can take before being incapacitated.",
+          "description": "The injuries at which the pilot is incapacitated.",
           "format": "int32"
         },
         "tags": {
@@ -2011,7 +2011,7 @@
       "properties": {
         "readyOnDay": {
           "type": "integer",
-          "description": "The day the mech lab finishes the work order, as in workQueue.",
+          "description": "The day the mech lab finishes the work order, on the scale of Company.daysPassed, as in workQueue.",
           "format": "int32"
         },
         "id": {
@@ -2459,7 +2459,7 @@
       "properties": {
         "readyOnDay": {
           "type": "integer",
-          "description": "The day the mech lab finishes the work order, as in workQueue.",
+          "description": "The day the mech lab finishes the work order, on the scale of Company.daysPassed, as in workQueue.",
           "format": "int32"
         },
         "id": {
@@ -2618,7 +2618,7 @@
         },
         "damagedCount": {
           "type": "integer",
-          "description": "The damaged copies, which need a repair once mounted.",
+          "description": "The damaged copies, which need a repair, in storage or once mounted.",
           "format": "int32"
         }
       }
@@ -2896,7 +2896,7 @@
         },
         "health": {
           "type": "integer",
-          "description": "The injuries the pilot can take before being incapacitated.",
+          "description": "The injuries at which the pilot is incapacitated.",
           "format": "int32"
         },
         "tags": {
@@ -2913,7 +2913,7 @@
         },
         "salary": {
           "type": "integer",
-          "description": "What the pilot would add to the expenses of each report, as a crew member's line does.",
+          "description": "The C-Bills the pilot would add to the expenses of each report once hired.",
           "format": "int32"
         },
         "canHire": {
@@ -2951,7 +2951,7 @@
           "$ref": "#/definitions/LanceLimits"
         },
         "biome": {
-          "description": "`null` where the game has no biome for the contract.",
+          "description": "The biome of the map the mission is fought on, as the contract details show it; `null` where they show none.",
           "oneOf": [
             {
               "type": "null"
@@ -2966,7 +2966,7 @@
             "null",
             "string"
           ],
-          "description": "The contract's data file; `null` where the game keeps no reference to it."
+          "description": "The contract's id from the game's data files; `null` where the game keeps no reference to it."
         },
         "name": {
           "type": "string",
@@ -2990,7 +2990,7 @@
         },
         "difficulty": {
           "type": "integer",
-          "description": "On the scale of rules.json reputationLevels[].maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
+          "description": "The difficulty on the skulls' scale of 1 to 10 (two per skull), capped at rules.json campaign.contracts.maxGlobalDifficulty and limited by rules.json reputationLevels[].maxContractDifficulty.",
           "format": "int32"
         },
         "terms": {
@@ -3002,7 +3002,7 @@
             "integer",
             "null"
           ],
-          "description": "While travelling to the star system, the day of arrival, as in Travel.arrivesOnDay; `null` otherwise.",
+          "description": "While travelling to the star system, the day of arrival, on the scale of Company.daysPassed, as in Travel.arrivesOnDay; `null` otherwise.",
           "format": "int32"
         },
         "starSystem": {
@@ -3171,12 +3171,12 @@
       "properties": {
         "total": {
           "type": "integer",
-          "description": "The salvage the company gets, including the priority salvage.",
+          "description": "The salvage items the company gets, including the priority salvage.",
           "format": "int32"
         },
         "priority": {
           "type": "integer",
-          "description": "The part of the salvage the company picks itself; the rest is assigned to it.",
+          "description": "The salvage items the company picks itself; the rest are assigned to it.",
           "format": "int32"
         }
       }
@@ -3195,7 +3195,7 @@
             "integer",
             "null"
           ],
-          "description": "The change, usually a gain, with the employer; `null` when the employer doesn't gain reputation.",
+          "description": "The change of the reputation value with the employer, usually a gain; `null` when the employer doesn't gain reputation.",
           "format": "int32"
         },
         "target": {
@@ -3203,7 +3203,7 @@
             "integer",
             "null"
           ],
-          "description": "The change, usually a loss, with the target; `null` when the target doesn't gain reputation.",
+          "description": "The change of the reputation value with the target, usually a loss; `null` when the target doesn't gain reputation.",
           "format": "int32"
         }
       }
@@ -3397,7 +3397,7 @@
           "$ref": "#/definitions/LanceLimits"
         },
         "biome": {
-          "description": "`null` where the game has no biome for the contract.",
+          "description": "The biome of the map the mission is fought on, as the contract details show it; `null` where they show none.",
           "oneOf": [
             {
               "type": "null"
@@ -3412,7 +3412,7 @@
             "null",
             "string"
           ],
-          "description": "The contract's data file; `null` where the game keeps no reference to it."
+          "description": "The contract's id from the game's data files; `null` where the game keeps no reference to it."
         },
         "name": {
           "type": "string",
@@ -3436,7 +3436,7 @@
         },
         "difficulty": {
           "type": "integer",
-          "description": "On the scale of rules.json reputationLevels[].maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
+          "description": "The difficulty on the skulls' scale of 1 to 10 (two per skull), capped at rules.json campaign.contracts.maxGlobalDifficulty and limited by rules.json reputationLevels[].maxContractDifficulty.",
           "format": "int32"
         },
         "meetsReputation": {
@@ -3541,7 +3541,7 @@
         },
         "pay": {
           "type": "integer",
-          "description": "The pay when the pay slider is at this share.",
+          "description": "The pay in C-Bills when the pay slider is at this share.",
           "format": "int32"
         },
         "salvage": {

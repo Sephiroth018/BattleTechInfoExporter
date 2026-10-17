@@ -31,15 +31,21 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="Position">Where the unit is, or was last detected at for <see cref="UnitVisibility.LastSeen" />.</param>
 /// <param name="FacingDegrees">
-///     The direction the unit faces, in degrees clockwise from the map's +Z axis, from 0 to below 360 and to 0.1°,
-///     which a blip's marker turns to at every level; <c>null</c> when last seen.
+///     The direction the unit faces, in degrees clockwise seen from above, to 0.1°: 0 towards the map's +z, 90
+///     towards its +x, up to below 360. A blip's marker shows it at every level; <c>null</c> when last seen.
 /// </param>
 /// <param name="Terrain">
 ///     The terrain the unit stands in, keyed as in <see cref="Catalog.TerrainDefinitions" />, which a blip's
 ///     position on the map shows; <c>null</c> on open ground and when last seen.
 /// </param>
-/// <param name="Pilot">The pilot, which the HUD names only in full view (<see cref="UnitVisibility.Full" />).</param>
-/// <param name="State">The unit's condition, shown in full view (<see cref="UnitVisibility.Full" />).</param>
+/// <param name="Pilot">
+///     The pilot, which the HUD names only in full view (<see cref="UnitVisibility.Full" />); <c>null</c> otherwise
+///     and for a unit without a pilot.
+/// </param>
+/// <param name="State">
+///     The unit's condition, which the HUD shows only in full view (<see cref="UnitVisibility.Full" />); <c>null</c>
+///     otherwise.
+/// </param>
 /// <param name="LinesOfFire">
 ///     The lines of fire to the units it could attack: from the player's units to every living enemy in full view
 ///     (<see cref="UnitVisibility.Full" />), and from those enemies to the player's units. <c>null</c> for the
@@ -157,7 +163,7 @@ internal sealed record MechHeat(int Current, int Dissipation, int OverheatsAbove
 /// <summary>A unit's pilot's condition in the battle.</summary>
 /// <param name="Injuries">The injuries, including those from before the mission.</param>
 /// <param name="Health">
-///     The injuries the pilot can take before being incapacitated, as in <see cref="LanceUnitOutcome.Health" />.
+///     The injuries at which the pilot is incapacitated, as in <see cref="LanceUnitOutcome.Health" />.
 /// </param>
 /// <param name="BonusHealth">
 ///     The bonus health left, which takes hits before they become injuries and is used up by them; the portrait
@@ -183,9 +189,9 @@ internal sealed record UnitLocation(string Location, LocationArmor<int> Armor, i
 
 /// <summary>The unit's guard, which the HUD shows as guarded at <see cref="Level" /> 1 or more.</summary>
 /// <param name="Level">
-///     What the sources below add up to: bracing and cover 1 each, Bulwark 1 more on top of either. Bracing and
-///     Bulwark don't count while the guard is broken (unsteady, prone, shut down, sensor locked or hit), and none
-///     while the unit moves.
+///     What the sources below add up to: bracing and cover 1 each, Bulwark 1 more on top of either; Bulwark not
+///     after a melee hit since the unit's last activation. Bracing and Bulwark don't count while the guard is broken
+///     (unsteady, prone, shut down, sensor locked or hit), and none while the unit moves.
 /// </param>
 /// <param name="IsBraced">Braced in its last activation, until its next one.</param>
 /// <param name="HasCover">Standing in a terrain that grants guard.</param>

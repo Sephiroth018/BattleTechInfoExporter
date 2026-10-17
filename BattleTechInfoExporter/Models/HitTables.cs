@@ -27,7 +27,10 @@ internal sealed record HitTables(
 /// <param name="FromLeft">The weight of each location for an attack from the left.</param>
 /// <param name="FromRight">The weight of each location for an attack from the right.</param>
 /// <param name="FromBack">The weight of each location for an attack from behind.</param>
-/// <param name="Artillery">The locations an artillery strike or mortar hits, each with its own damage.</param>
+/// <param name="Artillery">
+///     The locations an artillery strike or mortar hits, all at once; each takes the full damage, which a mortar
+///     rolls anew per location.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal record HitTablesOf<TLocation>(
     IReadOnlyDictionary<TLocation, int> FromFront,
@@ -66,7 +69,9 @@ internal sealed record CalledShotRules(int WeightMultiplier, float DegradePerHit
 /// <param name="AdjacentLocation">For the locations adjacent to the first hit's.</param>
 /// <param name="OtherLocation">For every other location.</param>
 /// <param name="IsHeadMultiplied">Whether the head's weight is multiplied like the other locations'.</param>
-/// <param name="CanHeadBeClustered">Whether a later hit can land on the head unless the first hit did.</param>
+/// <param name="CanHeadBeClustered">
+///     Whether a later hit can land on the head after a first hit elsewhere; after one on the head, it always can.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ClusteredHitWeights(
     float SameLocation,

@@ -14,7 +14,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="IsGoodFaithEffort">
 ///     Whether a retreated or failed contract still counts as a good faith effort, which softens its penalties.
 /// </param>
-/// <param name="Rounds">The combat rounds the mission took, counted from 1.</param>
+/// <param name="Rounds">The combat round the mission ended in, counted from 1.</param>
 /// <param name="Objectives">The objectives as the after-action report lists them.</param>
 /// <param name="Pay">The C-Bills paid, with the good faith modifier and the bonuses applied.</param>
 /// <param name="Reputation">The final reputation changes with the employer, the target and the Mercenary Review Board.</param>
@@ -57,8 +57,8 @@ internal sealed record MissionContract(
 ///     those where it has results of its own.
 /// </param>
 /// <param name="ObjectiveIds">
-///     Never empty: the ids <see cref="CombatObjective.Id" /> had for the objectives this one groups, also those
-///     the HUD didn't list; its own id alone where it is one of them or groups none.
+///     The ids, as in <see cref="CombatObjective.Id" />, of the objectives this one groups, including those the HUD
+///     didn't list. Never empty: its own id alone where it groups none or is itself one the HUD showed.
 /// </param>
 /// <param name="Title">The objective's title as plain text.</param>
 /// <param name="IsPrimary">Whether the after-action report lists it as a primary objective.</param>
@@ -76,7 +76,7 @@ internal sealed record ObjectiveResult(
 /// <summary>A mech and its pilot after the mission.</summary>
 /// <param name="Pilot">The pilot who fought in the mech.</param>
 /// <param name="Injuries">The pilot's injuries, including those from before the mission.</param>
-/// <param name="Health">The injuries the pilot can take before being incapacitated.</param>
+/// <param name="Health">The injuries at which the pilot is incapacitated.</param>
 /// <param name="IsIncapacitated">
 ///     Whether the pilot was incapacitated: <see cref="Injuries" /> reached <see cref="Health" />, or a lethal
 ///     injury such as the mech's head destroyed.

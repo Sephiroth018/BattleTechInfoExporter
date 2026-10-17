@@ -16,7 +16,7 @@ internal sealed record HiringHallPilot : Pilot
     /// <summary>The one-time C-Bills to hire the pilot.</summary>
     public int Price { get; }
 
-    /// <summary>What the pilot would add to the expenses of each report, as a crew member's line does.</summary>
+    /// <summary>The C-Bills the pilot would add to the expenses of each report once hired.</summary>
     public int Salary { get; }
 
     /// <summary>

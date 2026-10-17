@@ -26,7 +26,7 @@
     },
     "exportedAt": {
       "type": "string",
-      "description": "When the file was last written.",
+      "description": "When the file was last written, in ISO 8601 with the local time's UTC offset.",
       "format": "date-time"
     },
     "trigger": {
@@ -47,7 +47,7 @@
     },
     "rounds": {
       "type": "integer",
-      "description": "The combat rounds the mission took, counted from 1.",
+      "description": "The combat round the mission ended in, counted from 1.",
       "format": "int32"
     },
     "objectives": {
@@ -160,7 +160,7 @@
             "null",
             "string"
           ],
-          "description": "The contract's data file; `null` where the game keeps no reference to it."
+          "description": "The contract's id from the game's data files; `null` where the game keeps no reference to it."
         },
         "name": {
           "type": "string",
@@ -184,7 +184,7 @@
         },
         "difficulty": {
           "type": "integer",
-          "description": "On the scale of rules.json reputationLevels[].maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
+          "description": "The difficulty on the skulls' scale of 1 to 10 (two per skull), capped at rules.json campaign.contracts.maxGlobalDifficulty and limited by rules.json reputationLevels[].maxContractDifficulty.",
           "format": "int32"
         },
         "starSystem": {
@@ -270,7 +270,7 @@
         },
         "objectiveIds": {
           "type": "array",
-          "description": "Never empty: the ids combat-state.json objectives[].id had for the objectives this one groups, also those the HUD didn't list; its own id alone where it is one of them or groups none.",
+          "description": "The ids, as in combat-state.json objectives[].id, of the objectives this one groups, including those the HUD didn't list. Never empty: its own id alone where it groups none or is itself one the HUD showed.",
           "items": {
             "type": "string"
           }
@@ -322,7 +322,7 @@
             "integer",
             "null"
           ],
-          "description": "The change, usually a gain, with the employer; `null` when the employer doesn't gain reputation.",
+          "description": "The change of the reputation value with the employer, usually a gain; `null` when the employer doesn't gain reputation.",
           "format": "int32"
         },
         "target": {
@@ -330,7 +330,7 @@
             "integer",
             "null"
           ],
-          "description": "The change, usually a loss, with the target; `null` when the target doesn't gain reputation.",
+          "description": "The change of the reputation value with the target, usually a loss; `null` when the target doesn't gain reputation.",
           "format": "int32"
         },
         "mercenaryReviewBoard": {
@@ -372,7 +372,7 @@
         },
         "health": {
           "type": "integer",
-          "description": "The injuries the pilot can take before being incapacitated.",
+          "description": "The injuries at which the pilot is incapacitated.",
           "format": "int32"
         },
         "isIncapacitated": {
@@ -789,7 +789,7 @@
       "properties": {
         "components": {
           "type": "array",
-          "description": "Their StoredComponent.damagedCount is 0: the game generates no damaged salvage.",
+          "description": "The components, whose StoredComponent.damagedCount is 0: the game generates no damaged salvage.",
           "items": {
             "$ref": "#/definitions/StoredComponent"
           }
@@ -824,7 +824,7 @@
         },
         "damagedCount": {
           "type": "integer",
-          "description": "The damaged copies, which need a repair once mounted.",
+          "description": "The damaged copies, which need a repair, in storage or once mounted.",
           "format": "int32"
         }
       }

@@ -28,7 +28,7 @@
     },
     "exportedAt": {
       "type": "string",
-      "description": "When the file was last written.",
+      "description": "When the file was last written, in ISO 8601 with the local time's UTC offset.",
       "format": "date-time"
     },
     "trigger": {
@@ -481,7 +481,7 @@
     },
     "MechDefinition": {
       "type": "object",
-      "description": "A mech: a loadout on a chassis, as a mech assembled from parts or bought comes with it. The frame is in chassisDefinitions.",
+      "description": "A mech: a loadout on a chassis, which a mech assembled from parts or bought comes with while rules.json campaign.salvage.assembledMechsComeEquipped is true. The frame is in chassisDefinitions.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -1030,7 +1030,7 @@
         },
         "firingArcDegrees": {
           "type": "number",
-          "description": "The arc it can fire into without turning, in degrees.",
+          "description": "How far to either side of its facing it can fire, in degrees.",
           "format": "float"
         },
         "armor": {
@@ -2088,7 +2088,7 @@
           "description": "As the combat HUD shows it."
         },
         "moveCost": {
-          "description": "What a step into the terrain costs of the unit's movement, per meter of the step: open ground costs 1.05; `null` where the unit can't enter.",
+          "description": "What a step into the terrain costs of the unit's movement, per meter of the step; `null` where the unit can't enter. Open ground has no terrain and costs 1.05 for every unit in the game's data.",
           "$ref": "#/definitions/TerrainMoveCosts"
         },
         "sprintMultiplier": {
@@ -2719,7 +2719,7 @@
             "integer",
             "null"
           ],
-          "description": "How many days the tag, statistic and component changes last before the game reverts them; `null` when they last.",
+          "description": "How many days the tag, statistic and component changes last before the game reverts them; `null` when they are permanent.",
           "format": "int32"
         },
         "actions": {
