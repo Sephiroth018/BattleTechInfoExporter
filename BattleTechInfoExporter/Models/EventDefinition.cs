@@ -5,7 +5,10 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
-/// <summary>An event the game can show between missions: when it can come, and the options it offers.</summary>
+/// <summary>
+///     An event the game can show between missions: when it can come, and the options it offers. Its story texts
+///     aren't exported.
+/// </summary>
 /// <param name="Name">
 ///     The event's title as plain text. Placeholders in braces stand for what the game picks, by its prefix:
 ///     <c>TGT_MW</c> the event's pilot, <c>SCN_MW</c> and <c>TRT_MW</c> the second and third pilot,
@@ -24,8 +27,8 @@ namespace BattleTechInfoExporter.Models;
 ///     schedules it.
 /// </param>
 /// <param name="Requirements">
-///     What the event's company or pilot (<paramref name="Scope" />) must meet; <c>null</c> when any will
-///     do.
+///     What the event's company or pilot (<paramref name="Scope" />) must meet; <c>null</c> when it has
+///     none.
 /// </param>
 /// <param name="AdditionalRequirements">What the other scopes must meet, all of them.</param>
 /// <param name="AdditionalTargets">
@@ -102,7 +105,7 @@ internal sealed record EventOutcome(int Weight, IReadOnlyList<EventResult> Resul
 /// <param name="ComponentChanges">The components added to or taken from the company's storage.</param>
 /// <param name="DurationDays">
 ///     How many days the tag, statistic and component changes last before the game reverts them; <c>null</c> when
-///     they're permanent.
+///     they are permanent.
 /// </param>
 /// <param name="Actions">What else the result does, e.g. kill or dismiss the pilot.</param>
 /// <param name="ForcedEvents">The events the result schedules.</param>

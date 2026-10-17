@@ -106,8 +106,9 @@ internal sealed partial class ModelDocumentation
     ///     A cref (<c>P:Namespace.Type.Member</c>) as the JSON shows it: an enum value as written; a property by its
     ///     JSON name alone on the documented type, as the type itself or one it derives from has it, or on the root; a
     ///     property or type elsewhere in this file by its owner's definition and JSON name (<c>Mech.id</c>); one in
-    ///     another file by that file and its path there (<c>rules.json moraleLevels</c>); one of a record no file holds
-    ///     directly where each of its derived records is; anything else by its name.
+    ///     another file by the file and path of its home (<see cref="ExportFilePaths.HomePath" />,
+    ///     <c>rules.json moraleLevels</c>); one of a record no file holds directly where each of its derived records is;
+    ///     anything else by its name.
     /// </summary>
     private string Target(string cref, Type documentedType)
     {
@@ -144,7 +145,7 @@ internal sealed partial class ModelDocumentation
                 : ExportFilePaths.Join(DefinitionNames.Of(owner), propertyName);
         }
 
-        if (_paths.ShortestPath(owner) is var (fileName, otherPath))
+        if (_paths.HomePath(owner) is var (fileName, otherPath))
         {
             return $"{fileName} {ExportFilePaths.Join(otherPath, propertyName)}".TrimEnd();
         }

@@ -41,7 +41,7 @@ internal abstract record ExportFile
     /// </summary>
     public string ModVersion { get; private init; } = string.Empty;
 
-    /// <summary>When the file was last written.</summary>
+    /// <summary>When the file was last written, in ISO 8601 with the local time's UTC offset.</summary>
     public DateTimeOffset ExportedAt { get; private init; }
 
     /// <summary>What caused the export that last wrote the file.</summary>

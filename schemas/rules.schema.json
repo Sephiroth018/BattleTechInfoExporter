@@ -26,7 +26,7 @@
     },
     "exportedAt": {
       "type": "string",
-      "description": "When the file was last written.",
+      "description": "When the file was last written, in ISO 8601 with the local time's UTC offset.",
       "format": "date-time"
     },
     "trigger": {
@@ -96,7 +96,7 @@
   "definitions": {
     "ExportTrigger": {
       "type": "string",
-      "description": "What caused an export.",
+      "description": "What caused an export. `careerLoaded`: A career is loaded, new or from a save. The game state is skipped while a finished contract's results are still to be applied, and the catalog is rebuilt only when it's missing or stale, once the game has loaded every vehicle, turret and design mask. `manualSave`: The player saves the career outside combat. `autosave`: The game saves the career on its own outside combat, e.g. once an event's popup is closed with the picked option's results applied, or once a contract's results are applied. `contractCompleted`: A contract's results are applied, salvage included, where the game doesn't save the career afterwards, which is `autosave` otherwise. `financialReportShown`: The monthly financial report is shown, with the expenses paid. `mechLabOrderCompleted`: A mech lab order completes, at the end of a day or right away when it has nothing left to do; when several work orders complete together, the last one names the export. `pilotHealed`: A pilot's healing in the med bay completes, as `mechLabOrderCompleted`. `shipUpgradeCompleted`: An Argo upgrade's installation completes, as `mechLabOrderCompleted`. `contractsGenerated`: The game has generated a star system's contracts. `jumped`: The ship has jumped into its destination star system, at the end of that day, with the star system's contracts; work orders completing that day export with it. `arrived`: The ship arrives at the planet after a trip. `storeClosed`: A store closes, from the main screen or the mech lab. `purchaseCompleted`: The store screen completes a purchase, or refuses one. `saleCompleted`: The store screen completes a sale, or refuses one, once for a stack sold at once. `mechBayChanged`: The mech bay changes: a refit, repair, readying or storing is queued, an order is cancelled, the work queue is reordered, a mech or chassis is stored or scrapped, a stored component's repair is queued, or a mech is renamed without a refit. `experienceSpent`: The barracks confirm a pilot's training. `mechPlacementShown`: The game asks where to put a new mech because every mech bay is full, e.g. after salvage completes one. `missionCompleted`: A mission ends, still in combat, before the salvage is chosen. `salvageChosen`: The after-action report has finalized the salvage: once the priority salvage is confirmed, or right away when there is nothing to choose. `shipUpgradeStarted`: An Argo upgrade is bought and its installation starts. `phaseStarted`: A phase begins, before its first unit acts: the battle's first once the lance is deployed, and every later one, also one reached by reserving units. `combatStarted`: A new battle begins, when the briefing is dismissed. `combatLoaded`: A battle is loaded from a save, continuing mid-phase. `activationCompleted`: A unit's activation is done, its attacks resolved; out of contact, once the player's units have all moved. Reserving a unit doesn't count.",
       "x-enumNames": [
         "CareerLoaded",
         "ManualSave",
@@ -413,7 +413,7 @@
             "integer",
             "null"
           ],
-          "description": "The rounds before the ability can be used again; `null` when it has no cooldown.",
+          "description": "The unit's activations before the ability can be used again; `null` when it has no cooldown.",
           "format": "int32"
         },
         "uses": {
@@ -1100,7 +1100,7 @@
     },
     "SkillLevel": {
       "type": "object",
-      "description": "A level of a skill; the shapes of the skills with numbers of their own per level add those.",
+      "description": "A level of a skill; a skill with numbers of its own per level adds them in its shape.",
       "additionalProperties": false,
       "required": [
         "level",
@@ -1211,7 +1211,7 @@
         },
         "distance": {
           "type": "number",
-          "description": "The distance in meters, which 1 plus the jump jets' `JumpDistanceMultiplier` effects multiplies.",
+          "description": "The distance in meters, before it is multiplied by 1 plus the jump jets' `JumpDistanceMultiplier` effects.",
           "format": "float"
         }
       }
@@ -1322,7 +1322,7 @@
     },
     "ToHitRules": {
       "type": "object",
-      "description": "How an attack's hit chance follows from its difficulty: the base chance of the skill level (see GunneryLevel.baseHitChancePercent) loses difficultySteps per point of the summed modifiers, is rounded to roundedToPercent and clamped between minChancePercent and maxChancePercent.",
+      "description": "How an attack's hit chance follows from its difficulty: the base chance of the skill level (see GunneryLevel.baseHitChancePercent) loses difficultySteps per point of the summed modifiers, is rounded to roundedToPercent and clamped between minChancePercent and maxChancePercent. The modifiers below are to-hit modifiers, added to that difficulty.",
       "additionalProperties": false,
       "required": [
         "difficultySteps",
@@ -1386,45 +1386,45 @@
         },
         "targetShutdown": {
           "type": "number",
-          "description": "Against a shut-down mech, ranged attacks.",
+          "description": "The modifier of ranged attacks against a shut-down mech.",
           "format": "float"
         },
         "targetProne": {
           "type": "number",
-          "description": "Against a prone mech, ranged attacks.",
+          "description": "The modifier of ranged attacks against a prone mech.",
           "format": "float"
         },
         "attackerSprinted": {
           "type": "number",
-          "description": "When the attacker sprinted this round.",
+          "description": "The modifier when the attacker sprinted this round.",
           "format": "float"
         },
         "attackerWalked": {
-          "description": "When the attacker moved more than 10 meters this round without sprinting.",
+          "description": "The modifier when the attacker moved more than 10 meters this round without sprinting.",
           "$ref": "#/definitions/AttackerWalkedModifiers"
         },
         "attackerStoodUp": {
           "type": "number",
-          "description": "When the attacker stood up this round.",
+          "description": "The modifier when the attacker stood up this round.",
           "format": "float"
         },
         "attackerOverheated": {
           "type": "number",
-          "description": "When the attacking mech is overheated.",
+          "description": "The modifier when the attacking mech is overheated.",
           "format": "float"
         },
         "armMountedWeapon": {
           "type": "number",
-          "description": "For a mech's ranged weapon mounted in an arm.",
+          "description": "The modifier for a mech's ranged weapon mounted in an arm.",
           "format": "float"
         },
         "attackerDamage": {
-          "description": "For damage to the attacker's weapon or the location it's mounted in.",
+          "description": "The modifiers for damage to the attacker's weapon or the location it's mounted in.",
           "$ref": "#/definitions/AttackerDamageModifiers"
         },
         "precisionStrike": {
           "type": "number",
-          "description": "For an attack made with Precision Strike.",
+          "description": "The modifier of an attack made with Precision Strike.",
           "format": "float"
         },
         "mechFiringArcDegrees": {
@@ -1609,7 +1609,7 @@
     },
     "AttackerDamageModifiers": {
       "type": "object",
-      "description": "The to-hit modifiers for damage to the attacker's weapon or its location; an attacking turret gets none.",
+      "description": "The to-hit modifiers for damage to the attacker's weapon or its location, by the attacker's kind; an attacking turret gets none.",
       "additionalProperties": false,
       "required": [
         "mech",
@@ -1628,7 +1628,7 @@
     },
     "WeaponDamageModifiers": {
       "type": "object",
-      "description": "Both apply when the weapon is damaged and its location too.",
+      "description": "The to-hit modifiers for damage to the attacking weapon and its location; both apply when the weapon and its location are damaged.",
       "additionalProperties": false,
       "required": [
         "damagedWeapon",
@@ -1689,7 +1689,7 @@
         },
         "modifierByPips": {
           "type": "array",
-          "description": "The to-hit modifier by the number of pips, from one pip up; each pip beyond the last entry adds the difference of the last two.",
+          "description": "The to-hit modifier by the number of pips the weapon doesn't ignore, from one pip up; for more pips than entries, the pips times the difference of the last two.",
           "items": {
             "type": "number",
             "format": "float"
@@ -2227,7 +2227,7 @@
         },
         "maxHeightDifference": {
           "type": "number",
-          "description": "In meters, between the attacker's and the target's position.",
+          "description": "The largest height difference, in meters, between the attacker's position and the target's for a melee or jump attack.",
           "format": "float"
         }
       }
@@ -2346,7 +2346,7 @@
         },
         "artillery": {
           "type": "array",
-          "description": "The locations an artillery strike or mortar hits, each with its own damage.",
+          "description": "The locations an artillery strike or mortar hits, all at once; each takes the full damage, which a mortar rolls anew per location.",
           "items": {
             "$ref": "#/definitions/ArmorLocation"
           }
@@ -2457,7 +2457,7 @@
         },
         "artillery": {
           "type": "array",
-          "description": "The locations an artillery strike or mortar hits, each with its own damage.",
+          "description": "The locations an artillery strike or mortar hits, all at once; each takes the full damage, which a mortar rolls anew per location.",
           "items": {
             "$ref": "#/definitions/VehicleChassisLocations"
           }
@@ -2545,7 +2545,7 @@
         },
         "canHeadBeClustered": {
           "type": "boolean",
-          "description": "Whether a later hit can land on the head unless the first hit did."
+          "description": "Whether a later hit can land on the head after a first hit elsewhere; after one on the head, it always can."
         }
       }
     },
@@ -3668,7 +3668,7 @@
     },
     "ContractRules": {
       "type": "object",
-      "description": "How contracts are generated, paid and rewarded. A contract's pay is payPerDifficulty times the mission type's ContractTypeDescription.payMultiplier times a scale of its difficulty (the sum of 1 / (0.4 n) for n from 1 to the difficulty, less 1.5), varied by up to payVariance either way and rounded to thousands.",
+      "description": "How contracts are generated, paid and rewarded. A contract's pay is payPerDifficulty times the mission type's ContractTypeDescription.payMultiplier times a scale of its difficulty (the sum of 1 / (0.4 n) for n from 1 to the difficulty, less 1.5), varied by up to payVariance either way and rounded to thousands. The reputation payment adjustments the reputation tooltips show aren't exported: the pay never applies them.",
       "additionalProperties": false,
       "required": [
         "payPerDifficulty",
@@ -3693,7 +3693,7 @@
         },
         "payVariance": {
           "type": "number",
-          "description": "The most the pay varies either way, as a fraction of it from 0 to 1.",
+          "description": "The most the pay varies either way, as a fraction from 0 to 1 of the pay.",
           "format": "float"
         },
         "guaranteedPayShare": {
@@ -3767,7 +3767,7 @@
       "properties": {
         "basePerDifficulty": {
           "type": "number",
-          "description": "Rounded, plus baseAddition.",
+          "description": "Times the contract's difficulty before the skulls' adjustment, rounded before baseAddition is added.",
           "format": "float"
         },
         "baseAddition": {
@@ -3777,7 +3777,7 @@
         },
         "negotiablePerDifficulty": {
           "type": "number",
-          "description": "Rounded, plus negotiableAddition.",
+          "description": "Times the contract's difficulty before the skulls' adjustment, rounded before negotiableAddition is added.",
           "format": "float"
         },
         "negotiableAddition": {
@@ -3888,7 +3888,7 @@
     },
     "TravelRules": {
       "type": "object",
-      "description": "How long a trip takes, which each star system's route in star-systems.json starSystems states: the days of each jump plus the days to and from the jump point of the star systems at both ends, scaled by the Argo's drive upgrades.",
+      "description": "How long a trip takes, as each star-systems.json starSystems.*.route states it: each jump's days plus the days to and from the jump point at both ends, scaled by the Argo's drive upgrades.",
       "additionalProperties": false,
       "required": [
         "daysPerJump",
