@@ -10,7 +10,8 @@ namespace BattleTechInfoExporter.Models;
 /// </summary>
 /// <param name="Type">
 ///     The game's component type, e.g. <c>Weapon</c> or <c>AmmunitionBox</c>, which names the component's group in
-///     <see cref="Catalog.ComponentDefinitions" />.
+///     <see cref="Catalog.ComponentDefinitions" />; never <c>NotSet</c>, <c>Special</c> or <c>MechPart</c>, which the
+///     game's enum also has.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record ComponentReference(string Id, string Name, ComponentType Type)

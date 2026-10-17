@@ -7,7 +7,7 @@ namespace BattleTechInfoExporter.SchemaGenerator;
 
 /// <summary>
 ///     Names a type's schema definition: its own name, a generic one followed by <c>Of</c> and its type arguments
-///     (<c>ByStoreOfStringList</c>), a list by its element.
+///     (<c>ByStoreOfStringList</c>), a list by its element, a number by its JSON type (<c>LocationArmorOfNumber</c>).
 /// </summary>
 internal sealed class DefinitionNames : ISchemaNameGenerator
 {
@@ -17,7 +17,14 @@ internal sealed class DefinitionNames : ISchemaNameGenerator
     {
         if (!type.IsGenericType)
         {
-            return type.Name;
+            return type.IsEnum
+                ? type.Name
+                : Type.GetTypeCode(type) switch
+                {
+                    TypeCode.Byte or TypeCode.Int16 or TypeCode.Int32 or TypeCode.Int64 => "Integer",
+                    TypeCode.Single or TypeCode.Double or TypeCode.Decimal => "Number",
+                    _ => type.Name
+                };
         }
 
         var arguments = type.GetGenericArguments();

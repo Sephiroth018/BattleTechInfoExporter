@@ -543,7 +543,8 @@ Planned features are issues on the GitHub Project "Road to 1.0", whose status fo
 - **Every export file has a JSON Schema** (draft-04), `schemas/<file>.schema.json`, generated on
   every build, committed, and shipped in the mod folder's `schemas/`. Every property is required,
   since the mod writes them all, `null` included; an abstract record declared as a property's type
-  is `anyOf` its derived records, each listing its own values of the enum that tells them apart.
+  is `anyOf` its derived records, each listing its own values of the enum or boolean that tells them
+  apart.
   An enum lists only the values the mod writes. A change to the export format shows in the schemas'
   diff.
 - **Every export file starts with `modVersion`, `exportedAt` and `trigger`** (`ExportFile`, which

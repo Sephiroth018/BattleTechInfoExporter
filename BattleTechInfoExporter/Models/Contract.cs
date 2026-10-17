@@ -14,7 +14,10 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Type">The mission type, described in <see cref="Rules.ContractTypes" />.</param>
 /// <param name="DisplayStyle">Whether it's a regular, story, restoration or flashpoint contract.</param>
 /// <param name="Employer">The faction that hires the company.</param>
-/// <param name="Target">The faction the mission is fought against.</param>
+/// <param name="Target">
+///     The faction the mission is fought against; <c>INVALID_UNSET</c>, which has no
+///     <see cref="Catalog.FactionDefinitions" /> entry, for a story contract that only travels.
+/// </param>
 /// <param name="Difficulty">
 ///     On the scale of <see cref="ReputationLevel.MaxContractDifficulty" />, not the 1-10 the skulls show
 ///     (two per skull).

@@ -72,7 +72,7 @@
     },
     "contractTypes": {
       "type": "array",
-      "description": "The mission types, which type refers to.",
+      "description": "The mission types, referred to by game-state.json activeContract.type, mission-outcome.json contract.type and game-state.json contracts[].type.",
       "items": {
         "$ref": "#/definitions/ContractTypeDescription"
       }
@@ -1169,7 +1169,7 @@
     },
     "ContractTypeDescription": {
       "type": "object",
-      "description": "A mission type with the game's description of its objectives, which type refers to.",
+      "description": "A mission type with the game's description of its objectives, referred to by game-state.json activeContract.type, mission-outcome.json contract.type and game-state.json contracts[].type.",
       "additionalProperties": false,
       "required": [
         "type",
@@ -1262,7 +1262,7 @@
         },
         "weaponCategories": {
           "type": "object",
-          "description": "By the weapon category's name, as the catalog's weapons name theirs; Melee is the melee and jump attacks'.",
+          "description": "By the weapon category's name, as the catalog's weapons name theirs; Melee is the melee and jump attacks'. AMS is a category no exported weapon has.",
           "additionalProperties": {
             "$ref": "#/definitions/WeaponCategoryRules"
           }
@@ -1511,19 +1511,19 @@
       "properties": {
         "mech": {
           "description": "Against a mech, by its weight class.",
-          "$ref": "#/definitions/ByWeightClassOfSingle"
+          "$ref": "#/definitions/ByWeightClassOfNumber"
         },
         "vehicle": {
           "description": "Against a vehicle, by its weight class.",
-          "$ref": "#/definitions/ByWeightClassOfSingle"
+          "$ref": "#/definitions/ByWeightClassOfNumber"
         },
         "turret": {
           "description": "Against a turret, by its chassis' weight class.",
-          "$ref": "#/definitions/ByWeightClassOfSingle"
+          "$ref": "#/definitions/ByWeightClassOfNumber"
         }
       }
     },
-    "ByWeightClassOfSingle": {
+    "ByWeightClassOfNumber": {
       "type": "object",
       "description": "A value per weight class of the unit it applies to.",
       "additionalProperties": false,
@@ -1598,7 +1598,7 @@
       "properties": {
         "mech": {
           "description": "For an attacking mech, by its weight class.",
-          "$ref": "#/definitions/ByWeightClassOfSingle"
+          "$ref": "#/definitions/ByWeightClassOfNumber"
         },
         "vehicle": {
           "type": "number",
@@ -1609,7 +1609,7 @@
     },
     "AttackerDamageModifiers": {
       "type": "object",
-      "description": "Turrets get none.",
+      "description": "The to-hit modifiers for damage to the attacker's weapon or its location; an attacking turret gets none.",
       "additionalProperties": false,
       "required": [
         "mech",
@@ -2004,7 +2004,7 @@
         },
         "overheatStructureDamageByWeightClass": {
           "description": "The structure damage per location an overheated mech takes, by its weight class.",
-          "$ref": "#/definitions/ByWeightClassOfSingle"
+          "$ref": "#/definitions/ByWeightClassOfNumber"
         }
       }
     },
@@ -2818,7 +2818,7 @@
       "properties": {
         "enemyDestroyed": {
           "description": "By the enemy's weight class; a turret counts as light.",
-          "$ref": "#/definitions/ByWeightClassOfInt32"
+          "$ref": "#/definitions/ByWeightClassOfInteger"
         },
         "enemyDestroyedInMelee": {
           "type": "integer",
@@ -2887,7 +2887,7 @@
         }
       }
     },
-    "ByWeightClassOfInt32": {
+    "ByWeightClassOfInteger": {
       "type": "object",
       "description": "A value per weight class of the unit it applies to.",
       "additionalProperties": false,

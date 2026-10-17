@@ -140,9 +140,9 @@ internal sealed class ExportSchemaGenerator
     }
 
     /// <summary>
-    ///     A switch property, an enum property of an abstract record that tells its derived records apart, lists in
-    ///     each derived record's schema only that record's values, and its enum only the values some derived record
-    ///     has.
+    ///     A switch property, an enum or boolean property of an abstract record that tells its derived records apart,
+    ///     lists in each derived record's schema only that record's values, and its enum only the values some derived
+    ///     record has.
     /// </summary>
     private sealed class ShapeValueProcessor : ISchemaProcessor
     {
@@ -151,7 +151,8 @@ internal sealed class ExportSchemaGenerator
             .Where(model => model is { IsClass: true, IsAbstract: true })
             .SelectMany(record =>
                 record.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly))
-            .Where(property => property.PropertyType.IsEnum && IsSwitch(property))
+            .Where(property => (property.PropertyType.IsEnum || property.PropertyType == typeof(bool))
+                               && IsSwitch(property))
             .ToList());
 
         private readonly JsonSerializerSettings _serializerSettings;
@@ -187,14 +188,18 @@ internal sealed class ExportSchemaGenerator
                 var schemaProperty =
                     schema.Properties[contract.Properties.Single(property =>
                         property.UnderlyingName == switchProperty.Name).PropertyName!];
-                // Draft-04 ignores keywords next to $ref, so the enum's definition moves into an allOf.
-                schemaProperty.AllOf.Add(new JsonSchema
+                if (switchProperty.PropertyType.IsEnum)
                 {
-                    Reference = schemaProperty.Reference
-                                ?? throw new InvalidOperationException(
-                                    $"{type.Name}.{switchProperty.Name} isn't a plain reference to its enum")
-                });
-                schemaProperty.Reference = null;
+                    // Draft-04 ignores keywords next to $ref, so the enum's definition moves into an allOf.
+                    schemaProperty.AllOf.Add(new JsonSchema
+                    {
+                        Reference = schemaProperty.Reference
+                                    ?? throw new InvalidOperationException(
+                                        $"{type.Name}.{switchProperty.Name} isn't a plain reference to its enum")
+                    });
+                    schemaProperty.Reference = null;
+                }
+
                 foreach (var value in ShapeValues(type, switchProperty))
                 {
                     schemaProperty.Enumeration.Add(value);
@@ -273,7 +278,7 @@ internal sealed class ExportSchemaGenerator
         // The values of the switch property a derived record is written with, as the JSON writes them: those its
         // static set of them lists, or else the one its base constructor call fixes. That value exists only in the
         // compiled call, so it's read by reflection from an instance built with default arguments.
-        private IEnumerable<string> ShapeValues(Type shape, PropertyInfo switchProperty)
+        private IEnumerable<object> ShapeValues(Type shape, PropertyInfo switchProperty)
         {
             IEnumerable values;
             if (ValueSetOf(shape, switchProperty) is { } valueSet)
@@ -291,7 +296,7 @@ internal sealed class ExportSchemaGenerator
             }
 
             var serializer = JsonSerializer.Create(_serializerSettings);
-            return values.Cast<object>().Select(value => JToken.FromObject(value, serializer).Value<string>()!);
+            return values.Cast<object>().Select(value => ((JValue)JToken.FromObject(value, serializer)).Value!);
         }
     }
 

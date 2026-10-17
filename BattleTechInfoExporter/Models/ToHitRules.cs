@@ -107,7 +107,9 @@ internal sealed record ElevationModifier(
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record AttackerWalkedModifiers(ByWeightClass<float> Mech, float Vehicle);
 
-/// <summary>Turrets get none.</summary>
+/// <summary>
+///     The to-hit modifiers for damage to the attacker's weapon or its location; an attacking turret gets none.
+/// </summary>
 /// <param name="Mech">For an attacking mech.</param>
 /// <param name="Vehicle">For an attacking vehicle.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

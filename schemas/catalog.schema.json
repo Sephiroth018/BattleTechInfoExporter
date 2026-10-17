@@ -367,7 +367,7 @@
         },
         "maxArmor": {
           "description": "The most armor the location can take.",
-          "$ref": "#/definitions/LocationArmorOfSingle"
+          "$ref": "#/definitions/LocationArmorOfNumber"
         },
         "structure": {
           "type": "number",
@@ -422,7 +422,7 @@
         "All"
       ]
     },
-    "LocationArmorOfSingle": {
+    "LocationArmorOfNumber": {
       "type": "object",
       "description": "A location's armor by side, in whatever a file measures armor in.",
       "additionalProperties": false,
@@ -794,7 +794,7 @@
         },
         "armor": {
           "description": "The armor fitted.",
-          "$ref": "#/definitions/LocationArmorOfSingle"
+          "$ref": "#/definitions/LocationArmorOfNumber"
         },
         "components": {
           "type": "array",
@@ -843,7 +843,7 @@
           "description": "The name the UI shows."
         },
         "type": {
-          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in componentDefinitions.",
+          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in componentDefinitions; never NotSet, Special or MechPart, which the game's enum also has.",
           "$ref": "#/definitions/ComponentType"
         }
       }
@@ -953,7 +953,7 @@
         },
         "armor": {
           "description": "The armor in combat, after the game's vehicle multiplier; a vehicle has no rear armor.",
-          "$ref": "#/definitions/LocationArmorOfSingle"
+          "$ref": "#/definitions/LocationArmorOfNumber"
         },
         "structure": {
           "type": "number",
@@ -1035,7 +1035,7 @@
         },
         "armor": {
           "description": "The armor in combat, after the game's vehicle multiplier; a turret has no rear armor.",
-          "$ref": "#/definitions/LocationArmorOfSingle"
+          "$ref": "#/definitions/LocationArmorOfNumber"
         },
         "structure": {
           "type": "number",
@@ -1782,7 +1782,7 @@
             "null",
             "number"
           ],
-          "description": "The heat the mech takes per attack is the damage of one shot divided by this; null when WeaponDefinition.heatGenerated applies instead.",
+          "description": "The heat the mech takes per attack is the damage of one shot as fired, after the evasive pips' increase and rules.json combat.damage.globalMultiplier, divided by this; null when WeaponDefinition.heatGenerated applies instead.",
           "format": "float"
         }
       }
@@ -2177,19 +2177,19 @@
       "properties": {
         "mech": {
           "description": "For mechs, by their weight class; null where they can't enter.",
-          "$ref": "#/definitions/ByWeightClassOfNullableSingle"
+          "$ref": "#/definitions/ByWeightClassOfNullableNumber"
         },
         "tracked": {
           "description": "For tracked vehicles, by their weight class; null where they can't enter.",
-          "$ref": "#/definitions/ByWeightClassOfNullableSingle"
+          "$ref": "#/definitions/ByWeightClassOfNullableNumber"
         },
         "wheeled": {
           "description": "For wheeled vehicles, by their weight class; null where they can't enter.",
-          "$ref": "#/definitions/ByWeightClassOfNullableSingle"
+          "$ref": "#/definitions/ByWeightClassOfNullableNumber"
         }
       }
     },
-    "ByWeightClassOfNullableSingle": {
+    "ByWeightClassOfNullableNumber": {
       "type": "object",
       "description": "A value per weight class of the unit it applies to.",
       "additionalProperties": false,
@@ -3262,7 +3262,7 @@
     },
     "FactionDefinition": {
       "type": "object",
-      "description": "A faction's relations to the other factions, which decide whom it hires the company against.",
+      "description": "A faction's relations to the other factions, which decide whom it hires the company against. Some faction references have no entry, such as Player1sMercUnit and INVALID_UNSET.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -3277,18 +3277,18 @@
         },
         "name": {
           "type": "string",
-          "description": "As in the references to the faction."
+          "description": "As in the references to the faction; not unique, since several ids can share a name."
         },
         "allies": {
           "type": "array",
-          "description": "The factions allied with it, sorted by name; on its contracts, one of them not allied with the other side may fight alongside it.",
+          "description": "The factions allied with it, sorted by name; on its contracts, one of them not allied with the other side may fight alongside it. The faction's own list: an ally needn't list it back.",
           "items": {
             "$ref": "#/definitions/DefinitionReference"
           }
         },
         "enemies": {
           "type": "array",
-          "description": "The factions hostile to it, sorted by name: those it can hire the company against where a star system lists them as targets; while the company is allied with it, the company's reputation entries mark them as enemies.",
+          "description": "The factions hostile to it, sorted by name: those it can hire the company against where a star system lists them as targets; while the company is allied with it, the company's reputation entries mark them as enemies. The faction's own list: an enemy needn't list it back.",
           "items": {
             "$ref": "#/definitions/DefinitionReference"
           }

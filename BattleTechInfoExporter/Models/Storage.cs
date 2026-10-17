@@ -25,6 +25,7 @@ internal sealed record StoredComponent(ComponentReference Component, int Count, 
 ///     fixed components, but no weapons or other components.
 /// </summary>
 /// <param name="Chassis">The chassis, described in <see cref="Catalog.ChassisDefinitions" />.</param>
+/// <param name="Count">The chassis kept.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record StoredChassis(DefinitionReference Chassis, int Count) : IStored;
 
