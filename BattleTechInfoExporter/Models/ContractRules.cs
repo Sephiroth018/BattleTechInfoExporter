@@ -48,11 +48,13 @@ internal sealed record ContractRules(
 ///     gains the difficulty times the rating level's multiplier (see <see cref="MercenaryReviewBoardLevel" />).
 /// </summary>
 /// <param name="BasePerDifficulty">
-///     Times the contract's difficulty, rounded before <see cref="BaseAddition" /> is added.
+///     Times the contract's difficulty before the skulls' adjustment, rounded before <see cref="BaseAddition" /> is
+///     added.
 /// </param>
 /// <param name="BaseAddition">Added to <see cref="BasePerDifficulty" /> times the difficulty, rounded.</param>
 /// <param name="NegotiablePerDifficulty">
-///     Times the contract's difficulty, rounded before <see cref="NegotiableAddition" /> is added.
+///     Times the contract's difficulty before the skulls' adjustment, rounded before
+///     <see cref="NegotiableAddition" /> is added.
 /// </param>
 /// <param name="NegotiableAddition">
 ///     Added to <see cref="NegotiablePerDifficulty" /> times the difficulty, rounded.

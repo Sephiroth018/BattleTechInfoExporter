@@ -1689,7 +1689,7 @@
         },
         "modifierByPips": {
           "type": "array",
-          "description": "The to-hit modifier by the number of pips, from one pip up; for more pips than entries, the pips times the difference of the last two.",
+          "description": "The to-hit modifier by the number of pips the weapon doesn't ignore, from one pip up; for more pips than entries, the pips times the difference of the last two.",
           "items": {
             "type": "number",
             "format": "float"
@@ -3767,7 +3767,7 @@
       "properties": {
         "basePerDifficulty": {
           "type": "number",
-          "description": "Times the contract's difficulty, rounded before baseAddition is added.",
+          "description": "Times the contract's difficulty before the skulls' adjustment, rounded before baseAddition is added.",
           "format": "float"
         },
         "baseAddition": {
@@ -3777,7 +3777,7 @@
         },
         "negotiablePerDifficulty": {
           "type": "number",
-          "description": "Times the contract's difficulty, rounded before negotiableAddition is added.",
+          "description": "Times the contract's difficulty before the skulls' adjustment, rounded before negotiableAddition is added.",
           "format": "float"
         },
         "negotiableAddition": {

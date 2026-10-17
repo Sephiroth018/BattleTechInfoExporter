@@ -188,8 +188,8 @@ internal sealed record UnitLocation(string Location, LocationArmor<int> Armor, i
 
 /// <summary>The unit's guard, which the HUD shows as guarded at <see cref="Level" /> 1 or more.</summary>
 /// <param name="Level">
-///     What the sources below add up to: bracing and cover 1 each, Bulwark 1 more on top of either, unless the unit
-///     was hit in melee since its last activation. Bracing and Bulwark don't count while the guard is broken
+///     What the sources below add up to: bracing and cover 1 each, Bulwark 1 more on top of either; Bulwark not
+///     after a melee hit since the unit's last activation. Bracing and Bulwark don't count while the guard is broken
 ///     (unsteady, prone, shut down, sensor locked or hit), and none while the unit moves.
 /// </param>
 /// <param name="IsBraced">Braced in its last activation, until its next one.</param>
