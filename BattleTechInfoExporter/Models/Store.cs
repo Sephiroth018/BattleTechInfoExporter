@@ -44,8 +44,6 @@ internal sealed record ComponentForSale(ComponentReference Component, int? Count
 internal sealed record MechForSale(DefinitionReference Mech, int? Count, int Price) : MechEntry(Mech), IForSale;
 
 /// <summary>Mech parts in stock.</summary>
-/// <param name="Count">The parts in stock; <c>null</c> when unlimited.</param>
-/// <param name="Price">The C-Bills for one part, after the star system's discount and the reputation's price change.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechPartsForSale(DefinitionReference Mech, int? Count, int Price)
     : MechPartsEntry(Mech), IForSale;

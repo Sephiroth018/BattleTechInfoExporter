@@ -11,9 +11,9 @@ namespace BattleTechInfoExporter.Models;
 /// </summary>
 /// <param name="Name">As the combat HUD shows it.</param>
 /// <param name="MoveCost">
-///     What a step into the terrain costs of the unit's movement, per meter of the step, in place of what it costs on
-///     open ground: the normal move cost of the unit's pathing capabilities, 1.05 for all of the game's;
-///     <c>null</c> when the unit can't enter it.
+///     What a step into the terrain costs of the unit's movement, per meter of the step; <c>null</c> when the unit
+///     can't enter it. Open ground has no terrain and costs the normal move cost of the unit's pathing capabilities
+///     instead, 1.05 for every unit in the game's data.
 /// </param>
 /// <param name="SprintMultiplier">Multiplies the move cost when sprinting; <c>null</c> when the unit can't enter it.</param>
 /// <param name="VisibilityMultiplier">

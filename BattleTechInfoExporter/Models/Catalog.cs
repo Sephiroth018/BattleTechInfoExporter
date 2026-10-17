@@ -30,7 +30,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="EventDefinitions">The events, keyed by event id.</param>
 /// <param name="ItemCollectionDefinitions">
 ///     The item collections the stores draw their stock from and the rewards are drawn from, keyed by collection
-///     id; a star system's stores name theirs in <see cref="Starmap.StarSystems" />.
+///     id; a star system's stores name theirs in <see cref="StarSystem.Stores" />.
 /// </param>
 /// <param name="FactionDefinitions">The factions' allies and enemies, keyed by faction id.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

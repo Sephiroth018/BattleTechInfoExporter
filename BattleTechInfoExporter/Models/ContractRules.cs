@@ -10,7 +10,7 @@ namespace BattleTechInfoExporter.Models;
 ///     reputation tooltips show aren't exported: the pay never applies them.
 /// </summary>
 /// <param name="PayPerDifficulty">In C-Bills, before the type's multiplier, the difficulty scale and the variance.</param>
-/// <param name="PayVariance">The most the pay varies either way, as a fraction of it from 0 to 1.</param>
+/// <param name="PayVariance">The most the pay varies either way, as a fraction from 0 to 1 of the pay.</param>
 /// <param name="GuaranteedPayShare">The share of the pay the company gets on top of the negotiated share.</param>
 /// <param name="GoodFaithPayShare">The share of the pay for a mission not completed, with a good faith effort.</param>
 /// <param name="NoFaithPayShare">The share without a good faith effort.</param>
@@ -50,9 +50,15 @@ internal sealed record ContractRules(
 ///     value, the target loses the employer's gain times its multiplier, and the Mercenary Review Board rating
 ///     gains the difficulty times the rating level's multiplier (see <see cref="MercenaryReviewBoardLevel" />).
 /// </summary>
-/// <param name="BasePerDifficulty">Rounded, plus <see cref="BaseAddition" />.</param>
+/// <param name="BasePerDifficulty">
+///     Times the contract's difficulty before the skulls' adjustment, rounded before <see cref="BaseAddition" /> is
+///     added.
+/// </param>
 /// <param name="BaseAddition">Added to <see cref="BasePerDifficulty" /> times the difficulty, rounded.</param>
-/// <param name="NegotiablePerDifficulty">Rounded, plus <see cref="NegotiableAddition" />.</param>
+/// <param name="NegotiablePerDifficulty">
+///     Times the contract's difficulty before the skulls' adjustment, rounded before
+///     <see cref="NegotiableAddition" /> is added.
+/// </param>
 /// <param name="NegotiableAddition">
 ///     Added to <see cref="NegotiablePerDifficulty" /> times the difficulty, rounded.
 /// </param>

@@ -66,7 +66,7 @@ internal sealed record HexGridLayout(
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record HexOffset(int Q, int R);
 
-/// <summary>A building, which units can be fired at, stand on and be blocked by.</summary>
+/// <summary>A building, which units can fire at, stand on and be blocked by.</summary>
 /// <param name="Id">The game's building id, as in <see cref="CombatState.DamagedBuildings" />.</param>
 /// <param name="Name">The building's name as the game shows it.</param>
 /// <param name="Position">The point the building is placed at, not necessarily its center.</param>
@@ -89,8 +89,8 @@ internal sealed record CombatBuilding(string Id, string Name, MapPosition Positi
 ///     Per entry of <see cref="CombatMap.PathingGroups" />, the steps to neighbors its units can't take on slopes,
 ///     one character per hex as <see cref="HexGridLayout.BlockedStepsFormula" /> says: too steep a grade between
 ///     path nodes, too steep ground or a ledge in between. Terrain move costs and units in the way aren't part of it;
-///     impassable terrain has its own character in <see cref="CombatMap.Terrains" />. An approximation: a blocked
-///     step may still be reachable by a detour; a player unit's <see cref="CombatUnit.Movement" /> is exact.
+///     impassable terrain has its own character in <see cref="CombatMap.Terrains" />. An approximation: a detour may
+///     still reach a neighbor a blocked step can't; a player unit's <see cref="CombatUnit.Movement" /> is exact.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record HexRow(
