@@ -58,7 +58,7 @@ internal sealed record CombatState(
 /// <param name="Kind">What is about to land.</param>
 /// <param name="Hexes">
 ///     The hexes where a unit is crushed by the landing, those whose center cell the game marks, in the order of
-///     <see cref="CombatMap.Rows" />: a dropship's whole footprint, or one hex per drop pod, one per unit of the
+///     <see cref="CombatMap.Rows" />: a dropship's whole footprint, or each drop pod's hex, one per unit of the
 ///     lance.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

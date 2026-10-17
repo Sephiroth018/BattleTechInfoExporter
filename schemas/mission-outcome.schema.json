@@ -583,7 +583,7 @@
           "$ref": "#/definitions/Armor"
         },
         "rear": {
-          "description": "The rear armor; `null` when the location is outside the torso, which alone has it.",
+          "description": "The rear armor; `null` when the location is outside the torso.",
           "oneOf": [
             {
               "type": "null"

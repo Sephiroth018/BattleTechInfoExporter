@@ -84,8 +84,8 @@ internal sealed record CombatBuilding(string Id, string Name, MapPosition Positi
 /// </param>
 /// <param name="BlockedSteps">
 ///     Per entry of <see cref="CombatMap.PathingGroups" />, the steps to neighbors its units can't take on slopes,
-///     one character per hex as <see cref="HexGridLayout.BlockedStepsFormula" /> says. An approximation: a blocked
-///     step may still be reachable by a detour; a player unit's <see cref="CombatUnit.Movement" /> is exact.
+///     one character per hex as <see cref="HexGridLayout.BlockedStepsFormula" /> says. An approximation: a detour
+///     may still reach a neighbor a blocked step can't; a player unit's <see cref="CombatUnit.Movement" /> is exact.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record HexRow(

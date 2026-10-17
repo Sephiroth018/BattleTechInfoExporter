@@ -146,7 +146,7 @@
         },
         "contractEmployers": {
           "type": "array",
-          "description": "The factions that can hire the company for the star system's generated contracts, sorted by name, each with its targets, without those the story sets aside; story and flashpoint contracts name their own.",
+          "description": "The factions that can hire the company for the star system's generated contracts, without the employers the story sets aside, sorted by name, each with its targets; story and flashpoint contracts name their own.",
           "items": {
             "$ref": "#/definitions/ContractEmployer"
           }

@@ -9,7 +9,7 @@ namespace BattleTechInfoExporter.Models;
 ///     <see cref="PayVariance" /> either way and rounded to thousands.
 /// </summary>
 /// <param name="PayPerDifficulty">In C-Bills, before the type's multiplier, the difficulty scale and the variance.</param>
-/// <param name="PayVariance">The most the pay varies either way, as a fraction of it from 0 to 1.</param>
+/// <param name="PayVariance">The most the pay varies either way, as a fraction from 0 to 1 of the pay.</param>
 /// <param name="GuaranteedPayShare">The share of the pay the company gets on top of the negotiated share.</param>
 /// <param name="GoodFaithPayShare">The share of the pay for a mission not completed, with a good faith effort.</param>
 /// <param name="NoFaithPayShare">The share without a good faith effort.</param>

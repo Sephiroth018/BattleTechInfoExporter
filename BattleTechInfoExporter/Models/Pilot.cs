@@ -5,8 +5,8 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     The fields every pilot has; the shapes of the pilots of the barracks and of the hiring hall add fields of
-///     their own.
+///     The fields every pilot has; the barracks' and the hiring hall's pilots each add their own fields in their
+///     shape.
 /// </summary>
 /// <param name="Id">The game's pilot id, which the references to the pilot carry.</param>
 /// <param name="Name">The full name without callsign.</param>

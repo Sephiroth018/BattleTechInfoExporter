@@ -27,7 +27,7 @@ internal sealed record SkillRules(
 internal sealed record Skill<TLevel>(string Description, IReadOnlyList<TLevel> Levels)
     where TLevel : SkillLevel;
 
-/// <summary>A level of a skill; the shapes of the skills with numbers of their own per level add those.</summary>
+/// <summary>A level of a skill; a skill with numbers of its own per level adds them in its shape.</summary>
 /// <param name="Level">The skill level, from 2.</param>
 /// <param name="ExperienceCost">The experience spent to reach the level from the one below.</param>
 /// <param name="Abilities">The primary abilities and passive traits unlocked at the level.</param>

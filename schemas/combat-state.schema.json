@@ -347,7 +347,7 @@
           ]
         },
         "definition": {
-          "description": "The mech, vehicle or turret in the catalog, which holds its armor and loadout; `null` when the unit is one of the player's mechs, which have bayMech instead, or out of full view.",
+          "description": "The mech, vehicle or turret in the catalog, which holds its armor and loadout; `null` when the unit is out of full view or one of the player's mechs, which have bayMech instead.",
           "oneOf": [
             {
               "type": "null"
@@ -414,7 +414,7 @@
             "array",
             "null"
           ],
-          "description": "The lines of fire to the units it could attack: from the player's units to every living enemy in full view (`full`), and from those enemies to the player's units. `null` when the unit is neither, or destroyed.",
+          "description": "The lines of fire to the units it could attack: from the player's units to every living enemy in full view (`full`), and from those enemies to the player's units. `null` when the unit is destroyed or neither of those.",
           "items": {
             "$ref": "#/definitions/LineOfFire"
           }
@@ -796,7 +796,7 @@
             "integer",
             "null"
           ],
-          "description": "The rear armor; `null` when the location is outside the torso, which alone has it.",
+          "description": "The rear armor; `null` when the location is outside the torso.",
           "format": "int32"
         }
       }
@@ -1413,7 +1413,7 @@
         },
         "hexes": {
           "type": "array",
-          "description": "The hexes where a unit is crushed by the landing, those whose center cell the game marks, in the order of combat-map.json rows: a dropship's whole footprint, or one hex per drop pod, one per unit of the lance.",
+          "description": "The hexes where a unit is crushed by the landing, those whose center cell the game marks, in the order of combat-map.json rows: a dropship's whole footprint, or each drop pod's hex, one per unit of the lance.",
           "items": {
             "$ref": "#/definitions/HexCoordinates"
           }

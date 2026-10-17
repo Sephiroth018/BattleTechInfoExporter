@@ -296,7 +296,7 @@
         },
         "blockedSteps": {
           "type": "array",
-          "description": "Per entry of pathingGroups, the steps to neighbors its units can't take on slopes, one character per hex as HexGridLayout.blockedStepsFormula says. An approximation: a blocked step may still be reachable by a detour; a player unit's combat-state.json units.*.movement is exact.",
+          "description": "Per entry of pathingGroups, the steps to neighbors its units can't take on slopes, one character per hex as HexGridLayout.blockedStepsFormula says. An approximation: a detour may still reach a neighbor a blocked step can't; a player unit's combat-state.json units.*.movement is exact.",
           "items": {
             "type": "string"
           }

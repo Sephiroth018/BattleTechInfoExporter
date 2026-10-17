@@ -23,7 +23,7 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="Definition">
 ///     The mech, vehicle or turret in the catalog, which holds its armor and loadout; <c>null</c> when the unit is
-///     one of the player's mechs, which have <see cref="BayMech" /> instead, or out of full view.
+///     out of full view or one of the player's mechs, which have <see cref="BayMech" /> instead.
 /// </param>
 /// <param name="BayMech">
 ///     The player's mech in <c>game-state.json</c>, whose loadout holds its assigned armor; <c>null</c> when the
@@ -43,7 +43,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="LinesOfFire">
 ///     The lines of fire to the units it could attack: from the player's units to every living enemy in full view
 ///     (<see cref="UnitVisibility.Full" />), and from those enemies to the player's units. <c>null</c> when the unit
-///     is neither, or destroyed.
+///     is destroyed or neither of those.
 /// </param>
 /// <param name="Movement">
 ///     Where the player's unit can move and what it gets there; <c>null</c> when the unit isn't the player's or can't

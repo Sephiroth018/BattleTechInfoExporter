@@ -1863,7 +1863,7 @@
           "$ref": "#/definitions/Armor"
         },
         "rear": {
-          "description": "The rear armor; `null` when the location is outside the torso, which alone has it.",
+          "description": "The rear armor; `null` when the location is outside the torso.",
           "oneOf": [
             {
               "type": "null"
@@ -2210,7 +2210,7 @@
             "null",
             "number"
           ],
-          "description": "The rear armor; `null` when the location is outside the torso, which alone has it.",
+          "description": "The rear armor; `null` when the location is outside the torso.",
           "format": "float"
         }
       }
@@ -2533,7 +2533,7 @@
     },
     "LastLanceUnit": {
       "type": "object",
-      "description": "A mech and its pilot from the lance last sent on a mission. The lance configuration pre-fills the slots the contract leaves open with them, leaving out the mechs and pilots that can't deploy.",
+      "description": "A mech and its pilot from the lance last sent on a mission. The lance configuration fills the contract's open slots with these, except the mechs and pilots that can't deploy.",
       "additionalProperties": false,
       "required": [
         "mech",
@@ -2823,12 +2823,12 @@
             "integer",
             "null"
           ],
-          "description": "The parts in stock; `null` when unlimited.",
+          "description": "The copies in stock; `null` when unlimited.",
           "format": "int32"
         },
         "price": {
           "type": "integer",
-          "description": "The C-Bills for one part, after the star system's discount and the reputation's price change.",
+          "description": "The C-Bills for one copy, after the star system's discount and the reputation's price change.",
           "format": "int32"
         }
       }
@@ -2913,7 +2913,7 @@
         },
         "salary": {
           "type": "integer",
-          "description": "What the pilot would add to the expenses of each report, as a pilot's line does.",
+          "description": "What the pilot would add to each report's expenses, as their salary line.",
           "format": "int32"
         },
         "canHire": {
@@ -3265,7 +3265,7 @@
         },
         "contractEmployers": {
           "type": "array",
-          "description": "The factions that can hire the company for the star system's generated contracts, sorted by name, each with its targets, without those the story sets aside; story and flashpoint contracts name their own.",
+          "description": "The factions that can hire the company for the star system's generated contracts, without the employers the story sets aside, sorted by name, each with its targets; story and flashpoint contracts name their own.",
           "items": {
             "$ref": "#/definitions/ContractEmployer"
           }
@@ -3674,7 +3674,7 @@
     },
     "ScheduledEvent": {
       "type": "object",
-      "description": "An event a result has scheduled. Its days assume a daily roll every day; the game skips the roll on arrival in a star system and when the story moves on, and the later events in the list on a day one comes.",
+      "description": "An event a result has scheduled. Its days assume a daily roll every day; the game skips the roll on arrival in a star system, when the story moves on, and for the events after one that comes that day.",
       "additionalProperties": false,
       "required": [
         "event",

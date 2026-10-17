@@ -441,7 +441,7 @@
             "null",
             "number"
           ],
-          "description": "The rear armor; `null` when the location is outside the torso, which alone has it.",
+          "description": "The rear armor; `null` when the location is outside the torso.",
           "format": "float"
         }
       }
@@ -1173,7 +1173,7 @@
             "null",
             "string"
           ],
-          "description": "The ammunition the weapon fires, as AmmunitionBoxDefinition.ammoCategory names it; a weapon with internalAmmoCapacity fires its own first and then any ammunition boxes of the category, which the catalog has none of; `null` when it needs no ammunition."
+          "description": "The ammunition the weapon fires, as AmmunitionBoxDefinition.ammoCategory names it; a weapon with internalAmmoCapacity fires its own, and the catalog has no ammunition boxes of its category; `null` when it needs no ammunition."
         },
         "internalAmmoCapacity": {
           "type": [
@@ -2007,7 +2007,7 @@
     },
     "ComponentDefinition": {
       "type": "object",
-      "description": "The fields every component definition has; the shapes of the types with stats of their own add those. Upgrades have no others.",
+      "description": "The fields every component definition has; each type with stats of its own adds them in its shape.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -2740,7 +2740,7 @@
     },
     "CareerStatisticChange": {
       "type": "object",
-      "description": "A change the career makes to a statistic of the company or a pilot, e.g. by a ship upgrade or an event: it adds to the statistic or sets it.",
+      "description": "A change the career makes to a statistic of the company or a pilot, e.g. by a ship upgrade or an event.",
       "additionalProperties": false,
       "required": [
         "statistic",

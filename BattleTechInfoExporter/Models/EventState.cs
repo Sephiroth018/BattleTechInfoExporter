@@ -17,7 +17,7 @@ internal sealed record EventState(
 
 /// <summary>
 ///     An event a result has scheduled. Its days assume a daily roll every day; the game skips the roll on arrival
-///     in a star system and when the story moves on, and the later events in the list on a day one comes.
+///     in a star system, when the story moves on, and for the events after one that comes that day.
 /// </summary>
 /// <param name="Event">The event scheduled.</param>
 /// <param name="Pilot">The pilot the event is about; <c>null</c> when the game picks one when it comes.</param>
