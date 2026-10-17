@@ -68,8 +68,9 @@ internal sealed record CombatUnit(
 
 /// <summary>A unit's condition as the HUD shows it, for a unit in full view.</summary>
 /// <param name="DeathMethod">
-///     How the unit was destroyed (the game's <see cref="BattleTech.DeathMethod" />), e.g.
-///     <c>LegDestruction</c>, or <c>PilotKilled</c> also for an incapacitated pilot; <c>null</c> when the unit lives.
+///     How the unit was destroyed (the game's <see cref="BattleTech.DeathMethod" />), e.g. <c>LegDestruction</c>, a
+///     turret's <c>CenterTorsoDestruction</c>, a vehicle's <c>VehicleLocationDestroyed</c>, or <c>PilotKilled</c>
+///     also for an incapacitated pilot; <c>null</c> when the unit lives.
 /// </param>
 /// <param name="Locations">
 ///     The armor and structure left per location, in the game's order: a mech's from head to legs, a vehicle's from

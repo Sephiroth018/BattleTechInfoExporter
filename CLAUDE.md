@@ -426,7 +426,8 @@ Folders:
   marked `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` because only the serializer reads
   them. Every exported property has a doc comment, overriding "XML doc comments only where name and
   signature aren't enough": a `<param>` on its record, or a `<summary>` on a body property, on the
-  record that declares it. It's the schema's description, so it's short (a fragment is fine) and
+  record that declares it, or once on the interface property it implements where every implementing
+  record means the same by it. It's the schema's description, so it's short (a fragment is fine) and
   says what the value is, its unit or scale and what `null` means. `ExportFile`, the root of every file, is more than data, by decision: it owns the header,
   the JSON conventions, the content compared before a write and the writing itself, through
   `ExportFileWriter` and the clock.

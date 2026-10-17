@@ -608,7 +608,7 @@
       ],
       "properties": {
         "deathMethod": {
-          "description": "How the unit was destroyed (the game's DeathMethod), e.g. `LegDestruction`, or `PilotKilled` also for an incapacitated pilot; `null` when the unit lives.",
+          "description": "How the unit was destroyed (the game's DeathMethod), e.g. `LegDestruction`, a turret's `CenterTorsoDestruction`, a vehicle's `VehicleLocationDestroyed`, or `PilotKilled` also for an incapacitated pilot; `null` when the unit lives.",
           "oneOf": [
             {
               "type": "null"

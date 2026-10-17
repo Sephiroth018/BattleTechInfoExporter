@@ -24,8 +24,8 @@ namespace BattleTechInfoExporter.Models;
 ///     schedules it.
 /// </param>
 /// <param name="Requirements">
-///     What the event's company or pilot (<paramref name="Scope" />) must meet; <c>null</c> when any will
-///     do.
+///     What the event's company or pilot (<paramref name="Scope" />) must meet; <c>null</c> when it has
+///     none.
 /// </param>
 /// <param name="AdditionalRequirements">What the other scopes must meet, all of them.</param>
 /// <param name="AdditionalTargets">

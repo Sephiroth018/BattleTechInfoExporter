@@ -3265,7 +3265,7 @@
         },
         "contractEmployers": {
           "type": "array",
-          "description": "The factions that can hire the company for the star system's generated contracts, without the employers the story sets aside, sorted by name, each with its targets; story and flashpoint contracts name their own.",
+          "description": "The factions that can hire the company for the star system's generated contracts, without the employers the story sets aside, sorted by name, each with its targets; a contract's own requirements can narrow them, and story and flashpoint contracts name their own.",
           "items": {
             "$ref": "#/definitions/ContractEmployer"
           }
@@ -3358,7 +3358,7 @@
       "properties": {
         "days": {
           "type": "integer",
-          "description": "The days the trip takes from the current star system's planet, with the whole leg to its jump point (Travel.jumpPointDays) even during a trip; 0 for the current star system.",
+          "description": "The days the trip takes from the current star system's planet, with the whole leg to its jump point (Travel.jumpPointDays) even during a trip, which Travel.legEndsOnDay corrects; 0 for the current star system.",
           "format": "int32"
         },
         "cost": {
@@ -3674,7 +3674,7 @@
     },
     "ScheduledEvent": {
       "type": "object",
-      "description": "An event a result has scheduled. Its days assume a daily roll every day; the game skips the roll on arrival in a star system, when the story moves on, and for the events after one that comes that day.",
+      "description": "An event a result has scheduled. Its days assume a daily roll every day from the next; the game skips it on arrival in a star system, when the story moves on, and for the events after one that comes that day.",
       "additionalProperties": false,
       "required": [
         "event",

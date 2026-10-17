@@ -1173,7 +1173,7 @@
             "null",
             "string"
           ],
-          "description": "The ammunition the weapon fires, as AmmunitionBoxDefinition.ammoCategory names it; a weapon with internalAmmoCapacity fires its own, and the catalog has no ammunition boxes of its category; `null` when it needs no ammunition."
+          "description": "The ammunition the weapon fires, as AmmunitionBoxDefinition.ammoCategory names it; a weapon with internalAmmoCapacity fires its own first, then any boxes of the category, of which the catalog has none; `null` when it needs no ammunition."
         },
         "internalAmmoCapacity": {
           "type": [
@@ -2384,7 +2384,7 @@
           "description": "Whether the daily event roll can draw the event; when false, it comes only when another event's result schedules it."
         },
         "requirements": {
-          "description": "What the event's company or pilot (scope) must meet; `null` when any will do.",
+          "description": "What the event's company or pilot (scope) must meet; `null` when it has none.",
           "oneOf": [
             {
               "type": "null"

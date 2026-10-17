@@ -73,8 +73,8 @@ internal sealed record WeaponDefinition : ComponentDefinition
 
     /// <summary>
     ///     The ammunition the weapon fires, as <see cref="AmmunitionBoxDefinition.AmmoCategory" /> names it; a weapon
-    ///     with <see cref="InternalAmmoCapacity" /> fires its own, and the catalog has no ammunition boxes of its
-    ///     category; <c>null</c> when it needs no ammunition.
+    ///     with <see cref="InternalAmmoCapacity" /> fires its own first, then any boxes of the category, of which the
+    ///     catalog has none; <c>null</c> when it needs no ammunition.
     /// </summary>
     public string? AmmoCategory { get; }
 

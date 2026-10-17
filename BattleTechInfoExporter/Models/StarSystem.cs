@@ -26,7 +26,8 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="ContractEmployers">
 ///     The factions that can hire the company for the star system's generated contracts, without the employers the
-///     story sets aside, sorted by name, each with its targets; story and flashpoint contracts name their own.
+///     story sets aside, sorted by name, each with its targets; a contract's own requirements can narrow them, and
+///     story and flashpoint contracts name their own.
 /// </param>
 /// <param name="Difficulty">The star system's difficulty, as the starmap shows it.</param>
 /// <param name="CanTravelTo">
