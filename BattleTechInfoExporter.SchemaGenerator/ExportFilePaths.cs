@@ -9,8 +9,7 @@ namespace BattleTechInfoExporter.SchemaGenerator;
 /// <summary>
 ///     The JSON path from each export file's root to every model type and enum in it, one in the fewest steps where a
 ///     type occurs in several places: properties joined by <c>.</c>, a list's entries as <c>[]</c>, a dictionary's values
-///     as
-///     <c>*</c>. The root's own path is empty.
+///     as <c>*</c>. The root's own path is empty.
 /// </summary>
 internal sealed class ExportFilePaths
 {

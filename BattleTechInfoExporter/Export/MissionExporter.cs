@@ -10,7 +10,7 @@ internal static class MissionExporter
 {
     /// <summary>
     ///     Exports the outcome of a contract the game has just completed, before the salvage is chosen, returning it
-    ///     for <see cref="ExportSalvageReceived" />, or null where the export was skipped or failed.
+    ///     for <see cref="ExportSalvageReceived" />, or <c>null</c> where the export was skipped or failed.
     /// </summary>
     internal static MissionOutcome? ExportOutcome(SimGameState simGame, Contract contract)
     {

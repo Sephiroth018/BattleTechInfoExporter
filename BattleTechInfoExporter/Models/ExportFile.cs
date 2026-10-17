@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using BattleTechInfoExporter.Export;
 using JetBrains.Annotations;
@@ -89,7 +90,7 @@ internal abstract record ExportFile
     /// </summary>
     /// <returns><c>null</c> when the file doesn't exist.</returns>
     /// <exception cref="JsonException">The file is malformed.</exception>
-    /// <exception cref="System.IO.IOException">The file can't be read.</exception>
+    /// <exception cref="IOException">The file can't be read.</exception>
     protected static IReadOnlyDictionary<string, string?>? ReadHeader(string fileName, params string[] memberNames)
     {
         return ExportFileWriter.ReadHeader(fileName, memberNames.Select(PropertyNameOf).ToList()) is { } header

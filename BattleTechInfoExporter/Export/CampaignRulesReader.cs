@@ -6,9 +6,10 @@ using UnityEngine;
 namespace BattleTechInfoExporter.Export;
 
 /// <summary>
-///     Builds the rules file's campaign rules from the campaign constants (SimGameConstants), which the game has
-///     already adjusted to the career's difficulty settings (SimGameDifficulty). Only constants that the game's
-///     campaign code reads are exported; the ones it never reads, or reads only for presentation, are left out.
+///     Builds the rules file's campaign rules from the campaign constants (<see cref="SimGameConstants" />), which the
+///     game has already adjusted to the career's difficulty settings (<see cref="SimGameDifficulty" />). Only constants
+///     that the game's campaign code reads are exported; the ones it never reads, or reads only for presentation, are
+///     left out.
 /// </summary>
 internal static class CampaignRulesReader
 {

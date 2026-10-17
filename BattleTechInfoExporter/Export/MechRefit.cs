@@ -6,8 +6,9 @@ using BattleTech;
 namespace BattleTechInfoExporter.Export;
 
 /// <summary>
-///     Builds the loadout a refit leads to, as the mech lab shows it (MechLabPanel.ApplyWorkOrder): the unfinished
-///     steps are applied to a copy of the mech the way SimGameState's ML_ methods apply each one when it finishes.
+///     Builds the loadout a refit leads to, as the mech lab shows it
+///     (<see cref="BattleTech.UI.MechLabPanel.ApplyWorkOrder" />): the unfinished steps are applied to a copy of the
+///     mech the way SimGameState's ML_ methods apply each one when it finishes.
 /// </summary>
 /// <remarks>
 ///     Components found in the game's state are copied before they change, so the game's own mech and work order

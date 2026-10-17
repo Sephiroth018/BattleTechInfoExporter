@@ -71,14 +71,16 @@ internal static class WorkQueueReader
     /// <summary>The day the ship arrives at the end of its travel order.</summary>
     /// <remarks>
     ///     The travel order keeps the legs as internal sub-entries, so its remaining cost is the whole trip, as the
-    ///     timeline shows it; the timeline counts travel one cost per day (TaskManagementElement.UpdateTaskInfo).
+    ///     timeline shows it; the timeline counts travel one cost per day
+    ///     (<see cref="BattleTech.UI.TaskManagementElement.UpdateTaskInfo" />).
     /// </remarks>
     internal static int ReadArrivalDay(SimGameState simGame, WorkOrderEntry_TravelGeneric travelOrder) =>
         simGame.DaysPassed + DaysUntilFinished(travelOrder, 1);
 
     /// <summary>
     ///     The day the leg under way ends: the travel order's legs are its sub-entries (to the jump point, each jump, to
-    ///     the planet; Starmap.OnPathfindingComplete), paid in order one cost per day (WorkOrderEntry.PayCost).
+    ///     the planet; <see cref="BattleTech.Starmap.OnPathfindingComplete" />), paid in order one cost per day
+    ///     (<see cref="WorkOrderEntry.PayCost" />).
     /// </summary>
     internal static int ReadLegEndDay(SimGameState simGame, WorkOrderEntry_TravelGeneric travelOrder)
     {
