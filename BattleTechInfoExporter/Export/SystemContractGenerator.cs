@@ -32,8 +32,8 @@ internal static class SystemContractGenerator
         || simGame.Starmap?.Destination?.System == simGame.CurSystem;
 
     /// <summary>
-    ///     StarSystem.GenerateInitialContracts' call without its callback and its useCoroutine, which waits 0.2 s per
-    ///     contract for the screen's loading spinner, so it completes within the call.
+    ///     <see cref="StarSystem.GenerateInitialContracts" />' call without its callback and its useCoroutine, which
+    ///     waits 0.2 s per contract for the screen's loading spinner, so it completes within the call.
     /// </summary>
     internal static void Generate(StarSystem system) => system.Sim.GeneratePotentialContracts(true, null);
 }

@@ -12,7 +12,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="MechParts">The mech parts a draw can yield.</param>
 /// <param name="Collections">The collections a draw can yield, drawn in turn.</param>
 /// <param name="EmptyWeight">
-///     The draw weight of the collection's empty entries, which use up a draw and yield nothing; 0 where it has
+///     The draw weight of the collection's empty entries, which use up a draw and yield nothing; 0 when it has
 ///     none.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -42,8 +42,8 @@ internal sealed record MechPartsCollectionEntry(DefinitionReference Mech, int? C
 /// <summary>Another collection a draw from the collection can yield, which is then drawn from in turn.</summary>
 /// <param name="Collection">The collection drawn from, by its id in <see cref="Catalog.ItemCollectionDefinitions" />.</param>
 /// <param name="Draws">
-///     The draws from the collection, each by weight and with the same entry possible again; <c>null</c>: every
-///     entry once.
+///     The draws from the collection, each by weight and with the same entry possible again; <c>null</c> when
+///     every entry is drawn once.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record NestedCollectionEntry(string Collection, int? Draws, int Weight) : IItemCollectionEntry;

@@ -12,9 +12,14 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="MercenaryReviewBoardLevels">
 ///     The Mercenary Review Board rating levels, which <see cref="MercenaryReviewBoard.Level" /> refers to.
 /// </param>
-/// <param name="Skills">The training table behind <see cref="Pilot.Skills" /> and <see cref="Pilot.Abilities" />.</param>
+/// <param name="Skills">
+///     The training table behind every pilot's skill levels and abilities, in the barracks and the hiring hall
+///     (<see cref="Pilot.Skills" />).
+/// </param>
 /// <param name="SpiritsLevels">The effects of each spirits level, which <see cref="Spirits.Level" /> refers to.</param>
-/// <param name="MechPartsPerMech">The <see cref="StoredMechParts" /> needed to assemble a mech.</param>
+/// <param name="MechPartsPerMech">
+///     How many parts of a mech, <see cref="StoredMechParts.Count" />, assemble it.
+/// </param>
 /// <param name="ContractTypes">The mission types, referred to by <see cref="ContractIdentity.Type" />.</param>
 /// <param name="JumpDistances">
 ///     The jump distance by number of working jump jets, from one up; the last entry applies to any higher number.

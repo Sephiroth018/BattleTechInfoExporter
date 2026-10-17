@@ -8,7 +8,6 @@ using Mech = BattleTech.Mech;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Builds the mission file's models from a contract the game has completed.</summary>
 internal static class MissionReader
 {
     // Read once Contract.CompleteContract has filled in every value read here, while the battle still exists: nothing

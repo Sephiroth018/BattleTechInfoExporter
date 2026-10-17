@@ -63,8 +63,8 @@ internal sealed record Experience(int Unspent, int Spent);
 /// <summary>A pilot's spirits, which events raise and lower for a while.</summary>
 /// <param name="Level">The spirits level, whose effects are in <see cref="Rules.SpiritsLevels" />.</param>
 /// <param name="EndsOnDay">
-///     The day high or low spirits end, on the scale of <see cref="Company.DaysPassed" />; <c>null</c> for normal
-///     spirits and when the game sets no end.
+///     The day high or low spirits end, on the scale of <see cref="Company.DaysPassed" />; <c>null</c> when spirits
+///     are normal or the game sets no end.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Spirits(SpiritsLevel Level, int? EndsOnDay);

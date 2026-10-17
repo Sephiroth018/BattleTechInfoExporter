@@ -16,9 +16,8 @@ internal sealed record EventState(
     IReadOnlyList<ScheduledEvent> ScheduledEvents);
 
 /// <summary>
-///     An event a result has scheduled. The days assume a daily roll on every day from the next on; the game skips
-///     the roll on the day the ship arrives at a star system and on the days the story moves on, and on a day one
-///     scheduled event comes, the ones after it in the list don't roll.
+///     An event a result has scheduled. Its days assume a daily roll every day; the game skips the roll on arrival
+///     in a star system and when the story moves on, and the later events in the list on a day one comes.
 /// </summary>
 /// <param name="Event">The event scheduled.</param>
 /// <param name="Pilot">The pilot the event is about; <c>null</c> when the game picks one when it comes.</param>

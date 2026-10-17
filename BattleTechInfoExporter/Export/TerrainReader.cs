@@ -8,8 +8,8 @@ using BattleTechInfoExporter.Models;
 namespace BattleTechInfoExporter.Export;
 
 /// <summary>
-///     Builds the catalog's terrain and biome definitions from the design masks (DesignMaskDef) the game has
-///     loaded, which <see cref="CatalogExporter" /> loads itself. Only fields the game's combat code reads are
+///     Builds the catalog's terrain and biome definitions from the design masks (<see cref="DesignMaskDef" />) the game
+///     has loaded, which <see cref="CatalogExporter" /> loads itself. Only fields the game's combat code reads are
 ///     exported.
 /// </summary>
 internal static class TerrainReader

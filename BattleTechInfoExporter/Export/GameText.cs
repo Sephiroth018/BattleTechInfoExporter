@@ -19,7 +19,8 @@ internal static class GameText
         GenderSwitch.Replace(FormattingTag.Replace(text, string.Empty), "$1");
 
     /// <summary>
-    ///     A stat result's text with its tooltip links resolved, as LocalizableText shows it with links disabled.
+    ///     A stat result's text with its tooltip links resolved, as
+    ///     <see cref="BattleTech.UI.TMProWrapper.LocalizableText" /> shows it with links disabled.
     /// </summary>
     internal static string ToPlainText(ResultDescriptionEntry description)
     {

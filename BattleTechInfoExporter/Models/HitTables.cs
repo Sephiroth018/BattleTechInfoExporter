@@ -56,7 +56,7 @@ internal sealed record MechHitTables(
 /// </summary>
 /// <param name="WeightMultiplier">Multiplies the chosen location's weight, before the pilot's own multiplier.</param>
 /// <param name="DegradePerHit">
-///     The share of the way to 1, from 0 to 1, the multiplier moves after each hit.
+///     The share of the way to 1 the multiplier moves after each hit, as a fraction from 0 to 1.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CalledShotRules(int WeightMultiplier, float DegradePerHit);

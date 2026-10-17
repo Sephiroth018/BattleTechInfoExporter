@@ -84,7 +84,7 @@ internal sealed record ObjectiveResult(
 /// <param name="IsKilled">Whether the pilot died; an incapacitated pilot may survive.</param>
 /// <param name="PilotReadyOnDay">
 ///     The day the pilot is out of the med bay, as the barracks counts it once the contract is resolved; <c>null</c>
-///     for an uninjured or killed pilot.
+///     when the pilot is uninjured or killed.
 /// </param>
 /// <param name="MechKills">The enemy mechs the pilot destroyed in this mission.</param>
 /// <param name="OtherKills">The other enemy units the pilot destroyed in this mission.</param>
@@ -95,12 +95,13 @@ internal sealed record ObjectiveResult(
 /// </param>
 /// <param name="Repair">
 ///     What repairing the mech's damage in the mech bay would take, as for a mech bay mech's
-///     <see cref="ReadyMech.Repair" />; <c>null</c> without damage and for a lost mech.
+///     <see cref="ReadyMech.Repair" />; <c>null</c> when the mech is undamaged or lost.
 /// </param>
 /// <param name="DamagedLocations">The locations that lost armor or structure, from head to legs.</param>
 /// <param name="DamagedComponents">The components damaged or destroyed.</param>
 /// <param name="Ammunition">
-///     The shots fired from every ammo box and every weapon that carries its own ammo, in the mech's component order.
+///     The shots fired from every ammunition box and every weapon that carries its own ammunition, in the mech's
+///     component order.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record LanceUnitOutcome(
@@ -126,14 +127,13 @@ internal sealed record DamagedLocation(ChassisLocations Location, LocationArmor<
 
 /// <summary>A component damaged or destroyed in the mission.</summary>
 /// <param name="Location">The location it is mounted in.</param>
-/// <param name="DamageLevel">The game's damage level, e.g. <c>Penalized</c> or <c>Destroyed</c>.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record DamagedComponent(
     ComponentReference Component,
     ChassisLocations Location,
     ComponentDamageLevel DamageLevel) : ComponentEntry(Component), IDamageable;
 
-/// <summary>The shots a mech fired from an ammo box, or from a weapon that carries its own ammo.</summary>
+/// <summary>The shots a mech fired from an ammunition box, or from a weapon that carries its own ammunition.</summary>
 /// <param name="Location">The location the box or weapon is mounted in.</param>
 /// <param name="ShotsFired">
 ///     The shots fired, also from a box destroyed since; the capacity is
@@ -160,7 +160,7 @@ internal sealed record MissionReputationChange(int? Employer, int? Target, int M
 /// </param>
 /// <param name="Received">
 ///     Everything the company gets: the priority salvage, the salvage drawn at random and <see cref="Automatic" />;
-///     <c>null</c> until the salvage is final.
+///     <c>null</c> when the salvage isn't final yet.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MissionSalvage(

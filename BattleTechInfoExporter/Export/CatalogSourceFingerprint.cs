@@ -20,8 +20,8 @@ namespace BattleTechInfoExporter.Export;
 internal static class CatalogSourceFingerprint
 {
     /// <summary>
-    ///     The types the catalog reads that the career doesn't load (SimGameState.RequestDataManagerResources), so
-    ///     <see cref="CatalogExporter" /> loads them.
+    ///     The types the catalog reads that the career doesn't load
+    ///     (<see cref="SimGameState.RequestDataManagerResources" />), so <see cref="CatalogExporter" /> loads them.
     /// </summary>
     internal static readonly IReadOnlyList<BattleTechResourceType> ResourceTypesTheCareerDoesNotLoad =
     [

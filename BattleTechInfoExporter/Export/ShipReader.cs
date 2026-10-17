@@ -6,7 +6,6 @@ using UnityEngine;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Builds the Argo's upgrades from the game's career state.</summary>
 internal static class ShipReader
 {
     // On the Leopard the starting upgrades are already listed, but the game applies them and shows the engineering

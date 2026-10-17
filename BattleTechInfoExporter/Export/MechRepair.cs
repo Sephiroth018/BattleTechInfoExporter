@@ -6,8 +6,9 @@ using UnityEngine;
 namespace BattleTechInfoExporter.Export;
 
 /// <summary>
-///     Estimates the mech bay's Repair of a mech as its confirmation prices it (MechBayPanel.OnRepairMech): the
-///     structure of every damaged location, the damaged components and the removal of the destroyed ones.
+///     Estimates the mech bay's Repair of a mech as its confirmation prices it
+///     (<see cref="BattleTech.UI.MechBayPanel.OnRepairMech" />): the structure of every damaged location, the damaged
+///     components and the removal of the destroyed ones.
 /// </summary>
 /// <remarks>
 ///     The prices are computed here instead of through SimGameState's Create…WorkOrder methods, because those

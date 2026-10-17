@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Rules",
   "type": "object",
-  "description": "The root of rules.json: how the game works for this career, level tables that values in game-state.json refer to.",
+  "description": "The root of `rules.json`: how the game works for this career, level tables that values in game-state.json refer to.",
   "additionalProperties": false,
   "required": [
     "modVersion",
@@ -55,7 +55,7 @@
       }
     },
     "skills": {
-      "description": "The training table behind skills and abilities.",
+      "description": "The training table behind every pilot's skill levels and abilities, in the barracks and the hiring hall (game-state.json pilots[].skills and game-state.json hiringHall[].skills).",
       "$ref": "#/definitions/SkillRules"
     },
     "spiritsLevels": {
@@ -67,7 +67,7 @@
     },
     "mechPartsPerMech": {
       "type": "integer",
-      "description": "The game-state.json storage.mechParts[] needed to assemble a mech.",
+      "description": "How many parts of a mech, game-state.json storage.mechParts[].count, assemble it.",
       "format": "int32"
     },
     "contractTypes": {
@@ -189,7 +189,7 @@
       ],
       "properties": {
         "level": {
-          "description": "The level as the game names it, e.g. LIKED.",
+          "description": "The level as the game names it, e.g. `LIKED`.",
           "$ref": "#/definitions/SimGameReputation"
         },
         "startsAt": {
@@ -204,11 +204,11 @@
         },
         "canUseSystemStore": {
           "type": "boolean",
-          "description": "Whether the system owner's store is open at this level."
+          "description": "Whether the system store is open at this level with the star system's owner."
         },
         "storePriceChangePercent": {
           "type": "integer",
-          "description": "The change of store prices at this level with the store's faction (the system owner, or the pirates at the black market), as a percentage of an item's cost added to its price, as the UI shows it. It adds to the system's own discount.",
+          "description": "The change of store prices at this level with the store's faction (the star system's owner, or the pirates at the black market), as a percentage of an item's cost added to its price, as the UI shows it. It adds to the star system's own discount.",
           "format": "int32"
         }
       }
@@ -394,11 +394,11 @@
           "description": "The game's description of the ability, as plain text."
         },
         "activationTiming": {
-          "description": "The game's activation timing of the ability, e.g. Passive, ConsumedByFiring or CommandAbility.",
+          "description": "The game's activation timing of the ability, e.g. `Passive`, `ConsumedByFiring` or `CommandAbility`.",
           "$ref": "#/definitions/ActivationTiming"
         },
         "targeting": {
-          "description": "How the ability is aimed; null for one that isn't.",
+          "description": "How the ability is aimed; `null` when it isn't.",
           "oneOf": [
             {
               "type": "null"
@@ -413,7 +413,7 @@
             "integer",
             "null"
           ],
-          "description": "The rounds before the ability can be used again; null without a cooldown.",
+          "description": "The rounds before the ability can be used again; `null` when it has no cooldown.",
           "format": "int32"
         },
         "uses": {
@@ -421,7 +421,7 @@
             "integer",
             "null"
           ],
-          "description": "How often the ability can be used per mission; null without a limit.",
+          "description": "How often the ability can be used per mission; `null` when there's no limit.",
           "format": "int32"
         },
         "effects": {
@@ -444,7 +444,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The definition's id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction)."
         },
         "name": {
           "type": "string",
@@ -523,14 +523,14 @@
           "description": "The statistic's name, as the game names it."
         },
         "operation": {
-          "description": "How value changes the statistic, e.g. Set, Int_Add.",
+          "description": "How value changes the statistic, e.g. `Set`, `Int_Add`.",
           "$ref": "#/definitions/StatOperation"
         },
         "value": {
-          "description": "A boolean, integer or number, as the statistic's type requires. Changes to the initiative statistics (BaseInitiative, PhaseModifier, PhaseModifierSelf) are as the HUD numbers phases, so a positive change makes the unit act earlier."
+          "description": "A boolean, integer or number, as the statistic's type requires. Changes to the initiative statistics (`BaseInitiative`, `PhaseModifier`, `PhaseModifierSelf`) are as the HUD numbers phases, so a positive change makes the unit act earlier."
         },
         "appliesTo": {
-          "description": "The pilot or the components whose statistic changes; null for the unit's own.",
+          "description": "The pilot or the components whose statistic changes; `null` when it's the unit's own.",
           "oneOf": [
             {
               "type": "null"
@@ -541,7 +541,7 @@
           ]
         },
         "duration": {
-          "description": "How long the change lasts; null when it lasts for the whole mission.",
+          "description": "How long the change lasts; `null` when it lasts for the whole mission.",
           "oneOf": [
             {
               "type": "null"
@@ -552,11 +552,11 @@
           ]
         },
         "target": {
-          "description": "Whose statistic changes: the unit with the ability or component (Creator), the unit it targets (SingleTarget) or a group around it; always one the game acts on, where its data leaves it unset.",
+          "description": "Whose statistic changes: the unit with the ability or component (`Creator`), the unit it targets (`SingleTarget`) or a group around it; always one the game acts on, where its data leaves it unset.",
           "$ref": "#/definitions/EffectTargetType"
         },
         "trigger": {
-          "description": "When the change is made, e.g. on the ability's activation, on a hit or always (Passive).",
+          "description": "When the change is made, e.g. on the ability's activation, on a hit or always (`Passive`).",
           "$ref": "#/definitions/EffectTriggerType"
         }
       }
@@ -629,7 +629,7 @@
           "$ref": "#/definitions/TargetCollection"
         },
         "filter": {
-          "description": "Which of the weapons or ammunition boxes; null for all of them, and always for the pilot, the random and the strongest weapon.",
+          "description": "Which of the weapons or ammunition boxes; `null` when it's all of them, and always for the pilot, the random and the strongest weapon.",
           "oneOf": [
             {
               "type": "null"
@@ -660,7 +660,7 @@
       ]
     },
     "ComponentFilter": {
-      "description": "The one property the game filters the components by; the game's data can name several, of which only the first in ComponentFilterKind's order counts. Each kind has a record with its value's type.",
+      "description": "The one property the game filters the components by; the game's data can name several, of which only the first in ComponentFilterKind's order counts. Each kind has a shape with its value's type.",
       "x-abstract": true,
       "anyOf": [
         {
@@ -766,7 +766,7 @@
           ]
         },
         "value": {
-          "description": "The weapon sub type the weapons must have, e.g. Melee or DFA.",
+          "description": "The weapon sub type the weapons must have, e.g. `Melee` or `DFA`.",
           "$ref": "#/definitions/WeaponSubType"
         }
       }
@@ -888,7 +888,7 @@
           ]
         },
         "value": {
-          "description": "The weapon type the weapons must have, e.g. LRM or SRM.",
+          "description": "The weapon type the weapons must have, e.g. `LRM` or `SRM`.",
           "$ref": "#/definitions/WeaponType"
         }
       }
@@ -945,7 +945,7 @@
     },
     "EffectDurationUnit": {
       "type": "string",
-      "description": "What an effect's duration counts, as Effect picks its ETimer.",
+      "description": "What an effect's duration counts, as `Effect` picks its `ETimer`. `activations`: The activations of the unit that made the effect. `targetActivations`: The activations of the unit the effect is on.",
       "x-enumNames": [
         "Activations",
         "TargetActivations",
@@ -1100,7 +1100,7 @@
     },
     "SkillLevel": {
       "type": "object",
-      "description": "A level of a skill; the skills with numbers of their own per level derive from it.",
+      "description": "A level of a skill; the shapes of the skills with numbers of their own per level add those.",
       "additionalProperties": false,
       "required": [
         "level",
@@ -1178,7 +1178,7 @@
       ],
       "properties": {
         "type": {
-          "description": "The mission type; the id Priority stands for every priority mission.",
+          "description": "The mission type; the id `Priority` stands for every priority mission.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "description": {
@@ -1190,7 +1190,7 @@
             "null",
             "number"
           ],
-          "description": "Multiplies the pay of the type's contracts (see ContractRules); null for priority missions, whose pay the story sets.",
+          "description": "Multiplies the pay of the type's contracts (see ContractRules); `null` when the type is `Priority`, whose pay the story sets.",
           "format": "float"
         }
       }
@@ -1211,14 +1211,14 @@
         },
         "distance": {
           "type": "number",
-          "description": "The distance in meters, before the jump jets' JumpDistanceMultiplier effects, which add to a multiplier of 1.",
+          "description": "The distance in meters, which 1 plus the jump jets' `JumpDistanceMultiplier` effects multiplies.",
           "format": "float"
         }
       }
     },
     "CombatRules": {
       "type": "object",
-      "description": "The combat rules: the constants behind to-hit, evasion, cover, damage, heat, stability, melee, hit locations, visibility, resolve and movement. A to-hit modifier is added to the attack's difficulty: positive makes the shot harder, negative is a bonus.",
+      "description": "The combat rules: the constants behind to-hit, evasion, cover, damage, heat, stability, melee, hit locations, visibility, resolve and movement. A to-hit modifier is added to the attack's difficulty: positive makes the attack harder, negative is a bonus.",
       "additionalProperties": false,
       "required": [
         "toHit",
@@ -1245,7 +1245,7 @@
           "$ref": "#/definitions/ToHitRules"
         },
         "evasion": {
-          "description": "The evasive pips units earn by moving.",
+          "description": "The evasion pips units earn by moving.",
           "$ref": "#/definitions/EvasionRules"
         },
         "guard": {
@@ -1262,13 +1262,13 @@
         },
         "weaponCategories": {
           "type": "object",
-          "description": "By the weapon category's name, as the catalog's weapons name theirs; Melee is the melee and jump attacks'. AMS is a category no exported weapon has.",
+          "description": "By the weapon category's name, as the catalog's weapons name theirs; `Melee` is the melee and jump attacks'. `AMS` is a category no exported weapon has.",
           "additionalProperties": {
             "$ref": "#/definitions/WeaponCategoryRules"
           }
         },
         "strayShots": {
-          "description": "What a missed shot can hit instead; null when misses hit nothing.",
+          "description": "What a missed shot can hit instead; `null` when misses hit nothing.",
           "oneOf": [
             {
               "type": "null"
@@ -1279,7 +1279,7 @@
           ]
         },
         "coil": {
-          "description": "How COIL weapons gain from the attacker's evasive pips.",
+          "description": "How COIL weapons gain from the attacker's evasion pips.",
           "$ref": "#/definitions/CoilRules"
         },
         "heat": {
@@ -1574,7 +1574,7 @@
         },
         "modifierPerLevel": {
           "type": "number",
-          "description": "Subtracted per level the attacker stands above the target, added per level below.",
+          "description": "The modifier per level of height difference.",
           "format": "float"
         },
         "usesMultipleLevels": {
@@ -1669,7 +1669,7 @@
     },
     "EvasionRules": {
       "type": "object",
-      "description": "How a unit earns evasive pips by moving and what each pip does to ranged attacks against it. A sensor lock strips pips (see SensorLockRules.evasivePipsStripped).",
+      "description": "How a unit earns evasion pips by moving and what each pip does to ranged attacks against it. A sensor lock strips pips (see SensorLockRules.evasivePipsStripped).",
       "additionalProperties": false,
       "required": [
         "pipsByDistanceMoved",
@@ -1682,7 +1682,7 @@
       "properties": {
         "pipsByDistanceMoved": {
           "type": "array",
-          "description": "The pips for moving more than a distance; a jump adds one, also in place, and the unit's own maximum caps them. A mech moving more than 12 m then gets its EvasivePipsGainedAdditional statistic on top, past the cap.",
+          "description": "The pips for moving more than a distance; a jump adds one, also in place, and the unit's own maximum caps them. A mech moving more than 12 m then gets its `EvasivePipsGainedAdditional` statistic on top, past the cap.",
           "items": {
             "$ref": "#/definitions/EvasivePips"
           }
@@ -1714,13 +1714,13 @@
         },
         "canVehiclesBeEvasive": {
           "type": "boolean",
-          "description": "Whether vehicles get evasive pips at all."
+          "description": "Whether vehicles get evasion pips at all."
         }
       }
     },
     "EvasivePips": {
       "type": "object",
-      "description": "The evasive pips a move longer than a distance earns.",
+      "description": "The evasion pips a move longer than a distance earns.",
       "additionalProperties": false,
       "required": [
         "moreThan",
@@ -1813,12 +1813,12 @@
         },
         "clearRatio": {
           "type": "number",
-          "description": "The share of clear sight lines, from 0 to 1, for a clear line of fire.",
+          "description": "The share of clear sight lines for a clear line of fire, as a fraction from 0 to 1.",
           "format": "float"
         },
         "obstructedRatio": {
           "type": "number",
-          "description": "The share of clear sight lines, from 0 to 1, for an obstructed line of fire.",
+          "description": "The share of clear sight lines for an obstructed line of fire, as a fraction from 0 to 1.",
           "format": "float"
         },
         "minRatioFromUnits": {
@@ -1871,7 +1871,7 @@
         },
         "isAffectedByEvasion": {
           "type": "boolean",
-          "description": "Whether the target's evasive pips apply to the category's attacks; the weapon's type must also be one of EvasionRules.weaponTypesAffected."
+          "description": "Whether the target's evasion pips apply to the category's attacks; the weapon's type must also be one of EvasionRules.weaponTypesAffected."
         }
       }
     },
@@ -1884,7 +1884,7 @@
       ],
       "properties": {
         "unitsHit": {
-          "description": "Which units a missed shot can hit, from the attacker's side: ENEMIES_ONLY, ENEMIES_AND_NEUTRAL or EVERYONE; null when it hits only buildings.",
+          "description": "Which units a missed shot can hit, from the attacker's side: `ENEMIES_ONLY`, `ENEMIES_AND_NEUTRAL` or `EVERYONE`; `null` when it hits only buildings.",
           "oneOf": [
             {
               "type": "null"
@@ -1912,7 +1912,7 @@
     },
     "CoilRules": {
       "type": "object",
-      "description": "How a COIL weapon gains from its mech's evasive pips; the weapon's own values are its catalog.json componentDefinitions.weapons.*.coil.",
+      "description": "How a COIL weapon gains from its mech's evasion pips; the weapon's own values are its catalog.json componentDefinitions.weapons.*.coil.",
       "additionalProperties": false,
       "required": [
         "multipliesShots",
@@ -2037,7 +2037,7 @@
     },
     "StabilityRules": {
       "type": "object",
-      "description": "The stability rules of mechs. A mech's stability bar is divided into equal levels; a mech that reaches unsteadyAbovePercent of its stability is unsteady and loses its evasive pips, and an unsteady mech that fills the bar is knocked down.",
+      "description": "The stability rules of mechs. A mech's stability bar is divided into equal levels; a mech that reaches unsteadyAbovePercent of its stability is unsteady and loses its evasion pips, and an unsteady mech that fills the bar is knocked down.",
       "additionalProperties": false,
       "required": [
         "unsteadyAbovePercent",
@@ -2052,7 +2052,7 @@
       "properties": {
         "unsteadyAbovePercent": {
           "type": "integer",
-          "description": "In percent of the stability bar; a mech's UnsteadyThreshold statistic starts at it, and combat-state.json units.*.state.mech.stability.unsteadyAbove is its current value in points.",
+          "description": "In percent of the stability bar; a mech's `UnsteadyThreshold` statistic starts at it, and combat-state.json units.*.state.mech.stability.unsteadyAbove is its current value in points.",
           "format": "int32"
         },
         "levels": {
@@ -2213,7 +2213,7 @@
     },
     "MeleeAttackRules": {
       "type": "object",
-      "description": "The melee rules; damage and stability damage are the chassis' in the catalog. A melee attack against a turret, a building, a prone or a shut-down mech always has the maximum hit chance. The damage against vehicles and turrets is multiplied by the Melee weapon category's (see CombatRules.weaponCategories).",
+      "description": "The melee rules; damage and stability damage are the chassis' in the catalog. A melee attack against a turret, a building, a prone or a shut-down mech always has the maximum hit chance. The damage against vehicles and turrets is multiplied by the `Melee` weapon category's (see CombatRules.weaponCategories).",
       "additionalProperties": false,
       "required": [
         "deathFromAboveToHit",
@@ -2507,7 +2507,7 @@
         },
         "degradePerHit": {
           "type": "number",
-          "description": "The share of the way to 1, from 0 to 1, the multiplier moves after each hit.",
+          "description": "The share of the way to 1 the multiplier moves after each hit, as a fraction from 0 to 1.",
           "format": "float"
         }
       }
@@ -2635,12 +2635,12 @@
       "properties": {
         "evasivePipsStripped": {
           "type": "integer",
-          "description": "The evasive pips the target loses; 0 when a sensor lock strips none.",
+          "description": "The evasion pips the target loses; 0 when a sensor lock strips none.",
           "format": "int32"
         },
         "targetEffects": {
           "type": "array",
-          "description": "The statistic changes the target gets, one entry per application of a change the game applies repeatedly. The change of -999 to GhostEffectStacks removes all of the target's stealth pips from ECM, however many it has: the game counts them only above 0.",
+          "description": "The statistic changes the target gets, one entry per application of a change the game applies repeatedly. The change of -999 to `GhostEffectStacks` removes all of the target's stealth pips from ECM, however many it has: the game counts them only above 0.",
           "items": {
             "$ref": "#/definitions/StatisticChange"
           }
@@ -2721,7 +2721,7 @@
         },
         "addsUnitResolveBonuses": {
           "type": "boolean",
-          "description": "Whether the units' resolve bonuses add to the gain, the MoraleBonusGain statistic that cockpit mods change."
+          "description": "Whether the units' resolve bonuses add to the gain, the `MoraleBonusGain` statistic that cockpit mods change."
         },
         "onlyBiggestUnitResolveBonus": {
           "type": "boolean",
@@ -2764,7 +2764,7 @@
     },
     "ResolveEventThresholds": {
       "type": "object",
-      "description": "The shares, from 0 to 1, at which an attack's resolve events happen.",
+      "description": "The shares at which an attack's resolve events happen, as fractions from 0 to 1.",
       "additionalProperties": false,
       "required": [
         "majorityHit",
@@ -2943,7 +2943,7 @@
         },
         "minMultiplier": {
           "type": "number",
-          "description": "The least share of the distance a mech keeps, from 0 to 1.",
+          "description": "The least share of the distance a mech keeps, as a fraction from 0 to 1.",
           "format": "float"
         },
         "pivotInPlaceThreshold": {
@@ -3130,7 +3130,7 @@
     },
     "InstallCosts": {
       "type": "object",
-      "description": "By the component's category: weapons by their type, where ballistic covers autocannons, Gauss rifles and machine guns, missile LRMs and SRMs, energy lasers, PPCs and COILs, and support flamers; other weapons and upgrades are other.",
+      "description": "By the component's category, weapons by their type.",
       "additionalProperties": false,
       "required": [
         "ballistic",
@@ -3233,17 +3233,17 @@
       "properties": {
         "incapacitated": {
           "type": "number",
-          "description": "Without lethal injuries, as a 0-1 fraction; 1 or more is certain before Guts.",
+          "description": "Without lethal injuries, as a fraction from 0 to 1; 1 or more is certain before Guts.",
           "format": "float"
         },
         "lethal": {
           "type": "number",
-          "description": "After lethal injuries, as a 0-1 fraction; 1 or more is certain before Guts.",
+          "description": "After lethal injuries, as a fraction from 0 to 1; 1 or more is certain before Guts.",
           "format": "float"
         },
         "reductionPerGuts": {
           "type": "number",
-          "description": "As a 0-1 fraction; the chance doesn't fall below 0.",
+          "description": "As a fraction from 0 to 1; the chance doesn't fall below 0.",
           "format": "float"
         }
       }
@@ -3266,7 +3266,7 @@
       "properties": {
         "costPerBaseSkillPoint": {
           "type": "number",
-          "description": "The hiring price, before the system owner's reputation adjustment.",
+          "description": "The hiring price, before the adjustment for the reputation with the star system's owner.",
           "format": "float"
         },
         "salaryPerBaseSkillPoint": {
@@ -3281,12 +3281,12 @@
         },
         "pilotsPerSystem": {
           "type": "integer",
-          "description": "How many pilots a system's hiring hall offers.",
+          "description": "How many pilots a star system's hiring hall offers.",
           "format": "int32"
         },
         "roninChance": {
           "type": "number",
-          "description": "The chance of each of them being a ronin, unless the system sets its own.",
+          "description": "The chance of each of them being a ronin, unless the star system sets its own.",
           "format": "float"
         },
         "generatedPilotHealth": {
@@ -3372,7 +3372,7 @@
         },
         "priorityShare": {
           "type": "number",
-          "description": "The share of the picks that are priority picks, a 0-1 fraction, rounded down.",
+          "description": "The share of the picks that are priority picks, as a fraction from 0 to 1, rounded down.",
           "format": "float"
         },
         "maxPriorityPicks": {
@@ -3420,7 +3420,7 @@
       "properties": {
         "chance": {
           "type": "number",
-          "description": "Multiplies the picks, as a 0-1 fraction.",
+          "description": "Multiplies the picks, as a fraction from 0 to 1.",
           "format": "float"
         },
         "chanceLostPerMechDestroyed": {
@@ -3478,7 +3478,7 @@
     },
     "RareSalvageSwap": {
       "type": "object",
-      "description": "The chance of a swap is the contract's difficulty plus the tier's chanceOffset, divided by divisor; the very rare tier is rolled first.",
+      "description": "The chance of a swap is the contract's difficulty plus the tier's `chanceOffset`, divided by divisor; the very rare tier is rolled first.",
       "additionalProperties": false,
       "required": [
         "veryRare",
@@ -3496,7 +3496,7 @@
         },
         "divisor": {
           "type": "number",
-          "description": "Divides the contract's difficulty plus a tier's offset, giving the tier's 0-1 chance.",
+          "description": "Divides the contract's difficulty plus a tier's offset, giving the tier's chance as a fraction from 0 to 1.",
           "format": "float"
         }
       }
@@ -3633,7 +3633,7 @@
       ],
       "properties": {
         "level": {
-          "description": "The spending level, as the game names it, e.g. Spartan.",
+          "description": "The spending level, as the game names it, e.g. `Spartan`.",
           "$ref": "#/definitions/EconomyScale"
         },
         "costMultiplier": {
@@ -3693,7 +3693,7 @@
         },
         "payVariance": {
           "type": "number",
-          "description": "The most the pay varies either way, as a 0-1 fraction of it.",
+          "description": "The most the pay varies either way, as a fraction of it from 0 to 1.",
           "format": "float"
         },
         "guaranteedPayShare": {
@@ -3726,27 +3726,27 @@
         },
         "difficultyVariance": {
           "type": "integer",
-          "description": "A contract's difficulty is the system's plus the global one, varied by up to this either way.",
+          "description": "A contract's difficulty is the star system's plus the global one, varied by up to this either way.",
           "format": "int32"
         },
         "maxPerSystem": {
           "type": "integer",
-          "description": "The most contracts a system offers at once, unless it sets its own.",
+          "description": "The most contracts a star system offers at once, unless it sets its own.",
           "format": "int32"
         },
         "renewedPerRefresh": {
           "type": "number",
-          "description": "Added to a system's open contract slots at each renewal.",
+          "description": "Added to a star system's open contract slots at each renewal.",
           "format": "float"
         },
         "refreshDays": {
           "type": "integer",
-          "description": "A system's open contract slots are renewed once more than this many days passed since their last renewal, so every refreshDays + 1 days.",
+          "description": "A star system's open contract slots are renewed once more than this many days passed since their last renewal, so every refreshDays + 1 days.",
           "format": "int32"
         },
         "removedPerCompleted": {
           "type": "number",
-          "description": "Taken off a system's open contract slots for each contract completed there.",
+          "description": "Taken off a star system's open contract slots for each contract completed there.",
           "format": "float"
         }
       }
@@ -3888,7 +3888,7 @@
     },
     "TravelRules": {
       "type": "object",
-      "description": "How long a trip takes, which the star systems file states per system: the days of each jump plus the days to and from the jump point of the systems at both ends, scaled by the Argo's drive upgrades.",
+      "description": "How long a trip takes, which each star system's route in star-systems.json starSystems states: the days of each jump plus the days to and from the jump point of the star systems at both ends, scaled by the Argo's drive upgrades.",
       "additionalProperties": false,
       "required": [
         "daysPerJump",
@@ -3899,17 +3899,17 @@
       "properties": {
         "daysPerJump": {
           "type": "integer",
-          "description": "Of a jump from a system without a fuel station.",
+          "description": "Of a jump from a star system without a fuel station.",
           "format": "int32"
         },
         "daysPerJumpFromFuelStation": {
           "type": "integer",
-          "description": "Of a jump from a system with one.",
+          "description": "Of a jump from a star system with one.",
           "format": "int32"
         },
         "defaultDaysToJumpPoint": {
           "type": "integer",
-          "description": "For a system that sets no distance of its own.",
+          "description": "For a star system that sets no distance of its own.",
           "format": "int32"
         },
         "maxJumpDistance": {

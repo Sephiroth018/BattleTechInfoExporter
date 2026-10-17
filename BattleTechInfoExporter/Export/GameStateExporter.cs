@@ -4,7 +4,6 @@ using Starmap = BattleTechInfoExporter.Models.Starmap;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>The single entry point every trigger of the career state export calls.</summary>
 internal static class GameStateExporter
 {
     internal static void Export(SimGameState simGame, ExportTrigger trigger) =>

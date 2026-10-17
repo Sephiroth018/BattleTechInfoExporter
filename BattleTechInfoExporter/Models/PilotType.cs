@@ -1,6 +1,6 @@
 namespace BattleTechInfoExporter.Models;
 
-/// <summary>The game's pilot types, as SimGameState.GetPilotTypeColor tells them apart.</summary>
+/// <summary>The game's pilot types.</summary>
 internal enum PilotType
 {
     Commander,

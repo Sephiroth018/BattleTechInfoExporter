@@ -5,7 +5,6 @@ using BattleTechInfoExporter.Models;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Builds the last lance from the game's career state.</summary>
 internal static class LanceReader
 {
     // Mirrors SimGameState.GetLastLance, which reads the first four units and drops those where neither the mech

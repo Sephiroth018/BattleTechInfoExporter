@@ -89,9 +89,7 @@ internal sealed record TargetWeightClassModifiers(
 ///     the attacker stands below the target, a bonus of as much per level above it.
 /// </summary>
 /// <param name="LevelHeight">In meters.</param>
-/// <param name="ModifierPerLevel">
-///     Subtracted per level the attacker stands above the target, added per level below.
-/// </param>
+/// <param name="ModifierPerLevel">The modifier per level of height difference.</param>
 /// <param name="UsesMultipleLevels">Whether more than one level counts.</param>
 /// <param name="AppliesPenalties">Whether an attacker below the target is penalized.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

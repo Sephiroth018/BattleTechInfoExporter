@@ -5,7 +5,8 @@ namespace BattleTechInfoExporter.Models;
 
 /// <summary>
 ///     A combat map some star system's contracts can be fought on, and the terrain it is made of. The contract
-///     generator draws a star system's map among the maps <c>star-systems.json</c> lists for the system, by weight.
+///     generator draws a star system's map among the maps its entry in <see cref="Starmap.StarSystems" /> lists,
+///     by weight.
 /// </summary>
 /// <param name="Name">The map's friendly name.</param>
 /// <param name="Biome">The map's biome, as the star systems refer to it.</param>

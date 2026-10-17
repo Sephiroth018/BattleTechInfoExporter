@@ -1,6 +1,9 @@
 namespace BattleTechInfoExporter.Models;
 
-/// <summary>How a unit could fire at a target from where it stands (the game's <c>FiringPreviewManager</c>).</summary>
+/// <summary>
+///     How a unit could fire at a target from where it stands (the game's
+///     <see cref="BattleTech.FiringPreviewManager" />).
+/// </summary>
 internal enum FireAvailability
 {
     /// <summary>The line of fire isn't blocked and the target is within the longest weapon's range.</summary>

@@ -59,8 +59,10 @@ internal static class MapHexReader
     }
 
     /// <summary>
-    ///     The hex as it is now: the height a unit standing on it is at (PathNodeGrid.GetPathNode), a building's roof
-    ///     where one stands, rounded to 0.1 m, and the terrain it is in (AbstractActor.OnPositionUpdate).
+    ///     The hex as it is now: the height a unit standing on it is at
+    ///     (<see cref="PathNodeGrid.GetPathNode(int, int, int, PathNode, List{AbstractActor})" />), a building's roof
+    ///     where one stands, rounded to 0.1 m, and the terrain it is in
+    ///     (<see cref="AbstractActor.OnPositionUpdate" />).
     /// </summary>
     internal static MapHex ReadHex(CombatGameState combat, HexPoint3 hex)
     {

@@ -7,11 +7,13 @@ namespace BattleTechInfoExporter.Models;
 ///     Hiring and paying pilots. A pilot's skill total is the sum of their four skills; their base skills are the
 ///     ones they were hired with, the bonus skills the ones trained since.
 /// </summary>
-/// <param name="CostPerBaseSkillPoint">The hiring price, before the system owner's reputation adjustment.</param>
+/// <param name="CostPerBaseSkillPoint">
+///     The hiring price, before the adjustment for the reputation with the star system's owner.
+/// </param>
 /// <param name="SalaryPerBaseSkillPoint">Per financial report.</param>
 /// <param name="SalaryPerBonusSkillPoint">Per financial report.</param>
-/// <param name="PilotsPerSystem">How many pilots a system's hiring hall offers.</param>
-/// <param name="RoninChance">The chance of each of them being a ronin, unless the system sets its own.</param>
+/// <param name="PilotsPerSystem">How many pilots a star system's hiring hall offers.</param>
+/// <param name="RoninChance">The chance of each of them being a ronin, unless the star system sets its own.</param>
 /// <param name="GeneratedPilotHealth">The health, the injuries they can take, of the pilots the game generates.</param>
 /// <param name="MoraleLimits">Low company morale limits who can be hired.</param>
 /// <param name="MaxPilotsPerBarracksPod">The roster size each barracks pod of the ship allows.</param>

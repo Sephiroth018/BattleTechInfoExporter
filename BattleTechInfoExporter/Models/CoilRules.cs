@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     How a COIL weapon gains from its mech's evasive pips; the weapon's own values are its
+///     How a COIL weapon gains from its mech's evasion pips; the weapon's own values are its
 ///     <see cref="WeaponDefinition.Coil" />.
 /// </summary>
 /// <param name="MultipliesShots">

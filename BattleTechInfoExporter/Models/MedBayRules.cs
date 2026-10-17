@@ -26,8 +26,10 @@ internal sealed record MedBayRules(
 ///     The chance that an incapacitated pilot dies after the mission: <see cref="Incapacitated" />, or
 ///     <see cref="Lethal" /> after lethal injuries, less <see cref="ReductionPerGuts" /> per point of Guts.
 /// </summary>
-/// <param name="Incapacitated">Without lethal injuries, as a 0-1 fraction; 1 or more is certain before Guts.</param>
-/// <param name="Lethal">After lethal injuries, as a 0-1 fraction; 1 or more is certain before Guts.</param>
-/// <param name="ReductionPerGuts">As a 0-1 fraction; the chance doesn't fall below 0.</param>
+/// <param name="Incapacitated">
+///     Without lethal injuries, as a fraction from 0 to 1; 1 or more is certain before Guts.
+/// </param>
+/// <param name="Lethal">After lethal injuries, as a fraction from 0 to 1; 1 or more is certain before Guts.</param>
+/// <param name="ReductionPerGuts">As a fraction from 0 to 1; the chance doesn't fall below 0.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record PilotDeathChance(float Incapacitated, float Lethal, float ReductionPerGuts);

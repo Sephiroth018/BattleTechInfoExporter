@@ -15,8 +15,8 @@ internal sealed record Ship(IReadOnlyList<ShipUpgrade> Upgrades);
 /// <summary>A ship upgrade as the engineering screen shows it.</summary>
 /// <param name="Upgrade">The ship upgrade's id and name.</param>
 /// <param name="Status">Where the upgrade stands, as the engineering screen shows it.</param>
-/// <param name="Category">The engineering screen's group, e.g. "Mech Bay".</param>
-/// <param name="Location">The room of the ship the upgrade's details name, e.g. <c>MECH_BAY</c>.</param>
+/// <param name="Category">The engineering screen's group, e.g. <c>Mech Bay</c>.</param>
+/// <param name="Location">The ship's room the upgrade is in, as its details name it, e.g. <c>MECH_BAY</c>.</param>
 /// <param name="Details">The upgrade's description, which also names effects the stats don't, e.g. training.</param>
 /// <param name="RequiredUpgrades">The upgrades that must be installed before this one can be bought.</param>
 /// <param name="Price">The one-time C-Bills to buy the upgrade.</param>
@@ -50,6 +50,6 @@ internal sealed record ShipUpgradeEffect : CareerStatisticChange
         Description = description;
     }
 
-    /// <summary>The effect in the game's words, e.g. "+2 Morale".</summary>
+    /// <summary>The effect in the game's words, e.g. <c>+2 Morale</c>.</summary>
     public string Description { get; }
 }

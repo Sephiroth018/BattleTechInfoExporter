@@ -32,8 +32,8 @@ internal static class EventStatisticReader
     }
 
     /// <summary>
-    ///     The statistics as SimGameState.MeetsStatRequirements compares them: as a number, 0 for one the collection
-    ///     doesn't have.
+    ///     The statistics as <see cref="SimGameState.MeetsStatRequirements" /> compares them: as a number, 0 for one
+    ///     the collection doesn't have.
     /// </summary>
     internal static SortedDictionary<string, float> ReadStatistics(
         StatCollection statistics,

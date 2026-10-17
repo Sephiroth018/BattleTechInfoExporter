@@ -9,7 +9,7 @@ namespace BattleTechInfoExporter.Export;
 
 /// <summary>
 ///     Builds the catalog's item collections from the collections the game has loaded, all of them at the career's
-///     start (SimGameState.RequestDataManagerResources).
+///     start (<see cref="SimGameState.RequestDataManagerResources" />).
 /// </summary>
 internal static class ItemCollectionReader
 {
