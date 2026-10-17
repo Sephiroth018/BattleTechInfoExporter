@@ -6,11 +6,13 @@ namespace BattleTechInfoExporter.Models;
 /// <summary>
 ///     A terrain's effects on the units in it: forest, water, rough ground, roads and the like. A cell has one
 ///     terrain at most, so the effects never stack; the map's biome applies on top (see
-///     <see cref="BiomeDefinition" />).
+///     <see cref="BiomeDefinition" />). Only the effects the game's combat code reads are exported; the tooltips also
+///     name a stability damage multiplier, which only the AI reads.
 /// </summary>
 /// <param name="Name">As the combat HUD shows it.</param>
 /// <param name="MoveCost">
-///     What a step into the terrain costs of the unit's movement, per meter of the step: open ground costs 1.05;
+///     What a step into the terrain costs of the unit's movement, per meter of the step, in place of what it costs on
+///     open ground: the normal move cost of the unit's pathing capabilities, 1.05 for all of the game's;
 ///     <c>null</c> when the unit can't enter it.
 /// </param>
 /// <param name="SprintMultiplier">Multiplies the move cost when sprinting; <c>null</c> when the unit can't enter it.</param>

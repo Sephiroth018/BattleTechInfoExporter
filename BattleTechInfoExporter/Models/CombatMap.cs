@@ -16,16 +16,19 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="HexGrid">How the hexes' axial coordinates map to positions in meters, and their neighbors.</param>
 /// <param name="Terrains">
 ///     The legend of <see cref="HexRow.Terrains" />: each character's terrain, keyed as in
-///     <see cref="Catalog.TerrainDefinitions" />; <c>.</c> is open ground (<c>null</c>).
+///     <see cref="Catalog.TerrainDefinitions" />; <c>.</c> is open ground (<c>null</c>). A cell's terrain is the
+///     first of: map boundary, impassable, destroyed building, deep water, water, the terrain of the building on
+///     it, road, the map's custom terrain, forest, rough ground; otherwise open ground.
 /// </param>
 /// <param name="PathingGroups">
 ///     The groups of the game's pathing capabilities units move with
 ///     (<see cref="ChassisMovement.PathingId" />) that block the same steps, by id; <see cref="HexRow.BlockedSteps" />
-///     has an entry per group.
+///     has an entry per group. The game's own data makes two groups, the mechs' and the vehicles'.
 /// </param>
 /// <param name="Buildings">
-///     Every building on the map when the file was written, in the order of their ids; a dropship only if it had
-///     landed by then.
+///     Every building on the map when the file was written, in the order of their ids. A dropship counts only if it
+///     had landed by then: hovering or not yet arrived, it occupies no hex, and one landing later, e.g. the Leopard an
+///     evacuation calls in, isn't here but can be in the combat state's building lists.
 /// </param>
 /// <param name="Rows">
 ///     The hexes a unit can stand on, by <c>r</c>, then <c>q</c>; a row of hexes with a gap in the playable area is
@@ -84,7 +87,9 @@ internal sealed record CombatBuilding(string Id, string Name, MapPosition Positi
 /// </param>
 /// <param name="BlockedSteps">
 ///     Per entry of <see cref="CombatMap.PathingGroups" />, the steps to neighbors its units can't take on slopes,
-///     one character per hex as <see cref="HexGridLayout.BlockedStepsFormula" /> says. An approximation: a blocked
+///     one character per hex as <see cref="HexGridLayout.BlockedStepsFormula" /> says: too steep a grade between
+///     path nodes, too steep ground or a ledge in between. Terrain move costs and units in the way aren't part of it;
+///     impassable terrain has its own character in <see cref="CombatMap.Terrains" />. An approximation: a blocked
 ///     step may still be reachable by a detour; a player unit's <see cref="CombatUnit.Movement" /> is exact.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

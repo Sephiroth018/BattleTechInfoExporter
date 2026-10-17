@@ -6,7 +6,9 @@ namespace BattleTechInfoExporter.Models;
 
 /// <summary>
 ///     A mech: a loadout on a chassis, as a mech assembled from parts or bought comes with it. The frame is in
-///     <see cref="Catalog.ChassisDefinitions" />.
+///     <see cref="Catalog.ChassisDefinitions" />. The game's appearance dates aren't exported, as the campaign
+///     ignores them; nor are the company tags a few DLC mechs need before enemy lances field them, which finishing a
+///     flashpoint adds.
 /// </summary>
 /// <param name="Name">The name with the variant, as in the references to the mech.</param>
 /// <param name="Chassis">The mech's chassis, in <see cref="Catalog.ChassisDefinitions" />.</param>

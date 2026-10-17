@@ -7,7 +7,8 @@ namespace BattleTechInfoExporter.Models;
 ///     The hexes a player's unit can end its move on, read from the game's own pathing, with the evasion pips it gets
 ///     and the attacks it has there. A unit that has activated gets those of its next activation, from where it
 ///     stands. Laid out in rows of characters, as <see cref="MovementLegend" /> explains, like
-///     <see cref="CombatMap.Rows" />, whose hexes give each hex's terrain and elevation.
+///     <see cref="CombatMap.Rows" />, whose hexes give each hex's terrain and elevation. The facing after a move isn't
+///     exported, as the unit can turn at its end.
 /// </summary>
 /// <param name="Targets">
 ///     The enemies in full view (<see cref="UnitVisibility.Full" />) by unit id, in the order of
@@ -42,7 +43,10 @@ internal sealed record MovementRow(
     IReadOnlyList<string> Attacks);
 
 /// <summary>How to read <see cref="UnitMovement" />'s rows, spelled out so the file explains itself.</summary>
-/// <param name="Moves">How to read the characters of the moves.</param>
+/// <param name="Moves">
+///     How to read the characters of the moves, whose evasion pips come from the length of the path the unit would
+///     walk there, or a jump's straight distance.
+/// </param>
 /// <param name="Fire">The first character of an attack: how the unit could fire at the target from the hex.</param>
 /// <param name="Side">The second character of an attack: the side of the target an attack from the hex hits.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Catalog",
   "type": "object",
-  "description": "The root of `catalog.json`: every chassis, mech, vehicle, turret, component, terrain, biome, map, event, item collection and faction definition the game has loaded, keyed by id. It describes the game, not the career, so it only changes with the game's data.",
+  "description": "The root of `catalog.json`: every chassis, mech, vehicle, turret, component, terrain, biome, map, event, item collection and faction definition the game has loaded, keyed by id. It describes the game, not the career, so it only changes with the game's data. Left out are the tutorial's target dummies and target vehicles, the copies of stock mechs the game makes for unlocked skins, the game's internal melee and AI weapons and the ammunition boxes for weapons that carry their own ammunition, such as flamers.",
   "additionalProperties": false,
   "required": [
     "modVersion",
@@ -37,7 +37,7 @@
     },
     "sourceFingerprint": {
       "type": "string",
-      "description": "A hash of the game's data files the catalog was built from: of every one it reads, its id, file and last write time; the catalog is rebuilt when it differs from the game's current data."
+      "description": "A hash of the game's data files the catalog was built from: of every one it reads, its id, file and last write time; the catalog is rebuilt when it differs from the game's current data. A game update, a DLC bought or removed, a mod installed, updated, removed or disabled, or a ModTek merge re-run changes it; a DLL mod patching definitions in memory doesn't, so deleting the file is what forces a rebuild then."
     },
     "chassisDefinitions": {
       "type": "object",
@@ -117,7 +117,7 @@
   "definitions": {
     "ExportTrigger": {
       "type": "string",
-      "description": "What caused an export.",
+      "description": "What caused an export. `careerLoaded`: A career is loaded, new or from a save. The game state is skipped while a finished contract's results are still to be applied, and the catalog is rebuilt only when it's missing or stale, once the game has loaded every vehicle, turret and design mask. `manualSave`: The player saves the career outside combat. `autosave`: The game saves the career on its own outside combat, e.g. once an event's popup is closed with the picked option's results applied, or once a contract's results are applied. `contractCompleted`: A contract's results are applied, salvage included, where the game doesn't save the career afterwards, which is `autosave` otherwise. `financialReportShown`: The monthly financial report is shown, with the expenses paid. `mechLabOrderCompleted`: A mech lab order completes, at the end of a day or right away when it has nothing left to do; when several work orders complete together, the last one names the export. `pilotHealed`: A pilot's healing in the med bay completes, as `mechLabOrderCompleted`. `shipUpgradeCompleted`: An Argo upgrade's installation completes, as `mechLabOrderCompleted`. `contractsGenerated`: The game has generated a star system's contracts. `jumped`: The ship has jumped into its destination star system, at the end of that day, with the star system's contracts; work orders completing that day export with it. `arrived`: The ship arrives at the planet after a trip. `storeClosed`: A store closes, from the main screen or the mech lab. `purchaseCompleted`: The store screen completes a purchase, or refuses one. `saleCompleted`: The store screen completes a sale, or refuses one, once for a stack sold at once. `mechBayChanged`: The mech bay changes: a refit, repair, readying or storing is queued, an order is cancelled, the work queue is reordered, a mech or chassis is stored or scrapped, a stored component's repair is queued, or a mech is renamed without a refit. `experienceSpent`: The barracks confirm a pilot's training. `mechPlacementShown`: The game asks where to put a new mech because every mech bay is full, e.g. after salvage completes one. `missionCompleted`: A mission ends, still in combat, before the salvage is chosen. `salvageChosen`: The after-action report has finalized the salvage: once the priority salvage is confirmed, or right away when there is nothing to choose. `shipUpgradeStarted`: An Argo upgrade is bought and its installation starts. `phaseStarted`: A phase begins, before its first unit acts: the battle's first once the lance is deployed, and every later one, also one reached by reserving units. `combatStarted`: A new battle begins, when the briefing is dismissed. `combatLoaded`: A battle is loaded from a save, continuing mid-phase. `activationCompleted`: A unit's activation is done, its attacks resolved; out of contact, once the player's units have all moved. Reserving a unit doesn't count.",
       "x-enumNames": [
         "CareerLoaded",
         "ManualSave",
@@ -481,7 +481,7 @@
     },
     "MechDefinition": {
       "type": "object",
-      "description": "A mech: a loadout on a chassis, as a mech assembled from parts or bought comes with it. The frame is in chassisDefinitions.",
+      "description": "A mech: a loadout on a chassis, as a mech assembled from parts or bought comes with it. The frame is in chassisDefinitions. The game's appearance dates aren't exported, as the campaign ignores them; nor are the company tags a few DLC mechs need before enemy lances field them, which finishing a flashpoint adds.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -2067,7 +2067,7 @@
     },
     "TerrainDefinition": {
       "type": "object",
-      "description": "A terrain's effects on the units in it: forest, water, rough ground, roads and the like. A cell has one terrain at most, so the effects never stack; the map's biome applies on top (see BiomeDefinition).",
+      "description": "A terrain's effects on the units in it: forest, water, rough ground, roads and the like. A cell has one terrain at most, so the effects never stack; the map's biome applies on top (see BiomeDefinition). Only the effects the game's combat code reads are exported; the tooltips also name a stability damage multiplier, which only the AI reads.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -2098,7 +2098,7 @@
           "description": "As the combat HUD shows it."
         },
         "moveCost": {
-          "description": "What a step into the terrain costs of the unit's movement, per meter of the step: open ground costs 1.05; `null` when the unit can't enter it.",
+          "description": "What a step into the terrain costs of the unit's movement, per meter of the step, in place of what it costs on open ground: the normal move cost of the unit's pathing capabilities, 1.05 for all of the game's; `null` when the unit can't enter it.",
           "$ref": "#/definitions/TerrainMoveCosts"
         },
         "sprintMultiplier": {
@@ -2343,7 +2343,7 @@
         },
         "terrainCoverage": {
           "type": "object",
-          "description": "Each terrain's share of the map's playable cells, keyed by terrain id, plus `none` for the cells with no terrain (bare biome). Cells are all the same size, so a share is an area share; the shares sum to 1.",
+          "description": "Each terrain's share of the map's playable cells, keyed by terrain id, plus `none` for the cells with no terrain (bare biome). Cells are all the same size, so a share is an area share; the shares sum to 1. Keyed by terrain because the same kind of cell is a different terrain per map, e.g. water is ice on a polar map; a cell under a building counts as the terrain below it.",
           "additionalProperties": {
             "type": "number",
             "format": "double"
@@ -2353,7 +2353,7 @@
     },
     "EventDefinition": {
       "type": "object",
-      "description": "An event the game can show between missions: when it can come, and the options it offers.",
+      "description": "An event the game can show between missions: when it can come, and the options it offers. Its story texts aren't exported.",
       "additionalProperties": false,
       "required": [
         "id",

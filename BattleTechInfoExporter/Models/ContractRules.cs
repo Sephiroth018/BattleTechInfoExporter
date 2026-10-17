@@ -6,7 +6,8 @@ namespace BattleTechInfoExporter.Models;
 ///     How contracts are generated, paid and rewarded. A contract's pay is <see cref="PayPerDifficulty" /> times
 ///     the mission type's <see cref="ContractTypeDescription.PayMultiplier" /> times a scale of its difficulty
 ///     (the sum of 1 / (0.4 n) for n from 1 to the difficulty, less 1.5), varied by up to
-///     <see cref="PayVariance" /> either way and rounded to thousands.
+///     <see cref="PayVariance" /> either way and rounded to thousands. The reputation payment adjustments the
+///     reputation tooltips show aren't exported: the pay never applies them.
 /// </summary>
 /// <param name="PayPerDifficulty">In C-Bills, before the type's multiplier, the difficulty scale and the variance.</param>
 /// <param name="PayVariance">The most the pay varies either way, as a fraction of it from 0 to 1.</param>

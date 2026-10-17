@@ -14,7 +14,9 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Weight">The contract generator's draw weight among a star system's maps.</param>
 /// <param name="TerrainCoverage">
 ///     Each terrain's share of the map's playable cells, keyed by terrain id, plus <c>none</c> for the cells with
-///     no terrain (bare biome). Cells are all the same size, so a share is an area share; the shares sum to 1.
+///     no terrain (bare biome). Cells are all the same size, so a share is an area share; the shares sum to 1. Keyed
+///     by terrain because the same kind of cell is a different terrain per map, e.g. water is ice on a polar map; a
+///     cell under a building counts as the terrain below it.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MapDefinition(

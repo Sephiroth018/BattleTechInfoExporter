@@ -17,12 +17,14 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Biomes">The biomes the star system's missions can be on, sorted by name.</param>
 /// <param name="Maps">
 ///     The maps the star system's contracts can be fought on, as the contract generator selects them from its biomes
-///     and map tags; each map's terrain is in <see cref="Catalog.MapDefinitions" />.
+///     and map tags; each map's terrain is in <see cref="Catalog.MapDefinitions" />. The contract type and the maps
+///     the game offered lately narrow a contract's choice further, which isn't exported.
 /// </param>
 /// <param name="Stores">
 ///     The item collections each of the star system's stores draws its stock from on arrival, every entry of each
 ///     once, by their ids in <see cref="Catalog.ItemCollectionDefinitions" />, sorted. A store without any doesn't
-///     exist in the star system.
+///     exist in the star system. The story adds collections, e.g. better progression tiers, by swapping the star
+///     system's definition, which these follow.
 /// </param>
 /// <param name="ContractEmployers">
 ///     The factions that can hire the company for the star system's generated contracts, sorted by name, each with

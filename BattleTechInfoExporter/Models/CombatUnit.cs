@@ -43,7 +43,8 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="LinesOfFire">
 ///     The lines of fire to the units it could attack: from the player's units to every living enemy in full view
 ///     (<see cref="UnitVisibility.Full" />), and from those enemies to the player's units. <c>null</c> when the unit
-///     is neither, or destroyed.
+///     is neither, or destroyed. The hit chance isn't exported: it follows from <see cref="CombatRules.ToHit" /> and
+///     changes as soon as a unit moves.
 /// </param>
 /// <param name="Movement">
 ///     Where the player's unit can move and what it gets there; <c>null</c> when the unit isn't the player's or can't
@@ -168,7 +169,10 @@ internal sealed record MechHeat(int Current, int Dissipation, int OverheatsAbove
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatPilotState(int Injuries, int Health, int BonusHealth, Skills Skills);
 
-/// <summary>A location's armor and structure left, in whole points as the paper doll shows them.</summary>
+/// <summary>
+///     A location's armor and structure left, in whole points as the paper doll shows them: cut off, a remainder
+///     below 1 shown as 1.
+/// </summary>
 /// <param name="Location">
 ///     The game's name of the location: a mech's as in <see cref="ChassisLocationDefinition.Location" />, a
 ///     vehicle's as in <see cref="VehicleLocationDefinition.Location" />, or <c>Structure</c> for a turret's single
