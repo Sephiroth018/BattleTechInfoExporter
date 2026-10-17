@@ -44,8 +44,8 @@ internal enum ExportTrigger
     ContractsGenerated,
 
     /// <summary>
-    ///     The ship has jumped into its destination star system, at the end of that day, with the star system's
-    ///     contracts; work orders completing that day export with it.
+    ///     The ship has jumped into its destination star system, once the game has refreshed the star system's stores
+    ///     and hiring hall, with its contracts; work orders completing that day export with it.
     /// </summary>
     Jumped,
 

@@ -1,7 +1,6 @@
 using System;
 using BattleTech;
 using BattleTechInfoExporter.Export;
-using BattleTechInfoExporter.Models;
 using HarmonyLib;
 using JetBrains.Annotations;
 using StarSystem = BattleTech.StarSystem;
@@ -9,8 +8,8 @@ using StarSystem = BattleTech.StarSystem;
 namespace BattleTechInfoExporter.Triggers;
 
 /// <summary>
-///     Fires once at the end of a day on which the ship jumped into its destination system or work orders completed,
-///     with the day fully processed.
+///     Fires once at the end of a day on which work orders completed, with the day fully processed, unless the ship
+///     jumped into its destination system that day: then <see cref="JumpedTrigger" /> exports.
 /// </summary>
 [HarmonyPatch(typeof(SimGameState), nameof(SimGameState.OnDayPassed))]
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -34,7 +33,7 @@ internal static class DayPassedTrigger
             // A jump changes the current system; systems jumped through on the way aren't exported.
             if (simGame.CurSystem != dayStart.System && SystemContractGenerator.IsInDestination(simGame))
             {
-                GameStateExporter.Export(simGame, ExportTrigger.Jumped);
+                JumpedTrigger.ExportOnceRefreshed(simGame);
             }
             else if (WorkOrderCompletionRecorder.CompletedSince(dayStart.CompletedCount) is { } trigger)
             {
