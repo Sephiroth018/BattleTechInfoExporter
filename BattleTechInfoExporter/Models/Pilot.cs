@@ -8,8 +8,8 @@ namespace BattleTechInfoExporter.Models;
 ///     The fields every pilot has; the pilots of the barracks and of the hiring hall derive from it with fields of
 ///     their own.
 /// </summary>
-/// <param name="Id">The game's pilot id, as in <see cref="PilotReference" />.</param>
-/// <param name="Name">The full name without callsign, as in <see cref="PilotReference" />.</param>
+/// <param name="Id">The game's pilot id, which the references to the pilot carry.</param>
+/// <param name="Name">The full name without callsign.</param>
 /// <param name="Callsign">The callsign, which generated pilots can share.</param>
 /// <param name="Type">The kind of pilot, which the barracks tells apart by color.</param>
 /// <param name="Age">The age in years.</param>

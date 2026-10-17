@@ -39,16 +39,17 @@ namespace BattleTechInfoExporter.Models;
 ///     position on the map shows; <c>null</c> on open ground and when last seen.
 /// </param>
 /// <param name="Pilot">
-///     The pilot, which the HUD names only at <see cref="UnitVisibility.Full" />; <c>null</c> below it and for a unit
-///     without a pilot.
+///     The pilot, which the HUD names only in full view (<see cref="UnitVisibility.Full" />); <c>null</c> otherwise
+///     and for a unit without a pilot.
 /// </param>
 /// <param name="State">
-///     The unit's condition, which the HUD shows only at <see cref="UnitVisibility.Full" />; <c>null</c> below it.
+///     The unit's condition, which the HUD shows only in full view (<see cref="UnitVisibility.Full" />); <c>null</c>
+///     otherwise.
 /// </param>
 /// <param name="LinesOfFire">
-///     The lines of fire to the units it could attack: from the player's units to every living enemy at
-///     <see cref="UnitVisibility.Full" />, and from those enemies to the player's units. <c>null</c> for the others,
-///     destroyed units included.
+///     The lines of fire to the units it could attack: from the player's units to every living enemy in full view
+///     (<see cref="UnitVisibility.Full" />), and from those enemies to the player's units. <c>null</c> for the
+///     others, destroyed units included.
 /// </param>
 /// <param name="Movement">
 ///     Where the player's unit can move and what it gets there; <c>null</c> for the others, and for a unit that can't

@@ -30,13 +30,20 @@ internal sealed class ExportFilePaths
         _files.Single(file => file.Model == fileModel).Paths.TryGetValue(type, out var path) ? path : null;
 
     /// <summary>
-    ///     The export file holding the type in the fewest steps, the first in <see cref="ExportFileModels.All" /> on a
-    ///     tie; <c>null</c> when no file holds it.
+    ///     The type's home: the export file whose root keys it by id (<c>star-systems.json starSystems.*</c>), or else
+    ///     the one holding it in the fewest steps, the first in <see cref="ExportFileModels.All" /> on a tie;
+    ///     <c>null</c> when no file holds it.
     /// </summary>
-    internal (string FileName, string Path)? ShortestPath(Type type) =>
+    internal (string FileName, string Path)? HomePath(Type type) =>
         _files.Where(file => file.Paths.ContainsKey(type))
             .Select(file => ((string FileName, string Path)?)(file.FileName, file.Paths[type]))
-            .MinBy(file => file!.Value.Path.Count(character => character is '.' or '['));
+            .MinBy(file => (IsKeyedAtRoot(file!.Value.Path) ? 0 : 1, StepsOf(file.Value.Path)));
+
+    // A value of a dictionary on the root, such as rootProperty.*.
+    private static bool IsKeyedAtRoot(string path) =>
+        path.EndsWith(".*", StringComparison.Ordinal) && StepsOf(path) == 1;
+
+    private static int StepsOf(string path) => path.Count(character => character is '.' or '[');
 
     // Breadth first, in the order the file writes its properties, so the first path found to a type is a shortest one.
     private Dictionary<Type, string> PathsFrom(Type fileModel)

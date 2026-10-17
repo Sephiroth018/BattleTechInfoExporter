@@ -10,7 +10,8 @@ namespace BattleTechInfoExporter.Models;
 ///     <see cref="CombatMap.Rows" />, whose hexes give each hex's terrain and elevation.
 /// </summary>
 /// <param name="Targets">
-///     The enemies at <see cref="UnitVisibility.Full" /> by unit id, in the order of <see cref="MovementRow.Attacks" />.
+///     The enemies in full view (<see cref="UnitVisibility.Full" />) by unit id, in the order of
+///     <see cref="MovementRow.Attacks" />.
 /// </param>
 /// <param name="Rows">The rows with a hex the unit can reach, by <c>r</c>.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
