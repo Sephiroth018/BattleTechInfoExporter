@@ -27,9 +27,9 @@ kept current.
   a career load only when it's missing or stale: written by another mod version, or from other
   game data than now (its `sourceFingerprint`). Delete it to force a rebuild.
 
-Only the combat files are ever deleted: when the game tears the battle down (the after-action
-report is left, or the battle is quit, restarted or left by loading a save) and when a career is
-loaded, so they exist only while their battle runs.
+Of these files, only the combat files are ever deleted: when the game tears the battle down (the
+after-action report is left, or the battle is quit, restarted or left by loading a save) and when
+a career is loaded, so they exist only while their battle runs.
 
 Every file starts with `modVersion`, `exportedAt` and the `trigger` of the export that last wrote
 it. A file is replaced in one step, never half-written, and only when its content apart from
@@ -47,7 +47,7 @@ The `trigger` values and the files each writes, the career files being the first
 
 | `trigger`                                                      | When                                                                                                                             | Career files | Mission | Combat map | Combat state | Catalog |
 |----------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|:------------:|:-------:|:----------:|:------------:|:-------:|
-| `CareerLoaded`                                                 | A career is started or loaded, also on the return from a mission; the career files only when no mission's results are pending.   |      ✓       |         |            |              |    ✓    |
+| `CareerLoaded`                                                 | A career is started or loaded, also after a mission; the career files when no results are pending, the catalog when it's stale.  |      ✓       |         |            |              |    ✓    |
 | `ManualSave`                                                   | The player saves the career outside combat.                                                                                      |      ✓       |         |            |              |         |
 | `Autosave`                                                     | The game saves the career outside combat, e.g. once a contract's results are applied.                                            |      ✓       |         |            |              |         |
 | `ContractCompleted`                                            | A contract's results are applied, where the game doesn't autosave after it, e.g. a flashpoint's.                                 |      ✓       |         |            |              |         |
