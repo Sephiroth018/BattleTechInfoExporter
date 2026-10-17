@@ -311,8 +311,8 @@ needs judgment.
 
 - **`internal` by default**; a type is `public` only when another assembly needs it. Public classes
   stay open.
-- **Immutable by default:** records for data, `init` where possible, and read-only collection
-  interfaces (`IReadOnlyList<T>`, `IReadOnlyDictionary<TKey, TValue>`) in signatures.
+- **Immutable by default:** records for data, `init` and `readonly` where possible, and read-only
+  collection interfaces (`IReadOnlyList<T>`, `IReadOnlyDictionary<TKey, TValue>`) in signatures.
 - **No escape hatches** (null-forgiving `!`, `#nullable disable`, `dynamic`, reflection) without a
   narrow, stated reason. Where a project needs one (e.g. reflection for a game's private members),
   its "Project" part says where.
@@ -389,7 +389,9 @@ patches in the assembly. Folders:
   generation complete in one go.
 - `Export/`: the exporters, the only entry points the triggers call: `GameStateExporter` for the
   career state, `MissionExporter` for the mission file, `CombatExporter` for the combat map and
-  state, which it also deletes, and `CatalogExporter` for the catalog. Below them, one
+  state, which it also deletes, and `CatalogExporter` for the catalog. The career export first
+  generates the current star system's contracts where the game hasn't yet, as the contract screen
+  does when it opens (`SystemContractGenerator`). Below the exporters, one
   `<Section>Reader` per section of a file builds its models from the game, and cross-cutting
   helpers make the references, the plain game texts, the rounding and the comparisons; a reference
   with a naming rule of its own is made by the reader that owns it. `ExportFileWriter` replaces,
@@ -414,9 +416,11 @@ format must keep.
 
 Conventions a new field follows:
 
-- **References are `{ "id", "name" }`**, both always set; component references also carry `type`.
-- **Definitions live only in the catalog,** keyed by the game's ids; the other files refer to them
-  by id and carry only their own state. A reference whose definition is missing has no entry.
+- **References are `{ "id", "name" }`**, both always set; component references also carry `type`,
+  and faction names get title case with the short name in brackets (`FactionNames`).
+- **Definitions live only in the catalog,** keyed by the game's ids and grouped by type, one entry
+  shape per group with no null sections; the other files refer to them by id and carry only their
+  own state. A reference whose definition is missing has no entry.
 - **Lists of entries are sorted by their references' comparison** where the game keeps no
   meaningful order; a mech's components keep the game's.
 - **Points in time are day numbers** on the `daysPassed` scale, never countdowns; durations stay
@@ -440,7 +444,8 @@ Layout decisions a change would otherwise undo:
   refers to them by name instead of repeating thresholds.
 - **Star systems live in `star-systems.json`, not the catalog,** keyed by their active
   definition's id (the story swaps definitions through the `StarSystem_SetActiveDef` result action),
-  and repeated in full wherever a step needs one: their state changes during a career.
+  and repeated in full wherever a step needs one: their state changes during a career. The inactive
+  definitions give a consumer nothing and aren't exported.
 - **The latest mission is one file written twice,** when the mission ends and once the salvage is
   final, the second write adding only `salvage.received`: the game has no id that identifies every
   contract to link two files by, and by then the battle the outcome reads from is torn down.
@@ -457,6 +462,8 @@ Layout decisions a change would otherwise undo:
 - **The rules export only constants the game's code reads,** never one read only for presentation
   or the AI, so a consumer never plans around a number that does nothing. Hardcoded values a tool
   computes with sit next to them; hardcoded rules go in the description of the value they affect.
+- **What the game doesn't show and only its random rolls use is left out** (e.g. the daily event
+  chance): a consumer can't act on it.
 - **Files are replaced atomically and only when their content apart from `exportedAt` and
   `trigger` changed,** so a tool never reads a half-written file and one copying the changed files
   skips the others. The game state's day counts as content.
