@@ -43,11 +43,7 @@ internal sealed record MechLabCost(float TechPoints, float CBills);
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MechLabCostMultipliers(float TechPoints, float CBills);
 
-/// <summary>
-///     By the component's category: weapons by their type, where ballistic covers autocannons, Gauss rifles and
-///     machine guns, missile LRMs and SRMs, energy lasers, PPCs and COILs, and support flamers; other weapons and
-///     upgrades are other.
-/// </summary>
+/// <summary>By the component's category, weapons by their type.</summary>
 /// <param name="Ballistic">For autocannons, Gauss rifles and machine guns.</param>
 /// <param name="Missile">For LRMs and SRMs.</param>
 /// <param name="Energy">For lasers, PPCs and COILs.</param>

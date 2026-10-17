@@ -4,7 +4,7 @@ namespace BattleTechInfoExporter.Models;
 
 /// <summary>
 ///     The stability rules of mechs. A mech's stability bar is divided into equal levels; a mech that reaches
-///     <see cref="UnsteadyAbovePercent" /> of its stability is unsteady and loses its evasive pips, and an
+///     <see cref="UnsteadyAbovePercent" /> of its stability is unsteady and loses its evasion pips, and an
 ///     unsteady mech that fills the bar is knocked down.
 /// </summary>
 /// <param name="UnsteadyAbovePercent">

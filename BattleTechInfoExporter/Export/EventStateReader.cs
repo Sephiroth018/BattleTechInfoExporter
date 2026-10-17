@@ -6,7 +6,6 @@ using BattleTechInfoExporter.Models;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Builds the career's event state from the game's event trackers.</summary>
 internal static class EventStateReader
 {
     internal static EventState ReadEventState(SimGameState simGame)

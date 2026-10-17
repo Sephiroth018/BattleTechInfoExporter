@@ -9,7 +9,6 @@ using Mech = BattleTechInfoExporter.Models.Mech;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Builds the mechs of the mech bay from the game's career state.</summary>
 internal static class MechReader
 {
     // From head to legs, in pairs, as the mech lab lays them out.
@@ -25,8 +24,7 @@ internal static class MechReader
         ChassisLocations.RightLeg
     ];
 
-    /// <summary>The chassis name followed by the variant, e.g. "Atlas - AS7-D".</summary>
-    /// <remarks>As the mech bay and mech lab show a mech (MechDetails.SetDescriptions), whatever its nickname.</remarks>
+    // As the mech bay and mech lab show a mech, whatever its nickname (MechDetails.SetDescriptions).
     private static string NameWithVariant(ChassisDef chassis) =>
         $"{chassis.Description.Name} - {chassis.VariantName}";
 

@@ -3,6 +3,8 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>A pilot: their id, full name without callsign, and callsign.</summary>
+/// <param name="Id">The game's pilot id.</param>
+/// <param name="Name">The pilot's full name without callsign.</param>
 /// <param name="Callsign">The pilot's callsign, which isn't part of <see cref="Reference.Name" />.</param>
 /// <remarks>Callsigns of generated pilots can repeat, so they're kept apart from the name.</remarks>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

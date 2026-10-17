@@ -14,7 +14,9 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Victory">For a mission won.</param>
 /// <param name="Retreat">For a mission the company retreated from.</param>
 /// <param name="Defeat">For a mission failed.</param>
-/// <param name="PriorityShare">The share of the picks that are priority picks, a 0-1 fraction, rounded down.</param>
+/// <param name="PriorityShare">
+///     The share of the picks that are priority picks, as a fraction from 0 to 1, rounded down.
+/// </param>
 /// <param name="MaxPriorityPicks">The most priority picks a mission gives, hardcoded by the game.</param>
 /// <param name="FloorBonus">
 ///     Picks added to the negotiated share of a contract's salvage potential, unless the potential is 0.
@@ -46,7 +48,7 @@ internal sealed record SalvageRules(
     bool AssembledMechsComeEquipped);
 
 /// <summary>What a mission's outcome does to its salvage.</summary>
-/// <param name="Chance">Multiplies the picks, as a 0-1 fraction.</param>
+/// <param name="Chance">Multiplies the picks, as a fraction from 0 to 1.</param>
 /// <param name="ChanceLostPerMechDestroyed">
 ///     Taken off <see cref="Chance" /> for each of the company's mechs destroyed or whose pilot was incapacitated,
 ///     down to 0.
@@ -76,7 +78,9 @@ internal sealed record RareSalvageSwaps(RareSalvageSwap Weapons, RareSalvageSwap
 ///     The rare tier, compared with the same roll, so it applies when the roll is below its chance but not the very
 ///     rare tier's.
 /// </param>
-/// <param name="Divisor">Divides the contract's difficulty plus a tier's offset, giving the tier's 0-1 chance.</param>
+/// <param name="Divisor">
+///     Divides the contract's difficulty plus a tier's offset, giving the tier's chance as a fraction from 0 to 1.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record RareSalvageSwap(RareSalvageTier VeryRare, RareSalvageTier Rare, float Divisor);
 

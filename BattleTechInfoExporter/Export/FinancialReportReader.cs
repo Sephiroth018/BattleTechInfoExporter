@@ -26,11 +26,11 @@ internal static class FinancialReportReader
 
     /// <summary>
     ///     The pilot's line in the expenses of each report, with the spending level's cost modifier
-    ///     (SimGameState.GetExpenditureCostModifier).
+    ///     (<see cref="SimGameState.GetExpenditureCostModifier" />).
     /// </summary>
     /// <remarks>
-    ///     Rounded as SGCaptainsQuartersStatusScreen.RefreshData does; the hiring hall rounds to the nearest instead
-    ///     (SimGameState.GetMechWarriorSalary).
+    ///     Rounded as <see cref="BattleTech.UI.SGCaptainsQuartersStatusScreen.RefreshData" /> does; the hiring hall
+    ///     rounds to the nearest instead (<see cref="SimGameState.GetMechWarriorSalary" />).
     /// </remarks>
     internal static int ReadSalary(SimGameState simGame, PilotDef pilot) =>
         Mathf.CeilToInt(CostModifierOf(simGame) * simGame.GetMechWarriorValue(pilot));
@@ -77,7 +77,8 @@ internal static class FinancialReportReader
 
     /// <summary>
     ///     The ship upgrade's line in the expenses of each report, with the spending level's cost modifier; the
-    ///     Argo's upgrade screen shows the same (SGShipModuleUpgradeViewPopulator.Populate).
+    ///     Argo's upgrade screen shows the same
+    ///     (<see cref="BattleTech.UI.SGShipModuleUpgradeViewPopulator.Populate" />).
     /// </summary>
     internal static int ReadUpkeep(SimGameState simGame, ShipModuleUpgrade upgrade) =>
         Mathf.RoundToInt(CostModifierOf(simGame) * UnmodifiedUpkeepOf(simGame, upgrade));

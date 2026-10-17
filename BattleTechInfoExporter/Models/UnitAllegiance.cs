@@ -9,6 +9,7 @@ internal enum UnitAllegiance
     /// <summary>A team on the player's side, e.g. the employer's units.</summary>
     Ally,
 
+    /// <summary>A team fighting the player's side.</summary>
     Enemy,
 
     /// <summary>A team neither side fights, until it turns hostile.</summary>

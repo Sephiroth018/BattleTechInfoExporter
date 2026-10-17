@@ -7,9 +7,9 @@ using UnityEngine;
 namespace BattleTechInfoExporter.Export;
 
 /// <summary>
-///     Builds the rules file's combat rules from the combat constants (CombatGameConstants). Only constants that
-///     the game's combat code reads are exported; the ones it never reads, reads only in code nothing calls, or that
-///     only drive presentation or the AI are left out.
+///     Builds the rules file's combat rules from the combat constants (<see cref="CombatGameConstants" />). Only
+///     constants that the game's combat code reads are exported; the ones it never reads, reads only in code nothing
+///     calls, or that only drive presentation or the AI are left out.
 /// </summary>
 internal static class CombatRulesReader
 {

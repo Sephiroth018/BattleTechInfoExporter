@@ -8,7 +8,6 @@ using Pilot = BattleTech.Pilot;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Builds the pilots of the barracks and the hiring hall from the game's career state.</summary>
 internal static class PilotReader
 {
     private const string NoLastName = "NONE";
@@ -67,7 +66,8 @@ internal static class PilotReader
     /// </summary>
     /// <remarks>
     ///     Injured pilots can't be deployed, so the pilot has no heal order yet, and the time counts from the injuries
-    ///     alone, as SimGameState.RefreshInjuries prices the order ResolveCompleteContract creates for them.
+    ///     alone, as <see cref="SimGameState.RefreshInjuries" /> prices the order
+    ///     <see cref="SimGameState.ResolveCompleteContract" /> creates for them.
     /// </remarks>
     internal static int? ReadReadyOnDayAfterMission(SimGameState simGame, Pilot pilot) =>
         pilot.Injuries == 0 ? null : ReadReadyOnDay(simGame, pilot);

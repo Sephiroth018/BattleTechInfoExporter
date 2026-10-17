@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -12,7 +13,8 @@ namespace BattleTechInfoExporter.SchemaGenerator;
 /// <summary>
 ///     The descriptions of the models and their properties in one export file's schema, from the mod's XML doc
 ///     comments, as plain text that names what the JSON shows: a <c>see cref</c> to a property or type becomes where
-///     the file holds it, or the other file and the path there, one to an enum value the value written.
+///     the file holds it, or the other file and the path there, one to an enum value the value written; code, keywords
+///     and enum values are in backticks.
 /// </summary>
 internal sealed partial class ModelDocumentation
 {
@@ -28,6 +30,25 @@ internal sealed partial class ModelDocumentation
     }
 
     internal string? TypeDescription(Type type) => Render(type.GetXmlDocsElement()?.Element("summary"), type);
+
+    /// <summary>
+    ///     The enum's summary, followed by each documented member's among <paramref name="writtenMembers" />, the
+    ///     schema's values with their member names, as <c>`value`: summary</c>.
+    /// </summary>
+    internal string? EnumDescription(Type enumType, IEnumerable<(object? Value, string Name)> writtenMembers)
+    {
+        if (TypeDescription(enumType) is not { } summary)
+        {
+            return null;
+        }
+
+        var members = writtenMembers
+            .Select(member => (member.Value,
+                Description: Render(enumType.GetField(member.Name)?.GetXmlDocsElement()?.Element("summary"), enumType)))
+            .Where(member => member.Description is not null)
+            .Select(member => $"`{member.Value}`: {member.Description}");
+        return string.Join(" ", members.Prepend(summary));
+    }
 
     /// <summary>
     ///     The property's record parameter, from the type itself up through its base types, so a derived record's
@@ -73,7 +94,8 @@ internal sealed partial class ModelDocumentation
             XText text => text.Value,
             XElement { Name.LocalName: "see" } see when see.Attribute("cref") is { } cref =>
                 Target(cref.Value, documentedType),
-            XElement { Name.LocalName: "see" } see when see.Attribute("langword") is { } word => word.Value,
+            XElement { Name.LocalName: "see" } see when see.Attribute("langword") is { } word => $"`{word.Value}`",
+            XElement { Name.LocalName: "c" } code => $"`{code.Value}`",
             XElement { Name.LocalName: "paramref" } reference =>
                 ExportFile.PropertyNaming.GetPropertyName((string)reference.Attribute("name")!, false),
             XElement element => string.Concat(element.Nodes().Select(child => RenderNode(child, documentedType))),
@@ -84,8 +106,8 @@ internal sealed partial class ModelDocumentation
     ///     A cref (<c>P:Namespace.Type.Member</c>) as the JSON shows it: an enum value as written; a property by its
     ///     JSON name alone on the documented type, as the type itself or one it derives from has it, or on the root; a
     ///     property or type elsewhere in this file by its owner's definition and JSON name (<c>Mech.id</c>); one in
-    ///     another file by that file and its path there (<c>rules.json moraleLevels</c>); one of an abstract record no
-    ///     property declares where each of its derived records is; anything else by its name.
+    ///     another file by that file and its path there (<c>rules.json moraleLevels</c>); one of a record no file holds
+    ///     directly where each of its derived records is; anything else by its name.
     /// </summary>
     private string Target(string cref, Type documentedType)
     {
@@ -99,7 +121,7 @@ internal sealed partial class ModelDocumentation
         return (kind, type) switch
         {
             ('F', { IsEnum: true }) =>
-                JsonConvert.SerializeObject(Enum.Parse(type, memberName), _serializerSettings).Trim('"'),
+                $"`{JsonConvert.SerializeObject(Enum.Parse(type, memberName), _serializerSettings).Trim('"')}`",
             ('P', not null) when JsonNameOf(type, memberName) is { } jsonName =>
                 type.IsAssignableFrom(documentedType) ? jsonName : Location(type, jsonName),
             ('T', not null) => Location(type, null),
@@ -127,21 +149,23 @@ internal sealed partial class ModelDocumentation
             return $"{fileName} {ExportFilePaths.Join(otherPath, propertyName)}".TrimEnd();
         }
 
-        // An abstract record no property declares is only ever written as one of its derived records.
-        if (ExportSchemaGenerator.IsModel(owner) && owner.IsAbstract)
+        if (!ExportSchemaGenerator.IsModel(owner))
         {
-            var locations = ExportSchemaGenerator.DerivedRecordsOf(owner)
-                .Select(derivedType => Location(derivedType, propertyName))
-                .ToList();
-            return locations switch
-            {
-                [] => throw new InvalidOperationException($"{owner.Name} has no derived record to refer to"),
-                [var only] => only,
-                _ => $"{string.Join(", ", locations[..^1])} and {locations[^1]}"
-            };
+            return propertyName ?? DefinitionNames.Of(owner);
         }
 
-        return propertyName ?? DefinitionNames.Of(owner);
+        // A record no file holds directly, abstract or not, is only ever written as one of its derived records.
+        var locations = ExportSchemaGenerator.DerivedRecordsOf(owner)
+            .Select(derivedType => Location(derivedType, propertyName))
+            .ToList();
+        return locations switch
+        {
+            [] when owner.IsAbstract =>
+                throw new InvalidOperationException($"{owner.Name} has no derived record to refer to"),
+            [] => propertyName ?? DefinitionNames.Of(owner),
+            [var only] => only,
+            _ => $"{string.Join(", ", locations[..^1])} and {locations[^1]}"
+        };
     }
 
     [GeneratedRegex(@"\s+")]

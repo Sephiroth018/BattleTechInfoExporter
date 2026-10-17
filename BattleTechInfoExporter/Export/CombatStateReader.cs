@@ -3,7 +3,6 @@ using BattleTechInfoExporter.Models;
 
 namespace BattleTechInfoExporter.Export;
 
-/// <summary>Builds the combat state file's model from the running battle.</summary>
 internal static class CombatStateReader
 {
     internal static CombatState Read(SimGameState simGame, CombatGameState combat)

@@ -9,8 +9,9 @@ namespace BattleTechInfoExporter.Export;
 
 /// <summary>
 ///     Reads where dropships and drop pods are about to land: the cells the game marks as a landing zone, which the
-///     HUD's movement reticle shows as dangerous (CombatMovementReticle.IsDangerousLocation) and whose units are
-///     crushed when the landing happens.
+///     HUD's movement reticle shows as dangerous
+///     (<see cref="BattleTech.UI.CombatMovementReticle.IsDangerousLocation" />) and whose units are crushed when the
+///     landing happens.
 /// </summary>
 internal static class LandingZoneReader
 {
