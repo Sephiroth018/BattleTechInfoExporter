@@ -10,7 +10,12 @@ internal enum RefitChangeType
     /// <summary>Takes a component off the mech, into storage or for installation elsewhere.</summary>
     RemoveComponent,
 
+    /// <summary>Repairs a damaged component where it is mounted.</summary>
     RepairComponent,
+
+    /// <summary>Changes a location's armor.</summary>
     ModifyArmor,
+
+    /// <summary>Repairs a location's structure.</summary>
     RepairStructure
 }

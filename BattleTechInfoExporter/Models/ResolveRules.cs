@@ -55,8 +55,13 @@ internal sealed record ResolveRules(
 /// <summary>What the baseline gain is multiplied by the count of.</summary>
 internal enum ResolveGainScale
 {
+    /// <summary>Nothing: the baseline gain counts once.</summary>
     None,
+
+    /// <summary>The team's living units.</summary>
     LivingUnits,
+
+    /// <summary>The team's living units with an elite pilot.</summary>
     LivingElitePilots
 }
 

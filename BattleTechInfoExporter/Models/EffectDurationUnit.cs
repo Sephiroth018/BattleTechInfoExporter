@@ -8,7 +8,13 @@ internal enum EffectDurationUnit
 
     /// <summary>The activations of the unit the effect is on.</summary>
     TargetActivations,
+
+    /// <summary>Rounds, counted at their end.</summary>
     Rounds,
+
+    /// <summary>The movements of the unit that made the effect.</summary>
     Movements,
+
+    /// <summary>Phases, whichever units act in them.</summary>
     Phases
 }

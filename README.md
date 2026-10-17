@@ -102,7 +102,8 @@ assemblies the build references in place.
 
    - `dotnet build` builds the mod and regenerates the schemas in `schemas/` with the schema
      generator (`BattleTechInfoExporter.SchemaGenerator`), from the models and their doc comments.
-     It fails when a record, an exported property or a game enum has no description.
+     It fails when a record, an exported property, a value of the mod's enums or a game enum has no
+     description.
    - `dotnet build -p:DeployToGame=true` also copies the mod, `mod.json`, the changelog and the
      schemas into the game's `Mods/BattleTechInfoExporter/` folder, to test it in the game.
    - `dotnet build -c Release` also packages them as `artifacts/BattleTechInfoExporter-<version>.zip`.

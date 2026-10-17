@@ -3,6 +3,7 @@ namespace BattleTechInfoExporter.Models;
 /// <summary>Where a ship upgrade stands, as the Argo's engineering screen shows it.</summary>
 internal enum ShipUpgradeStatus
 {
+    /// <summary>Installed on the ship.</summary>
     Installed,
 
     /// <summary>Bought and being installed; it finishes as <see cref="GameState.WorkQueue" /> shows.</summary>

@@ -137,7 +137,7 @@
   "definitions": {
     "ExportTrigger": {
       "type": "string",
-      "description": "What caused an export. `careerLoaded`: A career is loaded, new or from a save. The game state is skipped while a finished contract's results are still to be applied, and the catalog is rebuilt only when it's missing or stale, once the game has loaded every vehicle, turret and design mask. `manualSave`: The player saves the career outside combat. `autosave`: The game saves the career on its own outside combat, e.g. once an event's popup is closed with the picked option's results applied, or once a contract's results are applied. `contractCompleted`: A contract's results are applied, salvage included, where the game doesn't save the career afterwards, which is `autosave` otherwise. `financialReportShown`: The monthly financial report is shown, with the expenses paid. `mechLabOrderCompleted`: A mech lab order completes, at the end of a day or right away when it has nothing left to do; when several work orders complete together, the last one names the export. `pilotHealed`: A pilot's healing in the med bay completes, as `mechLabOrderCompleted`. `shipUpgradeCompleted`: An Argo upgrade's installation completes, as `mechLabOrderCompleted`. `contractsGenerated`: The game has generated a star system's contracts. `jumped`: The ship has jumped into its destination star system, once the game has refreshed the star system's stores and hiring hall, with its contracts; work orders completing that day export with it. `arrived`: The ship arrives at the planet after a trip. `storeClosed`: A store closes, from the main screen or the mech lab. `purchaseCompleted`: The store screen completes a purchase, or refuses one. `saleCompleted`: The store screen completes a sale, or refuses one, once for a stack sold at once. `mechBayChanged`: The mech bay changes: a refit, repair, readying or storing is queued, an order is cancelled, the work queue is reordered, a mech or chassis is stored or scrapped, a stored component's repair is queued, or a mech is renamed without a refit. `experienceSpent`: The barracks confirm a pilot's training. `mechPlacementShown`: The game asks where to put a new mech because every mech bay is full, e.g. after salvage completes one. `missionCompleted`: A mission ends, still in combat, before the salvage is chosen. `salvageChosen`: The after-action report has finalized the salvage: once the priority salvage is confirmed, or right away when there is nothing to choose. `shipUpgradeStarted`: An Argo upgrade is bought and its installation starts. `phaseStarted`: A phase begins, before its first unit acts: the battle's first once the lance is deployed, and every later one, also one reached by reserving units. `combatStarted`: A new battle begins, when the briefing is dismissed. `combatLoaded`: A battle is loaded from a save, continuing mid-phase. `activationCompleted`: A unit's activation is done, its attacks resolved; out of contact, once the player's units have all moved. Reserving a unit doesn't count.",
+      "description": "What caused an export.",
       "x-enumNames": [
         "CareerLoaded",
         "ManualSave",
@@ -189,6 +189,152 @@
         "combatStarted",
         "combatLoaded",
         "activationCompleted"
+      ],
+      "oneOf": [
+        {
+          "description": "A career is loaded, new or from a save. The game state is skipped while a finished contract's results are still to be applied, and the catalog is rebuilt only when it's missing or stale, once the game has loaded every vehicle, turret and design mask.",
+          "enum": [
+            "careerLoaded"
+          ]
+        },
+        {
+          "description": "The player saves the career outside combat.",
+          "enum": [
+            "manualSave"
+          ]
+        },
+        {
+          "description": "The game saves the career on its own outside combat, e.g. once an event's popup is closed with the picked option's results applied, or once a contract's results are applied.",
+          "enum": [
+            "autosave"
+          ]
+        },
+        {
+          "description": "A contract's results are applied, salvage included, where the game doesn't save the career afterwards, which is `autosave` otherwise.",
+          "enum": [
+            "contractCompleted"
+          ]
+        },
+        {
+          "description": "The monthly financial report is shown, with the expenses paid.",
+          "enum": [
+            "financialReportShown"
+          ]
+        },
+        {
+          "description": "A mech lab order completes, at the end of a day or right away when it has nothing left to do; when several work orders complete together, the last one names the export.",
+          "enum": [
+            "mechLabOrderCompleted"
+          ]
+        },
+        {
+          "description": "A pilot's healing in the med bay completes, as `mechLabOrderCompleted`.",
+          "enum": [
+            "pilotHealed"
+          ]
+        },
+        {
+          "description": "An Argo upgrade's installation completes, as `mechLabOrderCompleted`.",
+          "enum": [
+            "shipUpgradeCompleted"
+          ]
+        },
+        {
+          "description": "The game has generated a star system's contracts.",
+          "enum": [
+            "contractsGenerated"
+          ]
+        },
+        {
+          "description": "The ship has jumped into its destination star system, once the game has refreshed the star system's stores and hiring hall, with its contracts; work orders completing that day export with it.",
+          "enum": [
+            "jumped"
+          ]
+        },
+        {
+          "description": "The ship arrives at the planet after a trip.",
+          "enum": [
+            "arrived"
+          ]
+        },
+        {
+          "description": "A store closes, from the main screen or the mech lab.",
+          "enum": [
+            "storeClosed"
+          ]
+        },
+        {
+          "description": "The store screen completes a purchase, or refuses one.",
+          "enum": [
+            "purchaseCompleted"
+          ]
+        },
+        {
+          "description": "The store screen completes a sale, or refuses one, once for a stack sold at once.",
+          "enum": [
+            "saleCompleted"
+          ]
+        },
+        {
+          "description": "The mech bay changes: a refit, repair, readying or storing is queued, an order is cancelled, the work queue is reordered, a mech or chassis is stored or scrapped, a stored component's repair is queued, or a mech is renamed without a refit.",
+          "enum": [
+            "mechBayChanged"
+          ]
+        },
+        {
+          "description": "The barracks confirm a pilot's training.",
+          "enum": [
+            "experienceSpent"
+          ]
+        },
+        {
+          "description": "The game asks where to put a new mech because every mech bay is full, e.g. after salvage completes one.",
+          "enum": [
+            "mechPlacementShown"
+          ]
+        },
+        {
+          "description": "A mission ends, still in combat, before the salvage is chosen.",
+          "enum": [
+            "missionCompleted"
+          ]
+        },
+        {
+          "description": "The after-action report has finalized the salvage: once the priority salvage is confirmed, or right away when there is nothing to choose.",
+          "enum": [
+            "salvageChosen"
+          ]
+        },
+        {
+          "description": "An Argo upgrade is bought and its installation starts.",
+          "enum": [
+            "shipUpgradeStarted"
+          ]
+        },
+        {
+          "description": "A phase begins, before its first unit acts: the battle's first once the lance is deployed, and every later one, also one reached by reserving units.",
+          "enum": [
+            "phaseStarted"
+          ]
+        },
+        {
+          "description": "A new battle begins, when the briefing is dismissed.",
+          "enum": [
+            "combatStarted"
+          ]
+        },
+        {
+          "description": "A battle is loaded from a save, continuing mid-phase.",
+          "enum": [
+            "combatLoaded"
+          ]
+        },
+        {
+          "description": "A unit's activation is done, its attacks resolved; out of contact, once the player's units have all moved. Reserving a unit doesn't count.",
+          "enum": [
+            "activationCompleted"
+          ]
+        }
       ]
     },
     "Company": {
@@ -730,7 +876,7 @@
     },
     "WorkQueueEntryKind": {
       "type": "string",
-      "description": "What a work queue entry is about, which decides the entry's other fields. `mechLab`: A mech lab order on a mech of the company. `medBay`: A pilot healing in the med bay. `travel`: The trip under way. `shipUpgrade`: A ship upgrade being installed. `financialReport`: The next financial report.",
+      "description": "What a work queue entry is about, which decides the entry's other fields.",
       "x-enumNames": [
         "MechLab",
         "MedBay",
@@ -744,6 +890,38 @@
         "travel",
         "shipUpgrade",
         "financialReport"
+      ],
+      "oneOf": [
+        {
+          "description": "A mech lab order on a mech of the company.",
+          "enum": [
+            "mechLab"
+          ]
+        },
+        {
+          "description": "A pilot healing in the med bay.",
+          "enum": [
+            "medBay"
+          ]
+        },
+        {
+          "description": "The trip under way.",
+          "enum": [
+            "travel"
+          ]
+        },
+        {
+          "description": "A ship upgrade being installed.",
+          "enum": [
+            "shipUpgrade"
+          ]
+        },
+        {
+          "description": "The next financial report.",
+          "enum": [
+            "financialReport"
+          ]
+        }
       ]
     },
     "WorkOrderType": {
@@ -1090,7 +1268,7 @@
     },
     "ShipUpgradeStatus": {
       "type": "string",
-      "description": "Where a ship upgrade stands, as the Argo's engineering screen shows it. `installing`: Bought and being installed; it finishes as workQueue shows. `available`: Its required upgrades are all installed, so it can be bought, unless another upgrade is being installed or funds are short. `locked`: Not all of its required upgrades are installed yet, but each is installed, installing or available.",
+      "description": "Where a ship upgrade stands, as the Argo's engineering screen shows it.",
       "x-enumNames": [
         "Installed",
         "Installing",
@@ -1102,6 +1280,32 @@
         "installing",
         "available",
         "locked"
+      ],
+      "oneOf": [
+        {
+          "description": "Installed on the ship.",
+          "enum": [
+            "installed"
+          ]
+        },
+        {
+          "description": "Bought and being installed; it finishes as workQueue shows.",
+          "enum": [
+            "installing"
+          ]
+        },
+        {
+          "description": "Its required upgrades are all installed, so it can be bought, unless another upgrade is being installed or funds are short.",
+          "enum": [
+            "available"
+          ]
+        },
+        {
+          "description": "Not all of its required upgrades are installed yet, but each is installed, installing or available.",
+          "enum": [
+            "locked"
+          ]
+        }
       ]
     },
     "DropshipLocation": {
@@ -1289,7 +1493,7 @@
     },
     "PilotType": {
       "type": "string",
-      "description": "The game's pilot types. `vanguard`: A Kickstarter backer's pilot.",
+      "description": "The game's pilot types.",
       "x-enumNames": [
         "Commander",
         "Vanguard",
@@ -1301,6 +1505,32 @@
         "vanguard",
         "ronin",
         "regular"
+      ],
+      "oneOf": [
+        {
+          "description": "The player's commander.",
+          "enum": [
+            "commander"
+          ]
+        },
+        {
+          "description": "A Kickstarter backer's pilot.",
+          "enum": [
+            "vanguard"
+          ]
+        },
+        {
+          "description": "A premade pilot with its own name, portrait and backstory, e.g. a starting pilot.",
+          "enum": [
+            "ronin"
+          ]
+        },
+        {
+          "description": "Any other pilot, e.g. one the game generated for a hiring hall.",
+          "enum": [
+            "regular"
+          ]
+        }
       ]
     },
     "Gender": {
@@ -1377,7 +1607,7 @@
     },
     "PilotStatus": {
       "type": "string",
-      "description": "Whether a pilot can be deployed, as the barracks shows it. `unavailable`: Out of action without injuries, because of an event.",
+      "description": "Whether a pilot can be deployed, as the barracks shows it.",
       "x-enumNames": [
         "Ready",
         "Injured",
@@ -1387,6 +1617,26 @@
         "ready",
         "injured",
         "unavailable"
+      ],
+      "oneOf": [
+        {
+          "description": "Can be deployed.",
+          "enum": [
+            "ready"
+          ]
+        },
+        {
+          "description": "Injured, healing in the med bay.",
+          "enum": [
+            "injured"
+          ]
+        },
+        {
+          "description": "Out of action without injuries, because of an event.",
+          "enum": [
+            "unavailable"
+          ]
+        }
       ]
     },
     "Spirits": {
@@ -1424,6 +1674,26 @@
         "normal",
         "high",
         "low"
+      ],
+      "oneOf": [
+        {
+          "description": "Neither high nor low.",
+          "enum": [
+            "normal"
+          ]
+        },
+        {
+          "description": "High spirits, from an event.",
+          "enum": [
+            "high"
+          ]
+        },
+        {
+          "description": "Low spirits, from an event.",
+          "enum": [
+            "low"
+          ]
+        }
       ]
     },
     "ServiceRecord": {
@@ -1488,7 +1758,7 @@
     },
     "MechStatus": {
       "type": "string",
-      "description": "Whether a mech in the mech bay is free for use or held by the mech lab. `readying`: Being readied from a stored chassis. `inMaintenance`: Being repaired or refitted.",
+      "description": "Whether a mech in the mech bay is free for use or held by the mech lab.",
       "x-enumNames": [
         "Ready",
         "Readying",
@@ -1498,6 +1768,26 @@
         "ready",
         "readying",
         "inMaintenance"
+      ],
+      "oneOf": [
+        {
+          "description": "Free for use: no mech lab work order holds it.",
+          "enum": [
+            "ready"
+          ]
+        },
+        {
+          "description": "Being readied from a stored chassis.",
+          "enum": [
+            "readying"
+          ]
+        },
+        {
+          "description": "Being repaired or refitted.",
+          "enum": [
+            "inMaintenance"
+          ]
+        }
       ]
     },
     "MechLoadout": {
@@ -2098,7 +2388,7 @@
     },
     "RefitChangeType": {
       "type": "string",
-      "description": "The kind of a refit step. `installComponent`: Mounts a component taken from storage or removed from another location. `removeComponent`: Takes a component off the mech, into storage or for installation elsewhere.",
+      "description": "The kind of a refit step.",
       "x-enumNames": [
         "InstallComponent",
         "RemoveComponent",
@@ -2112,6 +2402,38 @@
         "repairComponent",
         "modifyArmor",
         "repairStructure"
+      ],
+      "oneOf": [
+        {
+          "description": "Mounts a component taken from storage or removed from another location.",
+          "enum": [
+            "installComponent"
+          ]
+        },
+        {
+          "description": "Takes a component off the mech, into storage or for installation elsewhere.",
+          "enum": [
+            "removeComponent"
+          ]
+        },
+        {
+          "description": "Repairs a damaged component where it is mounted.",
+          "enum": [
+            "repairComponent"
+          ]
+        },
+        {
+          "description": "Changes a location's armor.",
+          "enum": [
+            "modifyArmor"
+          ]
+        },
+        {
+          "description": "Repairs a location's structure.",
+          "enum": [
+            "repairStructure"
+          ]
+        }
       ]
     },
     "InstallComponentChange": {
