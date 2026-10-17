@@ -358,7 +358,10 @@ internal sealed class ExportSchemaGenerator
                 return;
             }
 
-            schema.Description = _documentation.TypeDescription(type);
+            // The enum's values are final by now: this processor runs last.
+            schema.Description = type.IsEnum
+                ? _documentation.EnumDescription(type, schema.Enumeration.OfType<string>().ToList())
+                : _documentation.TypeDescription(type);
             if (schema.Description is null)
             {
                 _undescribed.Add(type.Name.Split('`')[0]);

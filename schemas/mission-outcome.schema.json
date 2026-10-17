@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "MissionOutcome",
   "type": "object",
-  "description": "The root of mission-outcome.json: the latest mission as it ended, written again once its salvage is final.",
+  "description": "The root of `mission-outcome.json`: the latest mission as it ended, written again once its salvage is final.",
   "additionalProperties": false,
   "required": [
     "modVersion",
@@ -160,7 +160,7 @@
             "null",
             "string"
           ],
-          "description": "The contract's data file; null where the game keeps no reference to it."
+          "description": "The contract's data file; `null` where the game keeps no reference to it."
         },
         "name": {
           "type": "string",
@@ -179,7 +179,7 @@
           "$ref": "#/definitions/DefinitionReference"
         },
         "target": {
-          "description": "The faction the mission is fought against; INVALID_UNSET, which has no catalog.json factionDefinitions entry, for a story contract that only travels.",
+          "description": "The faction the mission is fought against; `INVALID_UNSET`, which has no catalog.json factionDefinitions entry, for a story contract that only travels.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "difficulty": {
@@ -284,7 +284,7 @@
           "description": "Whether the after-action report lists it as a primary objective."
         },
         "status": {
-          "description": "The objective's game status, e.g. Succeeded, Failed, or Active for one left unresolved.",
+          "description": "The objective's game status, e.g. `Succeeded`, `Failed`, or `Active` for one left unresolved.",
           "$ref": "#/definitions/ObjectiveStatus"
         }
       }
@@ -322,7 +322,7 @@
             "integer",
             "null"
           ],
-          "description": "The change, usually a gain, with the employer; null when the employer doesn't gain reputation.",
+          "description": "The change, usually a gain, with the employer; `null` when the employer doesn't gain reputation.",
           "format": "int32"
         },
         "target": {
@@ -330,7 +330,7 @@
             "integer",
             "null"
           ],
-          "description": "The change, usually a loss, with the target; null when the target doesn't gain reputation.",
+          "description": "The change, usually a loss, with the target; `null` when the target doesn't gain reputation.",
           "format": "int32"
         },
         "mercenaryReviewBoard": {
@@ -388,7 +388,7 @@
             "integer",
             "null"
           ],
-          "description": "The day the pilot is out of the med bay, as the barracks counts it once the contract is resolved; null for an uninjured or killed pilot.",
+          "description": "The day the pilot is out of the med bay, as the barracks counts it once the contract is resolved; `null` for an uninjured or killed pilot.",
           "format": "int32"
         },
         "mechKills": {
@@ -410,7 +410,7 @@
           "description": "Whether the mech was destroyed and not recovered; its surviving components are in MissionSalvage.automatic."
         },
         "repair": {
-          "description": "What repairing the mech's damage in the mech bay would take, as for a mech bay mech's game-state.json mechs[].repair; null without damage and for a lost mech.",
+          "description": "What repairing the mech's damage in the mech bay would take, as for a mech bay mech's game-state.json mechs[].repair; `null` without damage and for a lost mech.",
           "oneOf": [
             {
               "type": "null"
@@ -583,7 +583,7 @@
           "$ref": "#/definitions/Armor"
         },
         "rear": {
-          "description": "null outside the torso, which alone has rear armor.",
+          "description": "`null` outside the torso, which alone has rear armor.",
           "oneOf": [
             {
               "type": "null"
@@ -635,7 +635,7 @@
           "$ref": "#/definitions/ChassisLocations"
         },
         "damageLevel": {
-          "description": "The game's damage level, e.g. Penalized or Destroyed.",
+          "description": "The game's damage level, e.g. `Penalized` or `Destroyed`.",
           "$ref": "#/definitions/ComponentDamageLevel"
         }
       }
@@ -659,7 +659,7 @@
           "description": "The name the UI shows."
         },
         "type": {
-          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in catalog.json componentDefinitions; never NotSet, Special or MechPart, which the game's enum also has.",
+          "description": "The game's component type, e.g. `Weapon` or `AmmunitionBox`, which names the component's group in catalog.json componentDefinitions; never `NotSet`, `Special` or `MechPart`, which the game's enum also has.",
           "$ref": "#/definitions/ComponentType"
         }
       }
@@ -766,7 +766,7 @@
           "$ref": "#/definitions/SalvageItems"
         },
         "received": {
-          "description": "Everything the company gets: the priority salvage, the salvage drawn at random and automatic; null until the salvage is final.",
+          "description": "Everything the company gets: the priority salvage, the salvage drawn at random and automatic; `null` until the salvage is final.",
           "oneOf": [
             {
               "type": "null"
