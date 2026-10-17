@@ -375,7 +375,8 @@ Two projects in `BattleTechInfoExporter.slnx`:
   which the mod's build builds and runs on the built mod, in three roles. It writes a JSON Schema
   per export file into `schemas/` with the mod's own serializer settings (`ExportSchemaGenerator`,
   with `ExportFileModels` checking that the mod's `ExportFiles` lists every file). It fails the
-  build when a definition, an exported property or a game enum has no description
+  build when a definition, an exported property, a value of the mod's enums or a game enum has no
+  description
   (`ModelDocumentation` turns the models' doc comments into descriptions, rendering a cref as where
   the JSON holds its target, `ExportFilePaths`; `GameEnums` describes the game's enums). And it
   validates export files against the schemas (see "Commands"). The mod grants it
@@ -403,7 +404,8 @@ patches in the assembly. Folders:
   signature aren't enough": a `<param>` on its record, or a `<summary>` on a body property, on the
   record that declares it, or once on the interface property it implements where every implementing
   record means the same by it. It's the schema's description, so it's short (a fragment is fine)
-  and says what the value is, its unit or scale and what `null` means. `ExportFile`, the root of
+  and says what the value is, its unit or scale and what `null` means. Every member of the mod's
+  enums has a `<summary>` too, its value's description in the schema. `ExportFile`, the root of
   every file, is more than data, by decision: it owns the header, the JSON conventions, the content
   compared before a write and the writing itself, through `ExportFileWriter` and the clock.
 
@@ -433,7 +435,8 @@ Conventions a new field follows:
 - **A choice is a derived shape** with a switch field, the enum or boolean that tells them apart.
 - **Every file has a JSON Schema** (draft-04, `schemas/<file>.schema.json`, committed and
   shipped): every property required, derived shapes pinning their switch value, enums listing only
-  the values the mod writes. A format change shows in the schemas' diff.
+  the values the mod writes, the mod's own enums with a described `oneOf` branch per value. A format
+  change shows in the schemas' diff.
 - **Files are cut for round trips, not size:** the consumer copies each changed file whole, so data
   that changes together shares a file and what a step needs is in the file that step reads.
 - **JSON is camelCase and compact,** `null` written explicitly, through the game's Newtonsoft.Json.

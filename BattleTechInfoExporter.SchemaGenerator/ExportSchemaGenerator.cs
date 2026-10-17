@@ -32,8 +32,8 @@ internal sealed class ExportSchemaGenerator
     }
 
     /// <summary>
-    ///     The definitions without a description, as <c>Type</c>, and the exported properties without one, as
-    ///     <c>Type.property</c>.
+    ///     The definitions without a description, as <c>Type</c>, the exported properties without one, as
+    ///     <c>Type.property</c>, and the values of the mod's enums without one, as <c>Enum.Member</c>.
     /// </summary>
     internal IReadOnlyCollection<string> Undescribed => _undescribed;
 
@@ -330,8 +330,8 @@ internal sealed class ExportSchemaGenerator
     }
 
     /// <summary>
-    ///     Describes the models and their properties, and requires every property, as the mod writes them all,
-    ///     <c>null</c> included.
+    ///     Describes the models, their properties and the mod's enums' values, and requires every property, as the
+    ///     mod writes them all, <c>null</c> included.
     /// </summary>
     private sealed class ModelProcessor : ISchemaProcessor
     {
@@ -358,13 +358,16 @@ internal sealed class ExportSchemaGenerator
                 return;
             }
 
-            // The enum's values are final by now: this processor runs last.
-            schema.Description = type.IsEnum
-                ? _documentation.EnumDescription(type, schema.Enumeration.Zip(schema.EnumerationNames))
-                : _documentation.TypeDescription(type);
+            schema.Description = _documentation.TypeDescription(type);
             if (schema.Description is null)
             {
                 _undescribed.Add(type.Name.Split('`')[0]);
+            }
+
+            if (type.IsEnum)
+            {
+                DescribeEnumValues(type, schema);
+                return;
             }
 
             if (_serializerSettings.ContractResolver!.ResolveContract(type) is not JsonObjectContract contract)
@@ -384,6 +387,24 @@ internal sealed class ExportSchemaGenerator
 
                 schema.Properties[property.PropertyName!].Description = description;
                 schema.RequiredProperties.Add(property.PropertyName!);
+            }
+        }
+
+        // A single-value branch per value, described by its member's summary. The enum's values are final by now:
+        // this processor runs last.
+        private void DescribeEnumValues(Type enumType, JsonSchema enumSchema)
+        {
+            foreach (var (value, name) in enumSchema.Enumeration.Zip(enumSchema.EnumerationNames))
+            {
+                var description = _documentation.EnumMemberDescription(enumType, name);
+                if (description is null)
+                {
+                    _undescribed.Add($"{enumType.Name}.{name}");
+                }
+
+                var branch = new JsonSchema { Description = description };
+                branch.Enumeration.Add(value);
+                enumSchema.OneOf.Add(branch);
             }
         }
     }

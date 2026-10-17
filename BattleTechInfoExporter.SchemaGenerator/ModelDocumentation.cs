@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -11,10 +10,10 @@ using Newtonsoft.Json.Serialization;
 namespace BattleTechInfoExporter.SchemaGenerator;
 
 /// <summary>
-///     The descriptions of the models and their properties in one export file's schema, from the mod's XML doc
-///     comments, as plain text that names what the JSON shows: a <c>see cref</c> to a property or type becomes where
-///     the file holds it, or the other file and the path there, one to an enum value the value written; code, keywords
-///     and enum values are in backticks.
+///     The descriptions of the models, their properties and the mod's enums' values in one export file's schema, from
+///     the mod's XML doc comments, as plain text that names what the JSON shows: a <c>see cref</c> to a property or
+///     type becomes where the file holds it, or the other file and the path there, one to an enum value the value
+///     written; code, keywords and enum values are in backticks.
 /// </summary>
 internal sealed partial class ModelDocumentation
 {
@@ -31,24 +30,8 @@ internal sealed partial class ModelDocumentation
 
     internal string? TypeDescription(Type type) => Render(type.GetXmlDocsElement()?.Element("summary"), type);
 
-    /// <summary>
-    ///     The enum's summary, followed by each documented member's among <paramref name="writtenMembers" />, the
-    ///     schema's values with their member names, as <c>`value`: summary</c>.
-    /// </summary>
-    internal string? EnumDescription(Type enumType, IEnumerable<(object? Value, string Name)> writtenMembers)
-    {
-        if (TypeDescription(enumType) is not { } summary)
-        {
-            return null;
-        }
-
-        var members = writtenMembers
-            .Select(member => (member.Value,
-                Description: Render(enumType.GetField(member.Name)?.GetXmlDocsElement()?.Element("summary"), enumType)))
-            .Where(member => member.Description is not null)
-            .Select(member => $"`{member.Value}`: {member.Description}");
-        return string.Join(" ", members.Prepend(summary));
-    }
+    internal string? EnumMemberDescription(Type enumType, string memberName) =>
+        Render(enumType.GetField(memberName)?.GetXmlDocsElement()?.Element("summary"), enumType);
 
     /// <summary>
     ///     The property's record parameter, from the type itself up through its base types, so a derived record's
