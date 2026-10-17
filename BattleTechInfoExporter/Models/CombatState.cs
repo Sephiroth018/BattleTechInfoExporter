@@ -57,9 +57,8 @@ internal sealed record CombatState(
 /// <param name="Id">The game's id of the dropship, or of the lance spawner whose drop pods land there.</param>
 /// <param name="Kind">What is about to land.</param>
 /// <param name="Hexes">
-///     The hexes where a unit is crushed by the landing, those whose center cell the game marks, in the order of
-///     <see cref="CombatMap.Rows" />: a dropship's whole footprint, or each drop pod's hex, one per unit of the
-///     lance.
+///     The hexes whose center cell the game marks, in the order of <see cref="CombatMap.Rows" />; a unit standing on
+///     one is crushed. A dropship's whole footprint, or each drop pod's hex, one per unit of the lance.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record LandingZone(string Id, LandingZoneKind Kind, IReadOnlyList<HexCoordinates> Hexes);
@@ -80,8 +79,9 @@ internal sealed record BuildingSide(string Id, TeamSide Side);
 /// <param name="Id">The building's id in <see cref="CombatMap.Buildings" />.</param>
 /// <param name="Structure">The structure left; its max is in <see cref="CombatBuilding.MaxStructure" />.</param>
 /// <param name="DestroyedHexes">
-///     The hexes the building stood on as they are now, since <c>combat-map.json</c> isn't rewritten when it falls:
-///     units on its roof drop to the ground, which the rubble's terrain covers. <c>null</c> when it stands.
+///     The hexes the building stood on, now with the ground's elevation and the rubble's terrain, since
+///     <c>combat-map.json</c> isn't rewritten when it falls; units on its roof drop to the ground. <c>null</c> when
+///     it stands.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record DamagedBuilding(string Id, float Structure, IReadOnlyList<MapHex>? DestroyedHexes);

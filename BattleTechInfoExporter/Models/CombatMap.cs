@@ -63,7 +63,7 @@ internal sealed record HexGridLayout(
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record HexOffset(int Q, int R);
 
-/// <summary>A building, which units can be fired at, stand on and be blocked by.</summary>
+/// <summary>A building, which units can fire at, stand on and be blocked by.</summary>
 /// <param name="Id">The game's building id, as in <see cref="CombatState.DamagedBuildings" />.</param>
 /// <param name="Name">The building's name as the game shows it.</param>
 /// <param name="Position">The point the building is placed at, not necessarily its center.</param>

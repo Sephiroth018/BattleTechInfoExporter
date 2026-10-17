@@ -24,9 +24,15 @@ internal sealed record UnitMovement(IReadOnlyList<string> Targets, IReadOnlyList
 /// <param name="Q">The axial <c>q</c> of the row's first hex, the first character of each move and attack.</param>
 /// <param name="R">The axial <c>r</c> of every hex in the row.</param>
 /// <param name="Walk">The evasion pips per hex as <see cref="MovementLegend.Moves" /> says.</param>
-/// <param name="Sprint"><c>null</c> when the unit is a legged or unsteady mech, which can't sprint.</param>
-/// <param name="Reverse">Moving backward.</param>
-/// <param name="Jump"><c>null</c> when the unit is a vehicle or a mech without a working jump jet.</param>
+/// <param name="Sprint">
+///     Like <see cref="Walk" />, when sprinting; <c>null</c> when the unit is a legged or unsteady mech, which can't
+///     sprint.
+/// </param>
+/// <param name="Reverse">Like <see cref="Walk" />, when moving backward.</param>
+/// <param name="Jump">
+///     Like <see cref="Walk" />, when jumping; <c>null</c> when the unit is a vehicle or a mech without a working
+///     jump jet.
+/// </param>
 /// <param name="Attacks">
 ///     Per entry of <see cref="UnitMovement.Targets" />, the fire and side as <see cref="MovementLegend.Fire" /> and
 ///     <see cref="MovementLegend.Side" /> say.

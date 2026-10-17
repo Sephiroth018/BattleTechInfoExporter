@@ -9,7 +9,9 @@ namespace BattleTechInfoExporter.Models;
 ///     (<see cref="ActiveContract" />) and fought (<see cref="MissionContract" />). Each state declares the star
 ///     system the mission is fought in, by reference or in full.
 /// </summary>
-/// <param name="Id">The contract's data file; <c>null</c> when the game keeps no reference to it.</param>
+/// <param name="Id">
+///     The contract's id from the game's data files; <c>null</c> when the game keeps no reference to it.
+/// </param>
 /// <param name="Name">The contract's name, as the contract list shows it.</param>
 /// <param name="Type">The mission type, described in <see cref="Rules.ContractTypes" />.</param>
 /// <param name="DisplayStyle">Whether it's a regular, story, restoration or flashpoint contract.</param>
@@ -19,8 +21,9 @@ namespace BattleTechInfoExporter.Models;
 ///     <see cref="Catalog.FactionDefinitions" /> entry, for a story contract that only travels.
 /// </param>
 /// <param name="Difficulty">
-///     On the scale of <see cref="ReputationLevel.MaxContractDifficulty" />, not the 1-10 the skulls show
-///     (two per skull).
+///     The difficulty on the skulls' scale of 1 to 10 (two per skull), capped at
+///     <see cref="ContractRules.MaxGlobalDifficulty" /> and limited by
+///     <see cref="ReputationLevel.MaxContractDifficulty" />.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal abstract record ContractIdentity(
@@ -35,7 +38,10 @@ internal abstract record ContractIdentity(
 /// <summary>What the contract details show of a contract before its mission: offered or accepted.</summary>
 /// <param name="Description">The contract's description, as the contract details show it.</param>
 /// <param name="LanceLimits">The limits on the lance the company can deploy on the mission.</param>
-/// <param name="Biome">The contract's biome; <c>null</c> when the game has none for it.</param>
+/// <param name="Biome">
+///     The biome of the map the mission is fought on, as the contract details show it; <c>null</c> when they show
+///     none.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal abstract record ContractBriefing(
     string? Id,
@@ -80,8 +86,8 @@ internal sealed record OfferedContract(
 /// <summary>The accepted travel contract, until the company proceeds with it on arrival or breaks it.</summary>
 /// <param name="Terms">The terms the contract was accepted with.</param>
 /// <param name="ArrivesOnDay">
-///     The day of arrival in the star system, as in <see cref="Travel.ArrivesOnDay" />; <c>null</c> when the ship
-///     isn't travelling there.
+///     The day of arrival in the star system, on the scale of <see cref="Company.DaysPassed" />, as in
+///     <see cref="Travel.ArrivesOnDay" />; <c>null</c> when the ship isn't travelling there.
 /// </param>
 /// <param name="StarSystem">
 ///     The star system the mission is fought in, in full, as in <see cref="Starmap.StarSystems" />, with the trip
@@ -130,7 +136,7 @@ internal sealed record FixedTerms(int Pay, Salvage Salvage, ReputationChange Rep
 
 /// <summary>What one slider position gives, each value for its own slider.</summary>
 /// <param name="SharePercent">The slider's position, from 0 to 100.</param>
-/// <param name="Pay">The pay when the pay slider is at this share.</param>
+/// <param name="Pay">The pay in C-Bills when the pay slider is at this share.</param>
 /// <param name="Salvage">The salvage when the salvage slider is at this share.</param>
 /// <param name="Reputation">The reputation changes when this share is left over for reputation.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -155,17 +161,19 @@ internal sealed record NegotiatedShares(int PayPercent, int SalvagePercent);
 ///     The reputation changes of a contract: of its success, as the negotiation shows them, or of a mission's outcome.
 /// </summary>
 /// <param name="Employer">
-///     The change, usually a gain, with the employer; <c>null</c> when the employer doesn't gain reputation.
+///     The change of the reputation value with the employer, usually a gain; <c>null</c> when the employer doesn't
+///     gain reputation.
 /// </param>
 /// <param name="Target">
-///     The change, usually a loss, with the target; <c>null</c> when the target doesn't gain reputation.
+///     The change of the reputation value with the target, usually a loss; <c>null</c> when the target doesn't gain
+///     reputation.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal record ReputationChange(int? Employer, int? Target);
 
 /// <summary>The salvage of a contract, in items.</summary>
-/// <param name="Total">The salvage the company gets, including the priority salvage.</param>
-/// <param name="Priority">The part of the salvage the company picks itself; the rest is assigned to it.</param>
+/// <param name="Total">The salvage items the company gets, including the priority salvage.</param>
+/// <param name="Priority">The salvage items the company picks itself; the rest are assigned to it.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record Salvage(int Total, int Priority);
 
