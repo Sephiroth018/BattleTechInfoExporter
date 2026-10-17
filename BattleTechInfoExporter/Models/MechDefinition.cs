@@ -11,12 +11,12 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Name">The name with the variant, as in the references to the mech.</param>
 /// <param name="Chassis">The mech's chassis, in <see cref="Catalog.ChassisDefinitions" />.</param>
 /// <param name="Role">
-///     The chassis' stock role, e.g. "Brawler", as the mech tooltip and the mech lab show it: the game's flavor
-///     text, which no rule reads; <c>null</c> when the chassis has none.
+///     The chassis' stock role, e.g. "Brawler", as the mech tooltip and the mech lab show it: what its standard
+///     fitting is built for, which a refit can change; no rule reads it.
 /// </param>
 /// <param name="Description">
-///     The mech's description, as the mech tooltip and the store show it, as plain text: the game's flavor text,
-///     which no rule reads.
+///     The mech's description, as the mech tooltip and the store show it, as plain text: it describes the standard
+///     fitting, which a refit can change; no rule reads it.
 /// </param>
 /// <param name="Value">The C-Bill value the game computes from the chassis, armor and components.</param>
 /// <param name="UsedTonnage">The tonnage of the chassis, armor and components.</param>
@@ -31,7 +31,7 @@ internal sealed record MechDefinition(
     string Id,
     string Name,
     DefinitionReference Chassis,
-    string? Role,
+    string Role,
     string Description,
     int Value,
     float UsedTonnage,

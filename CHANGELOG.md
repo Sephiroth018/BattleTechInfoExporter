@@ -30,9 +30,9 @@ Changed: catalog.json.
 
 ### catalog.json
 - Added `mechDefinitions.<id>.role`: the chassis' stock role the game shows for the mech, e.g.
-  "Brawler"; `null` when the chassis has none. Flavor text, not a rule.
+  "Brawler". It describes the standard fitting, which a refit can change; no rule reads it.
 - Added `mechDefinitions.<id>.description`: the mech's description the game shows, as plain text.
-  Flavor text, not a rule.
+  It describes the standard fitting, which a refit can change; no rule reads it.
 
 ## 0.74.0
 

@@ -154,8 +154,9 @@ The last one describes the game rather than the career:
 
   The tutorial's target dummies and target vehicles, the copies of stock mechs the game makes for unlocked skins (e.g.
   the backers' Shadow Hawk-UMBRA), the game's internal melee and AI weapons and its debug ammo boxes for
-  flamers and infernos, which carry their own ammo, are left out. A mech's role and description are
-  the game's flavor texts, which often don't match the best way to use a mech.
+  flamers and infernos, which carry their own ammo, are left out. A mech's role and description
+  describe its standard fitting: some mechs are best used that way, others can be repurposed, e.g.
+  the brawler Centurion CN9-A into a missile boat.
 
 Every file starts with `modVersion`, `exportedAt` and the `trigger` of the export that last wrote
 it. A file is replaced in one step, never half-written, and only when its content apart from
