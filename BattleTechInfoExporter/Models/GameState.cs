@@ -18,7 +18,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Storage">What the company keeps in storage.</param>
 /// <param name="Stores">
 ///     The current star system's stores, each <c>null</c> if the star system has none or the company can't use it.
-///     Their stock changes only on arrival in a star system.
+///     Their stock is restocked on arrival in a star system; purchases take from it.
 /// </param>
 /// <param name="HiringHall">The pilots for hire in the current system's hiring hall.</param>
 /// <param name="ActiveContract">The travel contract the company has accepted; <c>null</c> without one.</param>
@@ -28,7 +28,8 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="Position">Where the ship is: the star system, and the travel under way.</param>
 /// <param name="Events">
-///     The events scheduled, drawn lately or used up, and the company's tags and statistics their requirements check.
+///     The events scheduled, drawn lately or used up; what their requirements check is on the entry of the scope
+///     they check, e.g. the company's tags and statistics on <see cref="Company" />.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record GameState(

@@ -44,8 +44,8 @@ internal sealed record CombatObjective(
 /// </param>
 /// <param name="Center">The zone's center on the map.</param>
 /// <param name="Radius">
-///     The radius of the hexagon the HUD draws; whether a unit is inside is decided per map cell, which this only
-///     approximates.
+///     The radius of the hexagon the HUD draws, in meters; whether a unit is inside is decided per map cell, which
+///     this only approximates.
 /// </param>
 /// <param name="IsPreview">Drawn as a zone that becomes active later.</param>
 /// <param name="ObjectiveIds">

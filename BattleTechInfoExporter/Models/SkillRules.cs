@@ -69,7 +69,9 @@ internal sealed record PilotingLevel(
 ///     <c>CommandAbility</c>.
 /// </param>
 /// <param name="Targeting">How the ability is aimed; <c>null</c> for one that isn't.</param>
-/// <param name="Cooldown">The rounds before the ability can be used again; <c>null</c> without a cooldown.</param>
+/// <param name="Cooldown">
+///     The unit's activations before the ability can be used again; <c>null</c> without a cooldown.
+/// </param>
 /// <param name="Uses">How often the ability can be used per mission; <c>null</c> without a limit.</param>
 /// <param name="Effects">
 ///     The statistics the ability changes; empty for an ability whose effect the game hardcodes, e.g.

@@ -6,7 +6,7 @@ namespace BattleTechInfoExporter.Models;
 
 /// <summary>A turret with its chassis' data: a fixed emplacement with a single location.</summary>
 /// <param name="Name">The name the combat HUD shows.</param>
-/// <param name="FiringArcDegrees">The arc it can fire into without turning, in degrees.</param>
+/// <param name="FiringArcDegrees">How far to either side of its facing it can fire, in degrees.</param>
 /// <param name="Armor">The armor in combat, after the game's vehicle multiplier; a turret has no rear armor.</param>
 /// <param name="Structure">The internal structure in combat, after the game's vehicle multiplier.</param>
 /// <param name="Components">The components mounted, in the game's order, all fixed.</param>

@@ -49,7 +49,10 @@ internal sealed record ReadyMech(
     : Mech(Id, Name, Chassis, Bay, Position, MechStatus.Ready, IsFieldable, Problems, Loadout);
 
 /// <summary>A mech the mech lab holds for a work order.</summary>
-/// <param name="ReadyOnDay">The day the mech lab finishes the work order, as in <see cref="GameState.WorkQueue" />.</param>
+/// <param name="ReadyOnDay">
+///     The day the mech lab finishes the work order, on the scale of <see cref="Company.DaysPassed" />, as in
+///     <see cref="GameState.WorkQueue" />.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal abstract record MechInMechLab(
     string Id,

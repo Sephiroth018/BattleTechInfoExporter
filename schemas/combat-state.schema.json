@@ -28,7 +28,7 @@
     },
     "exportedAt": {
       "type": "string",
-      "description": "When the file was last written.",
+      "description": "When the file was last written, in ISO 8601 with the local time's UTC offset.",
       "format": "date-time"
     },
     "trigger": {
@@ -185,7 +185,7 @@
             "null",
             "string"
           ],
-          "description": "The contract's data file; null where the game keeps no reference to it."
+          "description": "The contract's id from the game's data files; null where the game keeps no reference to it."
         },
         "name": {
           "type": "string",
@@ -209,7 +209,7 @@
         },
         "difficulty": {
           "type": "integer",
-          "description": "On the scale of rules.json reputationLevels[].maxContractDifficulty, not the 1-10 the skulls show (two per skull).",
+          "description": "The difficulty on the skulls' scale of 1 to 10 (two per skull), capped at rules.json campaign.contracts.maxGlobalDifficulty; the value rules.json reputationLevels[].maxContractDifficulty limits.",
           "format": "int32"
         },
         "starSystem": {
@@ -377,7 +377,7 @@
             "null",
             "number"
           ],
-          "description": "The direction the unit faces, in degrees clockwise from the map's +Z axis, from 0 to below 360 and to 0.1°, which a blip's marker turns to at every level; null when last seen.",
+          "description": "The direction the unit faces, in degrees clockwise seen from above, to 0.1°: 0 towards the map's +z, 90 towards its +x, up to below 360. A blip's marker shows it at every level; null when last seen.",
           "format": "float"
         },
         "terrain": {
@@ -388,7 +388,7 @@
           "description": "The terrain the unit stands in, keyed as in catalog.json terrainDefinitions, which a blip's position on the map shows; null on open ground and when last seen."
         },
         "pilot": {
-          "description": "The pilot, which the HUD names only at full.",
+          "description": "The pilot, which the HUD names only at full; null below it and for a unit without a pilot.",
           "oneOf": [
             {
               "type": "null"
@@ -399,7 +399,7 @@
           ]
         },
         "state": {
-          "description": "The unit's condition, shown at full.",
+          "description": "The unit's condition, which the HUD shows only at full; null below it.",
           "oneOf": [
             {
               "type": "null"
@@ -814,7 +814,7 @@
       "properties": {
         "level": {
           "type": "integer",
-          "description": "What the sources below add up to: bracing and cover 1 each, Bulwark 1 more on top of either. Bracing and Bulwark don't count while the guard is broken (unsteady, prone, shut down, sensor locked or hit), and none while the unit moves.",
+          "description": "What the sources below add up to: bracing and cover 1 each, Bulwark 1 more on top of either, unless the unit was hit in melee since its last activation. Bracing and Bulwark don't count while the guard is broken (unsteady, prone, shut down, sensor locked or hit), and none while the unit moves.",
           "format": "int32"
         },
         "isBraced": {
@@ -1031,7 +1031,7 @@
         },
         "health": {
           "type": "integer",
-          "description": "The injuries the pilot can take before being incapacitated, as in mission-outcome.json lance[].health.",
+          "description": "The injuries at which the pilot is incapacitated, as in mission-outcome.json lance[].health.",
           "format": "int32"
         },
         "bonusHealth": {
@@ -1245,18 +1245,18 @@
             "null",
             "string"
           ],
-          "description": "null for a legged or unsteady mech, which can't sprint."
+          "description": "The evasion pips per hex when sprinting, as MovementLegend.moves says; null for a legged or unsteady mech, which can't sprint."
         },
         "reverse": {
           "type": "string",
-          "description": "Moving backward."
+          "description": "The evasion pips per hex when moving backward, as MovementLegend.moves says."
         },
         "jump": {
           "type": [
             "null",
             "string"
           ],
-          "description": "null for a vehicle and a mech without a working jump jet."
+          "description": "The evasion pips per hex when jumping, as MovementLegend.moves says; null for a vehicle and a mech without a working jump jet."
         },
         "attacks": {
           "type": "array",
@@ -1377,7 +1377,7 @@
         },
         "radius": {
           "type": "number",
-          "description": "The radius of the hexagon the HUD draws; whether a unit is inside is decided per map cell, which this only approximates.",
+          "description": "The radius of the hexagon the HUD draws, in meters; whether a unit is inside is decided per map cell, which this only approximates.",
           "format": "float"
         },
         "isPreview": {
@@ -1413,7 +1413,7 @@
         },
         "hexes": {
           "type": "array",
-          "description": "The hexes a unit standing on is crushed: those whose center cell the game marks, in the order of combat-map.json rows: a dropship's whole footprint, or the hex each drop pod lands on, one per unit of the lance.",
+          "description": "The hexes whose center cell the game marks, in the order of combat-map.json rows; a unit standing on one is crushed. A dropship's whole footprint, or the hex each drop pod lands on, one per unit of the lance.",
           "items": {
             "$ref": "#/definitions/HexCoordinates"
           }
@@ -1496,7 +1496,7 @@
             "array",
             "null"
           ],
-          "description": "The hexes the building stood on as they are now, since combat-map.json isn't rewritten when it falls: units on its roof drop to the ground, which the rubble's terrain covers. null while it stands.",
+          "description": "The hexes the building stood on, with the ground's elevation and the rubble's terrain they now have in place of those in combat-map.json, which isn't rewritten when it falls; units on its roof drop to the ground. null while it stands.",
           "items": {
             "$ref": "#/definitions/MapHex"
           }

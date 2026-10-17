@@ -4,8 +4,8 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     An entry of the timeline: a work order the company is waiting for. Each <see cref="Kind" /> has a record with
-///     the target it is about.
+///     An entry of the timeline: a work order the company is waiting for. Each <see cref="Kind" /> has a record of
+///     its own, with the target it is about where it has one.
 /// </summary>
 /// <param name="Kind">What the entry is about, which decides its other fields.</param>
 /// <param name="Type">The game's kind of work order, e.g. <c>MedLabHeal</c> or <c>FinancialReport</c>.</param>
@@ -20,7 +20,7 @@ internal sealed record MechLabOrder(WorkOrderType Type, int FinishesOnDay, MechR
     : WorkQueueEntry(WorkQueueEntryKind.MechLab, Type, FinishesOnDay);
 
 /// <summary>A med bay order, of type <c>MedLabHeal</c>.</summary>
-/// <param name="Target">The pilot the med bay heals.</param>
+/// <param name="Target">The pilot the med bay heals; always set, since the order holds the pilot itself.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MedBayOrder(WorkOrderType Type, int FinishesOnDay, PilotReference Target)
     : WorkQueueEntry(WorkQueueEntryKind.MedBay, Type, FinishesOnDay);

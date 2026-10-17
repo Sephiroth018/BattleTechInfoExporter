@@ -47,9 +47,13 @@ internal sealed record ContractRules(
 ///     value, the target loses the employer's gain times its multiplier, and the Mercenary Review Board rating
 ///     gains the difficulty times the rating level's multiplier (see <see cref="MercenaryReviewBoardLevel" />).
 /// </summary>
-/// <param name="BasePerDifficulty">Rounded, plus <see cref="BaseAddition" />.</param>
+/// <param name="BasePerDifficulty">
+///     Times the contract's difficulty, the product rounded, plus <see cref="BaseAddition" />.
+/// </param>
 /// <param name="BaseAddition">Added to <see cref="BasePerDifficulty" /> times the difficulty, rounded.</param>
-/// <param name="NegotiablePerDifficulty">Rounded, plus <see cref="NegotiableAddition" />.</param>
+/// <param name="NegotiablePerDifficulty">
+///     Times the contract's difficulty, the product rounded, plus <see cref="NegotiableAddition" />.
+/// </param>
 /// <param name="NegotiableAddition">
 ///     Added to <see cref="NegotiablePerDifficulty" /> times the difficulty, rounded.
 /// </param>

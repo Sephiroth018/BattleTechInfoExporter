@@ -15,7 +15,7 @@ internal sealed record Storage(
 
 /// <summary>A stored component, described in the catalog.</summary>
 /// <param name="Count">The working copies; the damaged ones are in <see cref="DamagedCount" />.</param>
-/// <param name="DamagedCount">The damaged copies, which need a repair once mounted.</param>
+/// <param name="DamagedCount">The damaged copies, which need a repair, in storage or once mounted.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record StoredComponent(ComponentReference Component, int Count, int DamagedCount)
     : ComponentEntry(Component), IStored;
