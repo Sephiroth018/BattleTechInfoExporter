@@ -1218,7 +1218,7 @@
     },
     "CombatRules": {
       "type": "object",
-      "description": "The combat rules: the constants behind to-hit, evasion, cover, damage, heat, stability, melee, hit locations, visibility, resolve and movement. A to-hit modifier is added to the attack's difficulty: positive makes the shot harder, negative is a bonus.",
+      "description": "The combat rules: the constants behind to-hit, evasion, cover, damage, heat, stability, melee, hit locations, visibility, resolve and movement. A to-hit modifier is added to the attack's difficulty: positive makes the attack harder, negative is a bonus.",
       "additionalProperties": false,
       "required": [
         "toHit",
@@ -1245,7 +1245,7 @@
           "$ref": "#/definitions/ToHitRules"
         },
         "evasion": {
-          "description": "The evasive pips units earn by moving.",
+          "description": "The evasion pips units earn by moving.",
           "$ref": "#/definitions/EvasionRules"
         },
         "guard": {
@@ -1279,7 +1279,7 @@
           ]
         },
         "coil": {
-          "description": "How COIL weapons gain from the attacker's evasive pips.",
+          "description": "How COIL weapons gain from the attacker's evasion pips.",
           "$ref": "#/definitions/CoilRules"
         },
         "heat": {
@@ -1669,7 +1669,7 @@
     },
     "EvasionRules": {
       "type": "object",
-      "description": "How a unit earns evasive pips by moving and what each pip does to ranged attacks against it. A sensor lock strips pips (see SensorLockRules.evasivePipsStripped).",
+      "description": "How a unit earns evasion pips by moving and what each pip does to ranged attacks against it. A sensor lock strips pips (see SensorLockRules.evasivePipsStripped).",
       "additionalProperties": false,
       "required": [
         "pipsByDistanceMoved",
@@ -1714,13 +1714,13 @@
         },
         "canVehiclesBeEvasive": {
           "type": "boolean",
-          "description": "Whether vehicles get evasive pips at all."
+          "description": "Whether vehicles get evasion pips at all."
         }
       }
     },
     "EvasivePips": {
       "type": "object",
-      "description": "The evasive pips a move longer than a distance earns.",
+      "description": "The evasion pips a move longer than a distance earns.",
       "additionalProperties": false,
       "required": [
         "moreThan",
@@ -1871,7 +1871,7 @@
         },
         "isAffectedByEvasion": {
           "type": "boolean",
-          "description": "Whether the target's evasive pips apply to the category's attacks; the weapon's type must also be one of EvasionRules.weaponTypesAffected."
+          "description": "Whether the target's evasion pips apply to the category's attacks; the weapon's type must also be one of EvasionRules.weaponTypesAffected."
         }
       }
     },
@@ -1912,7 +1912,7 @@
     },
     "CoilRules": {
       "type": "object",
-      "description": "How a COIL weapon gains from its mech's evasive pips; the weapon's own values are its catalog.json componentDefinitions.weapons.*.coil.",
+      "description": "How a COIL weapon gains from its mech's evasion pips; the weapon's own values are its catalog.json componentDefinitions.weapons.*.coil.",
       "additionalProperties": false,
       "required": [
         "multipliesShots",
@@ -2037,7 +2037,7 @@
     },
     "StabilityRules": {
       "type": "object",
-      "description": "The stability rules of mechs. A mech's stability bar is divided into equal levels; a mech that reaches unsteadyAbovePercent of its stability is unsteady and loses its evasive pips, and an unsteady mech that fills the bar is knocked down.",
+      "description": "The stability rules of mechs. A mech's stability bar is divided into equal levels; a mech that reaches unsteadyAbovePercent of its stability is unsteady and loses its evasion pips, and an unsteady mech that fills the bar is knocked down.",
       "additionalProperties": false,
       "required": [
         "unsteadyAbovePercent",
@@ -2635,7 +2635,7 @@
       "properties": {
         "evasivePipsStripped": {
           "type": "integer",
-          "description": "The evasive pips the target loses; 0 when a sensor lock strips none.",
+          "description": "The evasion pips the target loses; 0 when a sensor lock strips none.",
           "format": "int32"
         },
         "targetEffects": {

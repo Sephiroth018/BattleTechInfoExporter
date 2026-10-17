@@ -5,8 +5,8 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     A component's definition, like <see cref="DefinitionReference" />, with the type that tells which group of
-///     <see cref="Catalog.ComponentDefinitions" /> holds it. Components compare by type first, then as every reference.
+///     A reference to a component's definition, with its type. Components are ordered by type, then by name, with
+///     the id breaking ties.
 /// </summary>
 /// <param name="Type">
 ///     The game's component type, e.g. <c>Weapon</c> or <c>AmmunitionBox</c>, which names the component's group in

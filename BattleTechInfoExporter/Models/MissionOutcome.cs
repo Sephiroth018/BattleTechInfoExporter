@@ -126,7 +126,6 @@ internal sealed record DamagedLocation(ChassisLocations Location, LocationArmor<
 
 /// <summary>A component damaged or destroyed in the mission.</summary>
 /// <param name="Location">The location it is mounted in.</param>
-/// <param name="DamageLevel">The game's damage level, e.g. <c>Penalized</c> or <c>Destroyed</c>.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record DamagedComponent(
     ComponentReference Component,

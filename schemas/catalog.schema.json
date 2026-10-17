@@ -228,7 +228,7 @@
           "format": "float"
         },
         "movement": {
-          "description": "The walk and sprint distances and the pathing, which no loadout changes.",
+          "description": "How the chassis moves.",
           "$ref": "#/definitions/ChassisMovement"
         },
         "melee": {
@@ -424,7 +424,7 @@
     },
     "LocationArmorOfNumber": {
       "type": "object",
-      "description": "A location's armor by side, in whatever a file measures armor in.",
+      "description": "A location's armor by side.",
       "additionalProperties": false,
       "required": [
         "front",
@@ -441,7 +441,7 @@
             "null",
             "number"
           ],
-          "description": "null outside the torso, which alone has rear armor.",
+          "description": "The rear armor; null when the location is outside the torso, which alone has it.",
           "format": "float"
         }
       }
@@ -826,7 +826,7 @@
     },
     "ComponentReference": {
       "type": "object",
-      "description": "A component's definition, like DefinitionReference, with the type that tells which group of componentDefinitions holds it. Components compare by type first, then as every reference.",
+      "description": "A reference to a component's definition, with its type. Components are ordered by type, then by name, with the id breaking ties.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -1053,7 +1053,7 @@
     },
     "ComponentDefinitions": {
       "type": "object",
-      "description": "The catalog's component definitions, which every export file's references point to, grouped by ComponentReference.type and keyed by component id: a reference's type names its group, Weapon in weapons, AmmunitionBox in ammunitionBoxes, HeatSink in heatSinks, JumpJet in jumpJets and Upgrade in upgrades. A reference whose definition the game can't find has no entry; its id stands in for its name.",
+      "description": "The catalog's component definitions, which every export file's references point to, grouped by ComponentReference.type and keyed by component id. A reference whose definition the game can't find has no entry; its id stands in for its name.",
       "additionalProperties": false,
       "required": [
         "weapons",
@@ -1065,35 +1065,35 @@
       "properties": {
         "weapons": {
           "type": "object",
-          "description": "The components of type Weapon, keyed by component id, without the game's internal melee, jump attack and AI weapons, which no unit mounts.",
+          "description": "The components of type Weapon, without the game's internal melee, jump attack and AI weapons, which no unit mounts.",
           "additionalProperties": {
             "$ref": "#/definitions/WeaponDefinition"
           }
         },
         "ammunitionBoxes": {
           "type": "object",
-          "description": "The components of type AmmunitionBox, keyed by component id.",
+          "description": "The components of type AmmunitionBox.",
           "additionalProperties": {
             "$ref": "#/definitions/AmmunitionBoxDefinition"
           }
         },
         "heatSinks": {
           "type": "object",
-          "description": "The components of type HeatSink, keyed by component id.",
+          "description": "The components of type HeatSink.",
           "additionalProperties": {
             "$ref": "#/definitions/HeatSinkDefinition"
           }
         },
         "jumpJets": {
           "type": "object",
-          "description": "The components of type JumpJet, keyed by component id.",
+          "description": "The components of type JumpJet.",
           "additionalProperties": {
             "$ref": "#/definitions/JumpJetDefinition"
           }
         },
         "upgrades": {
           "type": "object",
-          "description": "The components of type Upgrade, e.g. actuators, cockpit mods and gyros, keyed by component id; they have only the common fields.",
+          "description": "The components of type Upgrade, e.g. actuators, cockpit mods and gyros; they have only the common fields.",
           "additionalProperties": {
             "$ref": "#/definitions/ComponentDefinition"
           }
@@ -1162,25 +1162,25 @@
         },
         "isSalvageable": {
           "type": "boolean",
-          "description": "Whether the component can come as salvage; the game's BLACKLISTED tag rules it out. Nothing else follows from it, e.g. about stores."
+          "description": "Whether the component can come as salvage; the game's BLACKLISTED tag rules it out."
         },
         "category": {
           "type": "string",
-          "description": "The hardpoint kind the weapon needs, e.g. \"Ballistic\" or \"Support\", which also keys rules.json combat.weaponCategories."
+          "description": "The hardpoint kind the weapon needs, e.g. Ballistic or Support, which also keys rules.json combat.weaponCategories."
         },
         "ammoCategory": {
           "type": [
             "null",
             "string"
           ],
-          "description": "The ammo the weapon fires, as AmmunitionBoxDefinition.ammoCategory names it; a weapon with internalAmmoCapacity fires its own ammo first and then any boxes of the category, which the catalog has none of; null when it needs no ammo."
+          "description": "The ammunition the weapon fires, as AmmunitionBoxDefinition.ammoCategory names it; a weapon with internalAmmoCapacity fires its own first and then any ammunition boxes of the category, which the catalog has none of; null when it needs no ammunition."
         },
         "internalAmmoCapacity": {
           "type": [
             "integer",
             "null"
           ],
-          "description": "The shots a weapon that carries its own ammo, like a flamer, has per mission; null for every other weapon.",
+          "description": "The shots a weapon that carries its own ammunition, like a flamer, has per mission; null when it carries none.",
           "format": "int32"
         },
         "damage": {
@@ -1219,7 +1219,7 @@
           "format": "int32"
         },
         "coil": {
-          "description": "How the COIL weapon gains from its mech's evasive pips, as rules.json combat.coil applies it; null for every other weapon.",
+          "description": "How the COIL weapon gains from its mech's evasion pips, as rules.json combat.coil applies it; null when it isn't a COIL weapon.",
           "oneOf": [
             {
               "type": "null"
@@ -1765,7 +1765,7 @@
     },
     "CoilWeapon": {
       "type": "object",
-      "description": "How a COIL weapon gains from its mech's evasive pips.",
+      "description": "How a COIL weapon gains from its mech's evasion pips.",
       "additionalProperties": false,
       "required": [
         "evasiveExponent",
@@ -1774,7 +1774,7 @@
       "properties": {
         "evasiveExponent": {
           "type": "number",
-          "description": "The power of the evasive pips that multiplies the damage of one shot; 0 leaves the damage at its base.",
+          "description": "The power of the evasion pips that multiplies the damage of one shot; 0 leaves the damage at its base.",
           "format": "float"
         },
         "heatDivisor": {
@@ -1782,7 +1782,7 @@
             "null",
             "number"
           ],
-          "description": "The heat the mech takes per attack is the damage of one shot as fired, after the evasive pips' increase and rules.json combat.damage.globalMultiplier, divided by this; null when WeaponDefinition.heatGenerated applies instead.",
+          "description": "The heat the mech takes per attack is the damage of one shot as fired, after the evasion pips' increase and rules.json combat.damage.globalMultiplier, divided by this; null when WeaponDefinition.heatGenerated applies instead.",
           "format": "float"
         }
       }
@@ -1874,11 +1874,11 @@
         },
         "isSalvageable": {
           "type": "boolean",
-          "description": "Whether the component can come as salvage; the game's BLACKLISTED tag rules it out. Nothing else follows from it, e.g. about stores."
+          "description": "Whether the component can come as salvage; the game's BLACKLISTED tag rules it out."
         },
         "ammoCategory": {
           "type": "string",
-          "description": "The weapons the ammo fits, e.g. \"AC/5\"."
+          "description": "The weapons the ammunition fits, e.g. AC/5."
         },
         "capacity": {
           "type": "integer",
@@ -1934,7 +1934,7 @@
         },
         "isSalvageable": {
           "type": "boolean",
-          "description": "Whether the component can come as salvage; the game's BLACKLISTED tag rules it out. Nothing else follows from it, e.g. about stores."
+          "description": "Whether the component can come as salvage; the game's BLACKLISTED tag rules it out."
         },
         "dissipation": {
           "type": "number",
@@ -1991,7 +1991,7 @@
         },
         "isSalvageable": {
           "type": "boolean",
-          "description": "Whether the component can come as salvage; the game's BLACKLISTED tag rules it out. Nothing else follows from it, e.g. about stores."
+          "description": "Whether the component can come as salvage; the game's BLACKLISTED tag rules it out."
         },
         "minTonnage": {
           "type": "number",
@@ -2007,7 +2007,7 @@
     },
     "ComponentDefinition": {
       "type": "object",
-      "description": "The fields every component definition has; the definitions of types with stats of their own derive from it. Upgrades have no others.",
+      "description": "The fields every component definition has; the shapes of the types with stats of their own add those. Upgrades have no others.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -2051,7 +2051,7 @@
         },
         "isSalvageable": {
           "type": "boolean",
-          "description": "Whether the component can come as salvage; the game's BLACKLISTED tag rules it out. Nothing else follows from it, e.g. about stores."
+          "description": "Whether the component can come as salvage; the game's BLACKLISTED tag rules it out."
         }
       }
     },
@@ -2740,7 +2740,7 @@
     },
     "CareerStatisticChange": {
       "type": "object",
-      "description": "A change the career makes to a statistic of the company or a pilot, e.g. by a ship upgrade or an event. Simpler than a combat statistic change on purpose: the career only adds to a statistic or sets it.",
+      "description": "A change the career makes to a statistic of the company or a pilot, e.g. by a ship upgrade or an event: it adds to the statistic or sets it.",
       "additionalProperties": false,
       "required": [
         "statistic",
@@ -2750,7 +2750,7 @@
       "properties": {
         "statistic": {
           "type": "string",
-          "description": "The game's name of the statistic, e.g. \"MechTechSkill\"."
+          "description": "The game's name of the statistic, e.g. MechTechSkill."
         },
         "value": {
           "type": "number",

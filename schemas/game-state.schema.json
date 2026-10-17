@@ -245,7 +245,7 @@
         },
         "reputation": {
           "type": "object",
-          "description": "The reputation with each faction that gains it, keyed by faction id, except the Mercenary Review Board.",
+          "description": "The reputation with each faction that gains it, keyed by faction id; the Mercenary Review Board's is mercenaryReviewBoard.",
           "additionalProperties": {
             "$ref": "#/definitions/FactionReputation"
           }
@@ -1154,7 +1154,7 @@
       "properties": {
         "statistic": {
           "type": "string",
-          "description": "The game's name of the statistic, e.g. \"MechTechSkill\"."
+          "description": "The game's name of the statistic, e.g. MechTechSkill."
         },
         "value": {
           "type": "number",
@@ -1407,7 +1407,7 @@
             "integer",
             "null"
           ],
-          "description": "The day high or low spirits end, on the scale of Company.daysPassed; null for normal spirits and when the game sets no end.",
+          "description": "The day high or low spirits end, on the scale of Company.daysPassed; null when spirits are normal or the game sets no end.",
           "format": "int32"
         }
       }
@@ -1851,7 +1851,7 @@
     },
     "LocationArmorOfArmor": {
       "type": "object",
-      "description": "A location's armor by side, in whatever a file measures armor in.",
+      "description": "A location's armor by side.",
       "additionalProperties": false,
       "required": [
         "front",
@@ -1863,7 +1863,7 @@
           "$ref": "#/definitions/Armor"
         },
         "rear": {
-          "description": "null outside the torso, which alone has rear armor.",
+          "description": "The rear armor; null when the location is outside the torso, which alone has it.",
           "oneOf": [
             {
               "type": "null"
@@ -1911,18 +1911,18 @@
           "$ref": "#/definitions/ComponentReference"
         },
         "damageLevel": {
-          "description": "The component's damage, e.g. Functional or Destroyed.",
+          "description": "The component's damage level, e.g. Penalized or Destroyed.",
           "$ref": "#/definitions/ComponentDamageLevel"
         },
         "isFixed": {
           "type": "boolean",
-          "description": "Whether it's part of the chassis: every mech of the chassis has it, and it can't be removed."
+          "description": "Whether the component is part of the chassis: every mech of the chassis has it, and it can't be removed."
         }
       }
     },
     "ComponentReference": {
       "type": "object",
-      "description": "A component's definition, like DefinitionReference, with the type that tells which group of catalog.json componentDefinitions holds it. Components compare by type first, then as every reference.",
+      "description": "A reference to a component's definition, with its type. Components are ordered by type, then by name, with the id breaking ties.",
       "additionalProperties": false,
       "required": [
         "id",
@@ -2193,7 +2193,7 @@
     },
     "LocationArmorOfNumber": {
       "type": "object",
-      "description": "A location's armor by side, in whatever a file measures armor in.",
+      "description": "A location's armor by side.",
       "additionalProperties": false,
       "required": [
         "front",
@@ -2210,7 +2210,7 @@
             "null",
             "number"
           ],
-          "description": "null outside the torso, which alone has rear armor.",
+          "description": "The rear armor; null when the location is outside the torso, which alone has it.",
           "format": "float"
         }
       }

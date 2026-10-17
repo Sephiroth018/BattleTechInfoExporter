@@ -8,26 +8,26 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Side">Whose side the unit is on.</param>
 /// <param name="Visibility">How much of the unit the HUD shows, deciding which of its other fields are set.</param>
 /// <param name="Kind">
-///     The kind of unit; <c>null</c> where the HUD doesn't tell: at <see cref="UnitVisibility.BlipMinimum" /> and
+///     The kind of unit; <c>null</c> when the HUD doesn't tell: at <see cref="UnitVisibility.BlipMinimum" /> and
 ///     <see cref="UnitVisibility.LastSeen" />.
 /// </param>
 /// <param name="Tonnage">
-///     The unit's tonnage, in tons; <c>null</c> where the HUD doesn't tell: for a blip below
+///     The unit's tonnage, in tons; <c>null</c> when the HUD doesn't tell: for a blip below
 ///     <see cref="UnitVisibility.BlipMaximum" />, a turret blip, which shows its weight class instead, and when
 ///     last seen.
 /// </param>
 /// <param name="WeightClass">
-///     The unit's weight class; <c>null</c> where the HUD doesn't tell: for a blip below
+///     The unit's weight class; <c>null</c> when the HUD doesn't tell: for a blip below
 ///     <see cref="UnitVisibility.BlipMaximum" />, a mech or vehicle blip, which shows its tonnage instead, and when
 ///     last seen.
 /// </param>
 /// <param name="Definition">
-///     The mech, vehicle or turret in the catalog, which holds its armor and loadout; <c>null</c> for the player's
-///     mechs, which have <see cref="BayMech" /> instead, and for units out of full view.
+///     The mech, vehicle or turret in the catalog, which holds its armor and loadout; <c>null</c> when the unit is
+///     one of the player's mechs, which have <see cref="BayMech" /> instead, or out of full view.
 /// </param>
 /// <param name="BayMech">
-///     The player's mech in <c>game-state.json</c>, whose loadout holds its assigned armor; <c>null</c> for every
-///     other unit.
+///     The player's mech in <c>game-state.json</c>, whose loadout holds its assigned armor; <c>null</c> when the
+///     unit isn't one.
 /// </param>
 /// <param name="Position">Where the unit is, or was last detected at for <see cref="UnitVisibility.LastSeen" />.</param>
 /// <param name="FacingDegrees">
@@ -36,17 +36,17 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="Terrain">
 ///     The terrain the unit stands in, keyed as in <see cref="Catalog.TerrainDefinitions" />, which a blip's
-///     position on the map shows; <c>null</c> on open ground and when last seen.
+///     position on the map shows; <c>null</c> when on open ground or last seen.
 /// </param>
 /// <param name="Pilot">The pilot, which the HUD names only at <see cref="UnitVisibility.Full" />.</param>
 /// <param name="State">The unit's condition, shown at <see cref="UnitVisibility.Full" />.</param>
 /// <param name="LinesOfFire">
 ///     The lines of fire to the units it could attack: from the player's units to every living enemy at
-///     <see cref="UnitVisibility.Full" />, and from those enemies to the player's units. <c>null</c> for the others,
-///     destroyed units included.
+///     <see cref="UnitVisibility.Full" />, and from those enemies to the player's units. <c>null</c> when the unit is
+///     neither, or destroyed.
 /// </param>
 /// <param name="Movement">
-///     Where the player's unit can move and what it gets there; <c>null</c> for the others, and for a unit that can't
+///     Where the player's unit can move and what it gets there; <c>null</c> when the unit isn't the player's or can't
 ///     move (a turret, a prone or shut down mech).
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -68,17 +68,15 @@ internal sealed record CombatUnit(
 
 /// <summary>A unit's condition as the HUD shows it, for a unit in full view.</summary>
 /// <param name="DeathMethod">
-///     How the unit was destroyed, as the game records it (<see cref="BattleTech.DeathMethod" />), e.g.
-///     <c>CenterTorsoDestruction</c>, <c>LegDestruction</c>, <c>PilotKilled</c> (also an incapacitated pilot),
-///     <c>PilotEjection</c>, a turret's <c>CenterTorsoDestruction</c> or a vehicle's
-///     <c>VehicleLocationDestroyed</c>; <c>null</c> while the unit lives.
+///     How the unit was destroyed (the game's <see cref="BattleTech.DeathMethod" />), e.g.
+///     <c>LegDestruction</c>, or <c>PilotKilled</c> also for an incapacitated pilot; <c>null</c> when the unit lives.
 /// </param>
 /// <param name="Locations">
 ///     The armor and structure left per location, in the game's order: a mech's from head to legs, a vehicle's from
 ///     front to rear and turret, a turret's single one. The limits are in <see cref="CombatUnit.Definition" /> or
 ///     <see cref="CombatUnit.BayMech" />.
 /// </param>
-/// <param name="EvasionPips">The evasive pips the unit has, earned by moving (see <see cref="EvasionRules" />).</param>
+/// <param name="EvasionPips">The evasion pips the unit has, earned by moving (see <see cref="EvasionRules" />).</param>
 /// <param name="Guard">The unit's guard level and its sources.</param>
 /// <param name="IsEntrenched">
 ///     Whether the unit is entrenched, e.g. by bracing, until its next activation: weapons' stability damage against it
@@ -90,15 +88,15 @@ internal sealed record CombatUnit(
 ///     Whether the mech is unsteady: its instability rose above <see cref="MechStability.UnsteadyAbove" /> and
 ///     hasn't fallen below since; only mechs can be.
 /// </param>
-/// <param name="Mech">What only a mech has; <c>null</c> for vehicles and turrets.</param>
+/// <param name="Mech">What only a mech has; <c>null</c> when the unit is a vehicle or turret.</param>
 /// <param name="HasActivated">Whether the unit has finished its activation this round.</param>
 /// <param name="Initiative">The phase the unit acts in, on the scale of <see cref="CombatState.Phase" />.</param>
 /// <param name="Components">Every component mounted, in the game's order.</param>
-/// <param name="Pilot">The pilot's condition; <c>null</c> without a pilot.</param>
+/// <param name="Pilot">The pilot's condition; <c>null</c> when the unit has no pilot.</param>
 /// <param name="Abilities">The pilot's and components' abilities that can be activated, with their cooldowns.</param>
 /// <param name="ResolveCosts">
-///     What Precision Strike and Vigilance cost the unit now, which its pilot's spirits change; <c>null</c> for the
-///     units not in the player's lance, which spend no resolve.
+///     What Precision Strike and Vigilance cost the unit now, which its pilot's spirits change; <c>null</c> when the
+///     unit isn't in the player's lance, which alone spends resolve.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatUnitState(
@@ -127,7 +125,7 @@ internal sealed record MechState(MechHeat Heat, MechStability Stability);
 /// <summary>A mech's stability as the HUD's stability bar shows it, with the thresholds it draws.</summary>
 /// <param name="Current">The instability taken, from 0 up, as the bar fills.</param>
 /// <param name="UnsteadyAbove">
-///     The instability above which the mech is unsteady and loses its evasive pips, after effects; the base is
+///     The instability above which the mech is unsteady and loses its evasion pips, after effects; the base is
 ///     <see cref="StabilityRules.UnsteadyAbovePercent" /> of <see cref="MaxStability" />.
 /// </param>
 /// <param name="MaxStability">
@@ -141,7 +139,7 @@ internal sealed record MechStability(float Current, float UnsteadyAbove, float M
 /// <param name="Current">The heat now.</param>
 /// <param name="Dissipation">
 ///     The heat the mech sheds at the end of its activation now: its heat sinks after the terrain it stands in, the
-///     biome and effects; standing in water or on a cold map changes it.
+///     biome and effects.
 /// </param>
 /// <param name="OverheatsAbove">
 ///     The heat above which the mech overheats, after the pilot's Guts and effects; the base is in
@@ -195,10 +193,9 @@ internal sealed record Guard(int Level, bool IsBraced, bool HasCover, bool HasBu
 
 /// <summary>A component mounted on a unit, with its condition in the battle.</summary>
 /// <param name="Location">The game's name of the location it is mounted in, as <see cref="UnitLocation.Location" />.</param>
-/// <param name="DamageLevel">The game's damage level, e.g. <c>Functional</c> or <c>Destroyed</c>.</param>
 /// <param name="ShotsLeft">
-///     The shots left in an ammunition box, or in a weapon that carries its own; <c>null</c> for other components.
-///     A destroyed box has none.
+///     The shots left in an ammunition box, or in a weapon that carries its own; <c>null</c> when it's another
+///     component. A destroyed box has none.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatComponent(
@@ -210,7 +207,7 @@ internal sealed record CombatComponent(
 /// <summary>An ability a unit can activate, as its HUD button shows it.</summary>
 /// <param name="Ability">The ability, the pilot's or a mounted component's.</param>
 /// <param name="Cooldown">The unit's activations until the ability can be used again; 0 when ready.</param>
-/// <param name="UsesLeft">The uses left of an ability that can be used only so often; <c>null</c> without a limit.</param>
+/// <param name="UsesLeft">The uses left of an ability that can be used only so often; <c>null</c> when unlimited.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatAbility(DefinitionReference Ability, int Cooldown, int? UsesLeft);
 
