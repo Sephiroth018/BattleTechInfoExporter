@@ -11,63 +11,63 @@ other file there, e.g. one an earlier version wrote, so a tool never reads a fil
 kept current.
 
 - `game-state.json`: the career state, from the company, pilots, mechs and storage to the stores,
-  contracts, events and the next financial report. Never deleted.
+  contracts, events and the next financial report.
 - `rules.json`: the game's tables and constants for this career, which the other files refer to
-  by name. Written with the game state, never deleted.
+  by name. Written with the game state.
 - `star-systems.json`: every star system with its owner, tags, maps, stores, employers and the
-  route there. Written with the game state, never deleted.
+  route there. Written with the game state.
 - `mission-outcome.json`: the latest mission's outcome, pay, lance and salvage, written when the
   mission ends and again once the salvage is final. The next mission replaces it.
 - `combat-map.json`: the battle's ground on the game's hex grid, written once when the battle
   begins.
 - `combat-state.json`: the running battle as the player's HUD shows it, written when a battle is
-  loaded, when every phase begins and after every unit's activation. Both combat files are deleted
-  when the game tears the battle down (the after-action report is left, or the battle is quit,
-  restarted or left by loading a save) and when a career is loaded, so they exist only while their
-  battle runs.
+  loaded, when every phase begins and after every unit's activation.
 - `catalog.json`: every definition the game has loaded, DLC included: chassis, mechs, vehicles,
   turrets, components, terrains, biomes, maps, events, item collections and factions. Rebuilt on
   a career load only when it's missing or stale: written by another mod version, or from other
   game data than now (its `sourceFingerprint`). Delete it to force a rebuild.
 
+Only the combat files are ever deleted: when the game tears the battle down (the after-action
+report is left, or the battle is quit, restarted or left by loading a save) and when a career is
+loaded, so they exist only while their battle runs.
+
 Every file starts with `modVersion`, `exportedAt` and the `trigger` of the export that last wrote
 it. A file is replaced in one step, never half-written, and only when its content apart from
-`exportedAt` and `trigger` changed, plus once after every game start, so a tool can skip copying a
-file whose `exportedAt` hasn't changed. The other files refer to the catalog's definitions by id;
-they belong together when their `modVersion` matches.
-
-Each file's `trigger` is one of these, and each trigger writes the files marked. The career files
-are `game-state.json`, `rules.json` and `star-systems.json`, always written together.
-
-| `trigger`                                                     | When                                                                                                                             | Career files | Mission | Combat map | Combat state | Catalog |
-|---------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|:------------:|:-------:|:----------:|:------------:|:-------:|
-| `CareerLoaded`                                                | A career is started or loaded, also on the return from a mission; the career files only when no mission's results are pending. |      ✓       |         |            |              |    ✓    |
-| `ManualSave`                                                  | The player saves the career outside combat.                                                                                      |      ✓       |         |            |              |         |
-| `Autosave`                                                    | The game saves the career outside combat, e.g. once a contract's results are applied.                                           |      ✓       |         |            |              |         |
-| `ContractCompleted`                                           | A contract's results are applied, where the game doesn't autosave after it, e.g. a flashpoint's.                                |      ✓       |         |            |              |         |
-| `FinancialReportShown`                                        | The monthly financial report is shown.                                                                                           |      ✓       |         |            |              |         |
-| `MechLabOrderCompleted`, `PilotHealed`, `ShipUpgradeCompleted` | Work orders complete, at the end of a day or when the mech lab queue is updated; named after the last one.                      |      ✓       |         |            |              |         |
-| `ContractsGenerated`                                          | The current system's contracts are generated: when the contract screen first opens there, or after a contract.                  |      ✓       |         |            |              |         |
-| `Jumped`                                                      | At the end of the day the ship jumps into its destination system, work orders of that day included.                             |      ✓       |         |            |              |         |
-| `Arrived`                                                     | The ship arrives at the planet after a trip.                                                                                     |      ✓       |         |            |              |         |
-| `PurchaseCompleted`, `SaleCompleted`                          | A purchase or sale in a store, once per action, a stack sold at once included.                                                   |      ✓       |         |            |              |         |
-| `StoreClosed`                                                 | A store is closed, from the main screen or the mech lab.                                                                         |      ✓       |         |            |              |         |
-| `MechBayChanged`                                              | An order is queued, cancelled or reordered, a mech is readied, stored or renamed, or a mech, chassis or mech parts are scrapped. |      ✓       |         |            |              |         |
-| `ShipUpgradeStarted`                                          | An Argo upgrade is bought.                                                                                                       |      ✓       |         |            |              |         |
-| `ExperienceSpent`                                             | A pilot's training is confirmed in the barracks.                                                                                 |      ✓       |         |            |              |         |
-| `MechPlacementShown`                                          | The game asks where to put a new mech because every mech bay is full.                                                            |      ✓       |         |            |              |         |
-| `MissionCompleted`                                            | A mission ends, still in combat, before the salvage is chosen.                                                                   |              |    ✓    |            |              |         |
-| `SalvageChosen`                                               | The salvage is final: the priority salvage is confirmed, or there is nothing to choose.                                          |              |    ✓    |            |              |         |
-| `CombatStarted`                                               | A new battle begins, when the briefing is dismissed.                                                                             |              |         |     ✓      |              |         |
-| `CombatLoaded`                                                | A battle is loaded from a save.                                                                                                  |              |         |     ✓      |      ✓       |         |
-| `PhaseStarted`                                                | A phase begins, before its first unit acts, also one reached by reserving units.                                                 |              |         |            |      ✓       |         |
-| `ActivationCompleted`                                         | A unit's activation is done, its attacks resolved; out of contact, once the player's units have all moved.                     |              |         |            |      ✓       |         |
+`exportedAt` and `trigger` changed, and once after every game start. A tool can skip copying a
+file whose `exportedAt` hasn't changed. The other files refer to the catalog's definitions by id
+and belong with the catalog whose `modVersion` matches theirs.
 
 Every file has a JSON Schema (draft-04) in `Mods/BattleTechInfoExporter/schemas/`, e.g.
 `game-state.schema.json`, generated from the models the mod writes the files from. It describes
 every property: its type, whether it can be `null`, the values of enums and what it means. What
 each version changed in the files is in the [changelog](CHANGELOG.md), written for the tool reading
 them and shipped as `Mods/BattleTechInfoExporter/CHANGELOG.md`.
+
+The `trigger` values and the files each writes, the career files being the first three above:
+
+| `trigger`                                                      | When                                                                                                                             | Career files | Mission | Combat map | Combat state | Catalog |
+|----------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|:------------:|:-------:|:----------:|:------------:|:-------:|
+| `CareerLoaded`                                                 | A career is started or loaded, also on the return from a mission; the career files only when no mission's results are pending.   |      ✓       |         |            |              |    ✓    |
+| `ManualSave`                                                   | The player saves the career outside combat.                                                                                      |      ✓       |         |            |              |         |
+| `Autosave`                                                     | The game saves the career outside combat, e.g. once a contract's results are applied.                                            |      ✓       |         |            |              |         |
+| `ContractCompleted`                                            | A contract's results are applied, where the game doesn't autosave after it, e.g. a flashpoint's.                                 |      ✓       |         |            |              |         |
+| `FinancialReportShown`                                         | The monthly financial report is shown.                                                                                           |      ✓       |         |            |              |         |
+| `MechLabOrderCompleted`, `PilotHealed`, `ShipUpgradeCompleted` | Work orders complete, at the end of a day or when the mech lab queue is updated; named after the last one.                       |      ✓       |         |            |              |         |
+| `ContractsGenerated`                                           | The current system's contracts are generated: when the contract screen first opens there, or after a contract.                   |      ✓       |         |            |              |         |
+| `Jumped`                                                       | At the end of the day the ship jumps into its destination system, work orders of that day included.                              |      ✓       |         |            |              |         |
+| `Arrived`                                                      | The ship arrives at the planet after a trip.                                                                                     |      ✓       |         |            |              |         |
+| `PurchaseCompleted`, `SaleCompleted`                           | A purchase or sale in a store, once per action, a stack sold at once included.                                                   |      ✓       |         |            |              |         |
+| `StoreClosed`                                                  | A store is closed, from the main screen or the mech lab.                                                                         |      ✓       |         |            |              |         |
+| `MechBayChanged`                                               | An order is queued, cancelled or reordered, a mech is readied, stored or renamed, or a mech, chassis or mech parts are scrapped. |      ✓       |         |            |              |         |
+| `ShipUpgradeStarted`                                           | An Argo upgrade is bought.                                                                                                       |      ✓       |         |            |              |         |
+| `ExperienceSpent`                                              | A pilot's training is confirmed in the barracks.                                                                                 |      ✓       |         |            |              |         |
+| `MechPlacementShown`                                           | The game asks where to put a new mech because every mech bay is full.                                                            |      ✓       |         |            |              |         |
+| `MissionCompleted`                                             | A mission ends, still in combat, before the salvage is chosen.                                                                   |              |    ✓    |            |              |         |
+| `SalvageChosen`                                                | The salvage is final: the priority salvage is confirmed, or there is nothing to choose.                                          |              |    ✓    |            |              |         |
+| `CombatStarted`                                                | A new battle begins, when the briefing is dismissed.                                                                             |              |         |     ✓      |              |         |
+| `CombatLoaded`                                                 | A battle is loaded from a save.                                                                                                  |              |         |     ✓      |      ✓       |         |
+| `PhaseStarted`                                                 | A phase begins, before its first unit acts, also one reached by reserving units.                                                 |              |         |            |      ✓       |         |
+| `ActivationCompleted`                                          | A unit's activation is done, its attacks resolved; out of contact, once the player's units have all moved.                       |              |         |            |      ✓       |         |
 
 ## Installing
 
@@ -115,10 +115,8 @@ dotnet BattleTechInfoExporter.SchemaGenerator/bin/Debug/net9.0/BattleTechInfoExp
 ```
 
 The build derives the version from git, as the "Versioning" section of [CLAUDE.md](CLAUDE.md)
-describes.
-
-`dotnet tool restore` installs the ReSharper command line tools that format and inspect the code;
-CLAUDE.md lists their commands.
+describes. `dotnet tool restore` installs the ReSharper command line tools that format and inspect
+the code; CLAUDE.md lists their commands.
 
 ## AI disclaimer
 
