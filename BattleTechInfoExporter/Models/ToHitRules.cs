@@ -7,7 +7,8 @@ namespace BattleTechInfoExporter.Models;
 ///     How an attack's hit chance follows from its difficulty: the base chance of the skill level (see
 ///     <see cref="GunneryLevel.BaseHitChancePercent" />) loses <see cref="DifficultySteps" /> per point of the
 ///     summed modifiers, is rounded to <see cref="RoundedToPercent" /> and clamped between
-///     <see cref="MinChancePercent" /> and <see cref="MaxChancePercent" />.
+///     <see cref="MinChancePercent" /> and <see cref="MaxChancePercent" />. The modifiers below are to-hit modifiers,
+///     added to that difficulty.
 /// </summary>
 /// <param name="DifficultySteps">The chance lost per point of difficulty, by step from the lowest difficulty up.</param>
 /// <param name="RoundedToPercent">The hit chance is rounded to the nearest multiple of this, in percent.</param>
@@ -19,15 +20,19 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="RangeBands">The modifier of each range band of the weapon.</param>
 /// <param name="TargetWeightClass">The modifier for the target's size.</param>
 /// <param name="Elevation">The modifier for the height difference between attacker and target.</param>
-/// <param name="TargetShutdown">Against a shut-down mech, ranged attacks.</param>
-/// <param name="TargetProne">Against a prone mech, ranged attacks.</param>
-/// <param name="AttackerSprinted">When the attacker sprinted this round.</param>
-/// <param name="AttackerWalked">When the attacker moved more than 10 meters this round without sprinting.</param>
-/// <param name="AttackerStoodUp">When the attacker stood up this round.</param>
-/// <param name="AttackerOverheated">When the attacking mech is overheated.</param>
-/// <param name="ArmMountedWeapon">For a mech's ranged weapon mounted in an arm.</param>
-/// <param name="AttackerDamage">For damage to the attacker's weapon or the location it's mounted in.</param>
-/// <param name="PrecisionStrike">For an attack made with Precision Strike.</param>
+/// <param name="TargetShutdown">The modifier of ranged attacks against a shut-down mech.</param>
+/// <param name="TargetProne">The modifier of ranged attacks against a prone mech.</param>
+/// <param name="AttackerSprinted">The modifier when the attacker sprinted this round.</param>
+/// <param name="AttackerWalked">
+///     The modifier when the attacker moved more than 10 meters this round without sprinting.
+/// </param>
+/// <param name="AttackerStoodUp">The modifier when the attacker stood up this round.</param>
+/// <param name="AttackerOverheated">The modifier when the attacking mech is overheated.</param>
+/// <param name="ArmMountedWeapon">The modifier for a mech's ranged weapon mounted in an arm.</param>
+/// <param name="AttackerDamage">
+///     The modifiers for damage to the attacker's weapon or the location it's mounted in.
+/// </param>
+/// <param name="PrecisionStrike">The modifier of an attack made with Precision Strike.</param>
 /// <param name="MechFiringArcDegrees">
 ///     How far to either side of its facing a mech can fire without turning; a turret's arc is in the catalog.
 /// </param>
@@ -108,14 +113,18 @@ internal sealed record ElevationModifier(
 internal sealed record AttackerWalkedModifiers(ByWeightClass<float> Mech, float Vehicle);
 
 /// <summary>
-///     The to-hit modifiers for damage to the attacker's weapon or its location; an attacking turret gets none.
+///     The to-hit modifiers for damage to the attacker's weapon or its location, by the attacker's kind; an attacking
+///     turret gets none.
 /// </summary>
 /// <param name="Mech">For an attacking mech.</param>
 /// <param name="Vehicle">For an attacking vehicle.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record AttackerDamageModifiers(WeaponDamageModifiers Mech, WeaponDamageModifiers Vehicle);
 
-/// <summary>Both apply when the weapon is damaged and its location too.</summary>
+/// <summary>
+///     The to-hit modifiers for damage to the attacking weapon and its location; both apply when the weapon and
+///     its location are damaged.
+/// </summary>
 /// <param name="DamagedWeapon">For a weapon damaged by a critical hit but not destroyed.</param>
 /// <param name="WeaponInDamagedLocation">For a weapon in a damaged location.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

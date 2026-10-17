@@ -8,6 +8,9 @@ namespace BattleTechInfoExporter.Models;
 ///     turrets is multiplied by the <c>Melee</c> weapon category's (see <see cref="CombatRules.WeaponCategories" />).
 /// </summary>
 /// <param name="DeathFromAboveToHit">The to-hit modifier of a jump attack.</param>
-/// <param name="MaxHeightDifference">In meters, between the attacker's and the target's position.</param>
+/// <param name="MaxHeightDifference">
+///     The largest height difference, in meters, between the attacker's position and the target's for a melee or
+///     jump attack.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record MeleeAttackRules(float DeathFromAboveToHit, float MaxHeightDifference);
