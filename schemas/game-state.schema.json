@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "GameState",
   "type": "object",
-  "description": "The root of game-state.json.",
+  "description": "The root of `game-state.json`.",
   "additionalProperties": false,
   "required": [
     "modVersion",
@@ -54,7 +54,7 @@
       }
     },
     "ship": {
-      "description": "The Argo; null when the company still flies the Leopard.",
+      "description": "The Argo; `null` when the company still flies the Leopard.",
       "oneOf": [
         {
           "type": "null"
@@ -97,7 +97,7 @@
       "$ref": "#/definitions/Storage"
     },
     "stores": {
-      "description": "The current star system's stores, each null when the star system has none or the company can't use it. Their stock changes only on arrival in a star system.",
+      "description": "The current star system's stores, each `null` when the star system has none or the company can't use it. Their stock changes only on arrival in a star system.",
       "$ref": "#/definitions/StarSystemStores"
     },
     "hiringHall": {
@@ -108,7 +108,7 @@
       }
     },
     "activeContract": {
-      "description": "The travel contract the company has accepted; null when there's none.",
+      "description": "The travel contract the company has accepted; `null` when there's none.",
       "oneOf": [
         {
           "type": "null"
@@ -223,12 +223,12 @@
         },
         "daysPassed": {
           "type": "integer",
-          "description": "The days passed since the career began; every day number in the export (e.g. readyOnDay) is on this scale.",
+          "description": "The days passed since the career began; every day number in the export (e.g. `readyOnDay`) is on this scale.",
           "format": "int32"
         },
         "currentDate": {
           "type": "string",
-          "description": "The in-game calendar date, as yyyy-MM-dd."
+          "description": "The in-game calendar date, as `yyyy-MM-dd`."
         },
         "morale": {
           "description": "The company's morale, with its level in rules.json moraleLevels.",
@@ -404,7 +404,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The definition's id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction)."
         },
         "name": {
           "type": "string",
@@ -655,7 +655,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The game's own id of the mech in the mech bay."
         },
         "name": {
           "type": "string",
@@ -695,11 +695,11 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The game's pilot id."
         },
         "name": {
           "type": "string",
-          "description": "The name the UI shows."
+          "description": "The pilot's full name without callsign."
         },
         "callsign": {
           "type": "string",
@@ -730,7 +730,7 @@
     },
     "WorkQueueEntryKind": {
       "type": "string",
-      "description": "What a work queue entry is about, which decides the entry's other fields.",
+      "description": "What a work queue entry is about, which decides the entry's other fields. `mechLab`: A mech lab order on a mech of the company. `medBay`: A pilot healing in the med bay. `travel`: The trip under way. `shipUpgrade`: A ship upgrade being installed. `financialReport`: The next financial report.",
       "x-enumNames": [
         "MechLab",
         "MedBay",
@@ -804,7 +804,7 @@
     },
     "FinancialReportOrder": {
       "type": "object",
-      "description": "The next financial report, of type FinancialReport.",
+      "description": "The next financial report, of type `FinancialReport`.",
       "additionalProperties": false,
       "required": [
         "kind",
@@ -824,7 +824,7 @@
           ]
         },
         "type": {
-          "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
+          "description": "The game's kind of work order, e.g. `MedLabHeal` or `FinancialReport`.",
           "$ref": "#/definitions/WorkOrderType"
         },
         "finishesOnDay": {
@@ -836,7 +836,7 @@
     },
     "MechLabOrder": {
       "type": "object",
-      "description": "A mech lab order, of the MechLab… types.",
+      "description": "A mech lab order, of the `MechLab…` types.",
       "additionalProperties": false,
       "required": [
         "kind",
@@ -857,7 +857,7 @@
           ]
         },
         "type": {
-          "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
+          "description": "The game's kind of work order, e.g. `MedLabHeal` or `FinancialReport`.",
           "$ref": "#/definitions/WorkOrderType"
         },
         "finishesOnDay": {
@@ -866,7 +866,7 @@
           "format": "int32"
         },
         "target": {
-          "description": "The mech the mech lab works on; null when the game can't resolve it.",
+          "description": "The mech the mech lab works on; `null` when the game can't resolve it.",
           "oneOf": [
             {
               "type": "null"
@@ -880,7 +880,7 @@
     },
     "MedBayOrder": {
       "type": "object",
-      "description": "A med bay order, of type MedLabHeal.",
+      "description": "A med bay order, of type `MedLabHeal`.",
       "additionalProperties": false,
       "required": [
         "kind",
@@ -901,7 +901,7 @@
           ]
         },
         "type": {
-          "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
+          "description": "The game's kind of work order, e.g. `MedLabHeal` or `FinancialReport`.",
           "$ref": "#/definitions/WorkOrderType"
         },
         "finishesOnDay": {
@@ -917,7 +917,7 @@
     },
     "ShipUpgradeOrder": {
       "type": "object",
-      "description": "A ship upgrade being installed, of the ArgoUpgrade… types.",
+      "description": "A ship upgrade being installed, of the `ArgoUpgrade…` types.",
       "additionalProperties": false,
       "required": [
         "kind",
@@ -938,7 +938,7 @@
           ]
         },
         "type": {
-          "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
+          "description": "The game's kind of work order, e.g. `MedLabHeal` or `FinancialReport`.",
           "$ref": "#/definitions/WorkOrderType"
         },
         "finishesOnDay": {
@@ -947,7 +947,7 @@
           "format": "int32"
         },
         "target": {
-          "description": "The ship upgrade, as in Ship.upgrades; null when the game can't resolve it.",
+          "description": "The ship upgrade, as in Ship.upgrades; `null` when the game can't resolve it.",
           "oneOf": [
             {
               "type": "null"
@@ -961,7 +961,7 @@
     },
     "TravelOrder": {
       "type": "object",
-      "description": "A trip, of the Travel… types.",
+      "description": "A trip, of the `Travel…` types.",
       "additionalProperties": false,
       "required": [
         "kind",
@@ -982,7 +982,7 @@
           ]
         },
         "type": {
-          "description": "The game's kind of work order, e.g. MedLabHeal or FinancialReport.",
+          "description": "The game's kind of work order, e.g. `MedLabHeal` or `FinancialReport`.",
           "$ref": "#/definitions/WorkOrderType"
         },
         "finishesOnDay": {
@@ -991,7 +991,7 @@
           "format": "int32"
         },
         "target": {
-          "description": "The star system the ship travels to; null when the game can't resolve it.",
+          "description": "The star system the ship travels to; `null` when the game can't resolve it.",
           "oneOf": [
             {
               "type": "null"
@@ -1046,11 +1046,11 @@
           "$ref": "#/definitions/ShipUpgradeStatus"
         },
         "category": {
-          "description": "The engineering screen's group, e.g. Mech Bay.",
+          "description": "The engineering screen's group, e.g. `Mech Bay`.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "location": {
-          "description": "The ship's room the upgrade is in, as its details name it, e.g. MECH_BAY.",
+          "description": "The ship's room the upgrade is in, as its details name it, e.g. `MECH_BAY`.",
           "$ref": "#/definitions/DropshipLocation"
         },
         "details": {
@@ -1090,7 +1090,7 @@
     },
     "ShipUpgradeStatus": {
       "type": "string",
-      "description": "Where a ship upgrade stands, as the Argo's engineering screen shows it.",
+      "description": "Where a ship upgrade stands, as the Argo's engineering screen shows it. `installing`: Bought and being installed; it finishes as workQueue shows. `available`: Its required upgrades are all installed, so it can be bought, unless another upgrade is being installed or funds are short. `locked`: Not all of its required upgrades are installed yet, but each is installed, installing or available.",
       "x-enumNames": [
         "Installed",
         "Installing",
@@ -1154,7 +1154,7 @@
       "properties": {
         "statistic": {
           "type": "string",
-          "description": "The game's name of the statistic, e.g. MechTechSkill."
+          "description": "The game's name of the statistic, e.g. `MechTechSkill`."
         },
         "value": {
           "type": "number",
@@ -1167,7 +1167,7 @@
         },
         "description": {
           "type": "string",
-          "description": "The effect in the game's words, e.g. +2 Morale."
+          "description": "The effect in the game's words, e.g. `+2 Morale`."
         }
       }
     },
@@ -1198,11 +1198,11 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The game's pilot id, as in PilotReference."
+          "description": "The game's pilot id, which the references to the pilot carry."
         },
         "name": {
           "type": "string",
-          "description": "The full name without callsign, as in PilotReference."
+          "description": "The full name without callsign."
         },
         "callsign": {
           "type": "string",
@@ -1218,12 +1218,12 @@
           "format": "int32"
         },
         "gender": {
-          "description": "The game's gender value, e.g. Female.",
+          "description": "The game's gender value, e.g. `Female`.",
           "$ref": "#/definitions/Gender"
         },
         "expertise": {
           "type": "string",
-          "description": "The barracks title derived from the primary abilities, e.g. Recruit or Lancer."
+          "description": "The barracks title derived from the primary abilities, e.g. `Recruit` or `Lancer`."
         },
         "skills": {
           "description": "The skill levels, whose effects rules.json skills lists per level.",
@@ -1266,7 +1266,7 @@
             "integer",
             "null"
           ],
-          "description": "The day the pilot is ready again, on the scale of Company.daysPassed; null when ready.",
+          "description": "The day the pilot is ready again, on the scale of Company.daysPassed; `null` when `ready`.",
           "format": "int32"
         },
         "spirits": {
@@ -1289,7 +1289,7 @@
     },
     "PilotType": {
       "type": "string",
-      "description": "The game's pilot types.",
+      "description": "The game's pilot types. `vanguard`: A Kickstarter backer's pilot.",
       "x-enumNames": [
         "Commander",
         "Vanguard",
@@ -1377,7 +1377,7 @@
     },
     "PilotStatus": {
       "type": "string",
-      "description": "Whether a pilot can be deployed, as the barracks shows it.",
+      "description": "Whether a pilot can be deployed, as the barracks shows it. `unavailable`: Out of action without injuries, because of an event.",
       "x-enumNames": [
         "Ready",
         "Injured",
@@ -1407,7 +1407,7 @@
             "integer",
             "null"
           ],
-          "description": "The day high or low spirits end, on the scale of Company.daysPassed; null when spirits are normal or the game sets no end.",
+          "description": "The day high or low spirits end, on the scale of Company.daysPassed; `null` when spirits are normal or the game sets no end.",
           "format": "int32"
         }
       }
@@ -1488,7 +1488,7 @@
     },
     "MechStatus": {
       "type": "string",
-      "description": "Whether a mech in the mech bay is free for use or held by the mech lab.",
+      "description": "Whether a mech in the mech bay is free for use or held by the mech lab. `readying`: Being readied from a stored chassis. `inMaintenance`: Being repaired or refitted.",
       "x-enumNames": [
         "Ready",
         "Readying",
@@ -1863,7 +1863,7 @@
           "$ref": "#/definitions/Armor"
         },
         "rear": {
-          "description": "The rear armor; null when the location is outside the torso, which alone has it.",
+          "description": "The rear armor; `null` when the location is outside the torso, which alone has it.",
           "oneOf": [
             {
               "type": "null"
@@ -1911,7 +1911,7 @@
           "$ref": "#/definitions/ComponentReference"
         },
         "damageLevel": {
-          "description": "The component's damage level, e.g. Penalized or Destroyed.",
+          "description": "The component's damage level, e.g. `Penalized` or `Destroyed`.",
           "$ref": "#/definitions/ComponentDamageLevel"
         },
         "isFixed": {
@@ -1932,14 +1932,14 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The component definition's id from the game's data files."
         },
         "name": {
           "type": "string",
           "description": "The name the UI shows."
         },
         "type": {
-          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in catalog.json componentDefinitions; never NotSet, Special or MechPart, which the game's enum also has.",
+          "description": "The game's component type, e.g. `Weapon` or `AmmunitionBox`, which names the component's group in catalog.json componentDefinitions; never `NotSet`, `Special` or `MechPart`, which the game's enum also has.",
           "$ref": "#/definitions/ComponentType"
         }
       }
@@ -2098,7 +2098,7 @@
     },
     "RefitChangeType": {
       "type": "string",
-      "description": "The kind of a refit step.",
+      "description": "The kind of a refit step. `installComponent`: Mounts a component taken from storage or removed from another location. `removeComponent`: Takes a component off the mech, into storage or for installation elsewhere.",
       "x-enumNames": [
         "InstallComponent",
         "RemoveComponent",
@@ -2210,7 +2210,7 @@
             "null",
             "number"
           ],
-          "description": "The rear armor; null when the location is outside the torso, which alone has it.",
+          "description": "The rear armor; `null` when the location is outside the torso, which alone has it.",
           "format": "float"
         }
       }
@@ -2292,7 +2292,7 @@
           "description": "Whether the mech techs have finished the step; its change is then part of the mech."
         },
         "location": {
-          "description": "Where the component is mounted; null when it's in storage.",
+          "description": "Where the component is mounted; `null` when it's in storage.",
           "oneOf": [
             {
               "type": "null"
@@ -2407,7 +2407,7 @@
           "$ref": "#/definitions/MechLoadout"
         },
         "repair": {
-          "description": "What repairing the mech's damage in the mech bay would take; null when the mech is undamaged.",
+          "description": "What repairing the mech's damage in the mech bay would take; `null` when the mech is undamaged.",
           "oneOf": [
             {
               "type": "null"
@@ -2541,7 +2541,7 @@
       ],
       "properties": {
         "mech": {
-          "description": "The mech; null when it has left the mech bay since, e.g. sold.",
+          "description": "The mech; `null` when it has left the mech bay since, e.g. sold.",
           "oneOf": [
             {
               "type": "null"
@@ -2552,7 +2552,7 @@
           ]
         },
         "pilot": {
-          "description": "The pilot; null when they have left the company since, e.g. dismissed or killed.",
+          "description": "The pilot; `null` when they have left the company since, e.g. dismissed or killed.",
           "oneOf": [
             {
               "type": "null"
@@ -2674,7 +2674,7 @@
       ],
       "properties": {
         "system": {
-          "description": "The system store; null when the star system has none or the reputation with its owner is LOATHED.",
+          "description": "The system store; `null` when the star system has none or the reputation with its owner is `LOATHED`.",
           "oneOf": [
             {
               "type": "null"
@@ -2685,7 +2685,7 @@
           ]
         },
         "faction": {
-          "description": "The faction store; null when the star system has none or the company isn't allied with its owner.",
+          "description": "The faction store; `null` when the star system has none or the company isn't allied with its owner.",
           "oneOf": [
             {
               "type": "null"
@@ -2696,7 +2696,7 @@
           ]
         },
         "blackMarket": {
-          "description": "The black market; null when the star system has none or the company hasn't gained access to black markets.",
+          "description": "The black market; `null` when the star system has none or the company hasn't gained access to black markets.",
           "oneOf": [
             {
               "type": "null"
@@ -2765,7 +2765,7 @@
             "integer",
             "null"
           ],
-          "description": "The copies in stock; null when unlimited.",
+          "description": "The copies in stock; `null` when unlimited.",
           "format": "int32"
         },
         "price": {
@@ -2794,7 +2794,7 @@
             "integer",
             "null"
           ],
-          "description": "The copies in stock; null when unlimited.",
+          "description": "The copies in stock; `null` when unlimited.",
           "format": "int32"
         },
         "price": {
@@ -2823,7 +2823,7 @@
             "integer",
             "null"
           ],
-          "description": "The parts in stock; null when unlimited.",
+          "description": "The parts in stock; `null` when unlimited.",
           "format": "int32"
         },
         "price": {
@@ -2856,11 +2856,11 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The game's pilot id, as in PilotReference."
+          "description": "The game's pilot id, which the references to the pilot carry."
         },
         "name": {
           "type": "string",
-          "description": "The full name without callsign, as in PilotReference."
+          "description": "The full name without callsign."
         },
         "callsign": {
           "type": "string",
@@ -2876,12 +2876,12 @@
           "format": "int32"
         },
         "gender": {
-          "description": "The game's gender value, e.g. Female.",
+          "description": "The game's gender value, e.g. `Female`.",
           "$ref": "#/definitions/Gender"
         },
         "expertise": {
           "type": "string",
-          "description": "The barracks title derived from the primary abilities, e.g. Recruit or Lancer."
+          "description": "The barracks title derived from the primary abilities, e.g. `Recruit` or `Lancer`."
         },
         "skills": {
           "description": "The skill levels, whose effects rules.json skills lists per level.",
@@ -2951,7 +2951,7 @@
           "$ref": "#/definitions/LanceLimits"
         },
         "biome": {
-          "description": "The contract's biome; null when the game has none for it.",
+          "description": "The contract's biome; `null` when the game has none for it.",
           "oneOf": [
             {
               "type": "null"
@@ -2966,7 +2966,7 @@
             "null",
             "string"
           ],
-          "description": "The contract's data file; null when the game keeps no reference to it."
+          "description": "The contract's data file; `null` when the game keeps no reference to it."
         },
         "name": {
           "type": "string",
@@ -2985,7 +2985,7 @@
           "$ref": "#/definitions/DefinitionReference"
         },
         "target": {
-          "description": "The faction the mission is fought against; INVALID_UNSET, which has no catalog.json factionDefinitions entry, for a story contract that only travels.",
+          "description": "The faction the mission is fought against; `INVALID_UNSET`, which has no catalog.json factionDefinitions entry, for a story contract that only travels.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "difficulty": {
@@ -3002,7 +3002,7 @@
             "integer",
             "null"
           ],
-          "description": "The day of arrival in the star system, as in Travel.arrivesOnDay; null when the ship isn't travelling there.",
+          "description": "The day of arrival in the star system, as in Travel.arrivesOnDay; `null` when the ship isn't travelling there.",
           "format": "int32"
         },
         "starSystem": {
@@ -3032,7 +3032,7 @@
             "null",
             "number"
           ],
-          "description": "The least total tonnage of the lance's mechs; null when there's no limit.",
+          "description": "The least total tonnage of the lance's mechs; `null` when there's no limit.",
           "format": "float"
         },
         "maxTonnage": {
@@ -3040,7 +3040,7 @@
             "null",
             "number"
           ],
-          "description": "The most total tonnage of the lance's mechs; null when there's no limit.",
+          "description": "The most total tonnage of the lance's mechs; `null` when there's no limit.",
           "format": "float"
         },
         "mechs": {
@@ -3048,7 +3048,7 @@
             "array",
             "null"
           ],
-          "description": "The tonnage limits of each mech slot, one per mech allowed; null when no slot has any.",
+          "description": "The tonnage limits of each mech slot, one per mech allowed; `null` when no slot has any.",
           "items": {
             "$ref": "#/definitions/MechSlotLimits"
           }
@@ -3069,7 +3069,7 @@
             "null",
             "number"
           ],
-          "description": "The least tonnage of the mech in the slot; null when there's no limit.",
+          "description": "The least tonnage of the mech in the slot; `null` when there's no limit.",
           "format": "float"
         },
         "maxTonnage": {
@@ -3077,7 +3077,7 @@
             "null",
             "number"
           ],
-          "description": "The most tonnage of the mech in the slot; null when there's no limit.",
+          "description": "The most tonnage of the mech in the slot; `null` when there's no limit.",
           "format": "float"
         }
       }
@@ -3114,7 +3114,7 @@
       ],
       "properties": {
         "shares": {
-          "description": "The slider positions the terms were negotiated at; null when the terms are fixed.",
+          "description": "The slider positions the terms were negotiated at; `null` when the terms are fixed.",
           "oneOf": [
             {
               "type": "null"
@@ -3195,7 +3195,7 @@
             "integer",
             "null"
           ],
-          "description": "The change, usually a gain, with the employer; null when the employer doesn't gain reputation.",
+          "description": "The change, usually a gain, with the employer; `null` when the employer doesn't gain reputation.",
           "format": "int32"
         },
         "target": {
@@ -3203,7 +3203,7 @@
             "integer",
             "null"
           ],
-          "description": "The change, usually a loss, with the target; null when the target doesn't gain reputation.",
+          "description": "The change, usually a loss, with the target; `null` when the target doesn't gain reputation.",
           "format": "int32"
         }
       }
@@ -3280,7 +3280,7 @@
           "description": "Whether the star system's travel requirements are met; story star systems stay locked until then."
         },
         "route": {
-          "description": "The trip from the current star system; null when the game finds no route, always when canTravelTo is false.",
+          "description": "The trip from the current star system; `null` when the game finds no route, always when canTravelTo is false.",
           "oneOf": [
             {
               "type": "null"
@@ -3397,7 +3397,7 @@
           "$ref": "#/definitions/LanceLimits"
         },
         "biome": {
-          "description": "The contract's biome; null when the game has none for it.",
+          "description": "The contract's biome; `null` when the game has none for it.",
           "oneOf": [
             {
               "type": "null"
@@ -3412,7 +3412,7 @@
             "null",
             "string"
           ],
-          "description": "The contract's data file; null when the game keeps no reference to it."
+          "description": "The contract's data file; `null` when the game keeps no reference to it."
         },
         "name": {
           "type": "string",
@@ -3431,7 +3431,7 @@
           "$ref": "#/definitions/DefinitionReference"
         },
         "target": {
-          "description": "The faction the mission is fought against; INVALID_UNSET, which has no catalog.json factionDefinitions entry, for a story contract that only travels.",
+          "description": "The faction the mission is fought against; `INVALID_UNSET`, which has no catalog.json factionDefinitions entry, for a story contract that only travels.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "difficulty": {
@@ -3569,11 +3569,11 @@
           "$ref": "#/definitions/StarSystem"
         },
         "travelStatus": {
-          "description": "Where the ship is on its way, e.g. IN_SYSTEM or TRANSIT_TO_JUMP.",
+          "description": "Where the ship is on its way, e.g. `IN_SYSTEM` or `TRANSIT_TO_JUMP`.",
           "$ref": "#/definitions/SimGameTravelStatus"
         },
         "travel": {
-          "description": "Where the ship is headed; null when it's in a star system.",
+          "description": "Where the ship is headed; `null` when it's in a star system.",
           "oneOf": [
             {
               "type": "null"
@@ -3689,7 +3689,7 @@
           "$ref": "#/definitions/DefinitionReference"
         },
         "pilot": {
-          "description": "The pilot the event is about; null when the game picks one when it comes.",
+          "description": "The pilot the event is about; `null` when the game picks one when it comes.",
           "oneOf": [
             {
               "type": "null"
