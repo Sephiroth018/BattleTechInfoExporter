@@ -38,12 +38,12 @@ namespace BattleTechInfoExporter.Models;
 ///     The terrain the unit stands in, keyed as in <see cref="Catalog.TerrainDefinitions" />, which a blip's
 ///     position on the map shows; <c>null</c> when on open ground or last seen.
 /// </param>
-/// <param name="Pilot">The pilot, which the HUD names only at <see cref="UnitVisibility.Full" />.</param>
-/// <param name="State">The unit's condition, shown at <see cref="UnitVisibility.Full" />.</param>
+/// <param name="Pilot">The pilot, which the HUD names only in full view (<see cref="UnitVisibility.Full" />).</param>
+/// <param name="State">The unit's condition, shown in full view (<see cref="UnitVisibility.Full" />).</param>
 /// <param name="LinesOfFire">
-///     The lines of fire to the units it could attack: from the player's units to every living enemy at
-///     <see cref="UnitVisibility.Full" />, and from those enemies to the player's units. <c>null</c> when the unit is
-///     neither, or destroyed.
+///     The lines of fire to the units it could attack: from the player's units to every living enemy in full view
+///     (<see cref="UnitVisibility.Full" />), and from those enemies to the player's units. <c>null</c> when the unit
+///     is neither, or destroyed.
 /// </param>
 /// <param name="Movement">
 ///     Where the player's unit can move and what it gets there; <c>null</c> when the unit isn't the player's or can't
@@ -207,7 +207,7 @@ internal sealed record CombatComponent(
 /// <summary>An ability a unit can activate, as its HUD button shows it.</summary>
 /// <param name="Ability">The ability, the pilot's or a mounted component's.</param>
 /// <param name="Cooldown">The unit's activations until the ability can be used again; 0 when ready.</param>
-/// <param name="UsesLeft">The uses left of an ability that can be used only so often; <c>null</c> when unlimited.</param>
+/// <param name="UsesLeft">The uses left of an ability that can be used only so often; <c>null</c> when there's no limit.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatAbility(DefinitionReference Ability, int Cooldown, int? UsesLeft);
 

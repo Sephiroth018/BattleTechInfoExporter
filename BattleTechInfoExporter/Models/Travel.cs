@@ -4,7 +4,8 @@ namespace BattleTechInfoExporter.Models;
 
 /// <summary>The trip the ship is on.</summary>
 /// <param name="Destination">
-///     The star system the ship travels to, at the end of its route, in full, as in <c>star-systems.json</c>.
+///     The star system the ship travels to, at the end of its route, in full, as in
+///     <see cref="Starmap.StarSystems" />.
 /// </param>
 /// <param name="ArrivesOnDay">The day the ship arrives, on the scale of <see cref="Company.DaysPassed" />.</param>
 /// <param name="JumpPointDays">

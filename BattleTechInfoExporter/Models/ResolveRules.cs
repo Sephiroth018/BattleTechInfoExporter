@@ -60,7 +60,7 @@ internal enum ResolveGainScale
     LivingElitePilots
 }
 
-/// <summary>The shares, from 0 to 1, at which an attack's resolve events happen.</summary>
+/// <summary>The shares at which an attack's resolve events happen, as fractions from 0 to 1.</summary>
 /// <param name="MajorityHit">The share of an attack's shots that have to hit for the majority-hit event.</param>
 /// <param name="MajorityMiss">The share of shots below which the majority-miss event happens.</param>
 /// <param name="MinorArmorDamage">The share of the target's starting armor an attack has to take off.</param>

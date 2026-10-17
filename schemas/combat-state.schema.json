@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "CombatState",
   "type": "object",
-  "description": "The root of combat-state.json: the battle as the player's HUD shows it, written when every phase begins and after every unit's activation; the file exists only while a battle is running.",
+  "description": "The root of `combat-state.json`: the battle as the player's HUD shows it, written when every phase begins and after every unit's activation; the file exists only while a battle is running.",
   "additionalProperties": false,
   "required": [
     "modVersion",
@@ -185,7 +185,7 @@
             "null",
             "string"
           ],
-          "description": "The contract's data file; null where the game keeps no reference to it."
+          "description": "The contract's data file; `null` when the game keeps no reference to it."
         },
         "name": {
           "type": "string",
@@ -204,7 +204,7 @@
           "$ref": "#/definitions/DefinitionReference"
         },
         "target": {
-          "description": "The faction the mission is fought against; INVALID_UNSET, which has no catalog.json factionDefinitions entry, for a story contract that only travels.",
+          "description": "The faction the mission is fought against; `INVALID_UNSET`, which has no catalog.json factionDefinitions entry, for a story contract that only travels.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "difficulty": {
@@ -229,7 +229,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The definition's id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction)."
         },
         "name": {
           "type": "string",
@@ -317,7 +317,7 @@
           "$ref": "#/definitions/UnitVisibility"
         },
         "kind": {
-          "description": "The kind of unit; null when the HUD doesn't tell: at blipMinimum and lastSeen.",
+          "description": "The kind of unit; `null` when the HUD doesn't tell: at `blipMinimum` and `lastSeen`.",
           "oneOf": [
             {
               "type": "null"
@@ -332,11 +332,11 @@
             "null",
             "number"
           ],
-          "description": "The unit's tonnage, in tons; null when the HUD doesn't tell: for a blip below blipMaximum, a turret blip, which shows its weight class instead, and when last seen.",
+          "description": "The unit's tonnage, in tons; `null` when the HUD doesn't tell: for a blip below `blipMaximum`, a turret blip, which shows its weight class instead, and when last seen.",
           "format": "float"
         },
         "weightClass": {
-          "description": "The unit's weight class; null when the HUD doesn't tell: for a blip below blipMaximum, a mech or vehicle blip, which shows its tonnage instead, and when last seen.",
+          "description": "The unit's weight class; `null` when the HUD doesn't tell: for a blip below `blipMaximum`, a mech or vehicle blip, which shows its tonnage instead, and when last seen.",
           "oneOf": [
             {
               "type": "null"
@@ -347,7 +347,7 @@
           ]
         },
         "definition": {
-          "description": "The mech, vehicle or turret in the catalog, which holds its armor and loadout; null when the unit is one of the player's mechs, which have bayMech instead, or out of full view.",
+          "description": "The mech, vehicle or turret in the catalog, which holds its armor and loadout; `null` when the unit is one of the player's mechs, which have bayMech instead, or out of full view.",
           "oneOf": [
             {
               "type": "null"
@@ -358,7 +358,7 @@
           ]
         },
         "bayMech": {
-          "description": "The player's mech in game-state.json, whose loadout holds its assigned armor; null when the unit isn't one.",
+          "description": "The player's mech in `game-state.json`, whose loadout holds its assigned armor; `null` when the unit isn't one.",
           "oneOf": [
             {
               "type": "null"
@@ -369,7 +369,7 @@
           ]
         },
         "position": {
-          "description": "Where the unit is, or was last detected at for lastSeen.",
+          "description": "Where the unit is, or was last detected at for `lastSeen`.",
           "$ref": "#/definitions/MapPosition"
         },
         "facingDegrees": {
@@ -377,7 +377,7 @@
             "null",
             "number"
           ],
-          "description": "The direction the unit faces, in degrees clockwise from the map's +Z axis, from 0 to below 360 and to 0.1°, which a blip's marker turns to at every level; null when last seen.",
+          "description": "The direction the unit faces, in degrees clockwise from the map's +Z axis, from 0 to below 360 and to 0.1°, which a blip's marker turns to at every level; `null` when last seen.",
           "format": "float"
         },
         "terrain": {
@@ -385,10 +385,10 @@
             "null",
             "string"
           ],
-          "description": "The terrain the unit stands in, keyed as in catalog.json terrainDefinitions, which a blip's position on the map shows; null when on open ground or last seen."
+          "description": "The terrain the unit stands in, keyed as in catalog.json terrainDefinitions, which a blip's position on the map shows; `null` when on open ground or last seen."
         },
         "pilot": {
-          "description": "The pilot, which the HUD names only at full.",
+          "description": "The pilot, which the HUD names only in full view (`full`).",
           "oneOf": [
             {
               "type": "null"
@@ -399,7 +399,7 @@
           ]
         },
         "state": {
-          "description": "The unit's condition, shown at full.",
+          "description": "The unit's condition, shown in full view (`full`).",
           "oneOf": [
             {
               "type": "null"
@@ -414,13 +414,13 @@
             "array",
             "null"
           ],
-          "description": "The lines of fire to the units it could attack: from the player's units to every living enemy at full, and from those enemies to the player's units. null when the unit is neither, or destroyed.",
+          "description": "The lines of fire to the units it could attack: from the player's units to every living enemy in full view (`full`), and from those enemies to the player's units. `null` when the unit is neither, or destroyed.",
           "items": {
             "$ref": "#/definitions/LineOfFire"
           }
         },
         "movement": {
-          "description": "Where the player's unit can move and what it gets there; null when the unit isn't the player's or can't move (a turret, a prone or shut down mech).",
+          "description": "Where the player's unit can move and what it gets there; `null` when the unit isn't the player's or can't move (a turret, a prone or shut down mech).",
           "oneOf": [
             {
               "type": "null"
@@ -453,7 +453,7 @@
     },
     "UnitAllegiance": {
       "type": "string",
-      "description": "Whose side a team in combat is on, seen from the player: its units' and its buildings'.",
+      "description": "Whose side a team in combat is on, seen from the player: its units' and its buildings'. `player`: The player's own lance. `ally`: A team on the player's side, e.g. the employer's units. `enemy`: A team fighting the player's side. `neutral`: A team neither side fights, until it turns hostile.",
       "x-enumNames": [
         "Player",
         "Ally",
@@ -469,7 +469,7 @@
     },
     "UnitVisibility": {
       "type": "string",
-      "description": "How much of a unit the player's HUD shows (the game's VisibilityLevel).",
+      "description": "How much of a unit the player's HUD shows (the game's VisibilityLevel). `full`: In sight of the player's side, or one of its own units: everything the HUD can show. A unit hidden by ECM counts too. `blipMaximum`: A sensor blip with the unit's kind and tonnage, or a turret's weight class. `blipType`: A sensor blip with the unit's kind. `blipMinimum`: A sensor blip with nothing but its position. `lastSeen`: Out of sensor range, where the player's side last detected it; not known to be destroyed.",
       "x-enumNames": [
         "Full",
         "BlipMaximum",
@@ -526,7 +526,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The game's own id of the mech in the mech bay."
         },
         "name": {
           "type": "string",
@@ -573,11 +573,11 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The game's pilot id."
         },
         "name": {
           "type": "string",
-          "description": "The name the UI shows."
+          "description": "The pilot's full name without callsign."
         },
         "callsign": {
           "type": "string",
@@ -608,7 +608,7 @@
       ],
       "properties": {
         "deathMethod": {
-          "description": "How the unit was destroyed (the game's DeathMethod), e.g. LegDestruction, or PilotKilled also for an incapacitated pilot; null when the unit lives.",
+          "description": "How the unit was destroyed (the game's DeathMethod), e.g. `LegDestruction`, or `PilotKilled` also for an incapacitated pilot; `null` when the unit lives.",
           "oneOf": [
             {
               "type": "null"
@@ -651,7 +651,7 @@
           "description": "Whether the mech is unsteady: its instability rose above MechStability.unsteadyAbove and hasn't fallen below since; only mechs can be."
         },
         "mech": {
-          "description": "What only a mech has; null when the unit is a vehicle or turret.",
+          "description": "What only a mech has; `null` when the unit is a vehicle or turret.",
           "oneOf": [
             {
               "type": "null"
@@ -678,7 +678,7 @@
           }
         },
         "pilot": {
-          "description": "The pilot's condition; null when the unit has no pilot.",
+          "description": "The pilot's condition; `null` when the unit has no pilot.",
           "oneOf": [
             {
               "type": "null"
@@ -696,7 +696,7 @@
           }
         },
         "resolveCosts": {
-          "description": "What Precision Strike and Vigilance cost the unit now, which its pilot's spirits change; null when the unit isn't in the player's lance, which alone spends resolve.",
+          "description": "What Precision Strike and Vigilance cost the unit now, which its pilot's spirits change; `null` when the unit isn't in the player's lance, which alone spends resolve.",
           "oneOf": [
             {
               "type": "null"
@@ -764,7 +764,7 @@
       "properties": {
         "location": {
           "type": "string",
-          "description": "The game's name of the location: a mech's as in catalog.json chassisDefinitions.*.locations[].location, a vehicle's as in catalog.json vehicleDefinitions.*.locations[].location, or Structure for a turret's single location."
+          "description": "The game's name of the location: a mech's as in catalog.json chassisDefinitions.*.locations[].location, a vehicle's as in catalog.json vehicleDefinitions.*.locations[].location, or `Structure` for a turret's single location."
         },
         "armor": {
           "description": "The armor left, by side; only a mech's torso has a rear.",
@@ -796,7 +796,7 @@
             "integer",
             "null"
           ],
-          "description": "The rear armor; null when the location is outside the torso, which alone has it.",
+          "description": "The rear armor; `null` when the location is outside the torso, which alone has it.",
           "format": "int32"
         }
       }
@@ -905,7 +905,7 @@
         },
         "maxStability": {
           "type": "number",
-          "description": "The instability at which the mech is knocked down: the chassis' stability, as its MaxStability statistic has it now.",
+          "description": "The instability at which the mech is knocked down: the chassis' stability, as its `MaxStability` statistic has it now.",
           "format": "float"
         }
       }
@@ -930,7 +930,7 @@
           "description": "The game's name of the location it is mounted in, as UnitLocation.location."
         },
         "damageLevel": {
-          "description": "The component's damage level, e.g. Penalized or Destroyed.",
+          "description": "The component's damage level, e.g. `Penalized` or `Destroyed`.",
           "$ref": "#/definitions/ComponentDamageLevel"
         },
         "shotsLeft": {
@@ -938,7 +938,7 @@
             "integer",
             "null"
           ],
-          "description": "The shots left in an ammunition box, or in a weapon that carries its own; null when it's another component. A destroyed box has none.",
+          "description": "The shots left in an ammunition box, or in a weapon that carries its own; `null` when it's another component. A destroyed box has none.",
           "format": "int32"
         }
       }
@@ -955,14 +955,14 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The component definition's id from the game's data files."
         },
         "name": {
           "type": "string",
           "description": "The name the UI shows."
         },
         "type": {
-          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in catalog.json componentDefinitions; never NotSet, Special or MechPart, which the game's enum also has.",
+          "description": "The game's component type, e.g. `Weapon` or `AmmunitionBox`, which names the component's group in catalog.json componentDefinitions; never `NotSet`, `Special` or `MechPart`, which the game's enum also has.",
           "$ref": "#/definitions/ComponentType"
         }
       }
@@ -1102,7 +1102,7 @@
             "integer",
             "null"
           ],
-          "description": "The uses left of an ability that can be used only so often; null when unlimited.",
+          "description": "The uses left of an ability that can be used only so often; `null` when there's no limit.",
           "format": "int32"
         }
       }
@@ -1159,7 +1159,7 @@
     },
     "LineOfFireBlocking": {
       "type": "string",
-      "description": "How much of a line of fire is blocked (the game's LineOfFireLevel).",
+      "description": "How much of a line of fire is blocked (the game's LineOfFireLevel). `clear`: Nothing in the way: direct fire without a line of fire penalty. `partiallyBlocked`: The game's obstructed line: direct fire is still possible, with the penalties of rules.json combat.lineOfFire. `blocked`: No direct fire; a weapon that can fire indirectly still may.",
       "x-enumNames": [
         "Clear",
         "PartiallyBlocked",
@@ -1173,7 +1173,7 @@
     },
     "FireAvailability": {
       "type": "string",
-      "description": "How a unit could fire at a target from where it stands (the game's FiringPreviewManager).",
+      "description": "How a unit could fire at a target from where it stands (the game's FiringPreviewManager). `direct`: The line of fire isn't blocked and the target is within the longest weapon's range. `indirect`: The line of fire is blocked, but the target is within an indirect fire weapon's range. `outOfRange`: The line of fire isn't blocked, but the target is beyond the longest weapon's range. `none`: Blocked, and no weapon can fire indirectly at it.",
       "x-enumNames": [
         "Direct",
         "Indirect",
@@ -1198,14 +1198,14 @@
       "properties": {
         "targets": {
           "type": "array",
-          "description": "The enemies at full by unit id, in the order of MovementRow.attacks.",
+          "description": "The enemies in full view (`full`) by unit id, in the order of MovementRow.attacks.",
           "items": {
             "type": "string"
           }
         },
         "rows": {
           "type": "array",
-          "description": "The rows with a hex the unit can reach, by r.",
+          "description": "The rows with a hex the unit can reach, by `r`.",
           "items": {
             "$ref": "#/definitions/MovementRow"
           }
@@ -1228,12 +1228,12 @@
       "properties": {
         "q": {
           "type": "integer",
-          "description": "The axial q of the row's first hex, the first character of each move and attack.",
+          "description": "The axial `q` of the row's first hex, the first character of each move and attack.",
           "format": "int32"
         },
         "r": {
           "type": "integer",
-          "description": "The axial r of every hex in the row.",
+          "description": "The axial `r` of every hex in the row.",
           "format": "int32"
         },
         "walk": {
@@ -1245,7 +1245,7 @@
             "null",
             "string"
           ],
-          "description": "null when the unit is a legged or unsteady mech, which can't sprint."
+          "description": "`null` when the unit is a legged or unsteady mech, which can't sprint."
         },
         "reverse": {
           "type": "string",
@@ -1256,7 +1256,7 @@
             "null",
             "string"
           ],
-          "description": "null when the unit is a vehicle or a mech without a working jump jet."
+          "description": "`null` when the unit is a vehicle or a mech without a working jump jet."
         },
         "attacks": {
           "type": "array",
@@ -1291,7 +1291,7 @@
           "description": "The title the HUD shows, as plain text."
         },
         "status": {
-          "description": "The objective's game status, e.g. Active, Succeeded or Failed.",
+          "description": "The objective's game status, e.g. `Active`, `Succeeded` or `Failed`.",
           "$ref": "#/definitions/ObjectiveStatus"
         },
         "isPrimary": {
@@ -1303,7 +1303,7 @@
             "null",
             "string"
           ],
-          "description": "The progress line the HUD shows under the title, e.g. a count of units destroyed; null when it shows none."
+          "description": "The progress line the HUD shows under the title, e.g. a count of units destroyed; `null` when it shows none."
         },
         "targetUnitIds": {
           "type": "array",
@@ -1320,7 +1320,7 @@
           }
         },
         "beacon": {
-          "description": "Where the HUD draws the objective's beacon, 2 m above the ground, e.g. where the reinforcements it announces will land; null when it draws none: an objective that marks its target units instead, or a finished one.",
+          "description": "Where the HUD draws the objective's beacon, 2 m above the ground, e.g. where the reinforcements it announces will land; `null` when it draws none: an objective that marks its target units instead, or a finished one.",
           "oneOf": [
             {
               "type": "null"
@@ -1369,7 +1369,7 @@
         },
         "type": {
           "type": "string",
-          "description": "The game's id of the zone's region definition, e.g. regionDef_EvacZone, which names what the zone is for."
+          "description": "The game's id of the zone's region definition, e.g. `regionDef_EvacZone`, which names what the zone is for."
         },
         "center": {
           "description": "The zone's center on the map.",
@@ -1422,7 +1422,7 @@
     },
     "LandingZoneKind": {
       "type": "string",
-      "description": "What is about to land on a landing zone.",
+      "description": "What is about to land on a landing zone. `dropship`: A dropship, which marks its whole footprint. `dropPod`: A lance's drop pods, one per unit, each marking the hex it lands on.",
       "x-enumNames": [
         "Dropship",
         "DropPod"
@@ -1443,12 +1443,12 @@
       "properties": {
         "q": {
           "type": "integer",
-          "description": "The hex's axial q, as in combat-map.json hexGrid.",
+          "description": "The hex's axial `q`, as in combat-map.json hexGrid.",
           "format": "int32"
         },
         "r": {
           "type": "integer",
-          "description": "The hex's axial r, as in combat-map.json hexGrid.",
+          "description": "The hex's axial `r`, as in combat-map.json hexGrid.",
           "format": "int32"
         }
       }
@@ -1496,7 +1496,7 @@
             "array",
             "null"
           ],
-          "description": "The hexes the building stood on as they are now, since combat-map.json isn't rewritten when it falls: units on its roof drop to the ground, which the rubble's terrain covers. null when it stands.",
+          "description": "The hexes the building stood on as they are now, since `combat-map.json` isn't rewritten when it falls: units on its roof drop to the ground, which the rubble's terrain covers. `null` when it stands.",
           "items": {
             "$ref": "#/definitions/MapHex"
           }
@@ -1516,12 +1516,12 @@
       "properties": {
         "q": {
           "type": "integer",
-          "description": "The hex's axial q, as in combat-map.json hexGrid.",
+          "description": "The hex's axial `q`, as in combat-map.json hexGrid.",
           "format": "int32"
         },
         "r": {
           "type": "integer",
-          "description": "The hex's axial r, as in combat-map.json hexGrid.",
+          "description": "The hex's axial `r`, as in combat-map.json hexGrid.",
           "format": "int32"
         },
         "elevation": {
@@ -1534,7 +1534,7 @@
             "null",
             "string"
           ],
-          "description": "Keyed as in catalog.json terrainDefinitions; null when on open ground."
+          "description": "Keyed as in catalog.json terrainDefinitions; `null` when on open ground."
         }
       }
     }

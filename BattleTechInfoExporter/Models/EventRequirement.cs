@@ -9,7 +9,7 @@ namespace BattleTechInfoExporter.Models;
 /// </summary>
 /// <param name="Scope">
 ///     Whose tags and statistics are checked: the company's or a pilot's, the commander included (both in
-///     <c>game-state.json</c>), or the current star system's (in <c>star-systems.json</c>).
+///     <c>game-state.json</c>), or the current star system's (in <see cref="Starmap.StarSystems" />).
 /// </param>
 /// <param name="RequiredTags">The tags that must all be present.</param>
 /// <param name="ExcludedTags">The tags none of which may be present.</param>

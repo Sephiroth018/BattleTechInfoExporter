@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "MissionOutcome",
   "type": "object",
-  "description": "The root of mission-outcome.json: the latest mission as it ended, written again once its salvage is final.",
+  "description": "The root of `mission-outcome.json`: the latest mission as it ended, written again once its salvage is final.",
   "additionalProperties": false,
   "required": [
     "modVersion",
@@ -160,7 +160,7 @@
             "null",
             "string"
           ],
-          "description": "The contract's data file; null where the game keeps no reference to it."
+          "description": "The contract's data file; `null` when the game keeps no reference to it."
         },
         "name": {
           "type": "string",
@@ -179,7 +179,7 @@
           "$ref": "#/definitions/DefinitionReference"
         },
         "target": {
-          "description": "The faction the mission is fought against; INVALID_UNSET, which has no catalog.json factionDefinitions entry, for a story contract that only travels.",
+          "description": "The faction the mission is fought against; `INVALID_UNSET`, which has no catalog.json factionDefinitions entry, for a story contract that only travels.",
           "$ref": "#/definitions/DefinitionReference"
         },
         "difficulty": {
@@ -204,7 +204,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The definition's id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction)."
         },
         "name": {
           "type": "string",
@@ -284,7 +284,7 @@
           "description": "Whether the after-action report lists it as a primary objective."
         },
         "status": {
-          "description": "The objective's game status, e.g. Succeeded, Failed, or Active for one left unresolved.",
+          "description": "The objective's game status, e.g. `Succeeded`, `Failed`, or `Active` for one left unresolved.",
           "$ref": "#/definitions/ObjectiveStatus"
         }
       }
@@ -322,7 +322,7 @@
             "integer",
             "null"
           ],
-          "description": "The change, usually a gain, with the employer; null when the employer doesn't gain reputation.",
+          "description": "The change, usually a gain, with the employer; `null` when the employer doesn't gain reputation.",
           "format": "int32"
         },
         "target": {
@@ -330,7 +330,7 @@
             "integer",
             "null"
           ],
-          "description": "The change, usually a loss, with the target; null when the target doesn't gain reputation.",
+          "description": "The change, usually a loss, with the target; `null` when the target doesn't gain reputation.",
           "format": "int32"
         },
         "mercenaryReviewBoard": {
@@ -388,7 +388,7 @@
             "integer",
             "null"
           ],
-          "description": "The day the pilot is out of the med bay, as the barracks counts it once the contract is resolved; null for an uninjured or killed pilot.",
+          "description": "The day the pilot is out of the med bay, as the barracks counts it once the contract is resolved; `null` when the pilot is uninjured or killed.",
           "format": "int32"
         },
         "mechKills": {
@@ -410,7 +410,7 @@
           "description": "Whether the mech was destroyed and not recovered; its surviving components are in MissionSalvage.automatic."
         },
         "repair": {
-          "description": "What repairing the mech's damage in the mech bay would take, as for a mech bay mech's game-state.json mechs[].repair; null without damage and for a lost mech.",
+          "description": "What repairing the mech's damage in the mech bay would take, as for a mech bay mech's game-state.json mechs[].repair; `null` when the mech is undamaged or lost.",
           "oneOf": [
             {
               "type": "null"
@@ -436,7 +436,7 @@
         },
         "ammunition": {
           "type": "array",
-          "description": "The shots fired from every ammo box and every weapon that carries its own ammo, in the mech's component order.",
+          "description": "The shots fired from every ammunition box and every weapon that carries its own ammunition, in the mech's component order.",
           "items": {
             "$ref": "#/definitions/AmmunitionUse"
           }
@@ -455,11 +455,11 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The game's pilot id."
         },
         "name": {
           "type": "string",
-          "description": "The name the UI shows."
+          "description": "The pilot's full name without callsign."
         },
         "callsign": {
           "type": "string",
@@ -478,7 +478,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The game's own id of the mech in the mech bay."
         },
         "name": {
           "type": "string",
@@ -583,7 +583,7 @@
           "$ref": "#/definitions/Armor"
         },
         "rear": {
-          "description": "The rear armor; null when the location is outside the torso, which alone has it.",
+          "description": "The rear armor; `null` when the location is outside the torso, which alone has it.",
           "oneOf": [
             {
               "type": "null"
@@ -635,7 +635,7 @@
           "$ref": "#/definitions/ChassisLocations"
         },
         "damageLevel": {
-          "description": "The component's damage level, e.g. Penalized or Destroyed.",
+          "description": "The component's damage level, e.g. `Penalized` or `Destroyed`.",
           "$ref": "#/definitions/ComponentDamageLevel"
         }
       }
@@ -652,14 +652,14 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id it's referred to by: for a definition its id from the game's data files, or its name in the game's enumeration where it has no data file (e.g. the player's faction), for a mech in the mech bay or a pilot the game's own id of it."
+          "description": "The component definition's id from the game's data files."
         },
         "name": {
           "type": "string",
           "description": "The name the UI shows."
         },
         "type": {
-          "description": "The game's component type, e.g. Weapon or AmmunitionBox, which names the component's group in catalog.json componentDefinitions; never NotSet, Special or MechPart, which the game's enum also has.",
+          "description": "The game's component type, e.g. `Weapon` or `AmmunitionBox`, which names the component's group in catalog.json componentDefinitions; never `NotSet`, `Special` or `MechPart`, which the game's enum also has.",
           "$ref": "#/definitions/ComponentType"
         }
       }
@@ -712,7 +712,7 @@
     },
     "AmmunitionUse": {
       "type": "object",
-      "description": "The shots a mech fired from an ammo box, or from a weapon that carries its own ammo.",
+      "description": "The shots a mech fired from an ammunition box, or from a weapon that carries its own ammunition.",
       "additionalProperties": false,
       "required": [
         "component",
@@ -766,7 +766,7 @@
           "$ref": "#/definitions/SalvageItems"
         },
         "received": {
-          "description": "Everything the company gets: the priority salvage, the salvage drawn at random and automatic; null until the salvage is final.",
+          "description": "Everything the company gets: the priority salvage, the salvage drawn at random and automatic; `null` when the salvage isn't final yet.",
           "oneOf": [
             {
               "type": "null"
@@ -805,7 +805,7 @@
     },
     "StoredComponent": {
       "type": "object",
-      "description": "A stored component, described in the catalog.",
+      "description": "A stored component.",
       "additionalProperties": false,
       "required": [
         "component",
@@ -831,7 +831,7 @@
     },
     "StoredMechParts": {
       "type": "object",
-      "description": "Stored parts of a mech, described in the catalog, from which the mech is assembled.",
+      "description": "Stored parts of a mech, from which the mech is assembled.",
       "additionalProperties": false,
       "required": [
         "mech",
