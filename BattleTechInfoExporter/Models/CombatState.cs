@@ -18,22 +18,25 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="MovementLegend">How to read the units' <see cref="CombatUnit.Movement" />.</param>
 /// <param name="Units">
 ///     Every unit the player knows of, keyed by the game's unit id: the player's and allied units, and the enemies
-///     and neutral units the HUD shows or last showed.
+///     and neutral units the HUD shows or last showed. A destroyed unit stays, as its wreck is on the map; an enemy or
+///     neutral unit that withdrew or that the mission's script removed leaves no wreck and is left out.
 /// </param>
 /// <param name="Objectives">The objectives the HUD lists, finished ones included, in the HUD's order.</param>
 /// <param name="Zones">The zones drawn on the map.</param>
 /// <param name="LandingZones">
 ///     Where a dropship or drop pods are about to land; entries come and go as the mission readies landings and
-///     they happen.
+///     they happen. The game ties none to the objective announcing it: match them by position with the
+///     objective's <c>beacon</c>. A lance arriving without drop pods or a dropship has none; the band along the
+///     encounter boundary, which the HUD marks the same way, isn't exported.
 /// </param>
 /// <param name="BuildingSides">
-///     The buildings on a side, e.g. a base to destroy or defend, by their id in <see cref="CombatMap.Buildings" />
-///     and in the order of their ids; the others are on none. The mission's script can change a building's side
-///     during the battle.
+///     The buildings on a side, e.g. a base to destroy or defend, by their <see cref="CombatBuilding.Id" />, in the
+///     order of their ids; the others are on none. The mission's script can change a building's side during the
+///     battle.
 /// </param>
 /// <param name="DamagedBuildings">
-///     The buildings of <see cref="CombatMap.Buildings" /> below their max structure, destroyed ones included, in
-///     the order of their ids; the others are undamaged.
+///     The buildings below their max structure, destroyed ones included, by their <see cref="CombatBuilding.Id" />,
+///     in the order of their ids; the others are undamaged.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatState(
@@ -77,11 +80,15 @@ internal sealed record BuildingSide(string Id, TeamSide Side);
 
 /// <summary>A building below its max structure, or destroyed.</summary>
 /// <param name="Id">The building's id in <see cref="CombatMap.Buildings" />.</param>
-/// <param name="Structure">The structure left; its max is in <see cref="CombatBuilding.MaxStructure" />.</param>
+/// <param name="Structure">
+///     The structure left, which the HUD shows when the building is targeted; its max is in
+///     <see cref="CombatBuilding.MaxStructure" />.
+/// </param>
 /// <param name="DestroyedHexes">
 ///     The hexes the building stood on, now with the ground's elevation and the rubble's terrain, since
 ///     <c>combat-map.json</c> isn't rewritten when it falls; units on its roof drop to the ground. <c>null</c> when
-///     it stands.
+///     it stands. The blocked steps onto and off them still follow the roof, and the terrain a building's explosion
+///     changes around it isn't exported.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record DamagedBuilding(string Id, float Structure, IReadOnlyList<MapHex>? DestroyedHexes);

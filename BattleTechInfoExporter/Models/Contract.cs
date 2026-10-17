@@ -124,7 +124,8 @@ internal abstract record Negotiation(bool CanNegotiate);
 /// <summary>The terms of a contract negotiated with the sliders.</summary>
 /// <param name="ValuesByShare">
 ///     The values at each slider position. A row is not a deal: the pay comes from the row at the pay share, the
-///     salvage from the row at the salvage share and the reputation from the row at the share left over.
+///     salvage from the row at the salvage share and the reputation from the row at the share left over. The pay
+///     and salvage shares add up to at most 100, and to exactly 100 when the employer gains no reputation.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record NegotiableTerms(IReadOnlyList<ValuesAtShare> ValuesByShare) : Negotiation(true);

@@ -21,11 +21,12 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="PathingGroups">
 ///     The groups of the game's pathing capabilities units move with
 ///     (<see cref="ChassisMovement.PathingId" />) that block the same steps, by id; <see cref="HexRow.BlockedSteps" />
-///     has an entry per group.
+///     has an entry per group. The game's own data makes two groups, the mechs' and the vehicles'.
 /// </param>
 /// <param name="Buildings">
-///     Every building on the map when the file was written, in the order of their ids; a dropship only if it had
-///     landed by then.
+///     Every building on the map when the file was written, in the order of their ids. A dropship occupies no hex
+///     until it has landed; one landing later, e.g. the Leopard an evacuation calls in, isn't here but can be in the
+///     combat state's building lists.
 /// </param>
 /// <param name="Rows">
 ///     The hexes a unit can stand on, by <c>r</c>, then <c>q</c>; a row of hexes with a gap in the playable area is
@@ -74,7 +75,11 @@ internal sealed record CombatBuilding(string Id, string Name, MapPosition Positi
 /// <summary>Consecutive hexes of one row, from (<see cref="Q" />, <see cref="R" />) on, one entry per hex in each list.</summary>
 /// <param name="Q">The axial <c>q</c> of the first hex.</param>
 /// <param name="R">The axial <c>r</c> of every hex in the row.</param>
-/// <param name="Terrains">Each hex's terrain as a character of <see cref="CombatMap.Terrains" />.</param>
+/// <param name="Terrains">
+///     Each hex's terrain as a character of <see cref="CombatMap.Terrains" />: the first that applies to its center
+///     cell of map boundary, impassable, destroyed building, deep water, water, the terrain of the building on it,
+///     road, the map's custom terrain, forest and rough ground; otherwise open ground.
+/// </param>
 /// <param name="Elevations">
 ///     The height in meters a unit standing on each hex is at, a building's roof where one stands, to 0.1 m.
 /// </param>
@@ -84,8 +89,10 @@ internal sealed record CombatBuilding(string Id, string Name, MapPosition Positi
 /// </param>
 /// <param name="BlockedSteps">
 ///     Per entry of <see cref="CombatMap.PathingGroups" />, the steps to neighbors its units can't take on slopes,
-///     one character per hex as <see cref="HexGridLayout.BlockedStepsFormula" /> says. An approximation: a detour
-///     may still reach a neighbor a blocked step can't; a player unit's <see cref="CombatUnit.Movement" /> is exact.
+///     one character per hex as <see cref="HexGridLayout.BlockedStepsFormula" /> says: too steep a grade between
+///     path nodes, too steep ground or a ledge in between. Terrain move costs and units in the way aren't part of it;
+///     impassable terrain has its own character in <see cref="CombatMap.Terrains" />. An approximation: a detour may
+///     still reach a neighbor a blocked step can't; a player unit's <see cref="CombatUnit.Movement" /> is exact.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record HexRow(

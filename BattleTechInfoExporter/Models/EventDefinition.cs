@@ -5,7 +5,10 @@ using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
 
-/// <summary>An event the game can show between missions: when it can come, and the options it offers.</summary>
+/// <summary>
+///     An event the game can show between missions: when it can come, and the options it offers. Its story texts
+///     aren't exported.
+/// </summary>
 /// <param name="Name">
 ///     The event's title as plain text. Placeholders in braces stand for what the game picks, by its prefix:
 ///     <c>TGT_MW</c> the event's pilot, <c>SCN_MW</c> and <c>TRT_MW</c> the second and third pilot,

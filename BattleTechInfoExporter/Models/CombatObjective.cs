@@ -15,7 +15,7 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="TargetUnitIds">
 ///     The units it is about (to destroy, protect or escort), as keys of <see cref="CombatState.Units" />, while
-///     they are in full view: neither blips nor destroyed enemies.
+///     they are in full view, destroyed ones included; blips are left out.
 /// </param>
 /// <param name="TargetBuildingIds">
 ///     The buildings it is about (to destroy or defend), by their <see cref="CombatBuilding.Id" />.
