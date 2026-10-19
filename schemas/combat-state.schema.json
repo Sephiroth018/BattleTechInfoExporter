@@ -88,7 +88,7 @@
     },
     "landingZones": {
       "type": "array",
-      "description": "Where a dropship or drop pods are about to land; entries come and go as the mission readies landings and they happen. The game ties none to the objective announcing it: match them by position with the objective's `beacon`. A lance arriving without drop pods or a dropship has none; the band along the encounter boundary, which the HUD marks the same way, isn't exported.",
+      "description": "Where a dropship or drop pods are about to land; entries come and go as the mission readies landings and they happen. The game ties none to the objective announcing it: match them by hex with the objective's `beacon`. A lance arriving without drop pods or a dropship has none; the band along the encounter boundary, which the HUD marks the same way, isn't exported.",
       "items": {
         "$ref": "#/definitions/LandingZone"
       }
@@ -445,7 +445,8 @@
         "weightClass",
         "definition",
         "bayMech",
-        "position",
+        "hex",
+        "elevation",
         "facingDegrees",
         "terrain",
         "pilot",
@@ -514,16 +515,21 @@
             }
           ]
         },
-        "position": {
-          "description": "Where the unit is, or was last detected at for `lastSeen`.",
-          "$ref": "#/definitions/MapPosition"
+        "hex": {
+          "description": "The hex the unit stands on, or was last detected on for `lastSeen`; a unit stands on its center.",
+          "$ref": "#/definitions/HexCoordinates"
+        },
+        "elevation": {
+          "type": "number",
+          "description": "The height in meters the unit is at, or was last detected at, to 0.1 m, on the scale of the elevations in combat-map.json hexes.",
+          "format": "float"
         },
         "facingDegrees": {
           "type": [
             "null",
             "number"
           ],
-          "description": "The direction the unit faces, in degrees clockwise seen from above, to 0.1°: 0 towards the map's +z, 90 towards its +x, up to below 360. A blip's marker shows it at every level; `null` when last seen.",
+          "description": "The direction the unit faces, in degrees clockwise seen from above, to 0.1°: 0 towards the map's +z, 90 towards its +x, as in combat-map.json hexGrid.centerFormula, up to below 360. A blip's marker shows it at every level; `null` when last seen.",
           "format": "float"
         },
         "terrain": {
@@ -758,30 +764,24 @@
         }
       }
     },
-    "MapPosition": {
+    "HexCoordinates": {
       "type": "object",
-      "description": "A point on the map in meters: y is the elevation.",
+      "description": "A hex of the game's movement grid by its axial coordinates, as in combat-map.json hexes.",
       "additionalProperties": false,
       "required": [
-        "x",
-        "y",
-        "z"
+        "q",
+        "r"
       ],
       "properties": {
-        "x": {
-          "type": "number",
-          "description": "Along the map's x axis, 0 at the map's center, to 0.1 m.",
-          "format": "float"
+        "q": {
+          "type": "integer",
+          "description": "The hex's axial `q`, as in combat-map.json hexGrid.",
+          "format": "int32"
         },
-        "y": {
-          "type": "number",
-          "description": "The elevation, on the scale of MapHex.elevation.",
-          "format": "float"
-        },
-        "z": {
-          "type": "number",
-          "description": "Along the map's z axis, 0 at the map's center, to 0.1 m.",
-          "format": "float"
+        "r": {
+          "type": "integer",
+          "description": "The hex's axial `r`, as in combat-map.json hexGrid.",
+          "format": "int32"
         }
       }
     },
@@ -1590,13 +1590,13 @@
           }
         },
         "beacon": {
-          "description": "Where the HUD draws the objective's beacon, 2 m above the ground, e.g. where the reinforcements it announces will land; `null` when it draws none: an objective that marks its target units instead, or a finished one.",
+          "description": "The hex the HUD draws the objective's beacon above, e.g. where the reinforcements it announces will land; `null` when it draws none: an objective that marks its target units instead, or a finished one.",
           "oneOf": [
             {
               "type": "null"
             },
             {
-              "$ref": "#/definitions/MapPosition"
+              "$ref": "#/definitions/HexCoordinates"
             }
           ]
         }
@@ -1627,8 +1627,7 @@
       "required": [
         "id",
         "type",
-        "center",
-        "radius",
+        "hexes",
         "isPreview",
         "objectiveIds"
       ],
@@ -1641,14 +1640,12 @@
           "type": "string",
           "description": "The game's id of the zone's region definition, e.g. `regionDef_EvacZone`, which names what the zone is for."
         },
-        "center": {
-          "description": "The zone's center on the map.",
-          "$ref": "#/definitions/MapPosition"
-        },
-        "radius": {
-          "type": "number",
-          "description": "The radius of the hexagon the HUD draws, in meters; whether a unit is inside is decided per map cell, which this only approximates.",
-          "format": "float"
+        "hexes": {
+          "type": "array",
+          "description": "The playable hexes whose center cell is in the zone, by `r`, then `q`, as in combat-map.json hexes: a unit standing on one is in it. The game decides per map cell, so a unit whose footprint reaches into the zone from a hex next to these can count as in it too.",
+          "items": {
+            "$ref": "#/definitions/HexCoordinates"
+          }
         },
         "isPreview": {
           "type": "boolean",
@@ -1715,27 +1712,6 @@
           ]
         }
       ]
-    },
-    "HexCoordinates": {
-      "type": "object",
-      "description": "A hex of the game's movement grid by its axial coordinates, as in combat-map.json hexes.",
-      "additionalProperties": false,
-      "required": [
-        "q",
-        "r"
-      ],
-      "properties": {
-        "q": {
-          "type": "integer",
-          "description": "The hex's axial `q`, as in combat-map.json hexGrid.",
-          "format": "int32"
-        },
-        "r": {
-          "type": "integer",
-          "description": "The hex's axial `r`, as in combat-map.json hexGrid.",
-          "format": "int32"
-        }
-      }
     },
     "BuildingSide": {
       "type": "object",

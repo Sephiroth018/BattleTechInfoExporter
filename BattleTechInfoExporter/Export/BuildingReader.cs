@@ -49,11 +49,11 @@ internal static class BuildingReader
             .Select(building => new BuildingSide(building.GUID, CombatUnitReader.ReadSide(combat, building.team)))
             .ToList();
 
-    internal static CombatBuilding ReadBuilding(BattleTech.Building building) =>
+    internal static CombatBuilding ReadBuilding(CombatGameState combat, BattleTech.Building building) =>
         new(
             building.GUID,
             building.DisplayName,
-            CombatUnitReader.ReadPosition(building.CurrentPosition),
+            MapHexReader.ReadHexAt(combat, building.CurrentPosition),
             ReadMaxStructure(building));
 
     /// <summary>

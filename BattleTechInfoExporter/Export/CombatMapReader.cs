@@ -28,7 +28,7 @@ internal static class CombatMapReader
             ReadHexGridLayout(combat),
             pathingGroups.Select(pathingGroup => pathingGroup.Select(pathing => pathing.Description.Id).ToList())
                 .ToList(),
-            buildings.Select(BuildingReader.ReadBuilding).ToList(),
+            buildings.Select(building => BuildingReader.ReadBuilding(combat, building)).ToList(),
             playableHexes
                 .Select(hex =>
                 {

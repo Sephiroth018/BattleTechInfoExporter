@@ -111,6 +111,9 @@ internal static class CombatUnitReader
         var isLastSeen = visibility == UnitVisibility.LastSeen;
         var isPlayers = side.Allegiance == UnitAllegiance.Player;
         var bayMech = isPlayers && actor is Mech mech ? MechReader.ReferenceToBayMech(mech.MechDef) : null;
+        var position = isLastSeen
+            ? combat.LocalPlayerTeam.VisibilityCache.previouslyDetectedEnemyLocations[actor]
+            : actor.CurrentPosition;
         var isTurret = actor is Turret;
         // A blip at Blip4Maximum shows a mech's or vehicle's tonnage and a turret's weight class (Mech, Vehicle and
         // Turret.GetActorInfoFromVisLevel).
@@ -123,10 +126,8 @@ internal static class CombatUnitReader
             isSighted || (isBlipMaximum && isTurret) ? ReadWeightClass(actor) : null,
             isSighted && bayMech is null ? ReadDefinition(actor) : null,
             bayMech,
-            ReadPosition(
-                isLastSeen
-                    ? combat.LocalPlayerTeam.VisibilityCache.previouslyDetectedEnemyLocations[actor]
-                    : actor.CurrentPosition),
+            MapHexReader.ReadHexAt(combat, position),
+            Rounding.ToTenth(position.y),
             // A blip's marker takes the unit's rotation at every level (PilotableActorRepresentation.updateBlips).
             isLastSeen ? null : ReadFacingDegrees(actor),
             isLastSeen ? null : actor.occupiedDesignMask?.Id,
@@ -175,9 +176,6 @@ internal static class CombatUnitReader
             Turret turret => DefinitionReferences.ReferenceTo(turret.TurretDef.Description),
             _ => throw NoUnitKind(actor)
         };
-
-    internal static MapPosition ReadPosition(Vector3 position) =>
-        new(Rounding.ToTenth(position.x), Rounding.ToTenth(position.y), Rounding.ToTenth(position.z));
 
     // Rounding 359.96 up gives 360, which is 0.
     private static float ReadFacingDegrees(AbstractActor actor) =>

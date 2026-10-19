@@ -29,10 +29,18 @@ namespace BattleTechInfoExporter.Models;
 ///     The player's mech in <c>game-state.json</c>, whose loadout holds its assigned armor; <c>null</c> when the
 ///     unit isn't one.
 /// </param>
-/// <param name="Position">Where the unit is, or was last detected at for <see cref="UnitVisibility.LastSeen" />.</param>
+/// <param name="Hex">
+///     The hex the unit stands on, or was last detected on for <see cref="UnitVisibility.LastSeen" />; a unit stands
+///     on its center.
+/// </param>
+/// <param name="Elevation">
+///     The height in meters the unit is at, or was last detected at, to 0.1 m, on the scale of the
+///     elevations in <see cref="CombatMap.Hexes" />.
+/// </param>
 /// <param name="FacingDegrees">
 ///     The direction the unit faces, in degrees clockwise seen from above, to 0.1°: 0 towards the map's +z, 90
-///     towards its +x, up to below 360. A blip's marker shows it at every level; <c>null</c> when last seen.
+///     towards its +x, as in <see cref="HexGridLayout.CenterFormula" />, up to below 360. A blip's marker shows it at
+///     every level; <c>null</c> when last seen.
 /// </param>
 /// <param name="Terrain">
 ///     The terrain the unit stands in, keyed as in <see cref="Catalog.TerrainDefinitions" />, which a blip's
@@ -65,7 +73,8 @@ internal sealed record CombatUnit(
     WeightClass? WeightClass,
     DefinitionReference? Definition,
     MechReference? BayMech,
-    MapPosition Position,
+    HexCoordinates Hex,
+    float Elevation,
     float? FacingDegrees,
     string? Terrain,
     PilotReference? Pilot,

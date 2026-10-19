@@ -328,7 +328,7 @@
       "required": [
         "id",
         "name",
-        "position",
+        "hex",
         "maxStructure"
       ],
       "properties": {
@@ -340,9 +340,9 @@
           "type": "string",
           "description": "The building's name as the game shows it."
         },
-        "position": {
-          "description": "The point the building is placed at, not necessarily its center.",
-          "$ref": "#/definitions/MapPosition"
+        "hex": {
+          "description": "The hex the point the building is placed at lies in, which needn't be its center, a hex it covers or a playable one; the hexes it covers name it in CombatMapHex.building.",
+          "$ref": "#/definitions/HexCoordinates"
         },
         "maxStructure": {
           "type": "number",
@@ -351,30 +351,24 @@
         }
       }
     },
-    "MapPosition": {
+    "HexCoordinates": {
       "type": "object",
-      "description": "A point on the map in meters: y is the elevation.",
+      "description": "A hex of the game's movement grid by its axial coordinates, as in hexes.",
       "additionalProperties": false,
       "required": [
-        "x",
-        "y",
-        "z"
+        "q",
+        "r"
       ],
       "properties": {
-        "x": {
-          "type": "number",
-          "description": "Along the map's x axis, 0 at the map's center, to 0.1 m.",
-          "format": "float"
+        "q": {
+          "type": "integer",
+          "description": "The hex's axial `q`, as in hexGrid.",
+          "format": "int32"
         },
-        "y": {
-          "type": "number",
-          "description": "The elevation, on the scale of combat-state.json damagedBuildings[].destroyedHexes[].elevation.",
-          "format": "float"
-        },
-        "z": {
-          "type": "number",
-          "description": "Along the map's z axis, 0 at the map's center, to 0.1 m.",
-          "format": "float"
+        "r": {
+          "type": "integer",
+          "description": "The hex's axial `r`, as in hexGrid.",
+          "format": "int32"
         }
       }
     },

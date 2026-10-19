@@ -26,9 +26,23 @@ changes the format.
 
 ## 0.76.0
 
-Changed: combat-map.json (breaking).
+Changed: combat-state.json (breaking), combat-map.json (breaking).
+
+### combat-state.json (breaking)
+- Removed `units.<id>.position`: replaced by `hex` and `elevation`.
+- Added `units.<id>.hex`: the `q` and `r` of the hex the unit stands on, or was last detected
+  on, the same hexes as combat-map.json `hexes[]`.
+- Added `units.<id>.elevation`: the height the unit is at, `position.y` before.
+- Type changed `objectives[].beacon`: the hex the beacon stands above, `q` and `r`, instead of a
+  position in meters.
+- Removed `zones[].center` and `zones[].radius`: replaced by `hexes`.
+- Added `zones[].hexes[]`: the playable hexes whose center cell is in the zone, by `r`, then `q`.
+  A unit standing on one is in the zone.
 
 ### combat-map.json (breaking)
+- Removed `buildings[].position`: replaced by `hex`.
+- Added `buildings[].hex`: the hex the building's placement point lies in, which needn't be one
+  it covers or a playable one. The hexes it covers name it in `hexes[].building`.
 - Removed `rows`, `terrains` and `hexGrid.blockedStepsFormula`.
 - Added `hexes[]`: one object per playable hex, by `r`, then `q`, with `q`, `r`, `elevation`,
   `terrain` (the terrain id, `null` on open ground), `building` (the building's id, `null` where

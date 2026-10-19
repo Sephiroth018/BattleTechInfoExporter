@@ -62,10 +62,13 @@ internal sealed record HexOffset(int Q, int R);
 /// <summary>A building, which units can fire at, stand on and be blocked by.</summary>
 /// <param name="Id">The game's building id, as in <see cref="CombatState.DamagedBuildings" />.</param>
 /// <param name="Name">The building's name as the game shows it.</param>
-/// <param name="Position">The point the building is placed at, not necessarily its center.</param>
+/// <param name="Hex">
+///     The hex the point the building is placed at lies in, which needn't be its center, a hex it covers or a
+///     playable one; the hexes it covers name it in <see cref="CombatMapHex.Building" />.
+/// </param>
 /// <param name="MaxStructure">The structure of the undamaged building.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record CombatBuilding(string Id, string Name, MapPosition Position, float MaxStructure);
+internal sealed record CombatBuilding(string Id, string Name, HexCoordinates Hex, float MaxStructure);
 
 /// <summary>A hex a unit can stand on, as it is when the battle begins.</summary>
 /// <param name="Building">

@@ -25,7 +25,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Zones">The zones drawn on the map.</param>
 /// <param name="LandingZones">
 ///     Where a dropship or drop pods are about to land; entries come and go as the mission readies landings and
-///     they happen. The game ties none to the objective announcing it: match them by position with the
+///     they happen. The game ties none to the objective announcing it: match them by hex with the
 ///     objective's <c>beacon</c>. A lance arriving without drop pods or a dropship has none; the band along the
 ///     encounter boundary, which the HUD marks the same way, isn't exported.
 /// </param>
@@ -106,10 +106,3 @@ internal sealed record DamagedBuilding(string Id, float Structure, IReadOnlyList
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal record MapHex(int Q, int R, float Elevation, string? Terrain) : HexCoordinates(Q, R);
-
-/// <summary>A point on the map in meters: <see cref="Y" /> is the elevation.</summary>
-/// <param name="X">Along the map's x axis, 0 at the map's center, to 0.1 m.</param>
-/// <param name="Y">The elevation, on the scale of <see cref="MapHex.Elevation" />.</param>
-/// <param name="Z">Along the map's z axis, 0 at the map's center, to 0.1 m.</param>
-[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record MapPosition(float X, float Y, float Z);

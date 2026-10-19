@@ -47,6 +47,16 @@ internal static class MapHexReader
         }
     }
 
+    /// <summary>
+    ///     The hex a point on the map lies in, as the game places a unit (
+    ///     <see cref="HexGrid.GetClosestHexPoint3OnGrid" />).
+    /// </summary>
+    internal static HexCoordinates ReadHexAt(CombatGameState combat, Vector3 position)
+    {
+        var hex = combat.HexGrid.GetClosestHexPoint3OnGrid(position);
+        return new HexCoordinates(hex.q, hex.r);
+    }
+
     internal static MapTerrainDataCell CenterCell(CombatGameState combat, HexPoint3 hex) =>
         combat.MapMetaData.GetCellAt(combat.HexGrid.HexPoint3ToCartesianWorld(hex));
 
