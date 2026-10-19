@@ -310,7 +310,8 @@ internal static class CombatUnitReader
 
     // Mirrors FiringPreviewManager.Recalc at the unit's own position, for a unit that can't turn first. The line of
     // fire is the one the unit's VisibilityCache keeps from where it stands, as ToHit.GetToHitChance reads it.
-    private static List<StandingLineOfFire> ReadLinesOfFire(AbstractActor attacker,
+    private static List<StandingLineOfFire> ReadLinesOfFire(
+        AbstractActor attacker,
         IReadOnlyList<AbstractActor> targets)
     {
         var maxRanges = ReadMaxRanges(attacker);
@@ -322,11 +323,14 @@ internal static class CombatUnitReader
                 var level = cachedLevel == LineOfFireLevel.NotSet
                     ? attacker.Combat.LOS.GetLineOfFire(attacker, target, out _)
                     : cachedLevel;
-                var (blocking, fire) = ReadFire(level, attacker.CurrentPosition, target, maxRanges);
+                var (blocking, fire, distance, elevationModifier) =
+                    ReadFire(attacker, level, attacker.CurrentPosition, target, maxRanges);
                 return new StandingLineOfFire(
                     target.GUID,
                     blocking,
                     fire,
+                    distance,
+                    elevationModifier,
                     attacker.IsInFiringArc(target, attacker.CurrentPosition, attacker.CurrentRotation));
             })
             .ToList();
@@ -338,14 +342,17 @@ internal static class CombatUnitReader
             attacker.GetLongestRangeWeapon(false, true)?.MaxRange ?? 0f);
 
     /// <summary>
-    ///     How much the line of fire from the attacker's position to the target is blocked, and how the attacker could
-    ///     fire at the target from there.
+    ///     How much the line of fire from the attacker's position to the target is blocked, how the attacker could
+    ///     fire at the target from there, the distance as the weapons' ranges measure it and the to-hit modifier for the
+    ///     height difference (<see cref="ToHit.GetHeightModifier" />, as <see cref="ToHit.GetAllModifiers" /> reads it).
     /// </summary>
-    internal static (LineOfFireBlocking Blocking, FireAvailability Fire) ReadFire(
-        LineOfFireLevel level,
-        Vector3 attackerPosition,
-        AbstractActor target,
-        (float Direct, float Indirect) maxRanges)
+    internal static (LineOfFireBlocking Blocking, FireAvailability Fire, float Distance, float ElevationModifier)
+        ReadFire(
+            AbstractActor attacker,
+            LineOfFireLevel level,
+            Vector3 attackerPosition,
+            AbstractActor target,
+            (float Direct, float Indirect) maxRanges)
     {
         var distance = Vector3.Distance(attackerPosition, target.CurrentPosition);
         return (
@@ -359,6 +366,8 @@ internal static class CombatUnitReader
                 ? distance < maxRanges.Direct ? FireAvailability.Direct : FireAvailability.OutOfRange
                 : distance < maxRanges.Indirect && !target.HasIndirectFireImmunity
                     ? FireAvailability.Indirect
-                    : FireAvailability.None);
+                    : FireAvailability.None,
+            Rounding.ToTenth(distance),
+            Rounding.ToTenth(attacker.Combat.ToHit.GetHeightModifier(attackerPosition.y, target.CurrentPosition.y)));
     }
 }

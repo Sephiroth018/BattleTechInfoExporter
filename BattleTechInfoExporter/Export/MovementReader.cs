@@ -161,13 +161,17 @@ internal static class MovementReader
             target.CurrentPosition,
             target.CurrentRotation,
             out _);
-        var (blocking, fire) = CombatUnitReader.ReadFire(level, position, target, maxRanges);
-        if (fire == FireAvailability.None)
-        {
-            return null;
-        }
-
-        return new MoveLineOfFire(target.GUID, blocking, fire, ReadSide(actor, position, target));
+        var (blocking, fire, distance, elevationModifier) =
+            CombatUnitReader.ReadFire(actor, level, position, target, maxRanges);
+        return fire == FireAvailability.None
+            ? null
+            : new MoveLineOfFire(
+                target.GUID,
+                blocking,
+                fire,
+                distance,
+                elevationModifier,
+                ReadSide(actor, position, target));
     }
 
     // The side HitLocation.GetAttackDirection gives; a turret has a single location whichever it gives.

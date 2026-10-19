@@ -53,4 +53,6 @@ internal sealed record MoveLineOfFire(
     string Target,
     LineOfFireBlocking Blocking,
     FireAvailability Fire,
-    AttackSide Side) : LineOfFire(Target, Blocking, Fire);
+    float Distance,
+    float ElevationModifier,
+    AttackSide Side) : LineOfFire(Target, Blocking, Fire, Distance, ElevationModifier);

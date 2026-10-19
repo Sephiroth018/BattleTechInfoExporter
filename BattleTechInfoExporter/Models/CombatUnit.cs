@@ -242,8 +242,22 @@ internal sealed record CombatAbility(DefinitionReference Ability, int Cooldown, 
 ///     Whether the unit's weapons could fire at the target directly, only indirectly or not at all, or it is out of
 ///     their range.
 /// </param>
+/// <param name="Distance">
+///     The distance to the target in meters, to 0.1 m, as the weapons' ranges measure it: the straight line in three
+///     dimensions, the height difference included, not the distance across the map.
+/// </param>
+/// <param name="ElevationModifier">
+///     The to-hit modifier for the height difference to the target, as <see cref="ToHitRules.Elevation" /> sets it:
+///     negative, a bonus, for an attacker at least a level above the target, positive below it where the rules apply
+///     penalties, and 0 within a level.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal abstract record LineOfFire(string Target, LineOfFireBlocking Blocking, FireAvailability Fire);
+internal abstract record LineOfFire(
+    string Target,
+    LineOfFireBlocking Blocking,
+    FireAvailability Fire,
+    float Distance,
+    float ElevationModifier);
 
 /// <summary>How a unit could fire at a target from where it stands, as hovering over the target shows it.</summary>
 /// <param name="IsInFiringArc">Whether the target is in the unit's firing arc without turning.</param>
@@ -252,4 +266,6 @@ internal sealed record StandingLineOfFire(
     string Target,
     LineOfFireBlocking Blocking,
     FireAvailability Fire,
-    bool IsInFiringArc) : LineOfFire(Target, Blocking, Fire);
+    float Distance,
+    float ElevationModifier,
+    bool IsInFiringArc) : LineOfFire(Target, Blocking, Fire, Distance, ElevationModifier);

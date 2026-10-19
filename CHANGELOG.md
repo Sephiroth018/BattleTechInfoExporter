@@ -50,6 +50,12 @@ Changed: combat-state.json (breaking), combat-map.json (breaking).
   `prone` or `turret`), the attack characters before. An enemy the unit has no line of fire to
   and can't fire at indirectly from the hex has no entry.
 - Meaning changed `units.<id>.linesOfFire[]`: listed in the order of the targets' unit ids.
+- Added `units.<id>.linesOfFire[].distance` and `units.<id>.movement.hexes[].linesOfFire[].distance`:
+  the distance to the target in meters as the weapons' ranges measure it, the straight line in
+  three dimensions.
+- Added `units.<id>.linesOfFire[].elevationModifier` and
+  `units.<id>.movement.hexes[].linesOfFire[].elevationModifier`: the to-hit modifier for the
+  height difference to the target, as rules.json `combat.toHit.elevation` sets it.
 
 ### combat-map.json (breaking)
 - Removed `buildings[].position`: replaced by `hex`.

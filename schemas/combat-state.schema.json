@@ -1325,6 +1325,8 @@
         "target",
         "blocking",
         "fire",
+        "distance",
+        "elevationModifier",
         "isInFiringArc"
       ],
       "properties": {
@@ -1339,6 +1341,16 @@
         "fire": {
           "description": "Whether the unit's weapons could fire at the target directly, only indirectly or not at all, or it is out of their range.",
           "$ref": "#/definitions/FireAvailability"
+        },
+        "distance": {
+          "type": "number",
+          "description": "The distance to the target in meters, to 0.1 m, as the weapons' ranges measure it: the straight line in three dimensions, the height difference included, not the distance across the map.",
+          "format": "float"
+        },
+        "elevationModifier": {
+          "type": "number",
+          "description": "The to-hit modifier for the height difference to the target, as rules.json combat.toHit.elevation sets it: negative, a bonus, for an attacker at least a level above the target, positive below it where the rules apply penalties, and 0 within a level.",
+          "format": "float"
         },
         "isInFiringArc": {
           "type": "boolean",
@@ -1522,6 +1534,8 @@
         "target",
         "blocking",
         "fire",
+        "distance",
+        "elevationModifier",
         "side"
       ],
       "properties": {
@@ -1536,6 +1550,16 @@
         "fire": {
           "description": "Whether the unit's weapons could fire at the target directly, only indirectly or not at all, or it is out of their range.",
           "$ref": "#/definitions/FireAvailability"
+        },
+        "distance": {
+          "type": "number",
+          "description": "The distance to the target in meters, to 0.1 m, as the weapons' ranges measure it: the straight line in three dimensions, the height difference included, not the distance across the map.",
+          "format": "float"
+        },
+        "elevationModifier": {
+          "type": "number",
+          "description": "The to-hit modifier for the height difference to the target, as rules.json combat.toHit.elevation sets it: negative, a bonus, for an attacker at least a level above the target, positive below it where the rules apply penalties, and 0 within a level.",
+          "format": "float"
         },
         "side": {
           "description": "The side of the target an attack from the hex hits.",
