@@ -26,7 +26,7 @@ internal static class CombatExporter
                 ModLog.Logger.Log(
                     $"Read {CombatMap.FileName} in {stopwatch.ElapsedMilliseconds} ms, pathing groups "
                     + string.Join("; ", map.PathingGroups.Select(pathingIds => string.Join(", ", pathingIds))));
-                map.Write(CombatMap.FileName, trigger);
+                WriteTimed(map, CombatMap.FileName, trigger);
             });
 
     /// <summary>Exports the running battle; a skirmish's, which belongs to no career, is skipped.</summary>
@@ -41,8 +41,16 @@ internal static class CombatExporter
                 var stopwatch = Stopwatch.StartNew();
                 var state = CombatStateReader.Read(combat.BattleTechGame.Simulation, combat);
                 ModLog.Logger.Log($"Read {CombatState.FileName} in {stopwatch.ElapsedMilliseconds} ms");
-                state.Write(CombatState.FileName, trigger);
+                WriteTimed(state, CombatState.FileName, trigger);
             });
+
+    // Serializing the file, which a write does also when it skips an unchanged file, runs on the main thread too.
+    private static void WriteTimed(ExportFile file, string fileName, ExportTrigger trigger)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        file.Write(fileName, trigger);
+        ModLog.Logger.Log($"Wrote {fileName} in {stopwatch.ElapsedMilliseconds} ms");
+    }
 
     /// <summary>Deletes the files once no battle is running, so existing files always describe the running one.</summary>
     internal static void Delete()

@@ -24,6 +24,18 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.76.0
+
+Changed: combat-map.json (breaking).
+
+### combat-map.json (breaking)
+- Removed `rows`, `terrains` and `hexGrid.blockedStepsFormula`.
+- Added `hexes[]`: one object per playable hex, by `r`, then `q`, with `q`, `r`, `elevation`,
+  `terrain` (the terrain id, `null` on open ground), `building` (the building's id, `null` where
+  there is none) and `blockedSteps`. A hex that isn't listed is outside the playable area.
+- Added `hexes[].blockedSteps`: per entry of `pathingGroups`, the indices into
+  `hexGrid.directions` of the blocked steps, instead of a base64 mask per hex.
+
 ## 0.75.1
 
 Changed: game-state.json.

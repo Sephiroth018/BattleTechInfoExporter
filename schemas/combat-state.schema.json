@@ -775,7 +775,7 @@
         },
         "y": {
           "type": "number",
-          "description": "The elevation, on the scale of combat-map.json rows[].elevations.",
+          "description": "The elevation, on the scale of MapHex.elevation.",
           "format": "float"
         },
         "z": {
@@ -1459,7 +1459,7 @@
     },
     "UnitMovement": {
       "type": "object",
-      "description": "The hexes a player's unit can end its move on, read from the game's own pathing, with the evasion pips it gets and the attacks it has there. A unit that has activated gets those of its next activation, from where it stands. Laid out in rows of characters, as MovementLegend explains, like combat-map.json rows, whose hexes give each hex's terrain and elevation. The facing after a move isn't exported, as the unit can turn at its end.",
+      "description": "The hexes a player's unit can end its move on, read from the game's own pathing, with the evasion pips it gets and the attacks it has there. A unit that has activated gets those of its next activation, from where it stands. Laid out in rows of characters, as MovementLegend explains; combat-map.json hexes give each hex's terrain and elevation. The facing after a move isn't exported, as the unit can turn at its end.",
       "additionalProperties": false,
       "required": [
         "targets",
@@ -1683,7 +1683,7 @@
         },
         "hexes": {
           "type": "array",
-          "description": "The hexes whose center cell the game marks, in the order of combat-map.json rows; a unit standing on one is crushed. A dropship's whole footprint, or each drop pod's hex, one per unit of the lance.",
+          "description": "The hexes whose center cell the game marks, by `r`, then `q`, as in combat-map.json hexes; a unit standing on one is crushed. A dropship's whole footprint, or each drop pod's hex, one per unit of the lance.",
           "items": {
             "$ref": "#/definitions/HexCoordinates"
           }
@@ -1718,7 +1718,7 @@
     },
     "HexCoordinates": {
       "type": "object",
-      "description": "A hex of combat-map.json rows by its axial coordinates.",
+      "description": "A hex of the game's movement grid by its axial coordinates, as in combat-map.json hexes.",
       "additionalProperties": false,
       "required": [
         "q",
@@ -1789,7 +1789,7 @@
     },
     "MapHex": {
       "type": "object",
-      "description": "A hex of combat-map.json rows as it is now.",
+      "description": "A hex of combat-map.json hexes with its ground as it is now.",
       "additionalProperties": false,
       "required": [
         "q",
@@ -1810,7 +1810,7 @@
         },
         "elevation": {
           "type": "number",
-          "description": "As in combat-map.json rows[].elevations.",
+          "description": "The height in meters a unit standing on the hex is at, a building's roof where one stands, to 0.1 m.",
           "format": "float"
         },
         "terrain": {
@@ -1818,7 +1818,7 @@
             "null",
             "string"
           ],
-          "description": "Keyed as in catalog.json terrainDefinitions; `null` when on open ground."
+          "description": "The terrain a unit standing on the hex is in, keyed as in catalog.json terrainDefinitions: the first that applies to its center cell of map boundary, impassable, destroyed building, deep water, water, the terrain of the building on it, road, the map's custom terrain, forest and rough ground; `null` when on open ground."
         }
       }
     }

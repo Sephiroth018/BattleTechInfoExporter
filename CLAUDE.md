@@ -457,6 +457,9 @@ Layout decisions a change would otherwise undo:
   state only what the HUD shows: it's written after every activation, so its reads stay cached
   lookups and statistics, apart from the movement and destroyed buildings' cells.
 - **The combat map isn't in the catalog:** buildings exist only once the battle's map has loaded.
+- **Hexes are one object each,** never rows of characters behind a legend or a mask: the consumer
+  parses whole files with code, so size costs it nothing and every encoding is a place its parser
+  goes wrong.
 - **The catalog is rebuilt on a career load only when it's missing or stale,** written by another
   mod version or with another `sourceFingerprint` (the game's manifest entries it reads): a rebuild
   loads what the career doesn't. A DLL mod patching definitions in memory isn't detected.

@@ -6,8 +6,8 @@ namespace BattleTechInfoExporter.Models;
 /// <summary>
 ///     The hexes a player's unit can end its move on, read from the game's own pathing, with the evasion pips it gets
 ///     and the attacks it has there. A unit that has activated gets those of its next activation, from where it
-///     stands. Laid out in rows of characters, as <see cref="MovementLegend" /> explains, like
-///     <see cref="CombatMap.Rows" />, whose hexes give each hex's terrain and elevation. The facing after a move isn't
+///     stands. Laid out in rows of characters, as <see cref="MovementLegend" /> explains;
+///     <see cref="CombatMap.Hexes" /> give each hex's terrain and elevation. The facing after a move isn't
 ///     exported, as the unit can turn at its end.
 /// </summary>
 /// <param name="Targets">
