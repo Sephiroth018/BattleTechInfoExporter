@@ -89,4 +89,10 @@ internal sealed record CombatMapHex(
     float Elevation,
     string? Terrain,
     string? Building,
-    IReadOnlyList<IReadOnlyList<int>> BlockedSteps) : MapHex(Q, R, Elevation, Terrain);
+    IReadOnlyList<IReadOnlyList<int>> BlockedSteps) : MapHex(Q, R, Elevation, Terrain)
+{
+    internal CombatMapHex(MapHex ground, string? building, IReadOnlyList<IReadOnlyList<int>> blockedSteps)
+        : this(ground.Q, ground.R, ground.Elevation, ground.Terrain, building, blockedSteps)
+    {
+    }
+}

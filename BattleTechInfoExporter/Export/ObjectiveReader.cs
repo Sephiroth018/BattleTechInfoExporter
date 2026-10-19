@@ -58,20 +58,11 @@ internal static class ObjectiveReader
     // check reads (AbstractActor.IsInRegion). A visible region is a regular hexagon of its radius around its position
     // (RegionGameLogic.regionDisplayType), so its cells lie within that, a cell's width added for the rasterizing.
     private static List<HexCoordinates> ReadZoneHexes(CombatGameState combat, RegionGameLogic region)
-    {
-        var reach = region.radius + MapMetaDataExporter.cellSize;
-        var center = region.Position;
-        return MapHexReader.ReadPlayableHexesWithin(
-                combat,
-                center.x - reach,
-                center.x + reach,
-                center.z - reach,
-                center.z + reach)
+        => MapHexReader.ReadPlayableHexesAround(combat, region.Position, region.radius + MapMetaDataExporter.cellSize)
             .Where(hex => MapHexReader.CenterCell(combat, hex).MapEncounterLayerDataCell.GetRegionGuids()
                 ?.Contains(region.GUID) == true)
-            .Select(hex => new HexCoordinates(hex.q, hex.r))
+            .Select(MapHexReader.ToCoordinates)
             .ToList();
-    }
 
     // The progress line as CombatHUDObjectiveItem shows it. The targets are the units and buildings carrying the
     // objective's tags (ObjectiveGameLogic.GetTaggedCombatants).

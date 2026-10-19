@@ -47,15 +47,21 @@ internal static class MapHexReader
         }
     }
 
+    /// <summary>The playable hexes centered within <paramref name="reach" /> of the point along x and z, row by row.</summary>
+    internal static IEnumerable<HexPoint3> ReadPlayableHexesAround(
+        CombatGameState combat,
+        Vector3 center,
+        float reach) =>
+        ReadPlayableHexesWithin(combat, center.x - reach, center.x + reach, center.z - reach, center.z + reach);
+
     /// <summary>
-    ///     The hex a point on the map lies in, as the game places a unit (
-    ///     <see cref="HexGrid.GetClosestHexPoint3OnGrid" />).
+    ///     The hex a point on the map lies in, as the game places a unit
+    ///     (<see cref="HexGrid.GetClosestHexPoint3OnGrid" />).
     /// </summary>
-    internal static HexCoordinates ReadHexAt(CombatGameState combat, Vector3 position)
-    {
-        var hex = combat.HexGrid.GetClosestHexPoint3OnGrid(position);
-        return new HexCoordinates(hex.q, hex.r);
-    }
+    internal static HexCoordinates ReadHexAt(CombatGameState combat, Vector3 position) =>
+        ToCoordinates(combat.HexGrid.GetClosestHexPoint3OnGrid(position));
+
+    internal static HexCoordinates ToCoordinates(HexPoint3 hex) => new(hex.q, hex.r);
 
     internal static MapTerrainDataCell CenterCell(CombatGameState combat, HexPoint3 hex) =>
         combat.MapMetaData.GetCellAt(combat.HexGrid.HexPoint3ToCartesianWorld(hex));

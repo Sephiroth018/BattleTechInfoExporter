@@ -69,7 +69,7 @@ internal static class LandingZoneReader
             .Where(hex => markedCellSet.Contains(MapHexReader.CenterCell(combat, hex)))
             .OrderBy(hex => hex.r)
             .ThenBy(hex => hex.q)
-            .Select(hex => new HexCoordinates(hex.q, hex.r))
+            .Select(MapHexReader.ToCoordinates)
             .ToList();
         return hexes.Count == 0 ? null : new LandingZone(id, kind, hexes);
     }
@@ -91,15 +91,6 @@ internal static class LandingZoneReader
 
     // A pod marks the cell at its spawn point, which is snapped to the hex grid (WorldPointGameLogic), and the
     // ring of cells around it: the hex it lands on.
-    private static IEnumerable<HexPoint3> ReadPodHexes(CombatGameState combat, UnitSpawnPointGameLogic spawnPoint)
-    {
-        var reach = 2f * MapMetaDataExporter.cellSize;
-        var center = spawnPoint.hexPosition;
-        return MapHexReader.ReadPlayableHexesWithin(
-            combat,
-            center.x - reach,
-            center.x + reach,
-            center.z - reach,
-            center.z + reach);
-    }
+    private static IEnumerable<HexPoint3> ReadPodHexes(CombatGameState combat, UnitSpawnPointGameLogic spawnPoint) =>
+        MapHexReader.ReadPlayableHexesAround(combat, spawnPoint.hexPosition, 2f * MapMetaDataExporter.cellSize);
 }

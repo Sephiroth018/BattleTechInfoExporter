@@ -30,20 +30,13 @@ internal static class CombatMapReader
                 .ToList(),
             buildings.Select(building => BuildingReader.ReadBuilding(combat, building)).ToList(),
             playableHexes
-                .Select(hex =>
-                {
-                    var ground = MapHexReader.ReadHex(combat, hex);
-                    return new CombatMapHex(
-                        ground.Q,
-                        ground.R,
-                        ground.Elevation,
-                        ground.Terrain,
-                        BuildingReader.ReadObstructionId(MapHexReader.CenterCell(combat, hex)) is { } obstructionId
-                        && buildingIds.TryGetValue(obstructionId, out var buildingId)
-                            ? buildingId
-                            : null,
-                        stepReaders.Select(stepReader => stepReader.ReadBlockedSteps(hex, playableHexSet)).ToList());
-                })
+                .Select(hex => new CombatMapHex(
+                    MapHexReader.ReadHex(combat, hex),
+                    BuildingReader.ReadObstructionId(MapHexReader.CenterCell(combat, hex)) is { } obstructionId
+                    && buildingIds.TryGetValue(obstructionId, out var buildingId)
+                        ? buildingId
+                        : null,
+                    stepReaders.Select(stepReader => stepReader.ReadBlockedSteps(hex, playableHexSet)).ToList()))
                 .ToList());
     }
 
