@@ -10,8 +10,8 @@ namespace BattleTechInfoExporter.Models;
 ///     Multiplies the damage and structure damage the category's hits deal to a turret.
 /// </param>
 /// <param name="IsAffectedByEvasion">
-///     Whether the target's evasion pips apply to the category's attacks; the weapon's type must also be one of
-///     <see cref="EvasionRules.WeaponTypesAffected" />.
+///     Whether the target's evasion pips apply to the category's attacks; the weapon's
+///     <see cref="WeaponDefinition.WeaponType" /> must also be one of <see cref="EvasionRules.WeaponTypesAffected" />.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record WeaponCategoryRules(

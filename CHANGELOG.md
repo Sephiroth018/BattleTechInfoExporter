@@ -24,6 +24,27 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.76.0
+
+Changed: rules.json, catalog.json.
+
+### rules.json
+- Meaning changed: `combat.hitTables.clusteredHits` applies only to weapons with
+  `hasClusteredHits` (LRMs), not to every weapon that fires several shots; the hits of the others,
+  e.g. SRMs, LB-X autocannons and Snub-Nose PPCs, each roll their location on their own.
+- Meaning changed: `combat.hitTables.calledShot.degradePerHit` fades the multiplier after each hit
+  of one weapon, starting anew for the next weapon of the attack; a weapon with `hasClusteredHits`
+  gets the called-shot bonus on its first hit only.
+
+### catalog.json
+- Added `componentDefinitions.weapons.<id>.weaponType`: the game's weapon type, as
+  `combat.evasion.weaponTypesAffected` in rules.json and the statistic changes' `weaponType`
+  filters match it.
+- Added `componentDefinitions.weapons.<id>.weaponSubType`: the game's weapon sub type, as the
+  statistic changes' `weaponSubType` filters match it.
+- Added `componentDefinitions.weapons.<id>.hasClusteredHits`: whether the weapon's hits after the
+  first land around it, weighted by `combat.hitTables.clusteredHits` in rules.json.
+
 ## 0.75.1
 
 Changed: game-state.json.
