@@ -24,7 +24,11 @@ internal static class CombatUnitReader
             }
         }
 
-        var livingUnits = knownUnits.Where(unit => !unit.Actor.IsDead).ToList();
+        // In the order of the units' ids, as the lines of fire to them are listed.
+        var livingUnits = knownUnits
+            .Where(unit => !unit.Actor.IsDead)
+            .OrderBy(unit => unit.Actor.GUID, StringComparer.Ordinal)
+            .ToList();
         var playerUnits = livingUnits
             .Where(unit => unit.Side.Allegiance == UnitAllegiance.Player)
             .Select(unit => unit.Actor)
@@ -111,6 +115,9 @@ internal static class CombatUnitReader
         var isLastSeen = visibility == UnitVisibility.LastSeen;
         var isPlayers = side.Allegiance == UnitAllegiance.Player;
         var bayMech = isPlayers && actor is Mech mech ? MechReader.ReferenceToBayMech(mech.MechDef) : null;
+        var position = isLastSeen
+            ? combat.LocalPlayerTeam.VisibilityCache.previouslyDetectedEnemyLocations[actor]
+            : actor.CurrentPosition;
         var isTurret = actor is Turret;
         // A blip at Blip4Maximum shows a mech's or vehicle's tonnage and a turret's weight class (Mech, Vehicle and
         // Turret.GetActorInfoFromVisLevel).
@@ -123,10 +130,8 @@ internal static class CombatUnitReader
             isSighted || (isBlipMaximum && isTurret) ? ReadWeightClass(actor) : null,
             isSighted && bayMech is null ? ReadDefinition(actor) : null,
             bayMech,
-            ReadPosition(
-                isLastSeen
-                    ? combat.LocalPlayerTeam.VisibilityCache.previouslyDetectedEnemyLocations[actor]
-                    : actor.CurrentPosition),
+            MapHexReader.ReadHexAt(combat, position),
+            Rounding.ToTenth(position.y),
             // A blip's marker takes the unit's rotation at every level (PilotableActorRepresentation.updateBlips).
             isLastSeen ? null : ReadFacingDegrees(actor),
             isLastSeen ? null : actor.occupiedDesignMask?.Id,
@@ -175,9 +180,6 @@ internal static class CombatUnitReader
             Turret turret => DefinitionReferences.ReferenceTo(turret.TurretDef.Description),
             _ => throw NoUnitKind(actor)
         };
-
-    internal static MapPosition ReadPosition(Vector3 position) =>
-        new(Rounding.ToTenth(position.x), Rounding.ToTenth(position.y), Rounding.ToTenth(position.z));
 
     // Rounding 359.96 up gives 360, which is 0.
     private static float ReadFacingDegrees(AbstractActor actor) =>
@@ -308,7 +310,9 @@ internal static class CombatUnitReader
 
     // Mirrors FiringPreviewManager.Recalc at the unit's own position, for a unit that can't turn first. The line of
     // fire is the one the unit's VisibilityCache keeps from where it stands, as ToHit.GetToHitChance reads it.
-    private static List<LineOfFire> ReadLinesOfFire(AbstractActor attacker, IReadOnlyList<AbstractActor> targets)
+    private static List<StandingLineOfFire> ReadLinesOfFire(
+        AbstractActor attacker,
+        IReadOnlyList<AbstractActor> targets)
     {
         var maxRanges = ReadMaxRanges(attacker);
         return targets
@@ -319,11 +323,14 @@ internal static class CombatUnitReader
                 var level = cachedLevel == LineOfFireLevel.NotSet
                     ? attacker.Combat.LOS.GetLineOfFire(attacker, target, out _)
                     : cachedLevel;
-                var (blocking, fire) = ReadFire(level, attacker.CurrentPosition, target, maxRanges);
-                return new LineOfFire(
+                var (blocking, fire, distance, elevationModifier) =
+                    ReadFire(attacker, level, attacker.CurrentPosition, target, maxRanges);
+                return new StandingLineOfFire(
                     target.GUID,
                     blocking,
                     fire,
+                    distance,
+                    elevationModifier,
                     attacker.IsInFiringArc(target, attacker.CurrentPosition, attacker.CurrentRotation));
             })
             .ToList();
@@ -335,14 +342,17 @@ internal static class CombatUnitReader
             attacker.GetLongestRangeWeapon(false, true)?.MaxRange ?? 0f);
 
     /// <summary>
-    ///     How much the line of fire from the attacker's position to the target is blocked, and how the attacker could
-    ///     fire at the target from there.
+    ///     How much the line of fire from the attacker's position to the target is blocked, how the attacker could
+    ///     fire at the target from there, the distance as the weapons' ranges measure it and the to-hit modifier for the
+    ///     height difference (<see cref="ToHit.GetHeightModifier" />, as <see cref="ToHit.GetAllModifiers" /> reads it).
     /// </summary>
-    internal static (LineOfFireBlocking Blocking, FireAvailability Fire) ReadFire(
-        LineOfFireLevel level,
-        Vector3 attackerPosition,
-        AbstractActor target,
-        (float Direct, float Indirect) maxRanges)
+    internal static (LineOfFireBlocking Blocking, FireAvailability Fire, float Distance, float ElevationModifier)
+        ReadFire(
+            AbstractActor attacker,
+            LineOfFireLevel level,
+            Vector3 attackerPosition,
+            AbstractActor target,
+            (float Direct, float Indirect) maxRanges)
     {
         var distance = Vector3.Distance(attackerPosition, target.CurrentPosition);
         return (
@@ -356,6 +366,8 @@ internal static class CombatUnitReader
                 ? distance < maxRanges.Direct ? FireAvailability.Direct : FireAvailability.OutOfRange
                 : distance < maxRanges.Indirect && !target.HasIndirectFireImmunity
                     ? FireAvailability.Indirect
-                    : FireAvailability.None);
+                    : FireAvailability.None,
+            Rounding.ToTenth(distance),
+            Rounding.ToTenth(attacker.Combat.ToHit.GetHeightModifier(attackerPosition.y, target.CurrentPosition.y)));
     }
 }

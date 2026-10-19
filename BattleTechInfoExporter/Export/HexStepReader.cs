@@ -20,8 +20,7 @@ internal sealed class HexStepReader
     private const float BlockedStepCost = 99999.9f;
 
     /// <summary>
-    ///     The six neighbors' offsets, in the game's direction order (<see cref="HexPoint3.Step" />) and a mask's bit
-    ///     order.
+    ///     The six neighbors' offsets, in the game's direction order (<see cref="HexPoint3.Step" />).
     /// </summary>
     internal static readonly IReadOnlyList<HexPoint3> Directions =
         Enumerable.Range(0, 6).Select(direction => new HexPoint3(0, 0).Step(direction)).ToList();
@@ -88,23 +87,17 @@ internal sealed class HexStepReader
             .ToList();
 
     /// <summary>
-    ///     The blocked steps from the hex as a mask, bit i set for <see cref="Directions" />[i]; a step to a hex
-    ///     outside the playable area is blocked too.
+    ///     The blocked steps from the hex, as indices into <see cref="Directions" />; a step to a hex outside the
+    ///     playable area is blocked too.
     /// </summary>
-    internal int ReadBlockedSteps(HexPoint3 hex, ISet<HexPoint3> playableHexes)
+    internal IReadOnlyList<int> ReadBlockedSteps(HexPoint3 hex, ISet<HexPoint3> playableHexes)
     {
         var start = NodeOf(hex);
-        var mask = 0;
-        for (var direction = 0; direction < Directions.Count; direction++)
-        {
-            var neighbor = hex.Step(direction);
-            if (!playableHexes.Contains(neighbor) || !CanReach(start, NodeOf(neighbor), RouteNodes[direction]))
-            {
-                mask |= 1 << direction;
-            }
-        }
-
-        return mask;
+        return Enumerable.Range(0, Directions.Count)
+            .Where(direction => hex.Step(direction) is var neighbor
+                                && (!playableHexes.Contains(neighbor)
+                                    || !CanReach(start, NodeOf(neighbor), RouteNodes[direction])))
+            .ToList();
     }
 
     // A breadth-first search over the route's nodes, as PathNodeGrid.BuildPathNetwork spreads over every node.

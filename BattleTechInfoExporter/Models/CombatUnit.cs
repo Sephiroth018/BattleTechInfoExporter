@@ -29,10 +29,18 @@ namespace BattleTechInfoExporter.Models;
 ///     The player's mech in <c>game-state.json</c>, whose loadout holds its assigned armor; <c>null</c> when the
 ///     unit isn't one.
 /// </param>
-/// <param name="Position">Where the unit is, or was last detected at for <see cref="UnitVisibility.LastSeen" />.</param>
+/// <param name="Hex">
+///     The hex the unit stands on, or was last detected on for <see cref="UnitVisibility.LastSeen" />; a unit stands
+///     on its center.
+/// </param>
+/// <param name="Elevation">
+///     The height in meters the unit is at, or was last detected at, to 0.1 m, on the scale of the
+///     elevations in <see cref="CombatMap.Hexes" />.
+/// </param>
 /// <param name="FacingDegrees">
 ///     The direction the unit faces, in degrees clockwise seen from above, to 0.1°: 0 towards the map's +z, 90
-///     towards its +x, up to below 360. A blip's marker shows it at every level; <c>null</c> when last seen.
+///     towards its +x, as in <see cref="HexGridLayout.CenterFormula" />, up to below 360. A blip's marker shows it at
+///     every level; <c>null</c> when last seen.
 /// </param>
 /// <param name="Terrain">
 ///     The terrain the unit stands in, keyed as in <see cref="Catalog.TerrainDefinitions" />, which a blip's
@@ -48,7 +56,8 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="LinesOfFire">
 ///     The lines of fire to the units it could attack: from the player's units to every living enemy in full view
-///     (<see cref="UnitVisibility.Full" />), and from those enemies to the player's units. <c>null</c> when the unit
+///     (<see cref="UnitVisibility.Full" />), and from those enemies to the player's units, in the order of the
+///     targets' unit ids. <c>null</c> when the unit
 ///     is destroyed or neither of those. The hit chance isn't exported: it follows from
 ///     <see cref="CombatRules.ToHit" /> and changes as soon as a unit moves.
 /// </param>
@@ -65,12 +74,13 @@ internal sealed record CombatUnit(
     WeightClass? WeightClass,
     DefinitionReference? Definition,
     MechReference? BayMech,
-    MapPosition Position,
+    HexCoordinates Hex,
+    float Elevation,
     float? FacingDegrees,
     string? Terrain,
     PilotReference? Pilot,
     CombatUnitState? State,
-    IReadOnlyList<LineOfFire>? LinesOfFire,
+    IReadOnlyList<StandingLineOfFire>? LinesOfFire,
     UnitMovement? Movement);
 
 /// <summary>A unit's condition as the HUD shows it, for a unit in full view.</summary>
@@ -222,9 +232,7 @@ internal sealed record CombatComponent(
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatAbility(DefinitionReference Ability, int Cooldown, int? UsesLeft);
 
-/// <summary>
-///     How a unit could fire at a target from where it stands, as hovering over the target shows it.
-/// </summary>
+/// <summary>How a unit could fire at a target from a position.</summary>
 /// <param name="Target">The target's unit id, a key of <see cref="CombatState.Units" />.</param>
 /// <param name="Blocking">
 ///     How much of the line of fire itself is blocked. A target beyond every weapon's range and the unit's sensors is
@@ -234,10 +242,31 @@ internal sealed record CombatAbility(DefinitionReference Ability, int Cooldown, 
 ///     Whether the unit's weapons could fire at the target directly, only indirectly or not at all, or it is out of
 ///     their range.
 /// </param>
-/// <param name="IsInFiringArc">Whether the target is in the unit's firing arc without turning.</param>
+/// <param name="Distance">
+///     The distance to the target in meters, to 0.1 m, as the weapons' ranges measure it: the straight line in three
+///     dimensions, the height difference included, not the distance across the map.
+/// </param>
+/// <param name="ElevationModifier">
+///     The to-hit modifier for the height difference to the target, as <see cref="ToHitRules.Elevation" /> sets it:
+///     negative, a bonus, for an attacker at least a level above the target, positive below it where the rules apply
+///     penalties, and 0 within a level. The hit roll measures to the target's ground position; the HUD's to-hit
+///     tooltip measures to its top and can show a level less.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record LineOfFire(
+internal abstract record LineOfFire(
     string Target,
     LineOfFireBlocking Blocking,
     FireAvailability Fire,
-    bool IsInFiringArc);
+    float Distance,
+    float ElevationModifier);
+
+/// <summary>How a unit could fire at a target from where it stands, as hovering over the target shows it.</summary>
+/// <param name="IsInFiringArc">Whether the target is in the unit's firing arc without turning.</param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal sealed record StandingLineOfFire(
+    string Target,
+    LineOfFireBlocking Blocking,
+    FireAvailability Fire,
+    float Distance,
+    float ElevationModifier,
+    bool IsInFiringArc) : LineOfFire(Target, Blocking, Fire, Distance, ElevationModifier);

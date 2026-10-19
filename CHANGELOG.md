@@ -24,6 +24,50 @@ salvage-received.json (0.27.0 to 0.42.0), combat-state.json, combat-map.json, ca
 Versions are the first three parts of `modVersion`; its fourth part, the build number, never
 changes the format.
 
+## 0.77.0
+
+Changed: combat-state.json (breaking), combat-map.json (breaking).
+
+### combat-state.json (breaking)
+- Removed `units.<id>.position`: replaced by `hex` and `elevation`.
+- Added `units.<id>.hex`: the `q` and `r` of the hex the unit stands on, or was last detected
+  on, the same hexes as combat-map.json `hexes[]`.
+- Added `units.<id>.elevation`: the height the unit is at, `position.y` before.
+- Type changed `objectives[].beacon`: the hex the beacon stands above, `q` and `r`, instead of a
+  position in meters.
+- Removed `zones[].center` and `zones[].radius`: replaced by `hexes`.
+- Added `zones[].hexes[]`: the playable hexes whose center cell is in the zone, by `r`, then `q`.
+  A unit standing on one is in the zone.
+- Removed `movementLegend`, `units.<id>.movement.targets` and `units.<id>.movement.rows`:
+  replaced by `movement.hexes`.
+- Added `units.<id>.movement.canSprint` and `canJump`: whether the unit can make the move at all,
+  the `null` rows' meaning before.
+- Added `units.<id>.movement.hexes[]`: one object per hex some move ends on, by `r`, then `q`,
+  with `q`, `r`, the evasion pips of `walk`, `sprint`, `reverse` and `jump` (`null` where that
+  move doesn't reach the hex) and `linesOfFire`.
+- Added `units.<id>.movement.hexes[].linesOfFire[]`: per enemy in full view, by unit id, its
+  `target`, `blocking`, `fire` and the `side` an attack hits (`front`, `left`, `right`, `rear`,
+  `prone` or `turret`), the attack characters before. An enemy the unit has no line of fire to
+  and can't fire at indirectly from the hex has no entry.
+- Meaning changed `units.<id>.linesOfFire[]`: listed in the order of the targets' unit ids.
+- Added `units.<id>.linesOfFire[].distance` and `units.<id>.movement.hexes[].linesOfFire[].distance`:
+  the distance to the target in meters as the weapons' ranges measure it, the straight line in
+  three dimensions.
+- Added `units.<id>.linesOfFire[].elevationModifier` and
+  `units.<id>.movement.hexes[].linesOfFire[].elevationModifier`: the to-hit modifier for the
+  height difference to the target, as rules.json `combat.toHit.elevation` sets it.
+
+### combat-map.json (breaking)
+- Removed `buildings[].position`: replaced by `hex`.
+- Added `buildings[].hex`: the hex the building's placement point lies in, which needn't be one
+  it covers or a playable one. The hexes it covers name it in `hexes[].building`.
+- Removed `rows`, `terrains` and `hexGrid.blockedStepsFormula`.
+- Added `hexes[]`: one object per playable hex, by `r`, then `q`, with `q`, `r`, `elevation`,
+  `terrain` (the terrain id, `null` on open ground), `building` (the building's id, `null` where
+  there is none) and `blockedSteps`. A hex that isn't listed is outside the playable area.
+- Added `hexes[].blockedSteps`: per entry of `pathingGroups`, the indices into
+  `hexGrid.directions` of the blocked steps, instead of a base64 mask per hex.
+
 ## 0.76.0
 
 Changed: rules.json, catalog.json.

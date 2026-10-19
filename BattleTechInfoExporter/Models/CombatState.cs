@@ -15,7 +15,6 @@ namespace BattleTechInfoExporter.Models;
 ///     down to 1.
 /// </param>
 /// <param name="Resolve">The lance's resolve now; its limits are in <see cref="CombatRules.Resolve" />.</param>
-/// <param name="MovementLegend">How to read the units' <see cref="CombatUnit.Movement" />.</param>
 /// <param name="Units">
 ///     Every unit the player knows of, keyed by the game's unit id: the player's and allied units, and the enemies
 ///     and neutral units the HUD shows or last showed. A destroyed unit stays, as its wreck is on the map; an enemy or
@@ -25,7 +24,7 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Zones">The zones drawn on the map.</param>
 /// <param name="LandingZones">
 ///     Where a dropship or drop pods are about to land; entries come and go as the mission readies landings and
-///     they happen. The game ties none to the objective announcing it: match them by position with the
+///     they happen. The game ties none to the objective announcing it: match them by hex with the
 ///     objective's <c>beacon</c>. A lance arriving without drop pods or a dropship has none; the band along the
 ///     encounter boundary, which the HUD marks the same way, isn't exported.
 /// </param>
@@ -45,7 +44,6 @@ internal sealed record CombatState(
     int Round,
     int Phase,
     int Resolve,
-    MovementLegend MovementLegend,
     IReadOnlyDictionary<string, CombatUnit> Units,
     IReadOnlyList<CombatObjective> Objectives,
     IReadOnlyList<ObjectiveZone> Zones,
@@ -60,17 +58,18 @@ internal sealed record CombatState(
 /// <param name="Id">The game's id of the dropship, or of the lance spawner whose drop pods land there.</param>
 /// <param name="Kind">What is about to land.</param>
 /// <param name="Hexes">
-///     The hexes whose center cell the game marks, in the order of <see cref="CombatMap.Rows" />; a unit standing on
-///     one is crushed. A dropship's whole footprint, or each drop pod's hex, one per unit of the lance.
+///     The hexes whose center cell the game marks, by <c>r</c>, then <c>q</c>, as in <see cref="CombatMap.Hexes" />;
+///     a unit standing on one is crushed. A dropship's whole footprint, or each drop pod's hex, one per unit of the
+///     lance.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record LandingZone(string Id, LandingZoneKind Kind, IReadOnlyList<HexCoordinates> Hexes);
 
-/// <summary>A hex of <see cref="CombatMap.Rows" /> by its axial coordinates.</summary>
+/// <summary>A hex of the game's movement grid by its axial coordinates, as in <see cref="CombatMap.Hexes" />.</summary>
 /// <param name="Q">The hex's axial <c>q</c>, as in <see cref="CombatMap.HexGrid" />.</param>
 /// <param name="R">The hex's axial <c>r</c>, as in <see cref="CombatMap.HexGrid" />.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record HexCoordinates(int Q, int R);
+internal record HexCoordinates(int Q, int R);
 
 /// <summary>A building on a side, highlighted in its team's color on the map.</summary>
 /// <param name="Id">The building's id in <see cref="CombatMap.Buildings" />.</param>
@@ -93,19 +92,15 @@ internal sealed record BuildingSide(string Id, TeamSide Side);
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record DamagedBuilding(string Id, float Structure, IReadOnlyList<MapHex>? DestroyedHexes);
 
-/// <summary>A hex of <see cref="CombatMap.Rows" /> as it is now.</summary>
-/// <param name="Q">The hex's axial <c>q</c>, as in <see cref="CombatMap.HexGrid" />.</param>
-/// <param name="R">The hex's axial <c>r</c>, as in <see cref="CombatMap.HexGrid" />.</param>
-/// <param name="Elevation">As in <see cref="HexRow.Elevations" />.</param>
+/// <summary>A hex of <see cref="CombatMap.Hexes" /> with its ground as it is now.</summary>
+/// <param name="Elevation">
+///     The height in meters a unit standing on the hex is at, a building's roof where one stands, to 0.1 m.
+/// </param>
 /// <param name="Terrain">
-///     Keyed as in <see cref="Catalog.TerrainDefinitions" />; <c>null</c> when on open ground.
+///     The terrain a unit standing on the hex is in, keyed as in <see cref="Catalog.TerrainDefinitions" />: the
+///     first that applies to its center cell of map boundary, impassable, destroyed building, deep water, water, the
+///     terrain of the building on it, road, the map's custom terrain, forest and rough ground; <c>null</c> when on
+///     open ground.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record MapHex(int Q, int R, float Elevation, string? Terrain);
-
-/// <summary>A point on the map in meters: <see cref="Y" /> is the elevation.</summary>
-/// <param name="X">Along the map's x axis, 0 at the map's center, to 0.1 m.</param>
-/// <param name="Y">The elevation, on the scale of <see cref="HexRow.Elevations" />.</param>
-/// <param name="Z">Along the map's z axis, 0 at the map's center, to 0.1 m.</param>
-[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record MapPosition(float X, float Y, float Z);
+internal record MapHex(int Q, int R, float Elevation, string? Terrain) : HexCoordinates(Q, R);

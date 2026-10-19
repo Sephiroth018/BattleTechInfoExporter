@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "CombatMap",
   "type": "object",
-  "description": "The root of `combat-map.json`: the ground of the running battle on the game's movement hex grid, written once when the battle begins; the file exists only while a battle is running. Laid out in rows of characters and numbers instead of an object per hex, so the file stays small enough for an AI chat to read whole.",
+  "description": "The root of `combat-map.json`: the ground of the running battle on the game's movement hex grid, written once when the battle begins; the file exists only while a battle is running.",
   "additionalProperties": false,
   "required": [
     "modVersion",
@@ -10,10 +10,9 @@
     "trigger",
     "mapId",
     "hexGrid",
-    "terrains",
     "pathingGroups",
     "buildings",
-    "rows"
+    "hexes"
   ],
   "properties": {
     "modVersion": {
@@ -40,19 +39,9 @@
       "description": "How the hexes' axial coordinates map to positions in meters, and their neighbors.",
       "$ref": "#/definitions/HexGridLayout"
     },
-    "terrains": {
-      "type": "object",
-      "description": "The legend of HexRow.terrains: each character's terrain, keyed as in catalog.json terrainDefinitions; `.` is open ground (`null`).",
-      "additionalProperties": {
-        "type": [
-          "null",
-          "string"
-        ]
-      }
-    },
     "pathingGroups": {
       "type": "array",
-      "description": "The groups of the game's pathing capabilities units move with (catalog.json chassisDefinitions.*.movement.pathingId) that block the same steps, by id; HexRow.blockedSteps has an entry per group. The game's own data makes two groups, the mechs' and the vehicles'.",
+      "description": "The groups of the game's pathing capabilities units move with (catalog.json chassisDefinitions.*.movement.pathingId) that block the same steps, by id; CombatMapHex.blockedSteps has an entry per group. The game's own data makes two groups, the mechs' and the vehicles'.",
       "items": {
         "type": "array",
         "items": {
@@ -67,11 +56,11 @@
         "$ref": "#/definitions/CombatBuilding"
       }
     },
-    "rows": {
+    "hexes": {
       "type": "array",
-      "description": "The hexes a unit can stand on, by `r`, then `q`; a row of hexes with a gap in the playable area is split in two, and the hexes outside it aren't listed.",
+      "description": "The hexes a unit can stand on, by `r`, then `q`; a hex that isn't listed is outside the playable area.",
       "items": {
-        "$ref": "#/definitions/HexRow"
+        "$ref": "#/definitions/CombatMapHex"
       }
     }
   },
@@ -286,8 +275,7 @@
         "size",
         "orientation",
         "centerFormula",
-        "directions",
-        "blockedStepsFormula"
+        "directions"
       ],
       "properties": {
         "size": {
@@ -301,18 +289,14 @@
         },
         "centerFormula": {
           "type": "string",
-          "description": "The world position of a hex's center, as in the units' positions."
+          "description": "The world position of a hex's center, as the game places units on it."
         },
         "directions": {
           "type": "array",
-          "description": "The six neighbors' offsets, in the order of the bits of HexRow.blockedSteps.",
+          "description": "The six neighbors' offsets; CombatMapHex.blockedSteps refers to them by their index here.",
           "items": {
             "$ref": "#/definitions/HexOffset"
           }
-        },
-        "blockedStepsFormula": {
-          "type": "string",
-          "description": "How to read HexRow.blockedSteps."
         }
       }
     },
@@ -344,7 +328,7 @@
       "required": [
         "id",
         "name",
-        "position",
+        "hex",
         "maxStructure"
       ],
       "properties": {
@@ -356,9 +340,9 @@
           "type": "string",
           "description": "The building's name as the game shows it."
         },
-        "position": {
-          "description": "The point the building is placed at, not necessarily its center.",
-          "$ref": "#/definitions/MapPosition"
+        "hex": {
+          "description": "The hex the point the building is placed at lies in, which needn't be its center, a hex it covers or a playable one; the hexes it covers name it in CombatMapHex.building.",
+          "$ref": "#/definitions/HexCoordinates"
         },
         "maxStructure": {
           "type": "number",
@@ -367,84 +351,78 @@
         }
       }
     },
-    "MapPosition": {
+    "HexCoordinates": {
       "type": "object",
-      "description": "A point on the map in meters: y is the elevation.",
-      "additionalProperties": false,
-      "required": [
-        "x",
-        "y",
-        "z"
-      ],
-      "properties": {
-        "x": {
-          "type": "number",
-          "description": "Along the map's x axis, 0 at the map's center, to 0.1 m.",
-          "format": "float"
-        },
-        "y": {
-          "type": "number",
-          "description": "The elevation, on the scale of HexRow.elevations.",
-          "format": "float"
-        },
-        "z": {
-          "type": "number",
-          "description": "Along the map's z axis, 0 at the map's center, to 0.1 m.",
-          "format": "float"
-        }
-      }
-    },
-    "HexRow": {
-      "type": "object",
-      "description": "Consecutive hexes of one row, from (q, r) on, one entry per hex in each list.",
+      "description": "A hex of the game's movement grid by its axial coordinates, as in hexes.",
       "additionalProperties": false,
       "required": [
         "q",
-        "r",
-        "terrains",
-        "elevations",
-        "buildings",
-        "blockedSteps"
+        "r"
       ],
       "properties": {
         "q": {
           "type": "integer",
-          "description": "The axial `q` of the first hex.",
+          "description": "The hex's axial `q`, as in hexGrid.",
           "format": "int32"
         },
         "r": {
           "type": "integer",
-          "description": "The axial `r` of every hex in the row.",
+          "description": "The hex's axial `r`, as in hexGrid.",
+          "format": "int32"
+        }
+      }
+    },
+    "CombatMapHex": {
+      "type": "object",
+      "description": "A hex a unit can stand on, as it is when the battle begins.",
+      "additionalProperties": false,
+      "required": [
+        "q",
+        "r",
+        "elevation",
+        "terrain",
+        "building",
+        "blockedSteps"
+      ],
+      "properties": {
+        "elevation": {
+          "type": "number",
+          "description": "The height in meters a unit standing on the hex is at, a building's roof where one stands, to 0.1 m.",
+          "format": "float"
+        },
+        "terrain": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "The terrain a unit standing on the hex is in, keyed as in catalog.json terrainDefinitions: the first that applies to its center cell of map boundary, impassable, destroyed building, deep water, water, the terrain of the building on it, road, the map's custom terrain, forest and rough ground; `null` when on open ground."
+        },
+        "q": {
+          "type": "integer",
+          "description": "The hex's axial `q`, as in hexGrid.",
           "format": "int32"
         },
-        "terrains": {
-          "type": "string",
-          "description": "Each hex's terrain as a character of terrains: the first that applies to its center cell of map boundary, impassable, destroyed building, deep water, water, the terrain of the building on it, road, the map's custom terrain, forest and rough ground; otherwise open ground."
+        "r": {
+          "type": "integer",
+          "description": "The hex's axial `r`, as in hexGrid.",
+          "format": "int32"
         },
-        "elevations": {
-          "type": "array",
-          "description": "The height in meters a unit standing on each hex is at, a building's roof where one stands, to 0.1 m.",
-          "items": {
-            "type": "number",
-            "format": "float"
-          }
-        },
-        "buildings": {
-          "type": "array",
-          "description": "The index in buildings of the building on each hex, or `null`; that entry's CombatBuilding.id is what the combat state refers to the building by.",
-          "items": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32"
-          }
+        "building": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "description": "The CombatBuilding.id of the building on the hex, which a unit standing there is on; `null` when there is none."
         },
         "blockedSteps": {
           "type": "array",
-          "description": "Per entry of pathingGroups, the steps to neighbors its units can't take on slopes, one character per hex as HexGridLayout.blockedStepsFormula says: too steep a grade between path nodes, too steep ground or a ledge in between. Terrain move costs and units in the way aren't part of it; impassable terrain has its own character in terrains. An approximation: a detour may still reach a neighbor a blocked step can't; a player unit's combat-state.json units.*.movement is exact.",
+          "description": "Per entry of pathingGroups, the steps to neighbors its units can't take on slopes, as indices into HexGridLayout.directions: too steep a grade between path nodes, too steep ground or a ledge in between. A step to a hex that isn't listed is blocked too. Terrain move costs and units in the way aren't part of it; impassable terrain is a terrain of its own. An approximation: a detour may still reach a neighbor a blocked step can't; a player unit's combat-state.json units.*.movement is exact.",
           "items": {
-            "type": "string"
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
           }
         }
       }

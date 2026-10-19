@@ -21,9 +21,8 @@ namespace BattleTechInfoExporter.Models;
 ///     The buildings it is about (to destroy or defend), by their <see cref="CombatBuilding.Id" />.
 /// </param>
 /// <param name="Beacon">
-///     Where the HUD draws the objective's beacon, 2 m above the ground, e.g. where the reinforcements it announces
-///     will land; <c>null</c> when it draws none: an objective that marks its target units instead, or a
-///     finished one.
+///     The hex the HUD draws the objective's beacon above, e.g. where the reinforcements it announces will land;
+///     <c>null</c> when it draws none: an objective that marks its target units instead, or a finished one.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatObjective(
@@ -34,7 +33,7 @@ internal sealed record CombatObjective(
     string? Progress,
     IReadOnlyList<string> TargetUnitIds,
     IReadOnlyList<string> TargetBuildingIds,
-    MapPosition? Beacon);
+    HexCoordinates? Beacon);
 
 /// <summary>A zone drawn on the map, e.g. a capture or evacuation zone.</summary>
 /// <param name="Id">The game's id of the zone.</param>
@@ -42,10 +41,10 @@ internal sealed record CombatObjective(
 ///     The game's id of the zone's region definition, e.g. <c>regionDef_EvacZone</c>, which names what the zone is
 ///     for.
 /// </param>
-/// <param name="Center">The zone's center on the map.</param>
-/// <param name="Radius">
-///     The radius of the hexagon the HUD draws, in meters; whether a unit is inside is decided per map cell, which
-///     this only approximates.
+/// <param name="Hexes">
+///     The playable hexes whose center cell is in the zone, by <c>r</c>, then <c>q</c>, as in
+///     <see cref="CombatMap.Hexes" />: a unit standing on one is in it. The game decides per map cell, so a unit
+///     whose footprint reaches into the zone from a hex next to these can count as in it too.
 /// </param>
 /// <param name="IsPreview">Drawn as a zone that becomes active later.</param>
 /// <param name="ObjectiveIds">
@@ -56,7 +55,6 @@ internal sealed record CombatObjective(
 internal sealed record ObjectiveZone(
     string Id,
     string Type,
-    MapPosition Center,
-    float Radius,
+    IReadOnlyList<HexCoordinates> Hexes,
     bool IsPreview,
     IReadOnlyList<string> ObjectiveIds);

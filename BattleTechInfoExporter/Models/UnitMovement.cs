@@ -4,59 +4,55 @@ using JetBrains.Annotations;
 namespace BattleTechInfoExporter.Models;
 
 /// <summary>
-///     The hexes a player's unit can end its move on, read from the game's own pathing, with the evasion pips it gets
-///     and the attacks it has there. A unit that has activated gets those of its next activation, from where it
-///     stands. Laid out in rows of characters, as <see cref="MovementLegend" /> explains, like
-///     <see cref="CombatMap.Rows" />, whose hexes give each hex's terrain and elevation. The facing after a move isn't
-///     exported, as the unit can turn at its end.
+///     Where a player's unit can end its move, read from the game's own pathing, with the evasion pips it gets and
+///     its lines of fire there; <see cref="CombatMap.Hexes" /> give each hex's terrain and elevation. A unit that has
+///     activated gets those of its next activation, from where it stands. The facing after a move isn't exported, as
+///     the unit can turn at its end.
 /// </summary>
-/// <param name="Targets">
-///     The enemies in full view (<see cref="UnitVisibility.Full" />) by unit id, in the order of
-///     <see cref="MovementRow.Attacks" />.
-/// </param>
-/// <param name="Rows">The rows with a hex the unit can reach, by <c>r</c>.</param>
+/// <param name="CanSprint">Whether the unit can sprint; a legged or unsteady mech can't.</param>
+/// <param name="CanJump">Whether the unit can jump: a mech with a working jump jet.</param>
+/// <param name="Hexes">The hexes some move of the unit ends on, by <c>r</c>, then <c>q</c>.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record UnitMovement(IReadOnlyList<string> Targets, IReadOnlyList<MovementRow> Rows);
+internal sealed record UnitMovement(bool CanSprint, bool CanJump, IReadOnlyList<ReachableHex> Hexes);
 
 /// <summary>
-///     Consecutive hexes of one row, from (<see cref="Q" />, <see cref="R" />) to the last one the unit can reach,
-///     one character per hex in each move and two per hex in each attack.
+///     A hex a move of the unit can end on. Each move's evasion pips follow from the length of the path the unit
+///     would walk there, or a jump's straight distance, and abilities can raise them above the rules' table.
 /// </summary>
-/// <param name="Q">The axial <c>q</c> of the row's first hex, the first character of each move and attack.</param>
-/// <param name="R">The axial <c>r</c> of every hex in the row.</param>
-/// <param name="Walk">The evasion pips per hex as <see cref="MovementLegend.Moves" /> says.</param>
+/// <param name="Walk">The evasion pips a walk ending on the hex gives; <c>null</c> where no walk reaches it.</param>
 /// <param name="Sprint">
-///     Like <see cref="Walk" />, when sprinting; <c>null</c> when the unit is a legged or unsteady mech, which can't
+///     The evasion pips a sprint ending on the hex gives; <c>null</c> where no sprint reaches it or the unit can't
 ///     sprint.
 /// </param>
-/// <param name="Reverse">Like <see cref="Walk" />, when moving backward.</param>
-/// <param name="Jump">
-///     Like <see cref="Walk" />, when jumping; <c>null</c> when the unit is a vehicle or a mech without a working
-///     jump jet.
+/// <param name="Reverse">
+///     The evasion pips moving backward to the hex gives; <c>null</c> where no backward move reaches it.
 /// </param>
-/// <param name="Attacks">
-///     Per entry of <see cref="UnitMovement.Targets" />, the fire and side as <see cref="MovementLegend.Fire" /> and
-///     <see cref="MovementLegend.Side" /> say.
+/// <param name="Jump">
+///     The evasion pips a jump to the hex gives, one for a jump in place; <c>null</c> where no jump reaches it or the
+///     unit can't jump.
+/// </param>
+/// <param name="LinesOfFire">
+///     From the hex to each enemy in full view (<see cref="UnitVisibility.Full" />) the unit has a line of fire to or
+///     could fire at indirectly, in the order of their unit ids; an enemy it could do neither to from there has no
+///     entry.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record MovementRow(
+internal sealed record ReachableHex(
     int Q,
     int R,
-    string Walk,
-    string? Sprint,
-    string Reverse,
-    string? Jump,
-    IReadOnlyList<string> Attacks);
+    int? Walk,
+    int? Sprint,
+    int? Reverse,
+    int? Jump,
+    IReadOnlyList<MoveLineOfFire> LinesOfFire) : HexCoordinates(Q, R);
 
-/// <summary>How to read <see cref="UnitMovement" />'s rows, spelled out so the file explains itself.</summary>
-/// <param name="Moves">
-///     How to read the characters of the moves; their evasion pips follow from the length of the path the unit would
-///     walk there, or a jump's straight distance.
-/// </param>
-/// <param name="Fire">The first character of an attack: how the unit could fire at the target from the hex.</param>
-/// <param name="Side">The second character of an attack: the side of the target an attack from the hex hits.</param>
+/// <summary>How the unit could fire at a target after moving to a hex, as the HUD's move preview shows it.</summary>
+/// <param name="Side">The side of the target an attack from the hex hits.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record MovementLegend(
-    string Moves,
-    IReadOnlyDictionary<string, string> Fire,
-    IReadOnlyDictionary<string, string> Side);
+internal sealed record MoveLineOfFire(
+    string Target,
+    LineOfFireBlocking Blocking,
+    FireAvailability Fire,
+    float Distance,
+    float ElevationModifier,
+    AttackSide Side) : LineOfFire(Target, Blocking, Fire, Distance, ElevationModifier);

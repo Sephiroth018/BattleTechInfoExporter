@@ -5,8 +5,7 @@ namespace BattleTechInfoExporter.Models;
 
 /// <summary>
 ///     The root of <c>combat-map.json</c>: the ground of the running battle on the game's movement hex grid, written
-///     once when the battle begins; the file exists only while a battle is running. Laid out in rows of characters
-///     and numbers instead of an object per hex, so the file stays small enough for an AI chat to read whole.
+///     once when the battle begins; the file exists only while a battle is running.
 /// </summary>
 /// <param name="MapId">
 ///     The map's id in the game's metadata database, which keys <see cref="Catalog.MapDefinitions" />; a map no
@@ -14,32 +13,28 @@ namespace BattleTechInfoExporter.Models;
 ///     isn't in the metadata database.
 /// </param>
 /// <param name="HexGrid">How the hexes' axial coordinates map to positions in meters, and their neighbors.</param>
-/// <param name="Terrains">
-///     The legend of <see cref="HexRow.Terrains" />: each character's terrain, keyed as in
-///     <see cref="Catalog.TerrainDefinitions" />; <c>.</c> is open ground (<c>null</c>).
-/// </param>
 /// <param name="PathingGroups">
 ///     The groups of the game's pathing capabilities units move with
-///     (<see cref="ChassisMovement.PathingId" />) that block the same steps, by id; <see cref="HexRow.BlockedSteps" />
-///     has an entry per group. The game's own data makes two groups, the mechs' and the vehicles'.
+///     (<see cref="ChassisMovement.PathingId" />) that block the same steps, by id;
+///     <see cref="CombatMapHex.BlockedSteps" /> has an entry per group. The game's own data makes two groups, the
+///     mechs' and the vehicles'.
 /// </param>
 /// <param name="Buildings">
 ///     Every building on the map when the file was written, in the order of their ids. A dropship occupies no hex
 ///     until it has landed; one landing later, e.g. the Leopard an evacuation calls in, isn't here but can be in the
 ///     combat state's building lists.
 /// </param>
-/// <param name="Rows">
-///     The hexes a unit can stand on, by <c>r</c>, then <c>q</c>; a row of hexes with a gap in the playable area is
-///     split in two, and the hexes outside it aren't listed.
+/// <param name="Hexes">
+///     The hexes a unit can stand on, by <c>r</c>, then <c>q</c>; a hex that isn't listed is outside the playable
+///     area.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatMap(
     string? MapId,
     HexGridLayout HexGrid,
-    IReadOnlyDictionary<string, string?> Terrains,
     IReadOnlyList<IReadOnlyList<string>> PathingGroups,
     IReadOnlyList<CombatBuilding> Buildings,
-    IReadOnlyList<HexRow> Rows) : ExportFile
+    IReadOnlyList<CombatMapHex> Hexes) : ExportFile
 {
     internal const string FileName = "combat-map.json";
 }
@@ -47,16 +42,16 @@ internal sealed record CombatMap(
 /// <summary>How the hexes lie on the map, spelled out so the file explains itself.</summary>
 /// <param name="Size">The distance between neighboring hex centers in meters.</param>
 /// <param name="Orientation">The hexes' orientation: <c>pointyTop</c>, rows running along x.</param>
-/// <param name="CenterFormula">The world position of a hex's center, as in the units' positions.</param>
-/// <param name="Directions">The six neighbors' offsets, in the order of the bits of <see cref="HexRow.BlockedSteps" />.</param>
-/// <param name="BlockedStepsFormula">How to read <see cref="HexRow.BlockedSteps" />.</param>
+/// <param name="CenterFormula">The world position of a hex's center, as the game places units on it.</param>
+/// <param name="Directions">
+///     The six neighbors' offsets; <see cref="CombatMapHex.BlockedSteps" /> refers to them by their index here.
+/// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record HexGridLayout(
     float Size,
     string Orientation,
     string CenterFormula,
-    IReadOnlyList<HexOffset> Directions,
-    string BlockedStepsFormula);
+    IReadOnlyList<HexOffset> Directions);
 
 /// <summary>The step from a hex to one of its neighbors, in axial coordinates.</summary>
 /// <param name="Q">The change of <c>q</c>.</param>
@@ -67,38 +62,37 @@ internal sealed record HexOffset(int Q, int R);
 /// <summary>A building, which units can fire at, stand on and be blocked by.</summary>
 /// <param name="Id">The game's building id, as in <see cref="CombatState.DamagedBuildings" />.</param>
 /// <param name="Name">The building's name as the game shows it.</param>
-/// <param name="Position">The point the building is placed at, not necessarily its center.</param>
+/// <param name="Hex">
+///     The hex the point the building is placed at lies in, which needn't be its center, a hex it covers or a
+///     playable one; the hexes it covers name it in <see cref="CombatMapHex.Building" />.
+/// </param>
 /// <param name="MaxStructure">The structure of the undamaged building.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record CombatBuilding(string Id, string Name, MapPosition Position, float MaxStructure);
+internal sealed record CombatBuilding(string Id, string Name, HexCoordinates Hex, float MaxStructure);
 
-/// <summary>Consecutive hexes of one row, from (<see cref="Q" />, <see cref="R" />) on, one entry per hex in each list.</summary>
-/// <param name="Q">The axial <c>q</c> of the first hex.</param>
-/// <param name="R">The axial <c>r</c> of every hex in the row.</param>
-/// <param name="Terrains">
-///     Each hex's terrain as a character of <see cref="CombatMap.Terrains" />: the first that applies to its center
-///     cell of map boundary, impassable, destroyed building, deep water, water, the terrain of the building on it,
-///     road, the map's custom terrain, forest and rough ground; otherwise open ground.
-/// </param>
-/// <param name="Elevations">
-///     The height in meters a unit standing on each hex is at, a building's roof where one stands, to 0.1 m.
-/// </param>
-/// <param name="Buildings">
-///     The index in <see cref="CombatMap.Buildings" /> of the building on each hex, or <c>null</c>; that entry's
-///     <see cref="CombatBuilding.Id" /> is what the combat state refers to the building by.
+/// <summary>A hex a unit can stand on, as it is when the battle begins.</summary>
+/// <param name="Building">
+///     The <see cref="CombatBuilding.Id" /> of the building on the hex, which a unit standing there is on;
+///     <c>null</c> when there is none.
 /// </param>
 /// <param name="BlockedSteps">
 ///     Per entry of <see cref="CombatMap.PathingGroups" />, the steps to neighbors its units can't take on slopes,
-///     one character per hex as <see cref="HexGridLayout.BlockedStepsFormula" /> says: too steep a grade between
-///     path nodes, too steep ground or a ledge in between. Terrain move costs and units in the way aren't part of it;
-///     impassable terrain has its own character in <see cref="CombatMap.Terrains" />. An approximation: a detour may
-///     still reach a neighbor a blocked step can't; a player unit's <see cref="CombatUnit.Movement" /> is exact.
+///     as indices into <see cref="HexGridLayout.Directions" />: too steep a grade between path nodes, too steep
+///     ground or a ledge in between. A step to a hex that isn't listed is blocked too. Terrain move costs and units
+///     in the way aren't part of it; impassable terrain is a terrain of its own. An approximation: a detour may still
+///     reach a neighbor a blocked step can't; a player unit's <see cref="CombatUnit.Movement" /> is exact.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record HexRow(
+internal sealed record CombatMapHex(
     int Q,
     int R,
-    string Terrains,
-    IReadOnlyList<float> Elevations,
-    IReadOnlyList<int?> Buildings,
-    IReadOnlyList<string> BlockedSteps);
+    float Elevation,
+    string? Terrain,
+    string? Building,
+    IReadOnlyList<IReadOnlyList<int>> BlockedSteps) : MapHex(Q, R, Elevation, Terrain)
+{
+    internal CombatMapHex(MapHex ground, string? building, IReadOnlyList<IReadOnlyList<int>> blockedSteps)
+        : this(ground.Q, ground.R, ground.Elevation, ground.Terrain, building, blockedSteps)
+    {
+    }
+}
