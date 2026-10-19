@@ -2095,7 +2095,7 @@
         },
         "isAffectedByEvasion": {
           "type": "boolean",
-          "description": "Whether the target's evasion pips apply to the category's attacks; the weapon's type must also be one of EvasionRules.weaponTypesAffected."
+          "description": "Whether the target's evasion pips apply to the category's attacks; the weapon's catalog.json componentDefinitions.weapons.*.weaponType must also be one of EvasionRules.weaponTypesAffected."
         }
       }
     },
@@ -2506,7 +2506,7 @@
           "$ref": "#/definitions/CalledShotRules"
         },
         "clusteredHits": {
-          "description": "Multiplies the weights for the later hits of a weapon that fires several, by their place relative to the first hit.",
+          "description": "Multiplies the weights for the hits after the first of a weapon with catalog.json componentDefinitions.weapons.*.hasClusteredHits, by their place relative to the first hit.",
           "$ref": "#/definitions/ClusteredHitWeights"
         }
       }
@@ -2717,7 +2717,7 @@
     },
     "CalledShotRules": {
       "type": "object",
-      "description": "A called shot multiplies the chosen location's weight by weightMultiplier times the pilot's own multiplier; after every hit of the attack the multiplier moves towards 1 by degradePerHit of the way.",
+      "description": "A called shot multiplies the chosen location's weight by weightMultiplier times the pilot's own multiplier, anew for each weapon; after each of the weapon's hits the multiplier moves towards 1 by degradePerHit of the way. A weapon with catalog.json componentDefinitions.weapons.*.hasClusteredHits gets the multiplier on its first hit only.",
       "additionalProperties": false,
       "required": [
         "weightMultiplier",
@@ -2731,14 +2731,14 @@
         },
         "degradePerHit": {
           "type": "number",
-          "description": "The share of the way to 1 the multiplier moves after each hit, as a fraction from 0 to 1.",
+          "description": "The share of the way to 1 the multiplier moves after each of a weapon's hits, as a fraction from 0 to 1.",
           "format": "float"
         }
       }
     },
     "ClusteredHitWeights": {
       "type": "object",
-      "description": "The multipliers of the location weights for the later hits of a weapon that fires several.",
+      "description": "The multipliers of the location weights for the hits after the first of a weapon with catalog.json componentDefinitions.weapons.*.hasClusteredHits.",
       "additionalProperties": false,
       "required": [
         "sameLocation",

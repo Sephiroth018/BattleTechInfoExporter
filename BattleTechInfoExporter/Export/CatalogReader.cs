@@ -337,12 +337,16 @@ internal static class CatalogReader
         new(
             ReadComponent(weapon),
             weapon.WeaponCategoryValue.FriendlyName,
+            weapon.Type,
+            weapon.WeaponSubType,
             weapon.AmmoCategoryValue.Is_NotSet ? null : weapon.AmmoCategoryValue.FriendlyName,
             weapon.AmmoCategoryValue.UsesInternalAmmo ? weapon.StartingAmmoCapacity : null,
             weapon.Damage,
             weapon.StructureDamage,
             weapon.Instability,
             weapon.ShotsWhenFired,
+            // AttackDirector.GenerateHitInfo clusters only LRMs' hits (GetClusteredHits).
+            weapon.Type == WeaponType.LRM,
             weapon.ProjectilesPerShot,
             weapon.HeatDamage,
             weapon.HeatGenerated,

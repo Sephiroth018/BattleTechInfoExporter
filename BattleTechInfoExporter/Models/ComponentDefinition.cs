@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using BattleTech;
 using JetBrains.Annotations;
 
 namespace BattleTechInfoExporter.Models;
@@ -31,12 +32,15 @@ internal sealed record WeaponDefinition : ComponentDefinition
     internal WeaponDefinition(
         ComponentDefinition component,
         string category,
+        WeaponType weaponType,
+        WeaponSubType weaponSubType,
         string? ammoCategory,
         int? internalAmmoCapacity,
         float damage,
         float structureDamage,
         float stabilityDamage,
         int shotsWhenFired,
+        bool hasClusteredHits,
         int projectilesPerShot,
         float heatDamage,
         int heatGenerated,
@@ -48,12 +52,15 @@ internal sealed record WeaponDefinition : ComponentDefinition
         bool isIndirectFireCapable) : base(component)
     {
         Category = category;
+        WeaponType = weaponType;
+        WeaponSubType = weaponSubType;
         AmmoCategory = ammoCategory;
         InternalAmmoCapacity = internalAmmoCapacity;
         Damage = damage;
         StructureDamage = structureDamage;
         StabilityDamage = stabilityDamage;
         ShotsWhenFired = shotsWhenFired;
+        HasClusteredHits = hasClusteredHits;
         ProjectilesPerShot = projectilesPerShot;
         HeatDamage = heatDamage;
         HeatGenerated = heatGenerated;
@@ -70,6 +77,15 @@ internal sealed record WeaponDefinition : ComponentDefinition
     ///     <see cref="CombatRules.WeaponCategories" />.
     /// </summary>
     public string Category { get; }
+
+    /// <summary>
+    ///     The weapon's type, as <see cref="EvasionRules.WeaponTypesAffected" /> and the statistic changes' filters of
+    ///     kind <c>weaponType</c> match it.
+    /// </summary>
+    public WeaponType WeaponType { get; }
+
+    /// <summary>The weapon's sub type, as the statistic changes' filters of kind <c>weaponSubType</c> match it.</summary>
+    public WeaponSubType WeaponSubType { get; }
 
     /// <summary>
     ///     The ammunition the weapon fires, as <see cref="AmmunitionBoxDefinition.AmmoCategory" /> names it; a weapon
@@ -98,6 +114,12 @@ internal sealed record WeaponDefinition : ComponentDefinition
 
     /// <summary>The shots fired per attack.</summary>
     public int ShotsWhenFired { get; }
+
+    /// <summary>
+    ///     Whether the hits after the first of an attack land around it, as <see cref="HitTables.ClusteredHits" />
+    ///     weights them; otherwise each hit rolls its location on the hit table on its own.
+    /// </summary>
+    public bool HasClusteredHits { get; }
 
     /// <summary>
     ///     The projectiles the attack's animation shows per shot; only the visuals use it, each shot hits or misses
