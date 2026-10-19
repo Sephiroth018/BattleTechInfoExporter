@@ -249,7 +249,8 @@ internal sealed record CombatAbility(DefinitionReference Ability, int Cooldown, 
 /// <param name="ElevationModifier">
 ///     The to-hit modifier for the height difference to the target, as <see cref="ToHitRules.Elevation" /> sets it:
 ///     negative, a bonus, for an attacker at least a level above the target, positive below it where the rules apply
-///     penalties, and 0 within a level.
+///     penalties, and 0 within a level. The hit roll measures to the target's ground position; the HUD's to-hit
+///     tooltip measures to its top and can show a level less.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal abstract record LineOfFire(

@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
 using BattleTech;
 using BattleTechInfoExporter.Models;
@@ -19,14 +18,13 @@ internal static class CombatExporter
             trigger,
             () =>
             {
-                // Read on the game's main thread while the battle begins, so its time is logged, as are the pathing
-                // groups, which hold only the pathing capabilities loaded by then.
-                var stopwatch = Stopwatch.StartNew();
+                // The pathing groups are logged, as they hold only the pathing capabilities loaded when the battle
+                // begins.
                 var map = CombatMapReader.Read(combat);
                 ModLog.Logger.Log(
-                    $"Read {CombatMap.FileName} in {stopwatch.ElapsedMilliseconds} ms, pathing groups "
+                    $"Read {CombatMap.FileName} with pathing groups "
                     + string.Join("; ", map.PathingGroups.Select(pathingIds => string.Join(", ", pathingIds))));
-                WriteTimed(map, CombatMap.FileName, trigger);
+                map.Write(CombatMap.FileName, trigger);
             });
 
     /// <summary>Exports the running battle; a skirmish's, which belongs to no career, is skipped.</summary>
@@ -34,23 +32,8 @@ internal static class CombatExporter
         Run(
             combat,
             trigger,
-            () =>
-            {
-                // Read on the game's main thread, so its time is logged: the units' movement runs path and line of
-                // fire checks per hex.
-                var stopwatch = Stopwatch.StartNew();
-                var state = CombatStateReader.Read(combat.BattleTechGame.Simulation, combat);
-                ModLog.Logger.Log($"Read {CombatState.FileName} in {stopwatch.ElapsedMilliseconds} ms");
-                WriteTimed(state, CombatState.FileName, trigger);
-            });
-
-    // Serializing the file, which a write does also when it skips an unchanged file, runs on the main thread too.
-    private static void WriteTimed(ExportFile file, string fileName, ExportTrigger trigger)
-    {
-        var stopwatch = Stopwatch.StartNew();
-        file.Write(fileName, trigger);
-        ModLog.Logger.Log($"Wrote {fileName} in {stopwatch.ElapsedMilliseconds} ms");
-    }
+            () => CombatStateReader.Read(combat.BattleTechGame.Simulation, combat)
+                .Write(CombatState.FileName, trigger));
 
     /// <summary>Deletes the files once no battle is running, so existing files always describe the running one.</summary>
     internal static void Delete()
