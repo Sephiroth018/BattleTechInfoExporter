@@ -12,8 +12,8 @@ namespace BattleTechInfoExporter.Models;
 /// <param name="Vehicle">The weights of a vehicle's locations.</param>
 /// <param name="CalledShot">How a called shot raises the chosen location's weight.</param>
 /// <param name="ClusteredHits">
-///     Multiplies the weights for the later hits of a weapon that fires several, by their place relative to the
-///     first hit.
+///     Multiplies the weights for the hits after the first of a weapon with
+///     <see cref="WeaponDefinition.HasClusteredHits" />, by their place relative to the first hit.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record HitTables(
@@ -54,17 +54,21 @@ internal sealed record MechHitTables(
 
 /// <summary>
 ///     A called shot multiplies the chosen location's weight by <see cref="WeightMultiplier" /> times the pilot's own
-///     multiplier; after every hit of the attack the multiplier moves towards 1 by <see cref="DegradePerHit" /> of
-///     the way.
+///     multiplier, anew for each weapon; after each of the weapon's hits the multiplier moves towards 1 by
+///     <see cref="DegradePerHit" /> of the way. A weapon with <see cref="WeaponDefinition.HasClusteredHits" /> gets
+///     the multiplier on its first hit only.
 /// </summary>
 /// <param name="WeightMultiplier">Multiplies the chosen location's weight, before the pilot's own multiplier.</param>
 /// <param name="DegradePerHit">
-///     The share of the way to 1 the multiplier moves after each hit, as a fraction from 0 to 1.
+///     The share of the way to 1 the multiplier moves after each of a weapon's hits, as a fraction from 0 to 1.
 /// </param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CalledShotRules(int WeightMultiplier, float DegradePerHit);
 
-/// <summary>The multipliers of the location weights for the later hits of a weapon that fires several.</summary>
+/// <summary>
+///     The multipliers of the location weights for the hits after the first of a weapon with
+///     <see cref="WeaponDefinition.HasClusteredHits" />.
+/// </summary>
 /// <param name="SameLocation">For the location the first hit landed on.</param>
 /// <param name="AdjacentLocation">For the locations adjacent to the first hit's.</param>
 /// <param name="OtherLocation">For every other location.</param>

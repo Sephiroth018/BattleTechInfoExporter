@@ -1269,12 +1269,15 @@
         "effects",
         "isSalvageable",
         "category",
+        "weaponType",
+        "weaponSubType",
         "ammoCategory",
         "internalAmmoCapacity",
         "damage",
         "structureDamage",
         "stabilityDamage",
         "shotsWhenFired",
+        "hasClusteredHits",
         "projectilesPerShot",
         "heatDamage",
         "heatGenerated",
@@ -1324,6 +1327,14 @@
           "type": "string",
           "description": "The hardpoint kind the weapon needs, e.g. `Ballistic` or `Support`, which also keys rules.json combat.weaponCategories."
         },
+        "weaponType": {
+          "description": "The weapon's type, as rules.json combat.evasion.weaponTypesAffected and the statistic changes' filters of kind `weaponType` match it.",
+          "$ref": "#/definitions/WeaponType"
+        },
+        "weaponSubType": {
+          "description": "The weapon's sub type, as the statistic changes' filters of kind `weaponSubType` match it.",
+          "$ref": "#/definitions/WeaponSubType"
+        },
         "ammoCategory": {
           "type": [
             "null",
@@ -1358,6 +1369,10 @@
           "type": "integer",
           "description": "The shots fired per attack.",
           "format": "int32"
+        },
+        "hasClusteredHits": {
+          "type": "boolean",
+          "description": "Whether the hits after the first of an attack land around it, as rules.json combat.hitTables.clusteredHits weights them; otherwise each hit rolls its location on the hit table on its own."
         },
         "projectilesPerShot": {
           "type": "integer",
