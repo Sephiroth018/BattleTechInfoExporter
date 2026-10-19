@@ -15,7 +15,6 @@ namespace BattleTechInfoExporter.Models;
 ///     down to 1.
 /// </param>
 /// <param name="Resolve">The lance's resolve now; its limits are in <see cref="CombatRules.Resolve" />.</param>
-/// <param name="MovementLegend">How to read the units' <see cref="CombatUnit.Movement" />.</param>
 /// <param name="Units">
 ///     Every unit the player knows of, keyed by the game's unit id: the player's and allied units, and the enemies
 ///     and neutral units the HUD shows or last showed. A destroyed unit stays, as its wreck is on the map; an enemy or
@@ -45,7 +44,6 @@ internal sealed record CombatState(
     int Round,
     int Phase,
     int Resolve,
-    MovementLegend MovementLegend,
     IReadOnlyDictionary<string, CombatUnit> Units,
     IReadOnlyList<CombatObjective> Objectives,
     IReadOnlyList<ObjectiveZone> Zones,

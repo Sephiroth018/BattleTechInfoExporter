@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using BattleTech;
 using BattleTechInfoExporter.Models;
@@ -16,46 +15,8 @@ namespace BattleTechInfoExporter.Export;
 /// </summary>
 internal static class MovementReader
 {
-    private const char NotReachedCharacter = '.';
-    private const string NotReachedAttack = "..";
-
     // A build returning fewer nodes than asked for has finished its grids (PathingManager.Update).
     private const int NodesPerBuild = 1000;
-
-    // An attack's first character; only direct fire tells how much its line of fire is blocked.
-    private static readonly IReadOnlyDictionary<(FireAvailability Fire, LineOfFireBlocking? Blocking), AttackCode>
-        FireCodes = new Dictionary<(FireAvailability Fire, LineOfFireBlocking? Blocking), AttackCode>
-        {
-            [(FireAvailability.Direct, LineOfFireBlocking.Clear)] =
-                new('C', "direct fire, clear line of fire"),
-            [(FireAvailability.Direct, LineOfFireBlocking.PartiallyBlocked)] =
-                new('P', "direct fire, partially blocked line of fire"),
-            [(FireAvailability.Indirect, null)] = new('I', "indirect fire only"),
-            [(FireAvailability.OutOfRange, null)] =
-                new('O', "line of fire, but beyond every weapon's range"),
-            [(FireAvailability.None, null)] = new('-', "no fire")
-        };
-
-    // An attack's second character, the side HitLocation.GetAttackDirection gives.
-    private static readonly IReadOnlyDictionary<AttackDirection, AttackCode> SideCodes =
-        new Dictionary<AttackDirection, AttackCode>
-        {
-            [AttackDirection.FromFront] = new('F', "front"),
-            [AttackDirection.FromLeft] = new('L', "left"),
-            [AttackDirection.FromRight] = new('R', "right"),
-            [AttackDirection.FromBack] = new('B', "rear"),
-            [AttackDirection.ToProne] = new('P', "a prone target, hit anywhere")
-        };
-
-    private static readonly AttackCode TurretSide = new('T', "a turret, which has a single location");
-
-    // Mech.GetEvasivePipsResult adds a pip for any jump, and the EvasivePipsGainedAdditional statistic past the cap.
-    internal static readonly MovementLegend Legend = new(
-        $"one character per hex: the evasion pips a move ending there gives, which abilities can raise above the "
-        + $"rules' table, and a jump in place gives one; {NotReachedCharacter} where the move doesn't reach the hex. "
-        + $"An attack is {NotReachedAttack} at a hex no move reaches",
-        ReadLegend(FireCodes.Values),
-        ReadLegend(SideCodes.Values.Append(TurretSide)));
 
     /// <summary>The unit's movement; <c>null</c> for a unit that can't move.</summary>
     internal static UnitMovement? Read(AbstractActor actor, IReadOnlyList<AbstractActor> targets)
@@ -78,43 +39,30 @@ internal static class MovementReader
         var reverse = ReadGridPips(actor, MoveType.Backward);
         var jump = actor is Mech { JumpDistance: > 0f } jumpingMech ? ReadJumpPips(jumpingMech) : null;
 
+        var maxRanges = CombatUnitReader.ReadMaxRanges(actor);
         var hexes = new[] { walk, sprint, reverse, jump }
             .OfType<Dictionary<HexPoint3, int>>()
             .SelectMany(pips => pips.Keys)
             .Distinct()
-            .ToList();
-        var maxRanges = CombatUnitReader.ReadMaxRanges(actor);
-        var attacks = hexes.ToDictionary(
-            hex => hex,
-            hex =>
+            .OrderBy(hex => hex.r)
+            .ThenBy(hex => hex.q)
+            .Select(hex =>
             {
                 var position = MapHexReader.StandingPosition(actor.Combat, hex);
-                return targets.Select(target => ReadAttack(actor, position, target, maxRanges)).ToList();
-            });
-
-        var rows = hexes
-            .GroupBy(hex => hex.r)
-            .OrderBy(row => row.Key)
-            .Select(row =>
-            {
-                var firstQ = row.Min(hex => hex.q);
-                var rowHexes = Enumerable.Range(firstQ, row.Max(hex => hex.q) - firstQ + 1)
-                    .Select(q => new HexPoint3(q, row.Key))
-                    .ToList();
-                return new MovementRow(
-                    firstQ,
-                    row.Key,
-                    ReadMoveRow(rowHexes, walk),
-                    ReadMoveRow(rowHexes, sprint),
-                    ReadMoveRow(rowHexes, reverse),
-                    ReadMoveRow(rowHexes, jump),
-                    Enumerable.Range(0, targets.Count)
-                        .Select(targetIndex => string.Concat(rowHexes.Select(hex =>
-                            attacks.TryGetValue(hex, out var hexAttacks) ? hexAttacks[targetIndex] : NotReachedAttack)))
+                return new ReachableHex(
+                    hex.q,
+                    hex.r,
+                    PipsAt(walk, hex),
+                    PipsAt(sprint, hex),
+                    PipsAt(reverse, hex),
+                    PipsAt(jump, hex),
+                    targets
+                        .Select(target => ReadLineOfFire(actor, position, target, maxRanges))
+                        .OfType<MoveLineOfFire>()
                         .ToList());
             })
             .ToList();
-        return new UnitMovement(targets.Select(target => target.GUID).ToList(), rows);
+        return new UnitMovement(canSprint, jump is not null, hexes);
     }
 
     // The destinations the move preview offers, each with the length of the path the unit would walk, as the HUD
@@ -194,21 +142,12 @@ internal static class MovementReader
     private static void AddPips(Dictionary<HexPoint3, int> pips, HexPoint3 hex, int hexPips) =>
         pips[hex] = pips.TryGetValue(hex, out var otherPips) ? Math.Min(otherPips, hexPips) : hexPips;
 
-    // null for a move the unit can't make.
-    [return: NotNullIfNotNull(nameof(pips))]
-    private static string? ReadMoveRow(IEnumerable<HexPoint3> rowHexes, Dictionary<HexPoint3, int>? pips) =>
-        pips is null
-            ? null
-            : string.Concat(rowHexes.Select(hex =>
-                pips.TryGetValue(hex, out var hexPips) ? ToDigit(hexPips) : NotReachedCharacter));
+    // null where the move doesn't reach the hex or the unit can't make it.
+    private static int? PipsAt(Dictionary<HexPoint3, int>? pips, HexPoint3 hex) =>
+        pips is not null && pips.TryGetValue(hex, out var hexPips) ? hexPips : null;
 
-    // Pips are capped by the MaxEvasivePips statistic, a single digit in the game's data.
-    private static char ToDigit(int pips) =>
-        pips is >= 0 and <= 9
-            ? (char)('0' + pips)
-            : throw new InvalidOperationException($"{pips} evasion pips don't fit a single digit");
-
-    private static string ReadAttack(
+    // null where the unit has no line of fire to the target and can't fire at it indirectly.
+    private static MoveLineOfFire? ReadLineOfFire(
         AbstractActor actor,
         Vector3 position,
         AbstractActor target,
@@ -223,20 +162,31 @@ internal static class MovementReader
             target.CurrentRotation,
             out _);
         var (blocking, fire) = CombatUnitReader.ReadFire(level, position, target, maxRanges);
-        var fireCode = FireCodes[(fire, fire == FireAvailability.Direct ? blocking : null)];
-        var direction = actor.Combat.HitLocation.GetAttackDirection(position, target);
-        var sideCode = target is Turret
-            ? TurretSide
-            : SideCodes.TryGetValue(direction, out var code)
-                ? code
-                : throw new InvalidOperationException($"No side for the attack direction {direction}");
-        return $"{fireCode.Character}{sideCode.Character}";
+        if (fire == FireAvailability.None)
+        {
+            return null;
+        }
+
+        return new MoveLineOfFire(target.GUID, blocking, fire, ReadSide(actor, position, target));
     }
 
-    private static SortedDictionary<string, string> ReadLegend(IEnumerable<AttackCode> codes) =>
-        new(
-            codes.ToDictionary(code => code.Character.ToString(), code => code.Description),
-            StringComparer.Ordinal);
+    // The side HitLocation.GetAttackDirection gives; a turret has a single location whichever it gives.
+    private static AttackSide ReadSide(AbstractActor actor, Vector3 position, AbstractActor target)
+    {
+        if (target is Turret)
+        {
+            return AttackSide.Turret;
+        }
 
-    private sealed record AttackCode(char Character, string Description);
+        var direction = actor.Combat.HitLocation.GetAttackDirection(position, target);
+        return direction switch
+        {
+            AttackDirection.FromFront => AttackSide.Front,
+            AttackDirection.FromLeft => AttackSide.Left,
+            AttackDirection.FromRight => AttackSide.Right,
+            AttackDirection.FromBack => AttackSide.Rear,
+            AttackDirection.ToProne => AttackSide.Prone,
+            _ => throw new InvalidOperationException($"No side for the attack direction {direction}")
+        };
+    }
 }

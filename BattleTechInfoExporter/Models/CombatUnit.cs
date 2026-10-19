@@ -56,7 +56,8 @@ namespace BattleTechInfoExporter.Models;
 /// </param>
 /// <param name="LinesOfFire">
 ///     The lines of fire to the units it could attack: from the player's units to every living enemy in full view
-///     (<see cref="UnitVisibility.Full" />), and from those enemies to the player's units. <c>null</c> when the unit
+///     (<see cref="UnitVisibility.Full" />), and from those enemies to the player's units, in the order of the
+///     targets' unit ids. <c>null</c> when the unit
 ///     is destroyed or neither of those. The hit chance isn't exported: it follows from
 ///     <see cref="CombatRules.ToHit" /> and changes as soon as a unit moves.
 /// </param>
@@ -79,7 +80,7 @@ internal sealed record CombatUnit(
     string? Terrain,
     PilotReference? Pilot,
     CombatUnitState? State,
-    IReadOnlyList<LineOfFire>? LinesOfFire,
+    IReadOnlyList<StandingLineOfFire>? LinesOfFire,
     UnitMovement? Movement);
 
 /// <summary>A unit's condition as the HUD shows it, for a unit in full view.</summary>
@@ -231,9 +232,7 @@ internal sealed record CombatComponent(
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 internal sealed record CombatAbility(DefinitionReference Ability, int Cooldown, int? UsesLeft);
 
-/// <summary>
-///     How a unit could fire at a target from where it stands, as hovering over the target shows it.
-/// </summary>
+/// <summary>How a unit could fire at a target from a position.</summary>
 /// <param name="Target">The target's unit id, a key of <see cref="CombatState.Units" />.</param>
 /// <param name="Blocking">
 ///     How much of the line of fire itself is blocked. A target beyond every weapon's range and the unit's sensors is
@@ -243,10 +242,14 @@ internal sealed record CombatAbility(DefinitionReference Ability, int Cooldown, 
 ///     Whether the unit's weapons could fire at the target directly, only indirectly or not at all, or it is out of
 ///     their range.
 /// </param>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+internal abstract record LineOfFire(string Target, LineOfFireBlocking Blocking, FireAvailability Fire);
+
+/// <summary>How a unit could fire at a target from where it stands, as hovering over the target shows it.</summary>
 /// <param name="IsInFiringArc">Whether the target is in the unit's firing arc without turning.</param>
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-internal sealed record LineOfFire(
+internal sealed record StandingLineOfFire(
     string Target,
     LineOfFireBlocking Blocking,
     FireAvailability Fire,
-    bool IsInFiringArc);
+    bool IsInFiringArc) : LineOfFire(Target, Blocking, Fire);

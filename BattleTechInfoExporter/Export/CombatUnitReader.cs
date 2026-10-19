@@ -24,7 +24,11 @@ internal static class CombatUnitReader
             }
         }
 
-        var livingUnits = knownUnits.Where(unit => !unit.Actor.IsDead).ToList();
+        // In the order of the units' ids, as the lines of fire to them are listed.
+        var livingUnits = knownUnits
+            .Where(unit => !unit.Actor.IsDead)
+            .OrderBy(unit => unit.Actor.GUID, StringComparer.Ordinal)
+            .ToList();
         var playerUnits = livingUnits
             .Where(unit => unit.Side.Allegiance == UnitAllegiance.Player)
             .Select(unit => unit.Actor)
@@ -306,7 +310,8 @@ internal static class CombatUnitReader
 
     // Mirrors FiringPreviewManager.Recalc at the unit's own position, for a unit that can't turn first. The line of
     // fire is the one the unit's VisibilityCache keeps from where it stands, as ToHit.GetToHitChance reads it.
-    private static List<LineOfFire> ReadLinesOfFire(AbstractActor attacker, IReadOnlyList<AbstractActor> targets)
+    private static List<StandingLineOfFire> ReadLinesOfFire(AbstractActor attacker,
+        IReadOnlyList<AbstractActor> targets)
     {
         var maxRanges = ReadMaxRanges(attacker);
         return targets
@@ -318,7 +323,7 @@ internal static class CombatUnitReader
                     ? attacker.Combat.LOS.GetLineOfFire(attacker, target, out _)
                     : cachedLevel;
                 var (blocking, fire) = ReadFire(level, attacker.CurrentPosition, target, maxRanges);
-                return new LineOfFire(
+                return new StandingLineOfFire(
                     target.GUID,
                     blocking,
                     fire,

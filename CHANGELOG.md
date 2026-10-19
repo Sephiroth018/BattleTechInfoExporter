@@ -38,6 +38,18 @@ Changed: combat-state.json (breaking), combat-map.json (breaking).
 - Removed `zones[].center` and `zones[].radius`: replaced by `hexes`.
 - Added `zones[].hexes[]`: the playable hexes whose center cell is in the zone, by `r`, then `q`.
   A unit standing on one is in the zone.
+- Removed `movementLegend`, `units.<id>.movement.targets` and `units.<id>.movement.rows`:
+  replaced by `movement.hexes`.
+- Added `units.<id>.movement.canSprint` and `canJump`: whether the unit can make the move at all,
+  the `null` rows' meaning before.
+- Added `units.<id>.movement.hexes[]`: one object per hex some move ends on, by `r`, then `q`,
+  with `q`, `r`, the evasion pips of `walk`, `sprint`, `reverse` and `jump` (`null` where that
+  move doesn't reach the hex) and `linesOfFire`.
+- Added `units.<id>.movement.hexes[].linesOfFire[]`: per enemy in full view, by unit id, its
+  `target`, `blocking`, `fire` and the `side` an attack hits (`front`, `left`, `right`, `rear`,
+  `prone` or `turret`), the attack characters before. An enemy the unit has no line of fire to
+  and can't fire at indirectly from the hex has no entry.
+- Meaning changed `units.<id>.linesOfFire[]`: listed in the order of the targets' unit ids.
 
 ### combat-map.json (breaking)
 - Removed `buildings[].position`: replaced by `hex`.

@@ -13,7 +13,6 @@
     "round",
     "phase",
     "resolve",
-    "movementLegend",
     "units",
     "objectives",
     "zones",
@@ -60,10 +59,6 @@
       "type": "integer",
       "description": "The lance's resolve now; its limits are in rules.json combat.resolve.",
       "format": "int32"
-    },
-    "movementLegend": {
-      "description": "How to read the units' CombatUnit.movement.",
-      "$ref": "#/definitions/MovementLegend"
     },
     "units": {
       "type": "object",
@@ -403,36 +398,6 @@
         "HeavyMetalFlashpointCampaign"
       ]
     },
-    "MovementLegend": {
-      "type": "object",
-      "description": "How to read UnitMovement's rows, spelled out so the file explains itself.",
-      "additionalProperties": false,
-      "required": [
-        "moves",
-        "fire",
-        "side"
-      ],
-      "properties": {
-        "moves": {
-          "type": "string",
-          "description": "How to read the characters of the moves; their evasion pips follow from the length of the path the unit would walk there, or a jump's straight distance."
-        },
-        "fire": {
-          "type": "object",
-          "description": "The first character of an attack: how the unit could fire at the target from the hex.",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "side": {
-          "type": "object",
-          "description": "The second character of an attack: the side of the target an attack from the hex hits.",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      }
-    },
     "CombatUnit": {
       "type": "object",
       "description": "A unit in combat, with as much of it as the HUD shows at its visibility.",
@@ -566,9 +531,9 @@
             "array",
             "null"
           ],
-          "description": "The lines of fire to the units it could attack: from the player's units to every living enemy in full view (`full`), and from those enemies to the player's units. `null` when the unit is destroyed or neither of those. The hit chance isn't exported: it follows from rules.json combat.toHit and changes as soon as a unit moves.",
+          "description": "The lines of fire to the units it could attack: from the player's units to every living enemy in full view (`full`), and from those enemies to the player's units, in the order of the targets' unit ids. `null` when the unit is destroyed or neither of those. The hit chance isn't exported: it follows from rules.json combat.toHit and changes as soon as a unit moves.",
           "items": {
-            "$ref": "#/definitions/LineOfFire"
+            "$ref": "#/definitions/StandingLineOfFire"
           }
         },
         "movement": {
@@ -1352,7 +1317,7 @@
         }
       }
     },
-    "LineOfFire": {
+    "StandingLineOfFire": {
       "type": "object",
       "description": "How a unit could fire at a target from where it stands, as hovering over the target shows it.",
       "additionalProperties": false,
@@ -1459,32 +1424,34 @@
     },
     "UnitMovement": {
       "type": "object",
-      "description": "The hexes a player's unit can end its move on, read from the game's own pathing, with the evasion pips it gets and the attacks it has there. A unit that has activated gets those of its next activation, from where it stands. Laid out in rows of characters, as MovementLegend explains; combat-map.json hexes give each hex's terrain and elevation. The facing after a move isn't exported, as the unit can turn at its end.",
+      "description": "Where a player's unit can end its move, read from the game's own pathing, with the evasion pips it gets and its lines of fire there; combat-map.json hexes give each hex's terrain and elevation. A unit that has activated gets those of its next activation, from where it stands. The facing after a move isn't exported, as the unit can turn at its end.",
       "additionalProperties": false,
       "required": [
-        "targets",
-        "rows"
+        "canSprint",
+        "canJump",
+        "hexes"
       ],
       "properties": {
-        "targets": {
-          "type": "array",
-          "description": "The enemies in full view (`full`) by unit id, in the order of MovementRow.attacks.",
-          "items": {
-            "type": "string"
-          }
+        "canSprint": {
+          "type": "boolean",
+          "description": "Whether the unit can sprint; a legged or unsteady mech can't."
         },
-        "rows": {
+        "canJump": {
+          "type": "boolean",
+          "description": "Whether the unit can jump: a mech with a working jump jet."
+        },
+        "hexes": {
           "type": "array",
-          "description": "The rows with a hex the unit can reach, by `r`.",
+          "description": "The hexes some move of the unit ends on, by `r`, then `q`.",
           "items": {
-            "$ref": "#/definitions/MovementRow"
+            "$ref": "#/definitions/ReachableHex"
           }
         }
       }
     },
-    "MovementRow": {
+    "ReachableHex": {
       "type": "object",
-      "description": "Consecutive hexes of one row, from (q, r) to the last one the unit can reach, one character per hex in each move and two per hex in each attack.",
+      "description": "A hex a move of the unit can end on. Each move's evasion pips follow from the length of the path the unit would walk there, or a jump's straight distance, and abilities can raise them above the rules' table.",
       "additionalProperties": false,
       "required": [
         "q",
@@ -1493,49 +1460,146 @@
         "sprint",
         "reverse",
         "jump",
-        "attacks"
+        "linesOfFire"
       ],
       "properties": {
         "q": {
           "type": "integer",
-          "description": "The axial `q` of the row's first hex, the first character of each move and attack.",
+          "description": "The hex's axial `q`, as in combat-map.json hexGrid.",
           "format": "int32"
         },
         "r": {
           "type": "integer",
-          "description": "The axial `r` of every hex in the row.",
+          "description": "The hex's axial `r`, as in combat-map.json hexGrid.",
           "format": "int32"
         },
         "walk": {
-          "type": "string",
-          "description": "The evasion pips per hex as MovementLegend.moves says."
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The evasion pips a walk ending on the hex gives; `null` where no walk reaches it.",
+          "format": "int32"
         },
         "sprint": {
           "type": [
-            "null",
-            "string"
+            "integer",
+            "null"
           ],
-          "description": "Like walk, when sprinting; `null` when the unit is a legged or unsteady mech, which can't sprint."
+          "description": "The evasion pips a sprint ending on the hex gives; `null` where no sprint reaches it or the unit can't sprint.",
+          "format": "int32"
         },
         "reverse": {
-          "type": "string",
-          "description": "Like walk, when moving backward."
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "The evasion pips moving backward to the hex gives; `null` where no backward move reaches it.",
+          "format": "int32"
         },
         "jump": {
           "type": [
-            "null",
-            "string"
+            "integer",
+            "null"
           ],
-          "description": "Like walk, when jumping; `null` when the unit is a vehicle or a mech without a working jump jet."
+          "description": "The evasion pips a jump to the hex gives, one for a jump in place; `null` where no jump reaches it or the unit can't jump.",
+          "format": "int32"
         },
-        "attacks": {
+        "linesOfFire": {
           "type": "array",
-          "description": "Per entry of UnitMovement.targets, the fire and side as MovementLegend.fire and MovementLegend.side say.",
+          "description": "From the hex to each enemy in full view (`full`) the unit has a line of fire to or could fire at indirectly, in the order of their unit ids; an enemy it could do neither to from there has no entry.",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/MoveLineOfFire"
           }
         }
       }
+    },
+    "MoveLineOfFire": {
+      "type": "object",
+      "description": "How the unit could fire at a target after moving to a hex, as the HUD's move preview shows it.",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "blocking",
+        "fire",
+        "side"
+      ],
+      "properties": {
+        "target": {
+          "type": "string",
+          "description": "The target's unit id, a key of units."
+        },
+        "blocking": {
+          "description": "How much of the line of fire itself is blocked. A target beyond every weapon's range and the unit's sensors is blocked too.",
+          "$ref": "#/definitions/LineOfFireBlocking"
+        },
+        "fire": {
+          "description": "Whether the unit's weapons could fire at the target directly, only indirectly or not at all, or it is out of their range.",
+          "$ref": "#/definitions/FireAvailability"
+        },
+        "side": {
+          "description": "The side of the target an attack from the hex hits.",
+          "$ref": "#/definitions/AttackSide"
+        }
+      }
+    },
+    "AttackSide": {
+      "type": "string",
+      "description": "The side of a target an attack hits (the game's AttackDirection).",
+      "x-enumNames": [
+        "Front",
+        "Left",
+        "Right",
+        "Rear",
+        "Prone",
+        "Turret"
+      ],
+      "enum": [
+        "front",
+        "left",
+        "right",
+        "rear",
+        "prone",
+        "turret"
+      ],
+      "oneOf": [
+        {
+          "description": "The target's front.",
+          "enum": [
+            "front"
+          ]
+        },
+        {
+          "description": "The target's left side.",
+          "enum": [
+            "left"
+          ]
+        },
+        {
+          "description": "The target's right side.",
+          "enum": [
+            "right"
+          ]
+        },
+        {
+          "description": "The target's rear.",
+          "enum": [
+            "rear"
+          ]
+        },
+        {
+          "description": "A prone target, which an attack hits anywhere.",
+          "enum": [
+            "prone"
+          ]
+        },
+        {
+          "description": "A turret, which has a single location.",
+          "enum": [
+            "turret"
+          ]
+        }
+      ]
     },
     "CombatObjective": {
       "type": "object",
