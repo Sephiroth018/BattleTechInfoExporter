@@ -62,8 +62,9 @@ Once per repository, before the rest of the workflow applies:
 
 - **Every change starts from a GitHub issue**, small ones included. Search for an existing one
   before creating it.
-- **A session working an issue is titled `Issue #<nr>: <issue title>`**, also one started for an
-  issue from another session ("Issue #239: Add role and description back to mech definitions").
+- **A session renames itself to `Issue #<nr>: <issue title>`** as soon as it starts working on or
+  investigating an issue ("Issue #239: Add role and description back to mech definitions"). A
+  session started for an issue from another session gets that title from the start.
 - **The issue records every decision about it.** Signed-off plans and later decisions go into the
   description while work hasn't started, and into a new comment once it has.
 - **Labels:** apply the repo's existing labels that fit; ask before creating a new one. They
