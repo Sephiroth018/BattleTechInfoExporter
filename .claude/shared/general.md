@@ -259,9 +259,16 @@ from).
 
 ### Documentation
 
-- **The README** says what the project is, how to install and use it, and how to build it, and
-  carries an AI disclaimer stating how extensively AI is used in the project. It never refers to
-  issues: it describes the project as it is, not how it got there.
+- **The README** says what the project is, how to install and use it, and how to build it. It
+  never refers to issues: it describes the project as it is, not how it got there.
+- **The README's `## AI disclaimer` section** holds the standard text, unchanged:
+
+  ```markdown
+  This project is AI-assisted: [Claude Code](https://claude.com/claude-code) does most of the
+  implementation, under the direction and review of the maintainer. Commits written by Claude
+  carry a `Co-Authored-By: Claude` trailer, and everything it posts on GitHub is marked as
+  generated with Claude Code.
+  ```
 - **Decisions live in their GitHub issue**, not in separate decision records (see "Issues and
   projects").
 
