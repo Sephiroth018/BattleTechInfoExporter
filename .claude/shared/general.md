@@ -192,9 +192,10 @@ Apply these to every change and check them in every review.
   every edit shows as a reviewable diff. Exceptions: `git mv`, the language part's formatter, its
   CLI's own project and package commands, output of the project's own generators, and the update
   of `.claude/shared/`.
-- **`.claude/shared/` is replaced as a whole, never edited:**
-  `git fetch https://github.com/Sephiroth018/claude-instructions main`, then
-  `git rm -r -q .claude/shared` (not the first time) and
+- **`.claude/shared/` is replaced as a whole, never edited.** When the shared files change,
+  `claude-instructions` opens the issue and PR for it in every repository on its list. By hand, as
+  for a new repository's first copy: `git fetch https://github.com/Sephiroth018/claude-instructions
+  main`, then `git rm -r -q .claude/shared` (not the first time) and
   `git read-tree --prefix=.claude/shared -u FETCH_HEAD:shared`, committed on its own as
   `chore(#<issue>): update shared instructions to <short sha>`, the fetched commit's.
 - **Clean up and modernize the code you touch.** Small fixes and current idioms within the lines
