@@ -49,8 +49,9 @@ Once per repository, before the rest of the workflow applies:
    (build, tooling, dependencies), `refactor` (restructuring without behavior change) and
    `research` (finding out how something works before building on it). Work that is only about
    tests gets `enhancement` or `chore`.
-6. **CI** is a GitHub Actions workflow, `.github/workflows/ci.yml`, running on PRs and pushes to
-   `main`.
+6. **CI** is a GitHub Actions workflow, `.github/workflows/ci.yml`, running on pushes to `main`
+   and on PRs, but not on drafts: every job has `if: ${{ !github.event.pull_request.draft }}`, and
+   the `pull_request` trigger has `types: [opened, synchronize, reopened, ready_for_review]`.
 7. **No Dependabot or other scheduled workflows**: they use up Actions minutes even on an abandoned
    repository.
 
@@ -78,24 +79,31 @@ Once per repository, before the rest of the workflow applies:
   one.
 - **Commit messages:** `<type>(#<issue>): <imperative summary>`, with type `feat`, `fix`,
   `refactor`, `docs`, `test` or `chore` (build, dependencies, CI, tooling).
-- **Every commit lands on `main`** (PRs merge with merge commits), so each one is a single coherent
-  step that works.
+- **The per-commit rule:** every commit lands on `main` (PRs merge with merge commits), so each one
+  is formatted with the language part's formatter, builds or loads, and breaks nothing that worked.
+  New code may be unreachable or incomplete, but nothing crashes, the existing tests still pass,
+  and the static checks report nothing at warning level or above except what that unfinished state
+  causes (unreachable or unused code). It's checked before each commit.
+- **Push every commit** right after making it.
 - **Moves and renames get their own commit**, made with `git mv`, containing only the move and the
   minimal edits it forces (module paths, references), so git keeps following the file's history.
-- **Rewrite a branch only before its PR is opened** (amend, rebase, `--force-with-lease`) to tidy
-  its commits. Once the PR is open, changes are new commits so they can be reviewed on their own,
-  in the normal message format (usually `refactor` or `chore`; no `fixup!` commits). `main` is
-  never rewritten.
+- **Rewriting is the exception, and only while the PR is a draft.** Prefer new commits. Amend or
+  rebase (pushed with `--force-with-lease`) only when a commit is wrong on its own (it breaks the
+  per-commit rule or has a wrong message), not when the work merely moved on. Once the PR is ready
+  for review, changes are new commits so they can be reviewed on their own, in the normal message
+  format (usually `refactor` or `chore`; no `fixup!` commits). `main` is never rewritten.
 - **Commits are signed through 1Password's SSH agent.** If a commit or push fails because the agent
   is locked, stop, tell the user and wait. Don't retry in a loop, and never bypass signing.
 
 ### Pull requests
 
-- **Open a PR into `main`** once the change is done (see "Definition of done"). Its title follows
-  the commit message format; it becomes the merge commit's message. The description starts with
-  `Closes #<issue>` and explains what the code can't: why, rejected alternatives, risks, how it was
-  verified, what deserves a close look. No file-by-file list.
-- **Watch the PR** after opening it: turn on the desktop app's monitoring (auto-fix CI, address
+- **Open a draft PR into `main`** right after the branch's first commit. Its title follows the
+  commit message format; it becomes the merge commit's message. The description starts with
+  `Closes #<issue>`; title and description may stay provisional while it's a draft.
+- **Mark the PR ready for review** once the change is done (see "Definition of done"), with its
+  title and description final. The description explains what the code can't (why, rejected
+  alternatives, risks, how it was verified, what deserves a close look). No file-by-file list.
+- **Watch the PR** once it's ready: turn on the desktop app's monitoring (auto-fix CI, address
   comments). Fix CI failures at the cause; never skip or weaken a check.
 - **The user's own review comments fire no events** (a solo author can only leave "comment"
   reviews). When the user says they've reviewed, read all three surfaces: PR comments, inline diff
@@ -113,7 +121,9 @@ Once per repository, before the rest of the workflow applies:
 
 ## Definition of done
 
-A change is done when all of these hold, checked in this order before every commit that's pushed:
+A draft's commits only have to meet the per-commit rule (see "Branches and commits"). A change is
+done when all of these hold, checked in this order before the PR is marked ready and before every
+later push:
 
 1. **Tests cover the new or changed behavior** (see "Testing"). A gap means the change isn't done.
 2. **Formatted** with the language part's formatter, on the changed files.
@@ -128,7 +138,7 @@ A change is done when all of these hold, checked in this order before every comm
 
 Steps 2-5 are what CI runs; running them first keeps CI from being where problems are found.
 
-Before opening the PR, with the branch as target (its whole diff against `main`, not just
+Before marking the PR ready, with the branch as target (its whole diff against `main`, not just
 uncommitted changes):
 
 1. **`/simplify`**, then steps 2-7 again for what it changed. A suggested fix that changes design or
@@ -274,7 +284,7 @@ from).
 
 ## Testing
 
-- **A bug fix starts with a failing test** that reproduces it.
+- **A bug fix starts with a failing test** that reproduces it, committed together with the fix.
 - **Test behavior through the non-private API**, internals included, not implementation details.
   How tests reach internals is in the language part; never through hacks that break encapsulation.
 - **Real collaborators.** A test double only at a boundary (file system, clock, randomness,
