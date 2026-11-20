@@ -39,7 +39,7 @@ this file.
   `DynamicProxyGenAssembly2` so NSubstitute can proxy internal types; never reach private members
   through reflection.
 - **All test doubles use NSubstitute**, with `NSubstitute.Analyzers.CSharp` in every test project.
-- **Names:** `MethodName_Scenario_ExpectedResult` (`Parse_EmptyInput_ReturnsNoWeapons`), in a class
+- **Names:** `MethodName_Scenario_ExpectedResult` (`Parse_EmptyInput_ReturnsNoEntries`), in a class
   named after the unit under test.
 - **Layout:** one `<Project>.Tests` project per production project, folders mirroring it.
   Integration tests spanning several projects go in `<Solution>.IntegrationTests`.
@@ -50,11 +50,11 @@ What the tools enforce lives in `.editorconfig` and the analyzer settings; this 
 needs judgment.
 
 - **`internal` by default**; a type is `public` only when another assembly needs it. Public classes
-  stay open.
+  stay unsealed.
 - **Immutable by default:** records for data, `init` and `readonly` where possible, and read-only
   collection interfaces (`IReadOnlyList<T>`, `IReadOnlyDictionary<TKey, TValue>`) in signatures.
 - **No escape hatches** (null-forgiving `!`, `#nullable disable`, `dynamic`, reflection) without a
-  narrow, stated reason. Where a project needs one (e.g. reflection for a game's private members),
+  narrow, stated reason. Where a project needs one (e.g. reflection for a host's private members),
   its "Project" part says where.
 - **No mutable static state** unless a host framework requires it, documented under "Project".
 - **Enums stored by number have explicit values**, so reordering members can't change stored data.

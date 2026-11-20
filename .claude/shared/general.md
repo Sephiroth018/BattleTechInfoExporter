@@ -15,8 +15,8 @@
   passing.
 - **English everywhere:** code, comments, docs, commits, issues and PRs.
 - **Mark everything you write on GitHub** (issues, comments, PRs, review replies, releases) by
-  ending it with `🤖 Generated with [Claude Code](https://claude.com/claude-code)`. Commits carry a
-  `Co-Authored-By: Claude` trailer.
+  ending it with `🤖 Generated with [Claude Code](https://claude.com/claude-code)`. Commits carry
+  a `Co-Authored-By: Claude` trailer.
 - **Keep chat reports short.** A line or two on what was done. Explain at length only what's
   non-standard, what went wrong, or what needs a decision.
 - **Standing authorization** covers the source control steps below, except merging. Other
@@ -54,6 +54,8 @@ Once per repository, before the rest of the workflow applies:
    the `pull_request` trigger has `types: [opened, synchronize, reopened, ready_for_review]`.
 7. **No Dependabot or other scheduled workflows**: they use up Actions minutes even on an abandoned
    repository.
+8. **Register the repository in `claude-instructions`** with an issue there: its update workflow's
+   list gets the repository, and the user adds it to the workflow's token.
 
 ## Source control
 
@@ -62,7 +64,7 @@ Once per repository, before the rest of the workflow applies:
 - **Every change starts from a GitHub issue**, small ones included. Search for an existing one
   before creating it.
 - **A session renames itself to `Issue #<nr>: <issue title>`** as soon as it starts working on or
-  investigating an issue ("Issue #239: Add role and description back to mech definitions"). A
+  investigating an issue ("Issue #239: Add a retry limit to the upload queue"). A
   session started for an issue from another session gets that title from the start.
 - **The issue records every decision about it.** Signed-off plans and later decisions go into the
   description while work hasn't started, and into a new comment once it has.
@@ -75,7 +77,7 @@ Once per repository, before the rest of the workflow applies:
 ### Branches and commits
 
 - **Never commit to `main`.** Branch off an up-to-date `main` as `<issue>-<short-slug>`
-  (`12-export-infinite-levels`). If the session assigned a branch (a desktop worktree), use that
+  (`12-upload-retry-limit`). If the session assigned a branch (a desktop worktree), use that
   one.
 - **Commit messages:** `<type>(#<issue>): <imperative summary>`, with type `feat`, `fix`,
   `refactor`, `docs`, `test` or `chore` (build, dependencies, CI, tooling).
@@ -117,7 +119,8 @@ Once per repository, before the rest of the workflow applies:
   Merge with a merge commit, and never delete the remote branch yourself (no `--delete-branch`, no
   `git push --delete`): the repository deletes it after the merge, and only then does GitHub
   retarget the PRs stacked on it to `main`; a branch deleted by a client closes them instead.
-- **After merging:** switch to `main`, `git pull --prune`, delete the local branch.
+- **After merging:** update `main` (`git pull --prune` on it; in a worktree, `git fetch --prune`)
+  and delete the local branch, unless it's the worktree's own.
 
 ## Definition of done
 
@@ -166,14 +169,16 @@ Apply these to every change and check them in every review.
 - **Types say what things are.** A concept several types share is a shared type: a base for the
   common fields, an interface for a role unrelated types play. Judge by concept, not by whether
   code uses the shared part today. Two types that merely look alike stay separate.
-- **A thing in several states is one base per thing and one derived type per state**, with an
-  interface per state so every entry of a state's list carries what the state needs.
+- **A thing that passes through states gets one type per state**, derived from the thing's base:
+  an order that is first a draft and then placed is an order base with a draft order and a placed
+  order. Each state also has an interface its types share, so a list of placed things is typed by
+  what "placed" guarantees.
 - **A choice is structure, not nullable fields.** "Only the fields its type uses are set" means one
   derived type per case. Fields that are null together become one nullable nested type.
 - **Generics where only a member's type varies**, never its name or meaning. Where members are
   added, use a base type.
-- **A type owns what's about itself**: its shape, its comparison, its header. Code that handles
-  many types knows only their common base.
+- **A type owns what's about itself**: its shape, its comparison, how it's written out. Code that
+  handles many types knows only their common base.
 - **Pure logic in the middle, side effects at the edges.** I/O, external systems, time and
   randomness stay at the boundaries, so the core is testable without them.
 - **Validate at boundaries, trust inside.** Input is checked where it enters; inner code doesn't
@@ -206,8 +211,9 @@ Apply these to every change and check them in every review.
   `claude-instructions` opens the issue and PR for it in every repository on its list. By hand, as
   for a new repository's first copy: `git fetch https://github.com/Sephiroth018/claude-instructions
   main`, then `git rm -r -q .claude/shared` (not the first time) and
-  `git read-tree --prefix=.claude/shared -u FETCH_HEAD:shared`, committed on its own as
-  `chore(#<issue>): update shared instructions to <short sha>`, the fetched commit's.
+  `git read-tree --prefix=.claude/shared -u FETCH_HEAD:shared`. An update is committed on its own
+  as `chore(#<issue>): update shared instructions to <short sha>`, naming the fetched commit; the
+  first copy is part of the repository's first commit.
 - **Clean up and modernize the code you touch.** Small fixes and current idioms within the lines
   being changed are part of the change; anything beyond them is asked about first.
 - **No dead code.** Delete it rather than comment it out; git keeps the history.
@@ -232,14 +238,15 @@ name against these rules, and check them in every review.
 - **Domain words, not invented ones.** Use the problem domain's terms; no project jargon, made-up
   metaphors or cute names.
 - **Grammar matches role.** Functions are verb phrases, and one that changes state says so in its
-  verb. Fields are nouns. Booleans are positive and read as a question (is visible, has ammo, can
-  fire; not not hidden).
+  verb. Fields are nouns. Booleans are positive and read as a question (is visible, has children,
+  can retry; not not hidden).
 - **Write words out.** Only widely known abbreviations (`id`, `url`, `json`, `min`, `max`).
 - **Short scopes are the exception:** loop variables, short lambdas and comparers may use single
   letters or vague names.
-- **External names stay in their own world.** An external system's spelling (a game's ids or data
-  keys) appears only in its values and in names that refer to one of them. Our code is named by what
-  it does; when it mirrors an external function, cite that function's name in a comment.
+- **External names stay in their own world.** An external system's spelling (an API's field names,
+  a file format's keys) appears only in its values and in names that refer to one of them. Our
+  code is named by what it does; when it mirrors an external function, cite that function's name
+  in a comment.
 - **A rename is finished only when everything follows:** comments, tests and their names, docs,
   config keys and the glossary. Renaming something persisted falls under "Persisted formats".
 - **New or settled domain terms** are proposed to the user for the glossary, not added unasked.
@@ -249,18 +256,17 @@ name against these rules, and check them in every review.
 ### Comments
 
 Write a comment only for what the code can't show: why, an invariant or ordering constraint, a
-deliberate workaround, or an external fact with its source (e.g. the game API member it comes
-from).
+deliberate workaround, or an external fact with its source (e.g. the API member it comes from).
 
 - **Short:** one or two lines.
 - **No history or discussion narration**; that belongs in the commit message.
 - **Don't restate** the code or a nearby comment.
-- **Refer to other code by symbol name, never by file path,** ours and external code's alike (e.g. a
-  game's members). Where the language's doc comments can link a symbol, link it so renames follow;
-  elsewhere the plain name, as `(Type.member)` where it's a side reference.
+- **Refer to other code by symbol name, never by file path,** ours and external code's alike (e.g.
+  a library's members). Where the language's doc comments can link a symbol, link it so renames
+  follow; elsewhere the plain name, as `(Type.member)` where it's a side reference.
 - **Change a comment in the same edit as its code**, or delete it.
-- **No issue links**, except to explain code that deliberately looks like a bug when the reason is
-  too long to state inline.
+- **No issue links**, except the issue number of a `TODO` or a skipped test, and to explain code
+  that deliberately looks like a bug when the reason is too long to state inline.
 - **Nothing machine-local:** no paths or notes that exist on one machine only; cite the original
   source.
 - **Doc comments only where name and signature aren't enough**, apart from what the language part
@@ -288,7 +294,7 @@ from).
 - **Test behavior through the non-private API**, internals included, not implementation details.
   How tests reach internals is in the language part; never through hacks that break encapsulation.
 - **Real collaborators.** A test double only at a boundary (file system, clock, randomness,
-  external systems such as a game) or when the interaction itself is what's tested, made with the
+  external systems) or when the interaction itself is what's tested, made with the
   language part's mocking library; no hand-written fakes.
 - **One behavior per test**, as Arrange-Act-Assert, with no loops or conditionals. Table-driven
   cases use the test framework's parameterized tests.
@@ -298,6 +304,6 @@ from).
 - **Don't test what a library or the framework already guarantees.**
 - **A failing or flaky test is a bug.** Never skip or disable one without an issue number.
 - **Names** say the unit, the scenario and the expected result (parse, empty input, returns no
-  weapons), grouped by the unit under test; the form and the layout are in the language part.
+  entries), grouped by the unit under test; the form and the layout are in the language part.
 - **Coverage thresholds are enforced in CI and only go up**: raise them when a change adds coverage.
   A project may set a different policy under "Project".

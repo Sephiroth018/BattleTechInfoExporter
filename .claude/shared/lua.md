@@ -6,8 +6,8 @@ Tools enforce every rule they can; a rule a tool could check belongs in its conf
 this file.
 
 - **StyLua is the formatter** and `stylua.toml` the single source of formatting rules: 2-space
-  indents, double quotes, `line_endings = "Unix"` to match `.gitattributes`. Its defaults (tabs)
-  aren't the community's, so the file sets them.
+  indents, double quotes, `line_endings = "Unix"` to match `.gitattributes`. The file sets them
+  because StyLua's defaults (tabs) aren't the community's.
 - **EmmyLua is the type checker and linter**, run from the command line as `emmylua_check
   --warnings-as-errors` so its results don't depend on anyone's editor (without the flag, warnings
   don't fail it). `.emmyrc.json` holds the runtime version, the library definitions and the enabled
@@ -16,12 +16,12 @@ this file.
   against that host's version and its API definitions, not a standalone Lua.
 - **Tests, where a project has them, use busted.** Spec files are `<module>_spec.lua` in `spec/`,
   mirroring the source folders; a test reaches internals only through what the module returns.
-  Names are busted's sentences: `describe("parse")` around `it("returns no weapons for empty
+  Names are busted's sentences: `describe("parse")` around `it("returns no entries for empty
   input")`.
 
 ## Lua naming
 
-The usual Lua style, which the game APIs Lua is embedded in (Factorio's among them) follow too:
+The usual Lua style, which the APIs of games that embed Lua (Factorio's among them) follow too:
 
 - **`snake_case`** for locals, functions, fields, parameters and module files
   (`export_file.lua`, `write_export`, `is_researched`).
@@ -58,5 +58,5 @@ judgment.
 - **`#` only on sequences.** Tables with other keys are counted explicitly.
 - **`nil` means absent, `false` means no.** A field that can be either says which in its
   annotation.
-- **`error` for broken invariants, never as control flow;** `pcall` only where the caller handles the
-  failure, and never to hide one (see "Fail loud").
+- **`error` for broken invariants, never as control flow;** `pcall` only where the caller handles
+  the failure, and never to hide one (see "Fail loud").
