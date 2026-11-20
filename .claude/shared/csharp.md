@@ -20,10 +20,14 @@ this file.
   ReSharper settings file `<solution name>.sln.DotSettings` (named so even for `.slnx`), created
   when the first one is needed. Never loosen either to make a change pass. Its `end_of_line = lf`
   matches `.gitattributes`, so formatting checks see the same line endings on every machine.
+- **`.editorconfig` ends with `.claude/shared/csharp.editorconfig`, unchanged:** the settings every
+  C# repository shares. When an update PR changes it, a further commit on that PR copies it in.
 - **ReSharper Command Line Tools** (`JetBrains.ReSharper.GlobalTools`, a local tool) apply the
   IDE's rules outside it: `jb cleanupcode` is the formatter, `jb inspectcode` reports the
-  inspections. They run only on the shared settings layers, so their results don't depend on
-  anyone's IDE settings.
+  inspections. Both run with
+  `--disable-settings-layers="GlobalAll;GlobalPerProduct;SolutionPersonal;ProjectPersonal"`,
+  locally and in CI, so only the shared layers apply and their results don't depend on anyone's
+  IDE settings. Not `--no-buildin-settings`: it also drops the shared `.sln.DotSettings`.
 - **CI (GitHub Actions) is strict:** the build passes with warnings as errors, all tests pass,
   `jb cleanupcode` leaves no diff, and `jb inspectcode` reports nothing at warning level or above.
   Fix the cause; never weaken a check to get green.
