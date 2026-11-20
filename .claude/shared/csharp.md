@@ -35,8 +35,9 @@ this file.
 ## C# testing
 
 - **Tests use xUnit v3**; parameterized tests are `[Theory]`.
-- **Each production project grants `InternalsVisibleTo` to its own test project only**; never reach
-  private members through reflection.
+- **Each production project grants `InternalsVisibleTo` to its own test project only**, plus
+  `DynamicProxyGenAssembly2` so NSubstitute can proxy internal types; never reach private members
+  through reflection.
 - **All test doubles use NSubstitute**, with `NSubstitute.Analyzers.CSharp` in every test project.
 - **Names:** `MethodName_Scenario_ExpectedResult` (`Parse_EmptyInput_ReturnsNoWeapons`), in a class
   named after the unit under test.
