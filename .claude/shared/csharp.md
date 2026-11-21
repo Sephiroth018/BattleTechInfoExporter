@@ -18,10 +18,11 @@ this file.
 - **`.editorconfig` is the single source of style, formatting and naming rules**, ReSharper's
   included (`resharper_*` keys). Inspection severities it can't express go in the team-shared
   ReSharper settings file `<solution name>.sln.DotSettings` (named so even for `.slnx`), created
-  when the first one is needed. Never loosen either to make a change pass. Its `end_of_line = lf`
-  matches `.gitattributes`, so formatting checks see the same line endings on every machine.
+  when the first one is needed. Its `end_of_line = lf` matches `.gitattributes`, so formatting
+  checks see the same line endings on every machine.
 - **`.editorconfig` ends with `.claude/shared/csharp.editorconfig`, unchanged:** the settings every
-  C# repository shares. When an update PR changes it, a further commit on that PR copies it in.
+  C# repository shares. An update that changes it arrives as a draft PR whose checklist asks for
+  the copy, made in a further commit on that PR.
 - **ReSharper Command Line Tools** (`JetBrains.ReSharper.GlobalTools`, a local tool) apply the
   IDE's rules outside it: `jb cleanupcode` is the formatter, `jb inspectcode` reports the
   inspections. Both run with
@@ -30,7 +31,6 @@ this file.
   IDE settings. Not `--no-buildin-settings`: it also drops the shared `.sln.DotSettings`.
 - **CI (GitHub Actions) is strict:** the build passes with warnings as errors, all tests pass,
   `jb cleanupcode` leaves no diff, and `jb inspectcode` reports nothing at warning level or above.
-  Fix the cause; never weaken a check to get green.
 
 ## C# testing
 
@@ -39,7 +39,7 @@ this file.
   `DynamicProxyGenAssembly2` so NSubstitute can proxy internal types; never reach private members
   through reflection.
 - **All test doubles use NSubstitute**, with `NSubstitute.Analyzers.CSharp` in every test project.
-- **Names:** `MethodName_Scenario_ExpectedResult` (`Parse_EmptyInput_ReturnsNoWeapons`), in a class
+- **Names:** `MethodName_Scenario_ExpectedResult` (`Parse_EmptyInput_ReturnsNoEntries`), in a class
   named after the unit under test.
 - **Layout:** one `<Project>.Tests` project per production project, folders mirroring it.
   Integration tests spanning several projects go in `<Solution>.IntegrationTests`.
@@ -50,11 +50,19 @@ What the tools enforce lives in `.editorconfig` and the analyzer settings; this 
 needs judgment.
 
 - **`internal` by default**; a type is `public` only when another assembly needs it. Public classes
-  stay open.
+  stay unsealed.
 - **Immutable by default:** records for data, `init` and `readonly` where possible, and read-only
   collection interfaces (`IReadOnlyList<T>`, `IReadOnlyDictionary<TKey, TValue>`) in signatures.
+- **A thing that passes through states gets one type per state**, derived from the thing's base:
+  an order that is first a draft and then placed is an order base with a draft order and a placed
+  order. Each state also has an interface its types share, so a list of placed things is typed by
+  what "placed" guarantees.
+- **Generics where only a member's type varies**, never its name or meaning. Where members are
+  added, use a base type.
+- **A type owns what's about itself**: its shape, its comparison, how it's written out. Code that
+  handles many types knows only their common base.
 - **No escape hatches** (null-forgiving `!`, `#nullable disable`, `dynamic`, reflection) without a
-  narrow, stated reason. Where a project needs one (e.g. reflection for a game's private members),
+  narrow, stated reason. Where a project needs one (e.g. reflection for a host's private members),
   its "Project" part says where.
 - **No mutable static state** unless a host framework requires it, documented under "Project".
 - **Enums stored by number have explicit values**, so reordering members can't change stored data.
@@ -64,5 +72,5 @@ needs judgment.
 - **Async all the way:** no `.Result` or `.Wait()`, no `async void` outside event handlers.
 - **Extension methods only for types we don't own**, never to avoid putting a method in the right
   class.
-- **XML docs link symbols with `<see cref="..."/>`** so renames follow; `//` comments, where no
-  cref can be written, use the plain name, as `(Type.Member)` where it's a side reference.
+- **XML docs link symbols with `<see cref="..."/>`**; `//` comments, where no cref can be written,
+  use the plain name.
