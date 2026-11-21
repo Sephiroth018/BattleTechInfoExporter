@@ -15,8 +15,8 @@
   passing.
 - **English everywhere:** code, comments, docs, commits, issues and PRs.
 - **Mark everything you write on GitHub** (issues, comments, PRs, review replies, releases) by
-  ending it with `🤖 Generated with [Claude Code](https://claude.com/claude-code)`. Commits carry a
-  `Co-Authored-By: Claude` trailer.
+  ending it with `🤖 Generated with [Claude Code](https://claude.com/claude-code)`. Commits carry
+  a `Co-Authored-By: Claude` trailer.
 - **Keep chat reports short.** A line or two on what was done. Explain at length only what's
   non-standard, what went wrong, or what needs a decision.
 - **Standing authorization** covers the source control steps below, except merging. Other
@@ -29,31 +29,8 @@
   repository and copied into every other repository's `.claude/shared/`, where `CLAUDE.md` imports
   them. They're changed only in `claude-instructions`: when a change belongs in one, say so instead
   of editing the copy.
-
-## New repository setup
-
-Once per repository, before the rest of the workflow applies:
-
-1. **First commit, directly on `main` and without an issue** (`chore: set up repository`):
-   `CLAUDE.md` importing the shared files, their copy in `.claude/shared/` (see "Hygiene"), the
-   stack's standard `.gitignore`, a `.gitattributes` fixing line endings to LF on every machine
-   (`* text=auto eol=lf`, CRLF only for `.cmd`/`.bat`), a README with the project goal and the AI
-   disclaimer, the LICENSE (MIT unless the project says otherwise) and the initial project
-   skeleton.
-2. **Create the GitHub repository** (name and visibility decided with the user) and push.
-3. **Repository settings:** merge commits only (no squash or rebase merging), default merge message
-   from the PR title and description, head branches deleted automatically after merging.
-4. **Ruleset on `main`:** changes only through PRs, signed commits required, no force pushes or
-   deletion, and the CI checks required once CI exists.
-5. **Labels:** delete `good first issue`, `help wanted`, `accessibility` and `invalid`; add `chore`
-   (build, tooling, dependencies), `refactor` (restructuring without behavior change) and
-   `research` (finding out how something works before building on it). Work that is only about
-   tests gets `enhancement` or `chore`.
-6. **CI** is a GitHub Actions workflow, `.github/workflows/ci.yml`, running on pushes to `main`
-   and on PRs, but not on drafts: every job has `if: ${{ !github.event.pull_request.draft }}`, and
-   the `pull_request` trigger has `types: [opened, synchronize, reopened, ready_for_review]`.
-7. **No Dependabot or other scheduled workflows**: they use up Actions minutes even on an abandoned
-   repository.
+- **A new repository is set up by `repository-setup.md`**, the shared file next to this one that
+  no `CLAUDE.md` imports. Read it before setting one up or copying the shared files by hand.
 
 ## Source control
 
@@ -62,7 +39,7 @@ Once per repository, before the rest of the workflow applies:
 - **Every change starts from a GitHub issue**, small ones included. Search for an existing one
   before creating it.
 - **A session renames itself to `Issue #<nr>: <issue title>`** as soon as it starts working on or
-  investigating an issue ("Issue #239: Add role and description back to mech definitions"). A
+  investigating an issue ("Issue #239: Add a retry limit to the upload queue"). A
   session started for an issue from another session gets that title from the start.
 - **The issue records every decision about it.** Signed-off plans and later decisions go into the
   description while work hasn't started, and into a new comment once it has.
@@ -75,15 +52,14 @@ Once per repository, before the rest of the workflow applies:
 ### Branches and commits
 
 - **Never commit to `main`.** Branch off an up-to-date `main` as `<issue>-<short-slug>`
-  (`12-export-infinite-levels`). If the session assigned a branch (a desktop worktree), use that
+  (`12-upload-retry-limit`). If the session assigned a branch (a desktop worktree), use that
   one.
 - **Commit messages:** `<type>(#<issue>): <imperative summary>`, with type `feat`, `fix`,
   `refactor`, `docs`, `test` or `chore` (build, dependencies, CI, tooling).
 - **The per-commit rule:** every commit lands on `main` (PRs merge with merge commits), so each one
-  is formatted with the language part's formatter, builds or loads, and breaks nothing that worked.
-  New code may be unreachable or incomplete, but nothing crashes, the existing tests still pass,
-  and the static checks report nothing at warning level or above except what that unfinished state
-  causes (unreachable or unused code). It's checked before each commit.
+  passes steps 2-5 of the "Definition of done", checked before the commit. New code may be
+  unreachable or incomplete, and steps 3 and 5 may report what that unfinished state causes
+  (unreachable or unused code).
 - **Push every commit** right after making it.
 - **Moves and renames get their own commit**, made with `git mv`, containing only the move and the
   minimal edits it forces (module paths, references), so git keeps following the file's history.
@@ -104,7 +80,7 @@ Once per repository, before the rest of the workflow applies:
   title and description final. The description explains what the code can't (why, rejected
   alternatives, risks, how it was verified, what deserves a close look). No file-by-file list.
 - **Watch the PR** once it's ready: turn on the desktop app's monitoring (auto-fix CI, address
-  comments). Fix CI failures at the cause; never skip or weaken a check.
+  comments). Fix CI failures at the cause (see "Errors").
 - **The user's own review comments fire no events** (a solo author can only leave "comment"
   reviews). When the user says they've reviewed, read all three surfaces: PR comments, inline diff
   comments and review summaries. Answer each comment on the PR, inline ones in their own thread.
@@ -117,7 +93,8 @@ Once per repository, before the rest of the workflow applies:
   Merge with a merge commit, and never delete the remote branch yourself (no `--delete-branch`, no
   `git push --delete`): the repository deletes it after the merge, and only then does GitHub
   retarget the PRs stacked on it to `main`; a branch deleted by a client closes them instead.
-- **After merging:** switch to `main`, `git pull --prune`, delete the local branch.
+- **After merging:** update `main` (`git pull --prune` on it; in a worktree, `git fetch --prune`)
+  and delete the local branch, unless it's the worktree's own.
 
 ## Definition of done
 
@@ -166,14 +143,8 @@ Apply these to every change and check them in every review.
 - **Types say what things are.** A concept several types share is a shared type: a base for the
   common fields, an interface for a role unrelated types play. Judge by concept, not by whether
   code uses the shared part today. Two types that merely look alike stay separate.
-- **A thing in several states is one base per thing and one derived type per state**, with an
-  interface per state so every entry of a state's list carries what the state needs.
 - **A choice is structure, not nullable fields.** "Only the fields its type uses are set" means one
   derived type per case. Fields that are null together become one nullable nested type.
-- **Generics where only a member's type varies**, never its name or meaning. Where members are
-  added, use a base type.
-- **A type owns what's about itself**: its shape, its comparison, its header. Code that handles
-  many types knows only their common base.
 - **Pure logic in the middle, side effects at the edges.** I/O, external systems, time and
   randomness stay at the boundaries, so the core is testable without them.
 - **Validate at boundaries, trust inside.** Input is checked where it enters; inner code doesn't
@@ -187,6 +158,8 @@ Apply these to every change and check them in every review.
   control flow.
 - **Don't silence the compiler, type checker or linter** without a narrow, stated reason (see the
   language part's conventions).
+- **Never weaken a check to make a change pass**: not the formatter's, type checker's or linter's
+  configuration, and not a CI check, which is never skipped either. Fix the cause.
 
 ### Dependencies
 
@@ -203,11 +176,11 @@ Apply these to every change and check them in every review.
   CLI's own project and package commands, output of the project's own generators, and the update
   of `.claude/shared/`.
 - **`.claude/shared/` is replaced as a whole, never edited.** When the shared files change,
-  `claude-instructions` opens the issue and PR for it in every repository on its list. By hand, as
-  for a new repository's first copy: `git fetch https://github.com/Sephiroth018/claude-instructions
-  main`, then `git rm -r -q .claude/shared` (not the first time) and
-  `git read-tree --prefix=.claude/shared -u FETCH_HEAD:shared`, committed on its own as
-  `chore(#<issue>): update shared instructions to <short sha>`, the fetched commit's.
+  `claude-instructions` opens the issue and PR for it in every repository on its list. A PR that
+  arrives as a draft needs more than the copy: its issue's checklist says what, added as further
+  commits before the PR is marked ready. An update made by hand (see `repository-setup.md`) is
+  committed on its own as `chore(#<issue>): update shared instructions to <short sha>`, naming
+  the fetched commit.
 - **Clean up and modernize the code you touch.** Small fixes and current idioms within the lines
   being changed are part of the change; anything beyond them is asked about first.
 - **No dead code.** Delete it rather than comment it out; git keeps the history.
@@ -232,14 +205,15 @@ name against these rules, and check them in every review.
 - **Domain words, not invented ones.** Use the problem domain's terms; no project jargon, made-up
   metaphors or cute names.
 - **Grammar matches role.** Functions are verb phrases, and one that changes state says so in its
-  verb. Fields are nouns. Booleans are positive and read as a question (is visible, has ammo, can
-  fire; not not hidden).
+  verb. Fields are nouns. Booleans are positive and read as a question (is visible, has children,
+  can retry; not not hidden).
 - **Write words out.** Only widely known abbreviations (`id`, `url`, `json`, `min`, `max`).
 - **Short scopes are the exception:** loop variables, short lambdas and comparers may use single
   letters or vague names.
-- **External names stay in their own world.** An external system's spelling (a game's ids or data
-  keys) appears only in its values and in names that refer to one of them. Our code is named by what
-  it does; when it mirrors an external function, cite that function's name in a comment.
+- **External names stay in their own world.** An external system's spelling (an API's field names,
+  a file format's keys) appears only in its values and in names that refer to one of them. Our
+  code is named by what it does; when it mirrors an external function, cite that function's name
+  in a comment.
 - **A rename is finished only when everything follows:** comments, tests and their names, docs,
   config keys and the glossary. Renaming something persisted falls under "Persisted formats".
 - **New or settled domain terms** are proposed to the user for the glossary, not added unasked.
@@ -249,18 +223,17 @@ name against these rules, and check them in every review.
 ### Comments
 
 Write a comment only for what the code can't show: why, an invariant or ordering constraint, a
-deliberate workaround, or an external fact with its source (e.g. the game API member it comes
-from).
+deliberate workaround, or an external fact with its source (e.g. the API member it comes from).
 
 - **Short:** one or two lines.
 - **No history or discussion narration**; that belongs in the commit message.
 - **Don't restate** the code or a nearby comment.
-- **Refer to other code by symbol name, never by file path,** ours and external code's alike (e.g. a
-  game's members). Where the language's doc comments can link a symbol, link it so renames follow;
-  elsewhere the plain name, as `(Type.member)` where it's a side reference.
+- **Refer to other code by symbol name, never by file path,** ours and external code's alike (e.g.
+  a library's members). Where the language's doc comments can link a symbol, link it so renames
+  follow; elsewhere the plain name, as `(Type.member)` where it's a side reference.
 - **Change a comment in the same edit as its code**, or delete it.
-- **No issue links**, except to explain code that deliberately looks like a bug when the reason is
-  too long to state inline.
+- **No issue links**, except the issue number of a `TODO` or a skipped test, and to explain code
+  that deliberately looks like a bug when the reason is too long to state inline.
 - **Nothing machine-local:** no paths or notes that exist on one machine only; cite the original
   source.
 - **Doc comments only where name and signature aren't enough**, apart from what the language part
@@ -288,7 +261,7 @@ from).
 - **Test behavior through the non-private API**, internals included, not implementation details.
   How tests reach internals is in the language part; never through hacks that break encapsulation.
 - **Real collaborators.** A test double only at a boundary (file system, clock, randomness,
-  external systems such as a game) or when the interaction itself is what's tested, made with the
+  external systems) or when the interaction itself is what's tested, made with the
   language part's mocking library; no hand-written fakes.
 - **One behavior per test**, as Arrange-Act-Assert, with no loops or conditionals. Table-driven
   cases use the test framework's parameterized tests.
@@ -298,6 +271,6 @@ from).
 - **Don't test what a library or the framework already guarantees.**
 - **A failing or flaky test is a bug.** Never skip or disable one without an issue number.
 - **Names** say the unit, the scenario and the expected result (parse, empty input, returns no
-  weapons), grouped by the unit under test; the form and the layout are in the language part.
+  entries), grouped by the unit under test; the form and the layout are in the language part.
 - **Coverage thresholds are enforced in CI and only go up**: raise them when a change adds coverage.
   A project may set a different policy under "Project".
