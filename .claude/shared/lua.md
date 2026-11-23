@@ -21,7 +21,8 @@ this file.
 - **Parameterized tests are a `for` over a table of cases around `it`**, each case's name part of
   the `it` sentence; busted has no construct of its own. The loop generates tests, so "no loops or
   conditionals", which is about a test's body, still holds.
-- **Test doubles use luassert's spies, stubs and mocks**, which come with busted.
+- **Test doubles use luassert's spies, stubs and mocks**, which come with busted. They can replace
+  any function or table, so no double is hand-written.
 - **Coverage is measured by LuaCov**, run by `busted --coverage`. `.luacov` sets `include` to the
   project's own modules, since LuaCov otherwise counts busted and every other loaded library too,
   `includeuntestedfiles` so a module no test loads counts as uncovered, and `runreport` so the run
@@ -49,7 +50,8 @@ judgment.
 
 - **`local` everything.** No globals, except what a host requires to be global.
 - **A module is a file returning one table** (or one function), loaded with `require`; it changes no
-  global state on load. Functions only the module uses stay `local` to it.
+  global state on load. The exception is an entry file the host loads to do that (registering
+  prototypes or event handlers). Functions only the module uses stay `local` to it.
 - **Strictly typed: every function carries EmmyLua annotations** (`---@param`, `---@return`), local
   ones included, and `---@type` where a value's type can't be inferred. They're Lua's types, so the
   type checker can check callers; the `incomplete-signature-doc` diagnostic enforces them (a
