@@ -41,7 +41,13 @@ this file.
 - **Each production project grants `InternalsVisibleTo` to its own test project only**, plus
   `DynamicProxyGenAssembly2` so NSubstitute can proxy internal types; never reach private members
   through reflection.
-- **All test doubles use NSubstitute**, with `NSubstitute.Analyzers.CSharp` in every test project.
+- **Test doubles are a library's own fake where it ships one** (`FakeTimeProvider`, `FakeLogger`,
+  `MockFileSystem`), **else NSubstitute**, with `NSubstitute.Analyzers.CSharp` in every test
+  project. A hand-written double only for a member NSubstitute can't reach, such as
+  `HttpMessageHandler`'s protected `SendAsync`.
+- **Test classes are `public sealed`**, since xUnit requires `public`. No internal type appears in
+  their public signatures: a theory's parameters carry the values the test builds it from, and a
+  test class creates what it needs in a private field instead of taking a fixture.
 - **Coverage is measured by coverlet** (`coverlet.MTP`, in every test project). The threshold is
   set in the test project's `TestingPlatformCommandLineArguments`
   (`--coverlet --coverlet-include "[<Project>]*" --coverlet-threshold <percent>`), so every
@@ -56,14 +62,19 @@ this file.
 What the tools enforce lives in `.editorconfig` and the analyzer settings; this section holds what
 needs judgment.
 
-- **`internal` by default**; a type is `public` only when another assembly needs it. Public classes
-  stay unsealed.
+- **`internal` by default**; a type is `public` only when another assembly compiles against it,
+  discovers it by reflection or generates code for it (a test framework, ASP.NET Core's
+  controllers), or when such a type's public signature exposes it. Visibility follows the design,
+  never decides it. Public classes stay unsealed, test classes excepted.
 - **Immutable by default:** records for data, `init` and `readonly` where possible, and read-only
-  collection interfaces (`IReadOnlyList<T>`, `IReadOnlyDictionary<TKey, TValue>`) in signatures.
+  collection interfaces (`IReadOnlyList<T>`, `IReadOnlyDictionary<TKey, TValue>`) in signatures;
+  unless a framework requires mutable types (a tracked entity, a view model), documented under
+  "Project".
 - **A thing that passes through states gets one type per state**, derived from the thing's base:
   an order that is first a draft and then placed is an order base with a draft order and a placed
   order. Each state also has an interface its types share, so a list of placed things is typed by
-  what "placed" guarantees.
+  what "placed" guarantees. Not where a framework or persisted format keeps one type across the
+  change (an ORM's tracked entity), documented under "Project".
 - **Generics where only a member's type varies**, never its name or meaning. Where members are
   added, use a base type.
 - **A type owns what's about itself**: its shape, its comparison, how it's written out. Code that

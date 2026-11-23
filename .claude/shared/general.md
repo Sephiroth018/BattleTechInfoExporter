@@ -237,8 +237,8 @@ deliberate workaround, or an external fact with its source (e.g. the API member 
 - **Nothing machine-local:** no paths or notes that exist on one machine only; cite the original
   source.
 - **Doc comments only where name and signature aren't enough**, apart from what the language part
-  requires for its type checker. A project that ships a library for others may require more in its
-  own section.
+  requires for its type checker. A project that ships a library for others, or whose doc comments
+  generate a public interface's documentation, may require more in its own section.
 
 ### Documentation
 
@@ -261,8 +261,9 @@ deliberate workaround, or an external fact with its source (e.g. the API member 
 - **Test behavior through the non-private API**, internals included, not implementation details.
   How tests reach internals is in the language part; never through hacks that break encapsulation.
 - **Real collaborators.** A test double only at a boundary (file system, clock, randomness,
-  external systems) or when the interaction itself is what's tested, made with the
-  language part's mocking library; no hand-written fakes.
+  external systems) or when the interaction itself is what's tested: a fake the boundary's
+  library ships for tests, else one made with the language part's mocking library. No hand-written
+  fakes, except where the language part says the mocking library can't reach.
 - **One behavior per test**, as Arrange-Act-Assert, with no loops or conditionals. Table-driven
   cases use the test framework's parameterized tests.
 - **Deterministic:** no real time, randomness, network or sleeps, and no dependence on test order or

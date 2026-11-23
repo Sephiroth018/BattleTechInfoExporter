@@ -83,11 +83,11 @@ patches in the assembly. Folders:
   deletes and reads the header of the files in `exports/`, by file name and text, knowing no model.
 - `Models/`: immutable records, one per JSON object, and the mod's own enums. The records are
   marked `[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]` because only the serializer reads
-  them. Every exported property has a doc comment, overriding "XML doc comments only where name and
-  signature aren't enough": a `<param>` on its record, or a `<summary>` on a body property, on the
-  record that declares it, or once on the interface property it implements where every implementing
-  record means the same by it. It's the schema's description, so it's short (a fragment is fine)
-  and says what the value is, its unit or scale and what `null` means. Every member of the mod's
+  them. Every exported property has a doc comment, since the schema generator turns it into the
+  property's description in the schema: a `<param>` on its record, or a `<summary>` on a body
+  property, on the record that declares it, or once on the interface property it implements where
+  every implementing record means the same by it. So it's short (a fragment is fine) and says
+  what the value is, its unit or scale and what `null` means. Every member of the mod's
   enums has a `<summary>` too, its value's description in the schema. `ExportFile`, the root of
   every file, is more than data, by decision: it owns the header, the JSON conventions, the content
   compared before a write and the writing itself, through `ExportFileWriter` and the clock.
