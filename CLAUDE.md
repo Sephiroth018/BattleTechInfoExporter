@@ -54,7 +54,7 @@ Two projects in `BattleTechInfoExporter.slnx`:
   and the description, author, repository URL and supported game version in
   `Directory.Build.props`, and runs the schema generator. The mod folder holds the DLL, `mod.json`,
   `CHANGELOG.md` and the schemas.
-- **The schema generator,** `BattleTechInfoExporter.SchemaGenerator/` (net9.0, never shipped),
+- **The schema generator,** `BattleTechInfoExporter.SchemaGenerator/` (net10.0, never shipped),
   which the mod's build builds and runs on the built mod, in three roles. It writes a JSON Schema
   per export file into `schemas/` with the mod's own serializer settings (`ExportSchemaGenerator`,
   with `ExportFileModels` checking that the mod's `ExportFiles` lists every file). It fails the
@@ -238,7 +238,7 @@ Layout decisions a change would otherwise undo:
 
 - **Build:** `dotnet build`.
 - **Validate exports:** `dotnet
-  BattleTechInfoExporter.SchemaGenerator/bin/Debug/net9.0/BattleTechInfoExporter.SchemaGenerator.dll
+  BattleTechInfoExporter.SchemaGenerator/bin/Debug/net10.0/BattleTechInfoExporter.SchemaGenerator.dll
   <game> --validate <game>/Mods/BattleTechInfoExporter/exports` checks the game's current export
   files against schemas it generates in memory from the last build's DLL, writing none.
 - **Deploy:** `dotnet build -p:DeployToGame=true` also copies the DLL, `mod.json`, `CHANGELOG.md`

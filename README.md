@@ -112,7 +112,7 @@ The schemas are committed, so a change to the export format shows in their diff.
 files, e.g. the ones the game just wrote, against schemas generated from the built mod:
 
 ```bash
-dotnet BattleTechInfoExporter.SchemaGenerator/bin/Debug/net9.0/BattleTechInfoExporter.SchemaGenerator.dll <game folder> --validate <game folder>/Mods/BattleTechInfoExporter/exports
+dotnet BattleTechInfoExporter.SchemaGenerator/bin/Debug/net10.0/BattleTechInfoExporter.SchemaGenerator.dll <game folder> --validate <game folder>/Mods/BattleTechInfoExporter/exports
 ```
 
 The build derives the version from git, as the "Versioning" section of [CLAUDE.md](CLAUDE.md)
