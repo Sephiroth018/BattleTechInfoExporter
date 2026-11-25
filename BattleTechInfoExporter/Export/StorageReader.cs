@@ -29,7 +29,7 @@ internal static class StorageReader
         IReadOnlyList<StoredItem> storedItems) =>
         ReferencedEntries.Read(
                 storedItems
-                    .Where(item => item.Type != SimGameState.MECH_PART_ITEM && item.Type != MechType)
+                    .Where(item => item.Type is not (SimGameState.MECH_PART_ITEM or MechType))
                     // Working and damaged copies are stats of their own.
                     .GroupBy(item => (item.Type, item.Id)),
                 copies => ComponentReferences.TryReferenceTo(

@@ -187,7 +187,6 @@ internal static class CombatUnitReader
 
     private static CombatUnitState ReadState(AbstractActor actor, bool isPlayers)
     {
-        var mech = actor as Mech;
         var pilot = actor.GetPilot();
         return new CombatUnitState(
             actor.IsDead ? actor.DeathMethod : null,
@@ -198,7 +197,7 @@ internal static class CombatUnitReader
             actor.IsProne,
             actor.IsShutDown,
             actor.IsUnsteady,
-            mech is null ? null : new MechState(ReadHeat(mech), ReadStability(mech)),
+            actor is Mech mech ? new MechState(ReadHeat(mech), ReadStability(mech)) : null,
             actor.HasActivatedThisRound,
             HudInitiative.FromGamePhase(actor.Initiative),
             actor.allComponents.Select(component => ReadComponent(actor, component)).ToList(),
