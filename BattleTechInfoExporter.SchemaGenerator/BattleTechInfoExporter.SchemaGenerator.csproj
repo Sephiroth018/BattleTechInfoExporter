@@ -2,7 +2,7 @@
   <!-- Writes a JSON Schema per export file from the mod's models; run by the mod's build, never shipped. -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <!-- Set by the mod's build to the DLL it wrote; the default is where a plain solution build writes it. -->
     <ModAssemblyPath Condition="'$(ModAssemblyPath)' == ''">$(MSBuildThisFileDirectory)..\BattleTechInfoExporter\bin\$(Configuration)\net472\BattleTechInfoExporter.dll</ModAssemblyPath>
   </PropertyGroup>
