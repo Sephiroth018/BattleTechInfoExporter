@@ -7,6 +7,9 @@
   and waits for the user's sign-off. Work inside an agreed design doesn't need one. A signed-off
   parent plan covers what to build, not how; each issue's implementation approach gets its own
   short plan unless it's trivial.
+- **Sign-off is an explicit go-ahead, given after the latest version of the plan.** Remarks,
+  questions and corrections on a plan are discussion: answer them, present the revised plan and
+  wait again. When it's unclear whether a reply is a go-ahead, ask.
 - **Stop when the plan breaks.** If a problem mid-task invalidates the agreed approach, stop and ask
   how to proceed, with concrete options and a recommendation. Never switch approach silently.
 - **Say so when there's a better way.** Raise it before implementing, with the trade-off, then do
