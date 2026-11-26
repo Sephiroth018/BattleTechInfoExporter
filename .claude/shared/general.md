@@ -79,6 +79,10 @@
 - **Mark the PR ready for review** once the change is done (see "Definition of done"), with its
   title and description final. The description explains what the code can't (why, rejected
   alternatives, risks, how it was verified, what deserves a close look). No file-by-file list.
+- **Edit a description from its live copy.** Fetch a PR's or issue's description right before
+  changing it and edit that, so that existing ticks don't get lost. Tick a manual check only once
+  the user confirms it; untick one when a later change makes it need repeating, and say which in
+  chat.
 - **Watch the PR** once it's ready: turn on the desktop app's monitoring (auto-fix CI, address
   comments). Fix CI failures at the cause (see "Errors").
 - **The user's own review comments fire no events** (a solo author can only leave "comment"
