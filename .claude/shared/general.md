@@ -41,9 +41,19 @@
 
 - **Every change starts from a GitHub issue**, small ones included. Search for an existing one
   before creating it.
-- **A session renames itself to `Issue #<nr>: <issue title>`** as soon as it starts working on or
-  investigating an issue ("Issue #239: Add a retry limit to the upload queue"). A
-  session started for an issue from another session gets that title from the start.
+- **Issue work happens in a worktree session of its own.** A session started on `main` first
+  updates it (`git pull --prune`), so the worktree session starts from the current `main` and
+  its instructions. Then it only gets the issue: it searches for an existing one, else creates
+  it with only what the user said, without planning, investigating or editing. After that it
+  starts a worktree session (`start_session` with `use_worktree`) titled
+  `Issue #<nr>: <issue title>` ("Issue #239: Add a retry limit to the upload queue"), with
+  `branch_name` `<issue>-<short-slug>` and a brief that links the issue, and archives itself
+  right away (`archive_session` with "self"): archiving also archives finished side sessions,
+  so the new session is only safe during its first turn. The worktree session does the rest:
+  the implementation plan, sign-off, implementation and PR. A session started for an issue
+  from another session is started the same way.
+- **Where a session can't start another one**, it branches off an up-to-date `main` itself and
+  renames itself to that title.
 - **The issue records every decision about it.** Signed-off plans and later decisions go into the
   description while work hasn't started, and into a new comment once it has.
 - **Labels:** apply the repo's existing labels that fit; ask before creating a new one. They
@@ -54,9 +64,8 @@
 
 ### Branches and commits
 
-- **Never commit to `main`.** Branch off an up-to-date `main` as `<issue>-<short-slug>`
-  (`12-upload-retry-limit`). If the session assigned a branch (a desktop worktree), use that
-  one.
+- **Never commit to `main`.** Work on the branch the worktree session was started with:
+  `<issue>-<short-slug>` (`12-upload-retry-limit`), between the prefix and suffix the app adds.
 - **Commit messages:** `<type>(#<issue>): <imperative summary>`, with type `feat`, `fix`,
   `refactor`, `docs`, `test` or `chore` (build, dependencies, CI, tooling).
 - **The per-commit rule:** every commit lands on `main` (PRs merge with merge commits), so each one
